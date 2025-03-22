@@ -1,0 +1,39 @@
+{% extends '_base.html' %}
+
+{% load static %}
+{% load i18n %}
+{% load widget_tweaks %}
+
+
+{% block content %}
+    <section class="blog-area mb--70 mb-md--50">
+        <div class="container">
+
+            <!-- Title -->
+            <div class="row mb--20 mb-md--23" style="margin-top: 5em">
+                <div class="col-12 text-center">
+                    <h2 style="font-size: 30px; color: #003379">هومبان: داشبورد مدیریت مشاوره املاک</h2>
+                </div>
+            </div>
+
+            <!-- Link -->
+            <div class="pb-2 pb-xl-5 mb-2 mb-xl-5 pt-3">
+                <div class="text-center" style="margin-top: 20px;">
+                    <a href="{% url 'login' %}" class="btn btn-outline btn-size-md btn-color-primary btn-shape-round btn-hover-2" style="width: 300px; font-weight: bolder;">
+                        به داشبورد هومبان وارد شوید
+                    </a>
+                </div>
+            </div>
+
+            <!-- Text -->
+            <div class="row mb--20 mb-md--23" style="margin-top: 10em">
+                <div class="col-12 text-center">
+                    <p style="font-size: 15px; color: #003379">طراحی شده توسط هومساز (تمامی حقوق متعلق به هومبابا است)</p>
+                </div>
+            </div>
+
+        </div>
+    </section>
+{% endblock %}
+           
+          

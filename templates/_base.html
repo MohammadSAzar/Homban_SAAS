@@ -1,0 +1,125 @@
+{% load static %}
+{% load i18n %}
+{% load widget_tweaks %}
+
+
+<!doctype html>
+<html class="no-js" lang="zxx">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible " content="ie=edge">
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="{% static 'main/css/bootstrap.css' %}">
+    <link rel="stylesheet" href="{% static 'main/css/font-awesome.min.css' %}">
+    <link rel="stylesheet" href="{% static 'main/css/vendor.css' %}">
+    <link rel="stylesheet" href="{% static 'main/css/main.css' %}">
+    <link rel="stylesheet" href="{% static 'main/css/line-awesome.min.css' %}">
+
+    <!-- Fav -->
+    <link rel="shortcut icon" href="{% static 'main/img/logos/ho-fav.png' %}" type="image/x-icon">
+    <link rel="apple-touch-icon" href="{% static 'main/img/logos/ho-fav.png' %}">
+
+    <title>{% block title %}{% endblock %}</title>
+</head>
+
+<body style="background-color: rgb(219, 243, 242);">
+
+    <!-- Preloader Start -->
+    <div class="ft-preloader active">
+        <div class="ft-preloader-inner h-100 d-flex align-items-center justify-content-center">
+            <div class="ft-child ft-bounce1"></div>
+            <div class="ft-child ft-bounce2"></div>
+            <div class="ft-child ft-bounce3"></div>
+        </div>
+    </div>
+    <!-- Preloader End -->
+
+    <!-- Main -->
+    <div class="wrapper">
+
+        <!-- Header -->
+        <header class="header">
+            <div class="header__inner fixed-header">
+                <div class="header__main" >
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="header__main-inner" style="padding-top: 0;!important; padding-bottom: 0;!important;">
+
+                                    <!-- Logo -->
+                                    <div class="header__main" style="margin-right: 0.5em; margin-left: 20px;!important;">
+                                        <div class="logo">
+                                            <a href="{% url 'home' %}" class="logo--normal">
+                                                <img src="{% static 'main/img/logos/ho-logo-0.png' %}" style="width: 100px; height: 154px;" alt="Logo">
+                                            </a>
+                                        </div>
+                                    </div>
+
+                                    <!-- Space -->
+                                    <div class="header__main-center">
+                                        <nav class="main-navigation text-center d-none d-lg-block" style="padding-right: 0.1em;">
+                                            <ul class="mainmenu"></ul>
+                                        </nav>
+                                    </div>
+
+                                    <!-- Hombaba -->
+                                    <div class="header__main-right">
+                                        <div class="header-toolbar-wrap">
+                                            <ul>
+                                                <li style="margin-bottom: 3px;">
+                                                    <div class="header-toolbar">
+                                                        <a href="#" class="btn btn-outline btn-size-md btn-color-primary btn-shape-round btn-hover-2" style="width: 215px; font-weight: bolder; margin-left: 0.5em;">
+                                                            رفتن به وبسایت هومبابا
+                                                        </a>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <!-- end: Header -->
+
+        <!-- Main content -->
+        <main class="main-content-wrapper">
+
+            {% block content %}
+
+            {% endblock %}
+
+        </main>
+        <!-- end: Main content -->
+
+    </div>
+    <!-- end: Main -->
+
+
+    <!-- JS -->
+    <script src="{% static 'main/js/vendor-1.js' %}"></script>
+    <script src="{% static 'main/js/main-1.js' %}"></script>
+    <script src="{% static 'main/js/reply-buttons.js' %}"></script>
+    <script src="{% static 'main/js/jquery-3.1.1.min.js' %}"></script>
+    <script src="{% static 'main/js/popper.min.js' %}"></script>
+    <script src="{% static 'main/js/bootstrap.min.js' %}"></script>
+    <!-- for Messages -->
+    <script>
+        $(document).ready(function() {
+            $('#messageModal').modal('show');
+        });
+    </script>
+    <!-- end: JS -->
+</body>
+
+</html>
+
+

@@ -1,0 +1,223 @@
+{% load static %}
+{% load i18n %}
+{#{% load jalali_tags %}#}
+{#{% load number_converter %}#}
+{% load widget_tweaks %}
+
+<!DOCTYPE html>
+<html lang="fa" class="js" dir="rtl">
+    <head>
+        <!-- Meta -->
+        <base href="../" />
+        <meta charset="utf-8" />
+        <meta name="author" content="" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="" />
+
+        <!-- CSS -->
+        <link rel="stylesheet" href="{% static 'profile/assets/css/dashlite.rtl.css' %}" />
+        <link id="skin-default" rel="stylesheet" href="{% static 'profile/assets/css/theme.css' %}" />
+
+        <!-- JS -->
+        <script src="{% static 'profile/assets/js/bundle.js' %}"></script>
+        <script src="{% static 'profile/assets/js/scripts.js' %}"></script>
+        <script src="{% static 'profile/assets/js/jquery-3.7.1.min.js' %}"></script>
+
+        <!-- Favicon -->
+        <link rel="icon" type="image/png" href="{% static 'main/img/logos/ho-fav.png' %}">
+
+        <!-- Title -->
+        <title>{% block title %}{% endblock %}</title>
+    </head>
+
+    <body class="bg-gray-100 all-projects-template muze-rtl">
+
+        <div class="nk-app-root">
+            <div class="nk-main">
+
+                <!-- Sidebar -->
+                <div class="nk-sidebar nk-sidebar-fixed " data-content="sidebarMenu">
+
+                    <!-- Logo -->
+                    <div class="nk-sidebar-element nk-sidebar-head" style="justify-content: center;">
+                        <div class="nk-sidebar-brand">
+                            <a href="{% url 'home' %}" class="logo-link nk-sidebar-logo">
+                                <img class="logo-light logo-img" src="{% static 'profile/images/logos/logo-near.png' %}" srcset="{% static 'profile/images/logos/logo-near-0.png' %}" alt="لوگو" />
+                                <img class="logo-dark logo-img" src="{% static 'profile/images/logos/logo-near.png' %}" srcset="{% static 'profile/images/logos/logo-near-0.png' %}" alt="لوگوی تاریک" />
+                            </a>
+                        </div>
+                        <div class="nk-menu-trigger me-n2">
+                            <a href="#" class="nk-nav-toggle nk-quick-nav-icon d-xl-none" data-target="sidebarMenu"><em class="icon ni ni-arrow-left"></em></a>
+                        </div>
+                    </div>
+                    <!-- end: Logo -->
+
+                    <!-- Sidebar >>> menu -->
+                    <div class="nk-sidebar-element">
+                        <div class="nk-sidebar-body" data-simplebar>
+                            <div class="nk-sidebar-content">
+                                <div class="nk-sidebar-menu">
+
+                                    <!-- Sidebar >>> menu >>> items -->
+                                    <ul class="nk-menu">
+
+                                        <!-- Info -->
+                                        <li class="nk-menu-item has-sub">
+                                            <a href="#" class="nk-menu-link nk-menu-toggle">
+                                                <span class="nk-menu-icon"><em class="icon ni ni-tile-thumb"></em></span>
+                                                <span class="nk-menu-text">{% trans 'Personal Information' %}</span>
+                                            </a>
+                                            <ul class="nk-menu-sub">
+                                                <li class="nk-menu-item">
+                                                    <a href="#" class="nk-menu-link"><span class="nk-menu-text">{% trans 'See My Information' %}</span></a>
+                                                </li>
+                                                <li class="nk-menu-item">
+                                                    <a href="#" class="nk-menu-link"><span class="nk-menu-text">{% trans 'Change My Information' %}</span></a>
+                                                </li>
+                                                <li class="nk-menu-item">
+                                                    <a href="#" class="nk-menu-link"><span class="nk-menu-text">{% trans 'Account Approval' %}</span></a>
+                                                </li>
+                                            </ul>
+                                        </li>
+
+                                        <!-- User -->
+                                        <li class="nk-menu-item has-sub">
+                                            <a href="#" class="nk-menu-link nk-menu-toggle">
+                                                <span class="nk-menu-icon"><em class="icon ni ni-users"></em></span>
+                                                <span class="nk-menu-text">{% trans 'Activities History' %}</span>
+                                            </a>
+                                            <ul class="nk-menu-sub">
+                                                <li class="nk-menu-item">
+                                                    <a href="#" class="nk-menu-link"><span class="nk-menu-text">{% trans 'Received Services' %}</span></a>
+                                                </li>
+                                            </ul>
+                                        </li>
+
+                                    </ul>
+                                    <!-- end:Sidebar >>> menu >>> items -->
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- end: Sidebar >>> menu -->
+
+                </div>
+                <!-- end: Sidebar -->
+
+                <!-- Header & Content -->
+                <div class="nk-wrap">
+
+                    <!-- Message -->
+                    <div id="successModal" class="modal">
+                        <div class="modal-content">
+                            <h4 class="modal-title" style="padding: 20px 20px 10px 0;!important;">عملیات با موفقیت انجام شد.</h4>
+                            <p id="modal-message" style="padding: 20px 20px 0 0;!important; color: black;!important;"></p>
+                            <button class="modal-my-button">بستن پیام و ادامه سفر در هومبیا</button>
+                        </div>
+                    </div>
+
+                    <script>
+                        $(document).ready(function() {
+                            var messages = "{% for message in messages %}{{ message }}{% if not forloop.last %}\\n{% endif %}{% endfor %}";
+                            if (messages) {
+                                $('#modal-message').text(messages);
+                                $('#successModal').show();
+                            }
+                            $('.modal-my-button').on('click', function() {
+                                $('#successModal').hide();
+                            });
+                        });
+                    </script>
+                    <!-- end: Message -->
+
+                    <!-- Header -->
+                    <div class="nk-header nk-header-fixed is-light">
+                        <div class="container-fluid">
+                            <div class="nk-header-wrap">
+
+                                <!-- 3-lines menu button -->
+                                <div class="nk-menu-trigger d-xl-none ms-n1">
+                                    <a href="#" class="nk-nav-toggle nk-quick-nav-icon" data-target="sidebarMenu"><em class="icon ni ni-menu"></em></a>
+                                </div>
+
+                                <!-- Logo -->
+                                <div class="nk-header-brand d-xl-none">
+                                    <a href="{% url 'home' %}" class="logo-link">
+                                        <img class="logo-light logo-img" src="{% static 'profile/images/logos/logo-near.png' %}" srcset="{% static 'profile/images/logos/logo-near.png' %}" alt="لوگو" />
+                                        <img class="logo-dark logo-img" src="{% static 'profile/images/logos/logo-near.png' %}" srcset="{% static 'profile/images/logos/logo-near.png' %}" alt="لوگوی تاریک" />
+                                    </a>
+                                </div>
+
+                                <!-- Name & Exit -->
+                                <div class="nk-header-tools">
+                                    <ul class="nk-quick-nav">
+                                        <li class="dropdown language-dropdown d-none d-sm-block me-n1">
+
+                                            <!-- Name -->
+                                            <a href="#" class="dropdown-toggle" data-bs-toggle="dropdown">
+                                                <div class="user-toggle">
+                                                    <div class="user-name dropdown-indicator" style="font-size: 1.6em; padding-top: 0.5em;">{{ user }}</div>
+                                                </div>
+                                            </a>
+
+                                            <!-- Exit -->
+                                            <div class="dropdown-menu dropdown-menu-md dropdown-menu-end dropdown-menu-s1">
+                                                <div class="dropdown-inner">
+                                                    <ul class="link-list">
+                                                        <li>
+                                                            <form action="{% url 'logout' %}" method="post">
+                                                                {% csrf_token %}
+                                                                <button type="submit" style="background-color: white; border: none;"><em class="icon ni ni-signout" style="margin-left: 1.5em;"></em>{% trans 'Exit' %}</button>
+                                                            </form>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+
+                                        </li>
+                                    </ul>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <!-- end: Header -->
+
+                    <!-- Content -->
+                    <div class="nk-content nk-content-fluid">
+                        <div class="container-xl wide-lg">
+
+                            <!-- Buttons -->
+                            {% block two_buttons %}
+
+                            {% endblock %}
+                            <!-- end: Buttons -->
+
+                            <!-- Main content -->
+                            <div class="nk-content-body">
+                                {% block content %}
+
+                                {% endblock %}
+                            </div>
+                            <!-- end: Main content -->
+
+                        </div>
+                    </div>
+                    <!-- end: Content -->
+
+                </div>
+                <!-- end: Header & Content -->
+
+            </div>
+        </div>
+
+    </body>
+
+</html>
+
+
+
+
+
+

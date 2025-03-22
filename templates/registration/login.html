@@ -1,0 +1,51 @@
+{% extends '_base.html' %}
+
+{% load static %}
+{% load i18n %}
+{% load widget_tweaks %}
+
+
+{% block content %}
+   <section class="blog-area mb--70 mb-md--50">
+        <div class="container">
+            <div class="pb-2 pb-xl-5 mb-2 mb-xl-5 pt-3">
+                <div class="text-center" style="margin-top: 20px;">
+
+                    <!-- ّForm -->
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <!-- Username -->
+                        <div style="margin-top: 0.7em; margin-bottom: 0.7em;">
+                            <label style="margin-bottom: 1em;!important;" for="{{ form.username.id_for_label }}">
+                                <span>نام کاربری خود را وارد کنید:</span>
+                                {% render_field form.username type="text" id="username" style="color: black;!important; text-transform: none; background-color: white;!important; border: #00a65c solid 1px;!important" class="btn btn-size-md btn-shape-round" %}
+                            </label>
+                        </div>
+
+                        <!-- Password -->
+                        <div style="margin-top: 0.7em; margin-bottom: 0.7em;">
+                            <label style="margin-bottom: 1em;!important;" for="{{ form.password.id_for_label }}">
+                                <span>رمز عبور خود را وارد کنید:</span>
+                                {% render_field form.password type="text" id="password" style="color: black;!important; text-transform: none; background-color: white;!important; border: #00a65c solid 1px;!important" class="btn btn-size-md btn-shape-round" %}
+                            </label>
+                        </div>
+
+                        <!-- Submit -->
+                        <div class="col-span-2 flex justify-end" style="margin-top: 2em">
+                            <button type="submit" class="btn btn-outline btn-color-primary btn-hover-2" style="line-height:0.7em; border-radius: 50px; width: 120px; font-weight: bolder;">
+                                ورود
+                            </button>
+                        </div>
+
+                    </form>
+                    <!-- ّend: Form -->
+
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+
+
