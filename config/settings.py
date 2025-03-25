@@ -21,6 +21,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'jalali_date',
     'widget_tweaks',
 
     'dashboard',
@@ -67,7 +68,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'homban_saas',
+        'NAME': 'homban',
         'HOST': 'localhost',
         'PORT': '3306',
         'USER': 'root',
