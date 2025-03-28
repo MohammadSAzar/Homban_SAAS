@@ -1,12 +1,15 @@
-from django.urls import path
+from django.urls import path, re_path
 
 from . import views
 
-
 urlpatterns = [
+    # main
     path('', views.home_view, name='home'),
     path('home/', views.home_view, name='home'),
     path('dashboard/', views.dashboard_view, name='dashboard'),
+    # file
+    path('files/sale/', views.SaleFileListView.as_view(), name='sale_file_list'),
+    re_path(r'sale-file/(?P<slug>[-\w]+)/(?P<unique_url_id>[-\w]+)/', views.SaleFileDetailView.as_view(), name='sale_file_detail'),
 ]
 
 

@@ -48,7 +48,7 @@ class DistrictAdmin(admin.ModelAdmin):
 
 @admin.register(models.SubDistrict)
 class SubDistrictAdmin(admin.ModelAdmin):
-    list_display = ('name', 'district')
+    list_display = ('name', 'district', 'description')
 
 
 # --------------------------------- FILE ---------------------------------

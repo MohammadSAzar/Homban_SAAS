@@ -124,10 +124,9 @@ def next_month_shamsi():
 # --------------------------------- CUM -----------------------------------
 class CustomUserModel(AbstractUser):
     TITLE_CHOICES = [
+        ('bs', _('Boss')),
         ('fp', _('File Person')),
         ('cp', _('Customer Person')),
-        ('cr', _('Coordinator')),
-        ('bs', _('Boss')),
     ]
     title = models.CharField(max_length=10, choices=TITLE_CHOICES, blank=True, null=True, verbose_name=_('Title'))
     email = models.EmailField(unique=False, blank=True, null=True)
@@ -159,8 +158,9 @@ class District(models.Model):
 
 
 class SubDistrict(models.Model):
-    name = models.CharField(max_length=100, default='_', verbose_name=_('Sub-District Name'))
+    name = models.CharField(max_length=100, default='', verbose_name=_('Sub-District Name'))
     district = models.ForeignKey(District, on_delete=models.CASCADE, related_name='sub_districts')
+    description = models.TextField(max_length=1000, blank=True, null=True, default='', verbose_name=_('Description'))
 
     def __str__(self):
         return self.name

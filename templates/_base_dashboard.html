@@ -1,7 +1,8 @@
 {% load static %}
 {% load i18n %}
-{#{% load jalali_tags %}#}
-{#{% load number_converter %}#}
+{% load jalali_tags %}
+{% load number_converter %}
+{% load humanize %}
 {% load widget_tweaks %}
 
 <!DOCTYPE html>
@@ -15,13 +16,13 @@
         <meta name="description" content="" />
 
         <!-- CSS -->
-        <link rel="stylesheet" href="{% static 'profile/assets/css/dashlite.rtl.css' %}" />
-        <link id="skin-default" rel="stylesheet" href="{% static 'profile/assets/css/theme.css' %}" />
+        <link rel="stylesheet" href="{% static 'dashboard/assets/css/dashlite.rtl.css' %}" />
+        <link id="skin-default" rel="stylesheet" href="{% static 'dashboard/assets/css/theme.css' %}" />
 
         <!-- JS -->
-        <script src="{% static 'profile/assets/js/bundle.js' %}"></script>
-        <script src="{% static 'profile/assets/js/scripts.js' %}"></script>
-        <script src="{% static 'profile/assets/js/jquery-3.7.1.min.js' %}"></script>
+        <script src="{% static 'dashboard/assets/js/bundle.js' %}"></script>
+        <script src="{% static 'dashboard/assets/js/scripts.js' %}"></script>
+        <script src="{% static 'dashboard/assets/js/jquery-3.7.1.min.js' %}"></script>
 
         <!-- Favicon -->
         <link rel="icon" type="image/png" href="{% static 'main/img/logos/ho-fav.png' %}">
@@ -42,11 +43,11 @@
                     <div class="nk-sidebar-element nk-sidebar-head" style="justify-content: center;">
                         <div class="nk-sidebar-brand">
                             <a href="{% url 'home' %}" class="logo-link nk-sidebar-logo">
-                                <img class="logo-light logo-img" src="{% static 'profile/images/logos/logo-near.png' %}" srcset="{% static 'profile/images/logos/logo-near-0.png' %}" alt="لوگو" />
-                                <img class="logo-dark logo-img" src="{% static 'profile/images/logos/logo-near.png' %}" srcset="{% static 'profile/images/logos/logo-near-0.png' %}" alt="لوگوی تاریک" />
+                                <img class="logo-light logo-img" src="{% static 'dashboard/images/logos/logo-near.png' %}" srcset="{% static 'dashboard/images/logos/logo-near-0.png' %}" alt="لوگو" />
+                                <img class="logo-dark logo-img" src="{% static 'dashboard/images/logos/logo-near.png' %}" srcset="{% static 'dashboard/images/logos/logo-near-0.png' %}" alt="لوگوی تاریک" />
                             </a>
                         </div>
-                        <div class="nk-menu-trigger me-n2">
+                        <div class="nk-menu-trigger  me-n2">
                             <a href="#" class="nk-nav-toggle nk-quick-nav-icon d-xl-none" data-target="sidebarMenu"><em class="icon ni ni-arrow-left"></em></a>
                         </div>
                     </div>
@@ -61,36 +62,74 @@
                                     <!-- Sidebar >>> menu >>> items -->
                                     <ul class="nk-menu">
 
-                                        <!-- Info -->
+                                        <!-- Main -->
+                                        <li class="nk-menu-item has-sub">
+                                            <a href="{% url 'dashboard' %}" class="nk-menu-link nk-menu-toggle">
+                                                <span class="nk-menu-icon"><em class="icon ni ni-tile-thumb"></em></span>
+                                                <span class="nk-menu-text">{% trans 'Dashboard First Page' %}</span>
+                                            </a>
+                                        </li>
+
+                                        <!-- Items -->
                                         <li class="nk-menu-item has-sub">
                                             <a href="#" class="nk-menu-link nk-menu-toggle">
-                                                <span class="nk-menu-icon"><em class="icon ni ni-tile-thumb"></em></span>
-                                                <span class="nk-menu-text">{% trans 'Personal Information' %}</span>
+                                                <span class="nk-menu-icon"><em class="icon ni ni-file"></em></span>
+                                                <span class="nk-menu-text">{% trans 'Items' %}</span>
                                             </a>
                                             <ul class="nk-menu-sub">
                                                 <li class="nk-menu-item">
-                                                    <a href="#" class="nk-menu-link"><span class="nk-menu-text">{% trans 'See My Information' %}</span></a>
+                                                    <a href="{% url 'sale_file_list' %}" class="nk-menu-link"><span class="nk-menu-text">{% trans 'Sale Files' %}</span></a>
                                                 </li>
                                                 <li class="nk-menu-item">
-                                                    <a href="#" class="nk-menu-link"><span class="nk-menu-text">{% trans 'Change My Information' %}</span></a>
+                                                    <a href="#" class="nk-menu-link"><span class="nk-menu-text">{% trans 'Rent Files' %}</span></a>
                                                 </li>
                                                 <li class="nk-menu-item">
-                                                    <a href="#" class="nk-menu-link"><span class="nk-menu-text">{% trans 'Account Approval' %}</span></a>
+                                                    <a href="#" class="nk-menu-link"><span class="nk-menu-text">{% trans 'Customers' %}</span></a>
                                                 </li>
                                             </ul>
                                         </li>
 
-                                        <!-- User -->
+                                        <!-- Services -->
                                         <li class="nk-menu-item has-sub">
                                             <a href="#" class="nk-menu-link nk-menu-toggle">
-                                                <span class="nk-menu-icon"><em class="icon ni ni-users"></em></span>
-                                                <span class="nk-menu-text">{% trans 'Activities History' %}</span>
+                                                <span class="nk-menu-icon"><em class="icon ni ni-ticket"></em></span>
+                                                <span class="nk-menu-text">{% trans 'Services' %}</span>
                                             </a>
                                             <ul class="nk-menu-sub">
                                                 <li class="nk-menu-item">
-                                                    <a href="#" class="nk-menu-link"><span class="nk-menu-text">{% trans 'Received Services' %}</span></a>
+                                                    <a href="#" class="nk-menu-link"><span class="nk-menu-text">{% trans 'Visits' %}</span></a>
+                                                </li>
+                                                <li class="nk-menu-item">
+                                                    <a href="#" class="nk-menu-link"><span class="nk-menu-text">{% trans 'Sessions' %}</span></a>
+                                                </li>
+                                                <li class="nk-menu-item">
+                                                    <a href="#" class="nk-menu-link"><span class="nk-menu-text">{% trans 'Trades' %}</span></a>
                                                 </li>
                                             </ul>
+                                        </li>
+
+                                        <!-- Team -->
+                                        <li class="nk-menu-item has-sub">
+                                            <a href="#" class="nk-menu-link nk-menu-toggle">
+                                                <span class="nk-menu-icon"><em class="icon ni ni-users"></em></span>
+                                                <span class="nk-menu-text">{% trans 'Team' %}</span>
+                                            </a>
+                                            <ul class="nk-menu-sub">
+                                                <li class="nk-menu-item">
+                                                    <a href="#" class="nk-menu-link"><span class="nk-menu-text">{% trans 'Agents' %}</span></a>
+                                                </li>
+                                                <li class="nk-menu-item">
+                                                    <a href="#" class="nk-menu-link"><span class="nk-menu-text">{% trans 'Tasks' %}</span></a>
+                                                </li>
+                                            </ul>
+                                        </li>
+
+                                        <!-- Chat -->
+                                        <li class="nk-menu-item has-sub">
+                                            <a href="#" class="nk-menu-link nk-menu-toggle">
+                                                <span class="nk-menu-icon"><em class="icon ni ni-mail"></em></span>
+                                                <span class="nk-menu-text">{% trans 'Online Chat' %}</span>
+                                            </a>
                                         </li>
 
                                     </ul>
@@ -108,29 +147,6 @@
                 <!-- Header & Content -->
                 <div class="nk-wrap">
 
-                    <!-- Message -->
-                    <div id="successModal" class="modal">
-                        <div class="modal-content">
-                            <h4 class="modal-title" style="padding: 20px 20px 10px 0;!important;">عملیات با موفقیت انجام شد.</h4>
-                            <p id="modal-message" style="padding: 20px 20px 0 0;!important; color: black;!important;"></p>
-                            <button class="modal-my-button">بستن پیام و ادامه سفر در هومبیا</button>
-                        </div>
-                    </div>
-
-                    <script>
-                        $(document).ready(function() {
-                            var messages = "{% for message in messages %}{{ message }}{% if not forloop.last %}\\n{% endif %}{% endfor %}";
-                            if (messages) {
-                                $('#modal-message').text(messages);
-                                $('#successModal').show();
-                            }
-                            $('.modal-my-button').on('click', function() {
-                                $('#successModal').hide();
-                            });
-                        });
-                    </script>
-                    <!-- end: Message -->
-
                     <!-- Header -->
                     <div class="nk-header nk-header-fixed is-light">
                         <div class="container-fluid">
@@ -144,15 +160,15 @@
                                 <!-- Logo -->
                                 <div class="nk-header-brand d-xl-none">
                                     <a href="{% url 'home' %}" class="logo-link">
-                                        <img class="logo-light logo-img" src="{% static 'profile/images/logos/logo-near.png' %}" srcset="{% static 'profile/images/logos/logo-near.png' %}" alt="لوگو" />
-                                        <img class="logo-dark logo-img" src="{% static 'profile/images/logos/logo-near.png' %}" srcset="{% static 'profile/images/logos/logo-near.png' %}" alt="لوگوی تاریک" />
+                                        <img class="logo-light logo-img" src="{% static 'dashboard/images/logos/logo-near.png' %}" srcset="{% static 'dashboard/images/logos/logo-near.png' %}" alt="لوگو" />
+                                        <img class="logo-dark logo-img" src="{% static 'dashboard/images/logos/logo-near.png' %}" srcset="{% static 'dashboard/images/logos/logo-near.png' %}" alt="لوگوی تاریک" />
                                     </a>
                                 </div>
 
                                 <!-- Name & Exit -->
                                 <div class="nk-header-tools">
                                     <ul class="nk-quick-nav">
-                                        <li class="dropdown language-dropdown d-none d-sm-block me-n1">
+                                        <li class="dropdown user-dropdown">
 
                                             <!-- Name -->
                                             <a href="#" class="dropdown-toggle" data-bs-toggle="dropdown">
@@ -185,23 +201,19 @@
                     <!-- end: Header -->
 
                     <!-- Content -->
-                    <div class="nk-content nk-content-fluid">
-                        <div class="container-xl wide-lg">
+                    <div class="nk-content">
+                        <div class="container-fluid">
+                            <div class="nk-content-inner">
 
-                            <!-- Buttons -->
-                            {% block two_buttons %}
+                                <!-- Main content -->
+                                <div class="nk-content-body">
+                                    {% block content %}
 
-                            {% endblock %}
-                            <!-- end: Buttons -->
+                                    {% endblock %}
+                                </div>
+                                <!-- end: Main content -->
 
-                            <!-- Main content -->
-                            <div class="nk-content-body">
-                                {% block content %}
-
-                                {% endblock %}
                             </div>
-                            <!-- end: Main content -->
-
                         </div>
                     </div>
                     <!-- end: Content -->
@@ -215,8 +227,6 @@
     </body>
 
 </html>
-
-
 
 
 

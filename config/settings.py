@@ -20,11 +20,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
 
     'jalali_date',
     'widget_tweaks',
 
     'dashboard',
+    'jalali',
     'templates'  # for translations
 ]
 
@@ -108,12 +110,6 @@ USE_L18N = True
 USE_TZ = False
 
 
-# Auth & CUM
-AUTH_USER_MODEL = 'dashboard.CustomUserModel'
-LOGIN_REDIRECT_URL = 'dashboard'
-LOGOUT_REDIRECT_URL = 'home'
-
-
 # Messages
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 MESSAGE_TAGS = {
@@ -123,6 +119,12 @@ MESSAGE_TAGS = {
     messages.WARNING: 'warning',
     messages.ERROR: 'danger',
 }
+
+
+# Auth & CUM
+AUTH_USER_MODEL = 'dashboard.CustomUserModel'
+LOGIN_REDIRECT_URL = 'dashboard'
+LOGOUT_REDIRECT_URL = 'home'
 
 
 # Static & Media
