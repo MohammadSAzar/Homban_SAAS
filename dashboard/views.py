@@ -25,7 +25,7 @@ class SaleFileListView(ListView):
     paginate_by = 12
 
     def get_queryset(self):
-        queryset_default = models.SaleFile.objects.select_related('province', 'city', 'district')
+        queryset_default = models.SaleFile.objects.select_related('province', 'city', 'district', 'sub_district')
         form = forms.SaleFileFilterForm(self.request.GET)
 
         if form.is_valid():
@@ -36,6 +36,8 @@ class SaleFileListView(ListView):
                 queryset_filtered = queryset_filtered.filter(city=form.cleaned_data['city'])
             if form.cleaned_data['district']:
                 queryset_filtered = queryset_filtered.filter(district=form.cleaned_data['district'])
+            if form.cleaned_data['sub_district']:
+                queryset_filtered = queryset_filtered.filter(sub_district=form.cleaned_data['sub_district'])
             # queryset_final = queryset_filtered
             if form.cleaned_data['min_price']:
                 queryset_filtered = queryset_filtered.filter(price__gte=form.cleaned_data['min_price'])
