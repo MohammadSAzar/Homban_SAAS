@@ -18,7 +18,7 @@
 {% block content %}
 
     <div class="nk-block">
-        <div class="row g-gs">
+        <div class="row g-gs" >
 
             <!-- Main (Sidebar) -->
             <div class="col-lg-4 col-xl-4 col-xxl-3">
@@ -31,7 +31,7 @@
 
                                 <!-- Cover -->
                                 <div class="user-avatar lg bg-primary">
-                                    {% if sale_file.has_image %}
+                                    {% if sale_file.image1 %}
                                         <img src="{{ sale_file.image1.url }}" alt="File Cover">
                                     {% else %}
                                         <img src="{% static 'dashboard/images/blank_file.jpg' %}" alt="File Cover">
@@ -186,9 +186,305 @@
                 <div class="card">
                     <div class="card-inner">
 
+                        <!-- ُShare (images) -->
+                        <div style="margin-bottom: 1em;">
+                            <ul class="nk-block-tools g-3">
+                                <!-- Whatsapp -->
+                                <li>
+                                    <button class="btn btn-primary" onclick="shareAllMediaWA()">ارسال گروهی با واتساپ</button>
+                                    <script>
+                                         function shareAllMediaWA() {
+                                            // Collect media URLs dynamically
+                                            let mediaUrls = [];
+
+                                            document.querySelectorAll(".gallery img, .gallery video source").forEach((element) => {
+                                                let fileUrl = element.src;
+
+                                                // Exclude placeholder images (Modify the filename based on your actual placeholder name)
+                                                if (!fileUrl.includes("blank_file.jpg")) {
+                                                    mediaUrls.push(fileUrl);
+                                                }
+                                            });
+
+                                            // If there are no real media files, show a message
+                                            if (mediaUrls.length === 0) {
+                                                alert("No media available to share.");
+                                                return;
+                                            }
+
+                                            let shareMessage = "Check out this media:\n" + mediaUrls.join("\n");
+
+                                            // If browser supports Web Share API (Best for Mobile)
+                                            if (navigator.share) {
+                                                navigator.share({
+                                                    title: "Shared Media",
+                                                    text: shareMessage,
+                                                    url: window.location.href // Share current page URL
+                                                })
+                                                .then(() => console.log("Shared successfully"))
+                                                .catch((error) => console.log("Error sharing:", error));
+                                            }
+                                            else {
+                                                // If Web Share API is not supported, show alternative links
+                                                let encodedMessage = encodeURIComponent(shareMessage);
+
+                                                let whatsappUrl = `https://api.whatsapp.com/send?text=${encodedMessage}`;
+
+                                                // Open sharing options in a new tab
+                                                window.open(whatsappUrl, "_blank");
+                                            }
+                                        }
+                                    </script>
+                                </li>
+                                <!-- Telegram -->
+                                <li>
+                                    <button class="btn btn-primary" onclick="shareAllMediaTE()">ارسال گروهی با تلگرام</button>
+                                    <script>
+                                         function shareAllMediaTE() {
+                                            // Collect media URLs dynamically
+                                            let mediaUrls = [];
+
+                                            document.querySelectorAll(".gallery img, .gallery video source").forEach((element) => {
+                                                let fileUrl = element.src;
+
+                                                // Exclude placeholder images (Modify the filename based on your actual placeholder name)
+                                                if (!fileUrl.includes("blank_file.jpg")) {
+                                                    mediaUrls.push(fileUrl);
+                                                }
+                                            });
+
+                                            // If there are no real media files, show a message
+                                            if (mediaUrls.length === 0) {
+                                                alert("No media available to share.");
+                                                return;
+                                            }
+
+                                            let shareMessage = "Check out this media:\n" + mediaUrls.join("\n");
+
+                                            // If browser supports Web Share API (Best for Mobile)
+                                            if (navigator.share) {
+                                                navigator.share({
+                                                    title: "Shared Media",
+                                                    text: shareMessage,
+                                                    url: window.location.href // Share current page URL
+                                                })
+                                                .then(() => console.log("Shared successfully"))
+                                                .catch((error) => console.log("Error sharing:", error));
+                                            }
+                                            else {
+                                                // If Web Share API is not supported, show alternative links
+                                                let encodedMessage = encodeURIComponent(shareMessage);
+
+                                                let telegramUrl = `https://t.me/share/url?url=${window.location.href}&text=${encodedMessage}`;
+
+                                                // Open sharing options in a new tab
+                                                window.open(telegramUrl, "_blank");
+                                            }
+                                        }
+
+                                    </script>
+                                </li>
+                            </ul>
+                        </div>
+                        <!-- end: Share (images) -->
+
+                        <!-- Gallery -->
+                        <div class="nk-block">
+
+                            <!-- Title (images) -->
+                            <div class="nk-block-head nk-block-head-sm">
+                                <div class="nk-block-between g-3">
+                                    <div class="nk-block-head-content">
+                                        <h5 class="nk-block-title">گالری تصویر</h5>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Media (images) -->
+                            <div class="row g-gs">
+
+                                {% if sale_file.image1 %}
+                                    <!-- image1 -->
+                                    <div class="col-sm-6 col-lg-4 col-xxl-4">
+                                        <div class="gallery card">
+                                            {% if sale_file.image1 %}
+                                                <a class="gallery-image popup-image" href="#">
+                                                    <img class="w-100 rounded-top" src="{{ sale_file.image1.url }}" alt="" />
+                                                </a>
+                                            {% else %}
+                                                <a class="gallery-image popup-image" href="#">
+                                                    <img class="w-100 rounded-top" src="{% static 'dashboard/images/blank_file.jpg' %}" alt="" />
+                                                </a>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <!-- image2 -->
+                                    <div class="col-sm-6 col-lg-4 col-xxl-4">
+                                        <div class="gallery card">
+                                            {% if sale_file.image2 %}
+                                                <a class="gallery-image popup-image" href="#">
+                                                    <img class="w-100 rounded-top" src="{{ sale_file.image2.url }}" alt="" />
+                                                </a>
+                                            {% else %}
+                                                <a class="gallery-image popup-image" href="#">
+                                                    <img class="w-100 rounded-top" src="{% static 'dashboard/images/blank_file.jpg' %}" alt="" />
+                                                </a>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <!-- image3 -->
+                                    <div class="col-sm-6 col-lg-4 col-xxl-4">
+                                        <div class="gallery card">
+                                            {% if sale_file.image3 %}
+                                                <a class="gallery-image popup-image" href="#">
+                                                    <img class="w-100 rounded-top" src="{{ sale_file.image3.url }}" alt="" />
+                                                </a>
+                                            {% else %}
+                                                <a class="gallery-image popup-image" href="#">
+                                                    <img class="w-100 rounded-top" src="{% static 'dashboard/images/blank_file.jpg' %}" alt="" />
+                                                </a>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <!-- image4 -->
+                                    <div class="col-sm-6 col-lg-4 col-xxl-4">
+                                        <div class="gallery card">
+                                            {% if sale_file.image4 %}
+                                                <a class="gallery-image popup-image" href="#">
+                                                    <img class="w-100 rounded-top" src="{{ sale_file.image4.url }}" alt="" />
+                                                </a>
+                                            {% else %}
+                                                <a class="gallery-image popup-image" href="#">
+                                                    <img class="w-100 rounded-top" src="{% static 'dashboard/images/blank_file.jpg' %}" alt="" />
+                                                </a>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <!-- image5 -->
+                                    <div class="col-sm-6 col-lg-4 col-xxl-4">
+                                        <div class="gallery card">
+                                            {% if sale_file.image5 %}
+                                                <a class="gallery-image popup-image" href="#">
+                                                    <img class="w-100 rounded-top" src="{{ sale_file.image5.url }}" alt="" />
+                                                </a>
+                                            {% else %}
+                                                <a class="gallery-image popup-image" href="#">
+                                                    <img class="w-100 rounded-top" src="{% static 'dashboard/images/blank_file.jpg' %}" alt="" />
+                                                </a>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <!-- image6 -->
+                                    <div class="col-sm-6 col-lg-4 col-xxl-4">
+                                        <div class="gallery card">
+                                            {% if sale_file.image6 %}
+                                                <a class="gallery-image popup-image" href="#">
+                                                    <img class="w-100 rounded-top" src="{{ sale_file.image6.url }}" alt="" />
+                                                </a>
+                                            {% else %}
+                                                <a class="gallery-image popup-image" href="#">
+                                                    <img class="w-100 rounded-top" src="{% static 'dashboard/images/blank_file.jpg' %}" alt="" />
+                                                </a>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <!-- image7 -->
+                                    <div class="col-sm-6 col-lg-4 col-xxl-4">
+                                        <div class="gallery card">
+                                            {% if sale_file.image7 %}
+                                                <a class="gallery-image popup-image" href="#">
+                                                    <img class="w-100 rounded-top" src="{{ sale_file.image7.url }}" alt="" />
+                                                </a>
+                                            {% else %}
+                                                <a class="gallery-image popup-image" href="#">
+                                                    <img class="w-100 rounded-top" src="{% static 'dashboard/images/blank_file.jpg' %}" alt="" />
+                                                </a>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <!-- image8 -->
+                                    <div class="col-sm-6 col-lg-4 col-xxl-4">
+                                        <div class="gallery card">
+                                            {% if sale_file.image8 %}
+                                                <a class="gallery-image popup-image" href="#">
+                                                    <img class="w-100 rounded-top" src="{{ sale_file.image8.url }}" alt="" />
+                                                </a>
+                                            {% else %}
+                                                <a class="gallery-image popup-image" href="#">
+                                                    <img class="w-100 rounded-top" src="{% static 'dashboard/images/blank_file.jpg' %}" alt="" />
+                                                </a>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <!-- image9 -->
+                                    <div class="col-sm-6 col-lg-4 col-xxl-4">
+                                        <div class="gallery card">
+                                            {% if sale_file.image9 %}
+                                                <a class="gallery-image popup-image" href="#">
+                                                    <img class="w-100 rounded-top" src="{{ sale_file.image9.url }}" alt="" />
+                                                </a>
+                                            {% else %}
+                                                <a class="gallery-image popup-image" href="#">
+                                                    <img class="w-100 rounded-top" src="{% static 'dashboard/images/blank_file.jpg' %}" alt="" />
+                                                </a>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                {% else %}
+                                    <div class="nk-block-head-content">
+                                        <span class="nk-block-title">هنوز تصویری موجود نیست!</span>
+                                    </div>
+                                {% endif %}
+
+                            </div>
+
+                            <!-- Title (video) -->
+                            <div class="nk-block-head nk-block-head-sm" style="margin-top: 2em;">
+                                <div class="nk-block-between g-3">
+                                    <div class="nk-block-head-content">
+                                        <h5 class="nk-block-title">ویدئو معرفی</h5>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Media (video) -->
+                            <div class="row g-gs">
+
+                                <!-- video -->
+                                {% if sale_file.video %}
+                                    <div class="col-sm-6 col-lg-4 col-xxl-4">
+                                        <div class="gallery card">
+                                            {% if sale_file.video %}
+                                                <a class="gallery-image popup-image" href="#">
+                                                    <video controls loop muted width="100%">
+                                                        <source src="{{ sale_file.video.url }}" type="video/mp4">
+                                                    </video>
+                                                </a>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                {% else %}
+                                    <div class="nk-block-head-content">
+                                        <span class="nk-block-title">هنوز ویدئویی موجود نیست!</span>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        
+                        </div>
+                        <!-- end: Gallery -->
+
                         <!-- Cards -->
                         <div class="nk-block">
                             <div class="row">
+
+                                <!-- Title (other) -->
+                                <div class="nk-block-head nk-block-head-sm">
+                                    <div class="nk-block-between g-3">
+                                        <div class="nk-block-head-content">
+                                            <h5 class="nk-block-title">سایر مشخصات</h5>
+                                        </div>
+                                    </div>
+                                </div>
 
                                 <!-- Source -->
                                 <div class="col-xl-12 col-xxl-3" style="margin-top: 13px; box-shadow: rgba(99, 99, 99, 0.35) 0px 2px 8px 0px;">
@@ -571,38 +867,6 @@
                         </div>
                         <!-- end: Cards -->
 
-                        <!-- Gallery -->
-                        <div class="nk-block">
-                            <h5 class="lead-text" style="margin-top: 2em;">گالری فایل (عکس - ویدئو)</h5>
-                            <div class="row">
-
-                                <!-- Source -->
-                                <div class="col-xl-12 col-xxl-4" style="margin-top: 13px; box-shadow: rgba(99, 99, 99, 0.35) 0px 2px 8px 0px;">
-                                    <div class="card">
-                                        <div class="card-inner">
-                                            <div class="d-flex justify-content-center">
-                                                <div style="display: flex; flex-direction: column; align-items: center;">
-                                                    <h6 class="lead-text">
-                                                        <span class="text-soft ml-1">منبع آگهی:</span>
-                                                    </h6>
-                                                    <h6 class="lead-text">
-                                                        {% if sale_file.source %}
-                                                            <span class="text-soft ml-1">{{ sale_file.get_source_display }}</span>
-                                                        {% else %}
-                                                            <span class="text-soft ml-1">----</span>
-                                                        {% endif %}
-                                                    </h6>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                
-                            </div>
-                        </div>
-                        <!-- end: Gallery -->
-
                     </div>
                 </div>
             </div>
@@ -612,6 +876,7 @@
     </div>
 
 {% endblock %}
+
 
 
 

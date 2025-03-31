@@ -19,7 +19,7 @@
     <div class="nk-fmg">
 
         <!-- ّFilter -->
-        <div class="nk-fmg-aside" data-content="files-aside"  data-toggle-overlay="true" data-toggle-body="true" data-toggle-screen="lg" data-simplebar>
+        <div class="nk-fmg-aside" data-content="files-aside" data-toggle-overlay="true" data-toggle-body="true" data-toggle-screen="lg" data-simplebar>
             <div class="nk-fmg-aside-wrap">
                 <div class="nk-fmg-aside-top" data-simplebar>
                     <div class="nk-block nk-block-lg">
@@ -225,7 +225,7 @@
         <div class="nk-fmg-body">
 
             <!-- Upper Navbar -->
-            <div class="nk-fmg-body-head d-none d-lg-flex">
+            <div class="nk-fmg-body-head d-none d-lg-flex" >
 
                 <!-- Search -->
                 <div class="nk-fmg-search">
@@ -324,7 +324,7 @@
                                                 <a href="{{ file.get_absolute_url }}" class="nk-file-link">
                                                     <div class="nk-file-icon">
                                                         <figure class="product-image--holder">
-                                                            {% if file.has_image == 'has' %}
+                                                            {% if file.image1 %}
                                                                 <img src="{{ file.image1.url }}" alt="File Cover">
                                                             {% else %}
                                                                 <img src="{% static 'dashboard/images/blank_file.jpg' %}" alt="File Cover">

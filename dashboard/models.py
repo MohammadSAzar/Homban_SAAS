@@ -12,7 +12,7 @@ from django.utils.translation import gettext as _
 from . import choices
 
 
-# -------------------------------- CODES --------------------------------
+# -------------------------------- CODES ---------------------------------
 def generate_unique_id():
     return ''.join(random.choices(string.ascii_letters + string.digits, k=20))
 
@@ -21,7 +21,7 @@ def generate_unique_code():
     return ''.join(random.choices(string.digits + string.digits, k=6))
 
 
-# -------------------------------- TIMES --------------------------------
+# -------------------------------- TIMES ---------------------------------
 def next_seven_days_shamsi():
     days = []
     today = date.today()
@@ -121,7 +121,7 @@ def next_month_shamsi():
     return final_days
 
 
-# --------------------------------- CUM -----------------------------------
+# --------------------------------- CUM ------------------------------------
 class CustomUserModel(AbstractUser):
     TITLE_CHOICES = [
         ('bs', _('Boss')),
@@ -133,7 +133,7 @@ class CustomUserModel(AbstractUser):
     REQUIRED_FIELDS = []
 
 
-# --------------------------------- LOCs ----------------------------------
+# --------------------------------- LOCs -----------------------------------
 class Province(models.Model):
     name = models.CharField(max_length=100, verbose_name=_('Province'))
 
@@ -166,7 +166,7 @@ class SubDistrict(models.Model):
         return self.name
 
 
-# --------------------------------- FILE ---------------------------------
+# --------------------------------- FILE ----------------------------------
 class Person(models.Model):
     name = models.CharField(max_length=100, verbose_name=_('Name'))
     phone_number = models.CharField(max_length=11, unique=True, verbose_name=_('Phone Number'))
@@ -205,8 +205,6 @@ class SaleFile(models.Model):
     image8 = models.ImageField(upload_to='files/images/', null=True, blank=True, verbose_name=_('Image 8'))
     image9 = models.ImageField(upload_to='files/images/', null=True, blank=True, verbose_name=_('Image 9'))
     video = models.FileField(upload_to='videos/', null=True, blank=True, verbose_name=_('Video'))
-    has_image = models.CharField(max_length=15, choices=choices.booleans, null=True, blank=True, default='hasnt', verbose_name=_('Has Image?'))
-    has_video = models.CharField(max_length=15, choices=choices.booleans, null=True, blank=True, default='hasnt', verbose_name=_('Has Video?'))
     # optional
     direction = models.CharField(max_length=15, choices=choices.directions, null=True, blank=True, verbose_name=_('Direction'))
     file_levels = models.CharField(max_length=15, choices=choices.levels, null=True, blank=True, verbose_name=_('Levels Number'))
@@ -234,6 +232,20 @@ class SaleFile(models.Model):
     @property
     def price_per_meter(self):
         return int(self.price_announced/self.area)
+
+    @property
+    def has_images(self):
+        if self.image1:
+            return choices.booleans[0][1]
+        else:
+            return choices.booleans[1][1]
+
+    @property
+    def has_video(self):
+        if self.video:
+            return choices.booleans[0][1]
+        else:
+            return choices.booleans[1][1]
 
     def save(self, *args, **kwargs):
         if self.pk is not None:
@@ -293,8 +305,6 @@ class RentFile(models.Model):
     image8 = models.ImageField(upload_to='files/images/', null=True, blank=True, verbose_name=_('Image 8'))
     image9 = models.ImageField(upload_to='files/images/', null=True, blank=True, verbose_name=_('Image 9'))
     video = models.FileField(upload_to='videos/', null=True, blank=True, verbose_name=_('Video'))
-    has_image = models.CharField(max_length=15, choices=choices.booleans, null=True, blank=True, default='hasnt', verbose_name=_('Has Image?'))
-    has_video = models.CharField(max_length=15, choices=choices.booleans, null=True, blank=True, default='hasnt', verbose_name=_('Has Video?'))
     # optional
     direction = models.CharField(max_length=15, choices=choices.directions, null=True, blank=True, verbose_name=_('Direction'))
     file_levels = models.CharField(max_length=15, choices=choices.levels, null=True, blank=True, verbose_name=_('Levels Number'))
@@ -318,6 +328,20 @@ class RentFile(models.Model):
     status = models.CharField(max_length=10, choices=choices.statuses, default='pen', verbose_name=_('Status'))
     datetime_created = models.DateTimeField(auto_now_add=True)
     datetime_expired = models.DateTimeField(blank=True, null=True)
+
+    @property
+    def has_images(self):
+        if self.image1:
+            return choices.booleans[0][1]
+        else:
+            return choices.booleans[1][1]
+
+    @property
+    def has_video(self):
+        if self.video:
+            return choices.booleans[0][1]
+        else:
+            return choices.booleans[1][1]
 
     def save(self, *args, **kwargs):
         if self.pk is not None:
@@ -345,7 +369,7 @@ class RentFile(models.Model):
         return reverse('rent_file_detail', args=[self.slug, self.unique_url_id])
 
 
-# --------------------------------- SERVs --------------------------------
+# --------------------------------- SERVs ---------------------------------
 class Customer(models.Model):
     name = models.CharField(max_length=100, verbose_name=_('Name'))
     phone_number = models.CharField(max_length=11, unique=True, verbose_name=_('Phone Number'))

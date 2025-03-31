@@ -5,7 +5,7 @@ from . import models
 from .forms import AdminCustomUserCreationForm, AdminCustomUserChangeForm
 
 
-# --------------------------------- CUM ----------------------------------
+# --------------------------------- CUM -----------------------------------
 class CustomUserAdmin(BaseUserAdmin):
     form = AdminCustomUserChangeForm
     add_form = AdminCustomUserCreationForm
@@ -30,7 +30,7 @@ class CustomUserAdmin(BaseUserAdmin):
 admin.site.register(models.CustomUserModel, CustomUserAdmin)
 
 
-# --------------------------------- LOCs ----------------------------------
+# --------------------------------- LOCs -----------------------------------
 @admin.register(models.Province)
 class ProvinceAdmin(admin.ModelAdmin):
     list_display = ('name',)
@@ -51,7 +51,7 @@ class SubDistrictAdmin(admin.ModelAdmin):
     list_display = ('name', 'district', 'description')
 
 
-# --------------------------------- FILE ---------------------------------
+# --------------------------------- FILE ----------------------------------
 @admin.register(models.Person)
 class PersonAdmin(admin.ModelAdmin):
     list_display = ('name', 'phone_number')
@@ -60,8 +60,9 @@ class PersonAdmin(admin.ModelAdmin):
 @admin.register(models.SaleFile)
 class SaleFileAdmin(admin.ModelAdmin):
     list_display = (
-        'title', 'code', 'source', 'status', 'sub_district', 'address', 'price_announced', 'price_min', 'room', 'area', 'age',
-        'document', 'level', 'parking', 'elevator', 'warehouse', 'has_image', 'has_video', 'datetime_created', 'datetime_expired')
+        'title', 'code', 'source', 'status', 'sub_district', 'address', 'price_announced', 'price_min', 'price_per_meter',
+        'room', 'area', 'age', 'document', 'level', 'parking', 'elevator', 'warehouse', 'has_images', 'has_video',
+        'datetime_created', 'datetime_expired')
     ordering = ('-datetime_created',)
     prepopulated_fields = {'slug': ('title',)}
     list_filter = ('status', 'sub_district',)
@@ -72,7 +73,7 @@ class SaleFileAdmin(admin.ModelAdmin):
 class RentFileAdmin(admin.ModelAdmin):
     list_display = (
         'title', 'code', 'source', 'status', 'sub_district', 'address', 'deposit_announced', 'deposit_min', 'rent_announced', 'rent_min',
-        'convertable', 'room', 'area', 'age', 'document', 'level', 'parking', 'elevator', 'warehouse', 'has_image', 'has_video',
+        'convertable', 'room', 'area', 'age', 'document', 'level', 'parking', 'elevator', 'warehouse', 'has_images', 'has_video',
         'datetime_created', 'datetime_expired')
     ordering = ('-datetime_created',)
     prepopulated_fields = {'slug': ('title',)}
@@ -80,7 +81,7 @@ class RentFileAdmin(admin.ModelAdmin):
     readonly_fields = ('code', 'datetime_created', 'datetime_expired',)
 
 
-# --------------------------------- SERVs --------------------------------
+# --------------------------------- SERVs ---------------------------------
 @admin.register(models.Customer)
 class CustomerAdmin(admin.ModelAdmin):
     list_display = ('name', 'phone_number', 'code', 'budget_announced', 'budget_max', 'budget_status', 'datetime_created')
@@ -113,7 +114,7 @@ class TradeAdmin(admin.ModelAdmin):
     readonly_fields = ('code', 'datetime_created',)
 
 
-# --------------------------------- MNGs ---------------------------------
+# --------------------------------- MNGs ----------------------------------
 @admin.register(models.Task)
 class TaskAdmin(admin.ModelAdmin):
     list_display = ('agent', 'type', 'status', 'title', 'code', 'datetime_created',)
