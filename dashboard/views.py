@@ -78,7 +78,7 @@ class SaleFileListView(ListView):
 class SaleFileDetailView(DetailView):
     model = models.SaleFile
     context_object_name = 'sale_file'
-    template_name = 'restates/sale_file_detail.html'
+    template_name = 'dashboard/files/sale_file_detail.html'
 
 
 # class SaleFileCreateView(CreateView):

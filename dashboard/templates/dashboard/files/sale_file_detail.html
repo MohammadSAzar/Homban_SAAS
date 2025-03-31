@@ -10,404 +10,607 @@
 
 
 {% block title %}
-    {% trans 'Sale Files' %}
+    {{ sale_file.title|farsi_number }}
 {% endblock %}
 
 
 
 {% block content %}
-    <div class="nk-fmg">
 
-        <!-- ّFilter -->
-        <div class="nk-fmg-aside" data-content="files-aside" data-toggle-overlay="true" data-toggle-body="true" data-toggle-screen="lg" data-simplebar>
-            <div class="nk-fmg-aside-wrap">
-                <div class="nk-fmg-aside-top" data-simplebar>
-                    <div class="nk-block nk-block-lg">
-                        <div class="row g-gs">
-                            <div class="col-lg-12">
-                                <div class="card h-100">
-                                    <div class="card-inner">
+    <div class="nk-block">
+        <div class="row g-gs">
 
-                                        <!-- Form -->
-                                        <form id="filter-form" method="get" action="{% url 'sale_file_list' %}" enctype="multipart/form-data">
-                                            {% csrf_token %}
-    
-                                            <!-- province -->
-                                            <div class="form-group">
-                                                <label class="form-label" for="{{ filter_form.province.id_for_label }}">استان</label>
-                                                {% render_field filter_form.province type="text" id="province" class="form-control" %}
-                                            </div>
-                                            
-                                            <!-- city -->
-                                            <div class="form-group">
-                                                <label class="form-label" for="{{ filter_form.city.id_for_label }}">شهر</label>
-                                                {% render_field filter_form.city type="text" id="city" class="form-control" %}
-                                            </div>
-                                            
-                                            <!-- district -->
-                                            <div class="form-group">
-                                                <label class="form-label" for="{{ filter_form.district.id_for_label }}">محله</label>
-                                                {% render_field filter_form.district type="text" id="district" class="form-control" %}
-                                            </div>
-                                            
-                                            <!-- sub_district -->
-                                            <div class="form-group">
-                                                <label class="form-label" for="{{ filter_form.sub_district.id_for_label }}">زیرمحله</label>
-                                                {% render_field filter_form.sub_district type="text" id="sub_district" class="form-control" %}
-                                            </div>
-                                            
-                                            <!-- max_price -->
-                                            <div class="form-group">
-                                                <label class="form-label" for="{{ filter_form.max_price.id_for_label }}">حداکثر قیمت</label>
-                                                {% render_field filter_form.max_price type="number" id="max_price" class="form-control" %}
-                                            </div>
-                                            
-                                            <!-- min_price -->
-                                            <div class="form-group">
-                                                <label class="form-label" for="{{ filter_form.min_price.id_for_label }}">حداقل قیمت</label>
-                                                {% render_field filter_form.min_price type="number" id="min_price" class="form-control" %}
-                                            </div>
-                                            
-                                            <!-- max_area -->
-                                            <div class="form-group">
-                                                <label class="form-label" for="{{ filter_form.max_area.id_for_label }}">حداکثر متراژ</label>
-                                                {% render_field filter_form.max_area type="number" id="max_area" class="form-control" %}
-                                            </div>
-                                            
-                                            <!-- min_area -->
-                                            <div class="form-group">
-                                                <label class="form-label" for="{{ filter_form.min_area.id_for_label }}">حداقل متراژ</label>
-                                                {% render_field filter_form.min_area type="number" id="min_area" class="form-control" %}
-                                            </div>
-                                            
-                                            <!-- max_room -->
-                                            <div class="form-group">
-                                                <label class="form-label" for="{{ filter_form.max_room.id_for_label }}">حداکثر متراژ</label>
-                                                {% render_field filter_form.max_room type="text" id="max_room" class="form-control" %}
-                                            </div>
-                                            
-                                            <!-- min_room -->
-                                            <div class="form-group">
-                                                <label class="form-label" for="{{ filter_form.min_room.id_for_label }}">حداقل متراژ</label>
-                                                {% render_field filter_form.min_room type="text" id="min_room" class="form-control" %}
-                                            </div>
-                                            
-                                            <!-- max_age -->
-                                            <div class="form-group">
-                                                <label class="form-label" for="{{ filter_form.max_age.id_for_label }}">حداکثر سن</label>
-                                                {% render_field filter_form.max_age type="text" id="max_age" class="form-control" %}
-                                            </div>
-                                            
-                                            <!-- min_age -->
-                                            <div class="form-group">
-                                                <label class="form-label" for="{{ filter_form.min_age.id_for_label }}">حداقل سن</label>
-                                                {% render_field filter_form.min_age type="text" id="min_age" class="form-control" %}
-                                            </div>
-                                            
-                                            <!-- max_level -->
-                                            <div class="form-group">
-                                                <label class="form-label" for="{{ filter_form.max_level.id_for_label }}">حداکثر طبقه</label>
-                                                {% render_field filter_form.max_level type="text" id="max_level" class="form-control" %}
-                                            </div>
-                                            
-                                            <!-- min_level -->
-                                            <div class="form-group">
-                                                <label class="form-label" for="{{ filter_form.min_level.id_for_label }}">حداقل طبقه</label>
-                                                {% render_field filter_form.min_level type="text" id="min_level" class="form-control" %}
-                                            </div>
-                                            
-                                            <!-- document -->
-                                            <div class="form-group">
-                                                <label class="form-label" for="{{ filter_form.document.id_for_label }}">وضعیت سند</label>
-                                                {% render_field filter_form.document type="text" id="document" class="form-control" %}
-                                            </div>
-                                            
-                                            <!-- parking -->
-                                            <div class="form-group">
-                                                <label class="form-label" for="{{ filter_form.parking.id_for_label }}">وضعیت پارکینگ</label>
-                                                {% render_field filter_form.parking type="text" id="parking" class="form-control" %}
-                                            </div>
-                                            
-                                            <!-- elevator -->
-                                            <div class="form-group">
-                                                <label class="form-label" for="{{ filter_form.elevator.id_for_label }}">وضعیت آسانسور</label>
-                                                {% render_field filter_form.elevator type="text" id="elevator" class="form-control" %}
-                                            </div>
-                                            
-                                            <!-- warehouse -->
-                                            <div class="form-group">
-                                                <label class="form-label" for="{{ filter_form.warehouse.id_for_label }}">وضعیت انبار</label>
-                                                {% render_field filter_form.warehouse type="text" id="warehouse" class="form-control" %}
-                                            </div>
+            <!-- Main (Sidebar) -->
+            <div class="col-lg-4 col-xl-4 col-xxl-3">
+                <div class="card">
+                    <div class="card-inner-group">
 
-                                            <!-- button -->
-                                            <div class="form-group" style="width: 100%;!important;">
-                                                <button type="submit" onclick="submitFormAndRefresh()" class="btn btn-lg btn-primary">اعمال فیلتر</button>
-                                            </div>
-                                        </form>
-                                        <!-- end: Form -->
-                                        
-                                        <!-- JS for filter Form -->
-                                        <script>
-                                            function submitFormAndRefresh() {
-                                                document.getElementById('filter-form').submit();
-                                                location.reload();
-                                            }
-                                        </script>
-        
-                                        <script>
-                                            document.addEventListener('DOMContentLoaded', function() {
-                                                const province = document.getElementById('province').value;
-                                                const city = document.getElementById('city').value;
-        
-                                                if (province) {
-                                                    updateCities(province);
-                                                }
-                                                if (city) {
-                                                    updateDistricts(city);
-                                                }
-                                            });
-        
-                                            function updateCities(provinceId) {
-                                                const url = `/get-cities/?province_id=${provinceId}`;
-                                                fetch(url)
-                                                    .then(response => response.json())
-                                                    .then(data => {
-                                                        const citySelect = document.getElementById('city');
-                                                        citySelect.innerHTML = '<option value="">Select City</option>';
-                                                        data.cities.forEach(city => {
-                                                            citySelect.innerHTML += `<option value="${city.id}">${city.name}</option>`;
-                                                        });
-        
-                                                        const selectedCity = '{{ request.GET.city }}';
-                                                        if (selectedCity) {
-                                                            citySelect.value = selectedCity;
-                                                        }
-                                                    });
-                                            }
-        
-                                            function updateDistricts(cityId) {
-                                                const url = `/get-districts/?city_id=${cityId}`;
-                                                fetch(url)
-                                                    .then(response => response.json())
-                                                    .then(data => {
-                                                        const districtSelect = document.getElementById('district');
-                                                        districtSelect.innerHTML = '<option value="">Select District</option>';
-                                                        data.districts.forEach(district => {
-                                                            districtSelect.innerHTML += `<option value="${district.id}">${district.name}</option>`;
-                                                        });
-        
-                                                        const selectedDistrict = '{{ request.GET.district }}';
-                                                        if (selectedDistrict) {
-                                                            districtSelect.value = selectedDistrict;
-                                                        }
-                                                    });
-                                            }
-        
-                                            function submitFormAndRefresh() {
-                                                document.getElementById('filter-form').submit();
-                                                location.reload();
-                                            }
-                                        </script>
-                                        <!-- end: JS for filter Form -->
+                        <!-- Title & Cover -->
+                        <div class="card-inner">
+                            <div class="user-card user-card-s2">
 
+                                <!-- Cover -->
+                                <div class="user-avatar lg bg-primary">
+                                    {% if sale_file.has_image %}
+                                        <img src="{{ sale_file.image1.url }}" alt="File Cover">
+                                    {% else %}
+                                        <img src="{% static 'dashboard/images/blank_file.jpg' %}" alt="File Cover">
+                                    {% endif %}
+                                </div>
+
+                                <!-- Title - Type -->
+                                <div class="user-info">
+                                    <div class="badge bg-light rounded-pill ucap">خرید و فروش</div>
+                                    <div style="height: 4em;!important; -webkit-line-clamp: 2;!important;">
+                                        <h6>{{ sale_file.title|linebreaksbr|farsi_number }}</h6>
+                                    </div>
+                                    <div style="font-size: 0.9em;">کد فایل: {{ sale_file.code }}</div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <!-- Locations -->
+                        <div class="card-inner card-inner-sm">
+                            <ul class="btn-toolbar justify-center gx-1">
+                                <li><span style="font-size: 0.9em;">{{ sale_file.city }}</span></li>
+                                <li><span>|</span></li>
+                                <li><span style="font-size: 0.9em;">{{ sale_file.district }}</span></li>
+                                <li><span>|</span></li>
+                                <li><span style="font-size: 0.9em;">{{ sale_file.sub_district|linebreaksbr|farsi_number }}</span></li>
+                            </ul>
+                        </div>
+
+                        <!-- Area - Age - Room -->
+                        <div class="card-inner">
+                            <div class="row text-center">
+                                <!-- Area -->
+                                <div class="col-4">
+                                    <div class="profile-stats">
+                                        <span class="amount">{{ sale_file.area }}</span>
+                                        <span class="sub-text">متراژ (متر)</span>
+                                    </div>
+                                </div>
+                                <!-- َAge -->
+                                <div class="col-4">
+                                    <div class="profile-stats">
+                                        <span class="amount">{{ sale_file.age }}</span>
+                                        <span class="sub-text">سن (سال)</span>
+                                    </div>
+                                </div>
+                                <!-- Room -->
+                                <div class="col-4">
+                                    <div class="profile-stats">
+                                        <span class="amount">{{ sale_file.room }}</span>
+                                        <span class="sub-text">تعداد اتاق</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- end: Filter -->
 
-        <!-- Main -->
-        <div class="nk-fmg-body">
+                        <!-- Prices - Floor - Document -->
+                        <div class="card-inner">
+                            <div class="nk-tb-list nk-tb-ulist is-compact card">
 
-            <!-- Upper Navbar -->
-            <div class="nk-fmg-body-head d-none d-lg-flex">
-
-                <!-- Search -->
-                <div class="nk-fmg-search">
-                    <em class="icon ni ni-search"></em>
-                    <input type="text" class="form-control border-transparent form-focus-none" placeholder="جستجو در میان فایل‌ها"/>
-                </div>
-
-                <!-- Add Link -->
-                <div class="nk-fmg-actions">
-                    <ul class="nk-block-tools g-3">
-                        <li>
-                            <a href="#" class="btn btn-primary" data-bs-toggle="modal"><em class="icon ni ni-plus"></em><span>ایجاد فایل جدید</span></a>
-                        </li>
-                    </ul>
-                </div>
-
-            </div>
-            <!-- end: Upper Navbar -->
-
-            <!-- List -->
-            <div class="nk-fmg-body-content">
-
-                <!-- Upper + Mobile -->
-                <div class="nk-block-head nk-block-head-sm" style="margin-bottom: 1.2em;">
-                    <div class="nk-block-between position-relative">
-
-                        <!-- Title -->
-                        <div class="nk-block-head-content">
-                            <h5 class="nk-block-title page-title">فایل‌های فروش</h5>
-                        </div>
-
-                        <!-- Mobile Navbar -->
-                        <div class="nk-block-head-content">
-                            <ul class="nk-block-tools g-1">
-
-                                <!-- Search -->
-                                <li class="d-lg-none">
-                                    <a href="#" class="btn btn-trigger btn-icon search-toggle toggle-search" data-target="search"><em class="icon ni ni-search"></em></a>
-                                </li>
-
-                                <!-- Add Link -->
-                                <li class="d-lg-none">
-                                    <div class="dropdown">
-                                        <a href="#" class="btn btn-trigger btn-icon" data-bs-toggle="dropdown"><em class="icon ni ni-plus"></em></a>
-                                        <div class="dropdown-menu dropdown-menu-end">
-                                            <ul class="link-list-opt no-bdr">
-                                                <li><a href="#" data-bs-toggle="modal"><em class="icon ni ni-upload-cloud"></em><span>ایجاد فایل جدید</span></a></li>
-                                            </ul>
-                                        </div>
+                                <!-- Total Price -->
+                                <div class="nk-tb-item">
+                                    <div class="nk-tb-col"><span class="fw-bold">قیمت کل:</span></div>
+                                    <div class="nk-tb-col tb-col-sm">
+                                        <span class="tb-product">
+                                            <span class="title" style="font-size: 1em;">{{ sale_file.price_announced|intcomma:False|farsi_number }} تومان</span>
+                                        </span>
                                     </div>
-                                </li>
+                                </div>
 
-                                <!-- Filter Navigator -->
-                                <li class="d-lg-none me-n1">
-                                    <a href="#" class="btn btn-trigger btn-icon toggle" data-target="files-aside"><em class="icon ni ni-menu-alt-r"></em></a>
-                                </li>
+                                <!-- Metric Price -->
+                                <div class="nk-tb-item">
+                                    <div class="nk-tb-col"><span class="fw-bold">قیمت متری:</span></div>
+                                    <div class="nk-tb-col tb-col-sm">
+                                        <span class="tb-product">
+                                            <span class="title" style="font-size: 1em;">{{ sale_file.price_per_meter|intcomma:False|farsi_number }} تومان</span>
+                                        </span>
+                                    </div>
+                                </div>
 
-                            </ul>
+                                <!-- Level -->
+                                <div class="nk-tb-item">
+                                    <div class="nk-tb-col"><span class="fw-bold">طبقه</span></div>
+                                    <div class="nk-tb-col tb-col-sm">
+                                        <span class="tb-product">
+                                            <span class="title">{{ sale_file.level }}</span>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <!-- Document -->
+                                <div class="nk-tb-item">
+                                    <div class="nk-tb-col"><span class="fw-bold">وضعیت سند:</span></div>
+                                    <div class="nk-tb-col tb-col-sm">
+                                        <span class="tb-product">
+                                            {% if sale_file.document == 'has' %}
+                                                <span class="title" style="font-size: 1em; color: green;">{{ sale_file.get_document_display }}</span>
+                                            {% else %}
+                                                <span class="title" style="font-size: 1em; color: red;">{{ sale_file.get_document_display }}</span>
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                </div>
+
+                            </div>
                         </div>
+                        <!-- Prices - Floor - Document -->
 
-                        <!-- Mobile Search Box -->
-                        <div class="search-wrap px-2 d-lg-none" data-search="search">
-                            <div class="search-content">
-                                <a href="#" class="search-back btn btn-icon toggle-search" data-target="search"><em class="icon ni ni-arrow-left"></em></a>
-                                <input type="text" class="form-control border-transparent form-focus-none" placeholder="جستجو در میان فایل‌ها"/>
-                                <button class="search-submit btn btn-icon">
-                                    <em class="icon ni ni-search"></em>
-                                </button>
+                        <!-- Parking - Warehouse - Elevator -->
+                        <div class="card-inner">
+                            <div class="row text-center">
+                                <!-- Parking -->
+                                <div class="col-4">
+                                    <div class="profile-stats">
+                                        {% if sale_file.parking == 'has' %}
+                                            <span class="sub-text" style="color: green; font-size: 1em; border-bottom: green 1px solid">پارکینگ</span>
+                                        {% else %}
+                                            <span class="sub-text" style="color: red; font-size: 1em; border-bottom: red 1px solid">پارکینگ</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <!-- Elevator -->
+                                <div class="col-4">
+                                    <div class="profile-stats">
+                                        {% if sale_file.elevator == 'has' %}
+                                            <span class="sub-text" style="color: green; font-size: 1em; border-bottom: green 1px solid">آسانسور</span>
+                                        {% else %}
+                                            <span class="sub-text" style="color: red; font-size: 1em; border-bottom: red 1px solid">آسانسور</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <!-- Warehouse -->
+                                <div class="col-4">
+                                    <div class="profile-stats">
+                                        {% if sale_file.warehouse == 'has' %}
+                                            <span class="sub-text" style="color: green; font-size: 1em; border-bottom: green 1px solid">انباری</span>
+                                        {% else %}
+                                            <span class="sub-text" style="color: red; font-size: 1em; border-bottom: red 1px solid">انباری</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
                     </div>
                 </div>
-                <!-- end: Upper + Mobile -->
+            </div>
+            <!-- end: Main (Sidebar) -->
 
-                <!-- Files -->
-                <div class="nk-fmg-quick-list nk-block">
-                    <div class="toggle-expand-content expanded" data-content="quick-access">
-                        <div class="nk-files nk-files-view-grid">
-                            <div class="nk-files-list">
+            <!-- Other -->
+            <div class="col-lg-8 col-xl-8 col-xxl-9 ">
+                <div class="card">
+                    <div class="card-inner">
 
-                                <!-- Loop -->
-                                {% for file in sale_files %}
-                                    <div class="nk-file-item nk-file">
-                                        <div class="nk-file-info">
-                                            <div class="nk-file-title">
+                        <!-- Cards -->
+                        <div class="nk-block">
+                            <div class="row">
 
-                                                <!-- Code / Sub-district -->
-                                                <div class="nk-file-name">
-                                                    <div class="nk-file-name-text" style="margin-bottom: 0.5em;">
-                                                        <span style="font-size: 0.8em;">کد: {{ file.code }} / <span style="color: green; font-size: 1.1em;">{{ file.sub_district }}</span></span>
-                                                    </div>
+                                <!-- Source -->
+                                <div class="col-xl-12 col-xxl-3" style="margin-top: 13px; box-shadow: rgba(99, 99, 99, 0.35) 0px 2px 8px 0px;">
+                                    <div class="card">
+                                        <div class="card-inner">
+                                            <div class="d-flex justify-content-center">
+                                                <div style="display: flex; flex-direction: column; align-items: center;">
+                                                    <h6 class="lead-text">
+                                                        <span class="text-soft ml-1">منبع آگهی:</span>
+                                                    </h6>
+                                                    <h6 class="lead-text">
+                                                        {% if sale_file.source %}
+                                                            <span class="text-soft ml-1">{{ sale_file.get_source_display }}</span>
+                                                        {% else %}
+                                                            <span class="text-soft ml-1">----</span>
+                                                        {% endif %}
+                                                    </h6>
                                                 </div>
-
-                                                <!-- Cover -->
-                                                <a href="{{ file.get_absolute_url }}" class="nk-file-link">
-                                                    <div class="nk-file-icon">
-                                                        <figure class="product-image--holder">
-                                                            {% if file.has_image == 'has' %}
-                                                                <img src="{{ file.image1.url }}" alt="File Cover">
-                                                            {% else %}
-                                                                <img src="{% static 'dashboard/images/blank_file.jpg' %}" alt="File Cover">
-                                                            {% endif %}
-                                                        </figure>
-                                                    </div>
-                                                </a>
-
-                                                <!-- Title -->
-                                                <div class="nk-file-name">
-                                                    <div class="nk-file-name-text" style="height: 4em;!important; -webkit-line-clamp: 2;!important;">
-                                                        <span class="title" style="font-size: 0.9em;">{{ file.title|linebreaksbr|farsi_number }}</span>
-                                                    </div>
-                                                </div>
-
-                                                <!-- Price -->
-                                                <div class="nk-file-name">
-                                                    <span class="title" style="font-size: 0.8em; color: green;">قیمت: {{ file.price_announced|intcomma:False|farsi_number }} تومان</span>
-                                                </div>
-
-                                                <!-- More -->
-                                                <a href="{{ file.get_absolute_url }}" class="btn btn-primary" style="margin-top: 1em;"><em class="icon ni ni-eye"></em><span>مشاهده</span></a>
-
                                             </div>
                                         </div>
                                     </div>
-                                {% endfor %}
+                                </div>
+
+                                <!-- Person -->
+                                {% if sale_file.source == 'PN' %}
+                                    <div class="col-xl-12 col-xxl-3" style="margin-top: 13px; box-shadow: rgba(99, 99, 99, 0.35) 0px 2px 8px 0px;">
+                                        <div class="card">
+                                            <div class="card-inner">
+                                                <div class="d-flex justify-content-center">
+                                                    <div style="display: flex; flex-direction: column; align-items: center;">
+                                                        <h6 class="lead-text">
+                                                            <span class="text-soft ml-1">شخص آگهی‌دهنده:</span>
+                                                        </h6>
+                                                        <h6 class="lead-text">
+                                                            {% if sale_file.person %}
+                                                                <span class="text-soft ml-1">{{ sale_file.person }}</span>
+                                                            {% else %}
+                                                                <span class="text-soft ml-1">----</span>
+                                                            {% endif %}
+                                                        </h6>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+
+                                <!-- Price (Min) -->
+                                <div class="col-xl-12 col-xxl-3" style="margin-top: 13px; box-shadow: rgba(99, 99, 99, 0.35) 0px 2px 8px 0px;">
+                                    <div class="card">
+                                        <div class="card-inner">
+                                            <div class="d-flex justify-content-center">
+                                                <div style="display: flex; flex-direction: column; align-items: center;">
+                                                    <h6 class="lead-text">
+                                                        <span class="text-soft ml-1">حداقل قیمت ممکن:</span>
+                                                    </h6>
+                                                    <h6 class="lead-text">
+                                                        {% if sale_file.price_min %}
+                                                            <span class="text-soft ml-1">{{ sale_file.price_min|intcomma:False|farsi_number }} تومان</span>
+                                                        {% else %}
+                                                            <span class="text-soft ml-1">----</span>
+                                                        {% endif %}
+                                                    </h6>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Direction -->
+                                <div class="col-xl-12 col-xxl-3" style="margin-top: 13px; box-shadow: rgba(99, 99, 99, 0.35) 0px 2px 8px 0px;">
+                                    <div class="card">
+                                        <div class="card-inner">
+                                            <div class="d-flex justify-content-center">
+                                                <div style="display: flex; flex-direction: column; align-items: center;">
+                                                    <h6 class="lead-text">
+                                                        <span class="text-soft ml-1">جهت ملک:</span>
+                                                    </h6>
+                                                    <h6 class="lead-text">
+                                                        {% if sale_file.direction %}
+                                                            <span class="text-soft ml-1">{{ sale_file.get_direction_display }}</span>
+                                                        {% else %}
+                                                            <span class="text-soft ml-1">----</span>
+                                                        {% endif %}
+                                                    </h6>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Levels -->
+                                <div class="col-xl-12 col-xxl-3" style="margin-top: 13px; box-shadow: rgba(99, 99, 99, 0.35) 0px 2px 8px 0px;">
+                                    <div class="card">
+                                        <div class="card-inner">
+                                            <div class="d-flex justify-content-center">
+                                                <div style="display: flex; flex-direction: column; align-items: center;">
+                                                    <h6 class="lead-text">
+                                                        <span class="text-soft ml-1">تعداد طبقات ساختمان:</span>
+                                                    </h6>
+                                                    <h6 class="lead-text">
+                                                        {% if sale_file.file_levels %}
+                                                            <span class="text-soft ml-1">{{ sale_file.get_file_levels_display }}</span>
+                                                        {% else %}
+                                                            <span class="text-soft ml-1">----</span>
+                                                        {% endif %}
+                                                    </h6>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                 <!-- Aparts -->
+                                <div class="col-xl-12 col-xxl-3" style="margin-top: 13px; box-shadow: rgba(99, 99, 99, 0.35) 0px 2px 8px 0px;">
+                                    <div class="card">
+                                        <div class="card-inner">
+                                            <div class="d-flex justify-content-center">
+                                                <div style="display: flex; flex-direction: column; align-items: center;">
+                                                    <h6 class="lead-text">
+                                                        <span class="text-soft ml-1">تعداد واحد در هر طبقه:</span>
+                                                    </h6>
+                                                    <h6 class="lead-text">
+                                                        {% if sale_file.apartments_per_level %}
+                                                            <span class="text-soft ml-1">{{ sale_file.get_apartments_per_level_display }}</span>
+                                                        {% else %}
+                                                            <span class="text-soft ml-1">----</span>
+                                                        {% endif %}
+                                                    </h6>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Restorations -->
+                                <div class="col-xl-12 col-xxl-3" style="margin-top: 13px; box-shadow: rgba(99, 99, 99, 0.35) 0px 2px 8px 0px;">
+                                    <div class="card">
+                                        <div class="card-inner">
+                                            <div class="d-flex justify-content-center">
+                                                <div style="display: flex; flex-direction: column; align-items: center;">
+                                                    <h6 class="lead-text">
+                                                        <span class="text-soft ml-1">وضعیت بازسازی:</span>
+                                                    </h6>
+                                                    <h6 class="lead-text">
+                                                        {% if sale_file.restoration %}
+                                                            <span class="text-soft ml-1">{{ sale_file.get_restoration_display }}</span>
+                                                        {% else %}
+                                                            <span class="text-soft ml-1">----</span>
+                                                        {% endif %}
+                                                    </h6>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Stove -->
+                                <div class="col-xl-12 col-xxl-3" style="margin-top: 13px; box-shadow: rgba(99, 99, 99, 0.35) 0px 2px 8px 0px;">
+                                    <div class="card">
+                                        <div class="card-inner">
+                                            <div class="d-flex justify-content-center">
+                                                <div style="display: flex; flex-direction: column; align-items: center;">
+                                                    <h6 class="lead-text">
+                                                        <span class="text-soft ml-1">گاز رومیزی:</span>
+                                                    </h6>
+                                                    <h6 class="lead-text">
+                                                        {% if sale_file.bench_stove %}
+                                                            <span class="text-soft ml-1">{{ sale_file.get_bench_stove_display }}</span>
+                                                        {% else %}
+                                                            <span class="text-soft ml-1">----</span>
+                                                        {% endif %}
+                                                    </h6>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Balcony -->
+                                <div class="col-xl-12 col-xxl-3" style="margin-top: 13px; box-shadow: rgba(99, 99, 99, 0.35) 0px 2px 8px 0px;">
+                                    <div class="card">
+                                        <div class="card-inner">
+                                            <div class="d-flex justify-content-center">
+                                                <div style="display: flex; flex-direction: column; align-items: center;">
+                                                    <h6 class="lead-text">
+                                                        <span class="text-soft ml-1">وضعیت بالکن:</span>
+                                                    </h6>
+                                                    <h6 class="lead-text">
+                                                        {% if sale_file.balcony %}
+                                                            <span class="text-soft ml-1">{{ sale_file.get_balcony_display }}</span>
+                                                        {% else %}
+                                                            <span class="text-soft ml-1">----</span>
+                                                        {% endif %}
+                                                    </h6>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                 <!-- Floor -->
+                                <div class="col-xl-12 col-xxl-3" style="margin-top: 13px; box-shadow: rgba(99, 99, 99, 0.35) 0px 2px 8px 0px;">
+                                    <div class="card">
+                                        <div class="card-inner">
+                                            <div class="d-flex justify-content-center">
+                                                <div style="display: flex; flex-direction: column; align-items: center;">
+                                                    <h6 class="lead-text">
+                                                        <span class="text-soft ml-1">جنس کف:</span>
+                                                    </h6>
+                                                    <h6 class="lead-text">
+                                                        {% if sale_file.floor %}
+                                                            <span class="text-soft ml-1">{{ sale_file.floor }}</span>
+                                                        {% else %}
+                                                            <span class="text-soft ml-1">----</span>
+                                                        {% endif %}
+                                                    </h6>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Toilet -->
+                                <div class="col-xl-12 col-xxl-3" style="margin-top: 13px; box-shadow: rgba(99, 99, 99, 0.35) 0px 2px 8px 0px;">
+                                    <div class="card">
+                                        <div class="card-inner">
+                                            <div class="d-flex justify-content-center">
+                                                <div style="display: flex; flex-direction: column; align-items: center;">
+                                                    <h6 class="lead-text">
+                                                        <span class="text-soft ml-1">سرویس بهداشتی:</span>
+                                                    </h6>
+                                                    <h6 class="lead-text">
+                                                        {% if sale_file.toilet %}
+                                                            <span class="text-soft ml-1">{{ sale_file.get_toilet_display }}</span>
+                                                        {% else %}
+                                                            <span class="text-soft ml-1">----</span>
+                                                        {% endif %}
+                                                    </h6>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Cooling -->
+                                <div class="col-xl-12 col-xxl-3" style="margin-top: 13px; box-shadow: rgba(99, 99, 99, 0.35) 0px 2px 8px 0px;">
+                                    <div class="card">
+                                        <div class="card-inner">
+                                            <div class="d-flex justify-content-center">
+                                                <div style="display: flex; flex-direction: column; align-items: center;">
+                                                    <h6 class="lead-text">
+                                                        <span class="text-soft ml-1">سیستم سرمایش:</span>
+                                                    </h6>
+                                                    <h6 class="lead-text">
+                                                        {% if sale_file.cooling %}
+                                                            <span class="text-soft ml-1">{{ sale_file.cooling }}</span>
+                                                        {% else %}
+                                                            <span class="text-soft ml-1">----</span>
+                                                        {% endif %}
+                                                    </h6>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Heating -->
+                                <div class="col-xl-12 col-xxl-3" style="margin-top: 13px; box-shadow: rgba(99, 99, 99, 0.35) 0px 2px 8px 0px;">
+                                    <div class="card">
+                                        <div class="card-inner">
+                                            <div class="d-flex justify-content-center">
+                                                <div style="display: flex; flex-direction: column; align-items: center;">
+                                                    <h6 class="lead-text">
+                                                        <span class="text-soft ml-1">سیستم گرمایش:</span>
+                                                    </h6>
+                                                    <h6 class="lead-text">
+                                                        {% if sale_file.heating %}
+                                                            <span class="text-soft ml-1">{{ sale_file.heating }}</span>
+                                                        {% else %}
+                                                            <span class="text-soft ml-1">----</span>
+                                                        {% endif %}
+                                                    </h6>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Hot Water -->
+                                <div class="col-xl-12 col-xxl-3" style="margin-top: 13px; box-shadow: rgba(99, 99, 99, 0.35) 0px 2px 8px 0px;">
+                                    <div class="card">
+                                        <div class="card-inner">
+                                            <div class="d-flex justify-content-center">
+                                                <div style="display: flex; flex-direction: column; align-items: center;">
+                                                    <h6 class="lead-text">
+                                                        <span class="text-soft ml-1">تامین آب گرم:</span>
+                                                    </h6>
+                                                    <h6 class="lead-text">
+                                                        {% if sale_file.hot_water %}
+                                                            <span class="text-soft ml-1">{{ sale_file.get_hot_water_display }}</span>
+                                                        {% else %}
+                                                            <span class="text-soft ml-1">----</span>
+                                                        {% endif %}
+                                                    </h6>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Address -->
+                                {% if sale_file.source == 'PN' %}
+                                    <div class="col-xl-12 col-xxl-6" style="margin-top: 13px; box-shadow: rgba(99, 99, 99, 0.35) 0px 2px 8px 0px;">
+                                        <div class="card">
+                                            <div class="card-inner">
+                                                <div class="d-flex justify-content-center">
+                                                    <div style="display: flex; flex-direction: column; align-items: center;">
+                                                        <h6 class="lead-text">
+                                                            <span class="text-soft ml-1">آدرس فایل:</span>
+                                                        </h6>
+                                                        <h6 class="lead-text">
+                                                            {% if sale_file.address %}
+                                                                <span class="text-soft ml-1">{{ sale_file.address|linebreaksbr|farsi_number }}</span>
+                                                            {% else %}
+                                                                <span class="text-soft ml-1">-------------------------------------------------</span>
+                                                            {% endif %}
+                                                        </h6>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% else %}
+                                    <div class="col-xl-12 col-xxl-9" style="margin-top: 13px; box-shadow: rgba(99, 99, 99, 0.35) 0px 2px 8px 0px;">
+                                        <div class="card">
+                                            <div class="card-inner">
+                                                <div class="d-flex justify-content-center">
+                                                    <div style="display: flex; flex-direction: column; align-items: center;">
+                                                        <h6 class="lead-text">
+                                                            <span class="text-soft ml-1">آدرس فایل:</span>
+                                                        </h6>
+                                                        <h6 class="lead-text">
+                                                            {% if sale_file.address %}
+                                                                <span class="text-soft ml-1">{{ sale_file.address|linebreaksbr|farsi_number }}</span>
+                                                            {% else %}
+                                                                <span class="text-soft ml-1">-------------------------------------------------</span>
+                                                            {% endif %}
+                                                        </h6>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+
+                                <!-- Description -->
+                                <div class="col-xl-12 col-xxl-12" style="margin-top: 13px; box-shadow: rgba(99, 99, 99, 0.35) 0px 2px 8px 0px;">
+                                    <div class="card">
+                                        <div class="card-inner">
+                                            <div class="d-flex justify-content-center">
+                                                <div style="display: flex; flex-direction: column; align-items: center;">
+                                                    <h6 class="lead-text">
+                                                        <span class="text-soft ml-1">توضیحات آگهی:</span>
+                                                    </h6>
+                                                    <h6 class="lead-text">
+                                                        {% if sale_file.description %}
+                                                            <p class="text-soft ml-1" style="line-height: 25px;!important; text-align: justify;!important;">{{ sale_file.description|safe|linebreaksbr }}</p>
+                                                        {% else %}
+                                                            <span class="text-soft ml-1">-----------------------------------------------------</span>
+                                                        {% endif %}
+                                                    </h6>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
 
                             </div>
                         </div>
-                    </div>
-                </div>
-                <!-- end: Files -->
+                        <!-- end: Cards -->
 
-            </div>
-            <!-- end: List -->
-        
-            <!-- Pagination -->
-            <div class="nk-block-head nk-block-head-lg" style="margin-top: 1.5em;">
-                <div class="nk-block-between" style="justify-items: center; justify-content: center; text-align: center">
-                    <div class="nk-block-head-content">
-                        <div class="my-profile-pagination" style="margin-top: 1em;">
-                            {% if page_obj.has_previous %}
-                                <a href="{% url 'sale_file_list' %}?page=1">&laquo; ابتدا</a>
-                            {% else %}
-                                <span class="my-profile-disabled">&laquo; ابتدا</span>
-                            {% endif %}
+                        <!-- Gallery -->
+                        <div class="nk-block">
+                            <h5 class="lead-text" style="margin-top: 2em;">گالری فایل (عکس - ویدئو)</h5>
+                            <div class="row">
 
-                            {% if page_obj.has_previous %}
-                                <a href="{% url 'sale_file_list' %}?page={{ page_obj.previous_page_number }}">‹ قبلی</a>
-                            {% else %}
-                                <span class="my-profile-disabled">‹ قبلی</span>
-                            {% endif %}
+                                <!-- Source -->
+                                <div class="col-xl-12 col-xxl-4" style="margin-top: 13px; box-shadow: rgba(99, 99, 99, 0.35) 0px 2px 8px 0px;">
+                                    <div class="card">
+                                        <div class="card-inner">
+                                            <div class="d-flex justify-content-center">
+                                                <div style="display: flex; flex-direction: column; align-items: center;">
+                                                    <h6 class="lead-text">
+                                                        <span class="text-soft ml-1">منبع آگهی:</span>
+                                                    </h6>
+                                                    <h6 class="lead-text">
+                                                        {% if sale_file.source %}
+                                                            <span class="text-soft ml-1">{{ sale_file.get_source_display }}</span>
+                                                        {% else %}
+                                                            <span class="text-soft ml-1">----</span>
+                                                        {% endif %}
+                                                    </h6>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
 
-                            {% for num in page_obj.paginator.page_range %}
-                                {% if num == page_obj.number %}
-                                    <span class="my-profile-current">{{ num }}</span>
-                                {% else %}
-                                    <a href="{% url 'sale_file_list' %}?page={{ num }}">{{ num }}</a>
-                                {% endif %}
-                            {% endfor %}
-
-                            {% if page_obj.has_next %}
-                                <a href="{% url 'sale_file_list' %}?page={{ page_obj.next_page_number }}">بعدی ›</a>
-                            {% else %}
-                                <span class="my-profile-disabled">بعدی ›</span>
-                            {% endif %}
-
-                            {% if page_obj.has_next %}
-                                <a href="{% url 'sale_file_list' %}?page={{ page_obj.paginator.num_pages }}">انتها &raquo;</a>
-                            {% else %}
-                                <span class="my-profile-disabled">انتها &raquo;</span>
-                            {% endif %}
+                                
+                            </div>
                         </div>
+                        <!-- end: Gallery -->
+
                     </div>
                 </div>
             </div>
-            <!-- end: Pagination -->
+            <!-- end: Other -->
 
         </div>
-        <!-- end: Main -->
-
     </div>
+
 {% endblock %}
 
 
