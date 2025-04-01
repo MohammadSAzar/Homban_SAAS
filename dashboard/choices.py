@@ -8,8 +8,8 @@ beings = [
 ]
 
 booleans = [
-    ('has', _('Has')),
-    ('hasnt', _('Has not')),
+    ('has', 'Has'),
+    ('hasnt', 'Has Not'),
 ]
 
 restorations = [

@@ -9,7 +9,7 @@ from django.views.generic import DetailView, CreateView, ListView
 from django.http import JsonResponse, HttpResponseRedirect, HttpResponse
 from django.contrib import messages
 
-from . import models, forms
+from . import models, forms, choices
 
 
 # ----------------------------------- Bases -----------------------------------
@@ -42,27 +42,56 @@ class SaleFileListView(ListView):
                 queryset_filtered = queryset_filtered.filter(district=form.cleaned_data['district'])
             if form.cleaned_data['sub_district']:
                 queryset_filtered = queryset_filtered.filter(sub_district=form.cleaned_data['sub_district'])
+            if form.cleaned_data['document']:
+                queryset_filtered = queryset_filtered.filter(document=form.cleaned_data['document'])
+            if form.cleaned_data['parking']:
+                queryset_filtered = queryset_filtered.filter(parking=form.cleaned_data['parking'])
+            if form.cleaned_data['elevator']:
+                queryset_filtered = queryset_filtered.filter(elevator=form.cleaned_data['elevator'])
+            if form.cleaned_data['warehouse']:
+                queryset_filtered = queryset_filtered.filter(warehouse=form.cleaned_data['warehouse'])
+
+            queryset_filtered = list(queryset_filtered)
+
+            if form.cleaned_data['has_images'] == 'has':
+                queryset_filtered = [obj for obj in queryset_filtered if obj.has_images]
+            if form.cleaned_data['has_images'] == 'hasnt':
+                queryset_filtered = [obj for obj in queryset_filtered if not obj.has_images]
+            if form.cleaned_data['has_video'] == 'has':
+                queryset_filtered = [obj for obj in queryset_filtered if obj.has_video]
+            if form.cleaned_data['has_video'] == 'hasnt':
+                queryset_filtered = [obj for obj in queryset_filtered if not obj.has_video]
+
             # queryset_final = queryset_filtered
             if form.cleaned_data['min_price']:
-                queryset_filtered = queryset_filtered.filter(price__gte=form.cleaned_data['min_price'])
+                queryset_filtered = [obj for obj in queryset_filtered if
+                                     obj.price_announced and obj.price_announced >= form.cleaned_data['min_price']]
             if form.cleaned_data['max_price']:
-                queryset_filtered = queryset_filtered.filter(price__lte=form.cleaned_data['max_price'])
+                queryset_filtered = [obj for obj in queryset_filtered if
+                                     obj.price_announced and obj.price_announced <= form.cleaned_data['max_price']]
             if form.cleaned_data['min_area']:
-                queryset_filtered = queryset_filtered.filter(area__gte=form.cleaned_data['min_area'])
+                queryset_filtered = [obj for obj in queryset_filtered if obj.area >= form.cleaned_data['min_area']]
             if form.cleaned_data['max_area']:
-                queryset_filtered = queryset_filtered.filter(area__lte=form.cleaned_data['max_area'])
+                queryset_filtered = [obj for obj in queryset_filtered if obj.area <= form.cleaned_data['max_area']]
             if form.cleaned_data['min_room']:
-                queryset_filtered = queryset_filtered.filter(room__gte=int(form.cleaned_data['min_room']))
+                queryset_filtered = [obj for obj in queryset_filtered if
+                                     int(obj.room) >= int(form.cleaned_data['min_room'])]
             if form.cleaned_data['max_room']:
-                queryset_filtered = queryset_filtered.filter(room__lte=int(form.cleaned_data['max_room']))
+                queryset_filtered = [obj for obj in queryset_filtered if
+                                     int(obj.room) <= int(form.cleaned_data['max_room'])]
             if form.cleaned_data['min_age']:
-                queryset_filtered = queryset_filtered.filter(age__gte=int(form.cleaned_data['min_age']))
+                queryset_filtered = [obj for obj in queryset_filtered if
+                                     int(obj.age) >= int(form.cleaned_data['min_age'])]
             if form.cleaned_data['max_age']:
-                queryset_filtered = queryset_filtered.filter(age__lte=int(form.cleaned_data['max_age']))
+                queryset_filtered = [obj for obj in queryset_filtered if
+                                     int(obj.age) <= int(form.cleaned_data['max_age'])]
             if form.cleaned_data['min_level']:
-                queryset_filtered = queryset_filtered.filter(level__gte=int(form.cleaned_data['min_level']))
+                queryset_filtered = [obj for obj in queryset_filtered if
+                                     int(obj.level) >= int(form.cleaned_data['min_level'])]
             if form.cleaned_data['max_level']:
-                queryset_filtered = queryset_filtered.filter(level__lte=int(form.cleaned_data['max_level']))
+                queryset_filtered = [obj for obj in queryset_filtered if
+                                     int(obj.level) <= int(form.cleaned_data['max_level'])]
+
             return queryset_filtered
         return queryset_default
 
@@ -74,6 +103,8 @@ class SaleFileListView(ListView):
             form.fields['city'].queryset = models.City.objects.filter(province_id=self.request.GET.get('province'))
         if self.request.GET.get('city'):
             form.fields['district'].queryset = models.District.objects.filter(city_id=self.request.GET.get('city'))
+        if self.request.GET.get('district'):
+            form.fields['sub_district'].queryset = models.SubDistrict.objects.filter(district_id=self.request.GET.get('district'))
 
         context['filter_form'] = form
         return context

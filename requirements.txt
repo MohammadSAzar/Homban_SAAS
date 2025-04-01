@@ -1,5 +1,6 @@
 asgiref==3.8.1
 Django==5.1.7
+django-debug-toolbar==5.1.0
 django-jalali-date==1.1.3
 django-widget-tweaks==1.5.0
 jalali_core==1.0.0

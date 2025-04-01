@@ -240,17 +240,13 @@ class SaleFile(models.Model):
 
     @property
     def has_images(self):
-        if self.image1:
-            return choices.booleans[0][1]
-        else:
-            return choices.booleans[1][1]
+        if self.image1 or self.image2 or self.image3 or self.image4 or self.image5 or self.image6 or self.image7 or self.image8 or self.image9:
+            return True
 
     @property
     def has_video(self):
         if self.video:
-            return choices.booleans[0][1]
-        else:
-            return choices.booleans[1][1]
+            return True
 
     @property
     def zip_file(self):

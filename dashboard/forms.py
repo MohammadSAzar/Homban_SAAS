@@ -28,8 +28,8 @@ class LoginForm(forms.ModelForm):
 create_sale_file_fields = ['province', 'city', 'district', 'sub_district', 'address', 'price_announced', 'price_min', 'room', 'area',
                            'age', 'document', 'level', 'parking', 'elevator', 'warehouse', 'title', 'description', 'source', 'person',
                            'image1', 'image2', 'image3', 'image4', 'image5', 'image6', 'image7', 'image8', 'image9', 'video',
-                           'direction', 'file_levels', 'apartments_per_level', 'restoration', 'bench_stove', 'balcony', 'toilet',
-                           'hot_water', 'cooling', 'heating', 'floor']
+                           'direction', 'file_levels', 'apartments_per_level', 'restoration', 'bench_stove', 'balcony',
+                           'toilet', 'hot_water', 'cooling', 'heating', 'floor']
 
 
 sale_file_required_fields = ['province', 'city', 'district', 'sub_district', 'address', 'price_announced', 'price_min', 'room', 'area',
@@ -87,6 +87,8 @@ class SaleFileFilterForm(forms.Form):
     parking = forms.ChoiceField(choices=[('', '---------')] + choices.booleans, required=False, label=_('Parking'))
     elevator = forms.ChoiceField(choices=[('', '---------')] + choices.booleans, required=False, label=_('Elevator'))
     warehouse = forms.ChoiceField(choices=[('', '---------')] + choices.booleans, required=False, label=_('Warehouse'))
+    has_images = forms.ChoiceField(choices=[('', '---------')] + choices.booleans, required=False, label=_('Has Images'))
+    has_video = forms.ChoiceField(choices=[('', '---------')] + choices.booleans, required=False, label=_('Has Video'))
 
     def clean(self):
         cleaned_data = super().clean()

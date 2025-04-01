@@ -19,7 +19,7 @@
     <div class="nk-fmg">
 
         <!-- ّFilter -->
-        <div class="nk-fmg-aside" data-content="files-aside" data-toggle-overlay="true" data-toggle-body="true" data-toggle-screen="lg" data-simplebar>
+        <div class="nk-fmg-aside" data-content="files-aside" data-toggle-overlay="true"  data-toggle-body="true" data-toggle-screen="lg" data-simplebar>
             <div class="nk-fmg-aside-wrap">
                 <div class="nk-fmg-aside-top" data-simplebar>
                     <div class="nk-block nk-block-lg">
@@ -82,13 +82,13 @@
                                             
                                             <!-- max_room -->
                                             <div class="form-group">
-                                                <label class="form-label" for="{{ filter_form.max_room.id_for_label }}">حداکثر متراژ</label>
+                                                <label class="form-label" for="{{ filter_form.max_room.id_for_label }}">حداکثر تعداد اتاق</label>
                                                 {% render_field filter_form.max_room type="text" id="max_room" class="form-control" %}
                                             </div>
                                             
                                             <!-- min_room -->
                                             <div class="form-group">
-                                                <label class="form-label" for="{{ filter_form.min_room.id_for_label }}">حداقل متراژ</label>
+                                                <label class="form-label" for="{{ filter_form.min_room.id_for_label }}">حداقل تعداد اتاق</label>
                                                 {% render_field filter_form.min_room type="text" id="min_room" class="form-control" %}
                                             </div>
                                             
@@ -136,8 +136,20 @@
                                             
                                             <!-- warehouse -->
                                             <div class="form-group">
-                                                <label class="form-label" for="{{ filter_form.warehouse.id_for_label }}">وضعیت انبار</label>
+                                                <label class="form-label" for="{{ filter_form.warehouse.id_for_label }}">وضعیت انباری</label>
                                                 {% render_field filter_form.warehouse type="text" id="warehouse" class="form-control" %}
+                                            </div>
+                                            
+                                            <!-- images -->
+                                            <div class="form-group">
+                                                <label class="form-label" for="{{ filter_form.has_images.id_for_label }}">عکس داشته باشد؟</label>
+                                                {% render_field filter_form.has_images type="text" id="has_images" class="form-control" %}
+                                            </div>
+                                            
+                                            <!-- video -->
+                                            <div class="form-group">
+                                                <label class="form-label" for="{{ filter_form.has_video.id_for_label }}">ویدئو معرفی داشته باشد؟</label>
+                                                {% render_field filter_form.has_video type="text" id="has_video" class="form-control" %}
                                             </div>
 
                                             <!-- button -->
