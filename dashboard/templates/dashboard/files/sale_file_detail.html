@@ -23,30 +23,18 @@
             <!-- Main (Sidebar) -->
             <div class="col-lg-4 col-xl-4 col-xxl-3">
                 <div class="card">
-                    <div class="card-inner-group">
+                    <div class="card-inner-group" >
 
-                        <!-- Title & Cover -->
+                        <!-- Title -->
                         <div class="card-inner">
                             <div class="user-card user-card-s2">
-
-                                <!-- Cover -->
-                                <div class="user-avatar lg bg-primary">
-                                    {% if sale_file.image1 %}
-                                        <img src="{{ sale_file.image1.url }}" alt="File Cover">
-                                    {% else %}
-                                        <img src="{% static 'dashboard/images/blank_file.jpg' %}" alt="File Cover">
-                                    {% endif %}
-                                </div>
-
-                                <!-- Title - Type -->
                                 <div class="user-info">
-                                    <div class="badge bg-light rounded-pill ucap">خرید و فروش</div>
                                     <div style="height: 4em;!important; -webkit-line-clamp: 2;!important;">
                                         <h6>{{ sale_file.title|linebreaksbr|farsi_number }}</h6>
                                     </div>
+                                    <div class="badge bg-light rounded-pill ucap">خرید و فروش</div>
                                     <div style="font-size: 0.9em;">کد فایل: {{ sale_file.code }}</div>
                                 </div>
-
                             </div>
                         </div>
 
@@ -138,7 +126,6 @@
 
                             </div>
                         </div>
-                        <!-- Prices - Floor - Document -->
 
                         <!-- Parking - Warehouse - Elevator -->
                         <div class="card-inner">
@@ -186,110 +173,68 @@
                 <div class="card">
                     <div class="card-inner">
 
-                        <!-- ُShare (images) -->
+                        <!-- ُShare -->
                         <div style="margin-bottom: 1em;">
                             <ul class="nk-block-tools g-3">
-                                <!-- Whatsapp -->
+
+                                <!-- Zip -->
                                 <li>
-                                    <button class="btn btn-primary" onclick="shareAllMediaWA()">ارسال گروهی با واتساپ</button>
-                                    <script>
-                                         function shareAllMediaWA() {
-                                            // Collect media URLs dynamically
-                                            let mediaUrls = [];
-
-                                            document.querySelectorAll(".gallery img, .gallery video source").forEach((element) => {
-                                                let fileUrl = element.src;
-
-                                                // Exclude placeholder images (Modify the filename based on your actual placeholder name)
-                                                if (!fileUrl.includes("blank_file.jpg")) {
-                                                    mediaUrls.push(fileUrl);
-                                                }
-                                            });
-
-                                            // If there are no real media files, show a message
-                                            if (mediaUrls.length === 0) {
-                                                alert("No media available to share.");
-                                                return;
-                                            }
-
-                                            let shareMessage = "Check out this media:\n" + mediaUrls.join("\n");
-
-                                            // If browser supports Web Share API (Best for Mobile)
-                                            if (navigator.share) {
-                                                navigator.share({
-                                                    title: "Shared Media",
-                                                    text: shareMessage,
-                                                    url: window.location.href // Share current page URL
-                                                })
-                                                .then(() => console.log("Shared successfully"))
-                                                .catch((error) => console.log("Error sharing:", error));
-                                            }
-                                            else {
-                                                // If Web Share API is not supported, show alternative links
-                                                let encodedMessage = encodeURIComponent(shareMessage);
-
-                                                let whatsappUrl = `https://api.whatsapp.com/send?text=${encodedMessage}`;
-
-                                                // Open sharing options in a new tab
-                                                window.open(whatsappUrl, "_blank");
-                                            }
-                                        }
-                                    </script>
+                                    {% if sale_file.zip_file %}
+                                        <a href="{{ sale_file.zip_file }}" class="btn btn-primary">دانلود یکجای محتوا</a>
+                                    {% else %}
+                                        <a href="#" class="btn btn-danger">محتوایی موجود نیست</a>
+                                    {% endif %}
                                 </li>
-                                <!-- Telegram -->
+
+                                <!-- Link -->
                                 <li>
-                                    <button class="btn btn-primary" onclick="shareAllMediaTE()">ارسال گروهی با تلگرام</button>
-                                    <script>
-                                         function shareAllMediaTE() {
-                                            // Collect media URLs dynamically
-                                            let mediaUrls = [];
+                                    {% if sale_file.zip_file %}
+                                        <a href="{% url 'sale_file_gallery' sale_file.slug sale_file.unique_url_id %}"
+                                           class="btn btn-primary"
+                                           onclick="copyToClipboard(event, this)">
+                                           کپی لینک مشاهده محتوا
+                                        </a>
 
-                                            document.querySelectorAll(".gallery img, .gallery video source").forEach((element) => {
-                                                let fileUrl = element.src;
+                                        <!-- Message -->
+                                        <span id="copy-message" style="display:none; color:green; margin-right:10px; margin-top: 5px;">شد!</span>
 
-                                                // Exclude placeholder images (Modify the filename based on your actual placeholder name)
-                                                if (!fileUrl.includes("blank_file.jpg")) {
-                                                    mediaUrls.push(fileUrl);
-                                                }
-                                            });
-
-                                            // If there are no real media files, show a message
-                                            if (mediaUrls.length === 0) {
-                                                alert("No media available to share.");
-                                                return;
+                                        <!-- JS -->
+                                        <script>
+                                            function copyToClipboard(event, element) {
+                                                event.preventDefault();
+                                                const baseUrl = window.location.origin;
+                                                const relativeUrl = element.getAttribute('href');
+                                                const fullUrl = baseUrl + relativeUrl;
+                                                navigator.clipboard.writeText(fullUrl).then(() => {
+                                                    const message = document.getElementById("copy-message");
+                                                    message.style.display = "inline";
+                                                    setTimeout(() => {
+                                                        message.style.display = "none";
+                                                    }, 2000);
+                                                }).catch(err => {
+                                                    console.error("Failed to copy: ", err);
+                                                });
                                             }
+                                        </script>
 
-                                            let shareMessage = "Check out this media:\n" + mediaUrls.join("\n");
-
-                                            // If browser supports Web Share API (Best for Mobile)
-                                            if (navigator.share) {
-                                                navigator.share({
-                                                    title: "Shared Media",
-                                                    text: shareMessage,
-                                                    url: window.location.href // Share current page URL
-                                                })
-                                                .then(() => console.log("Shared successfully"))
-                                                .catch((error) => console.log("Error sharing:", error));
-                                            }
-                                            else {
-                                                // If Web Share API is not supported, show alternative links
-                                                let encodedMessage = encodeURIComponent(shareMessage);
-
-                                                let telegramUrl = `https://t.me/share/url?url=${window.location.href}&text=${encodedMessage}`;
-
-                                                // Open sharing options in a new tab
-                                                window.open(telegramUrl, "_blank");
-                                            }
-                                        }
-
-                                    </script>
+                                    {% else %}
+                                        <a href="#" class="btn btn-danger">لینک حاوی محتوا موجود نیست</a>
+                                    {% endif %}
                                 </li>
+                                <!-- Share -->
+{#                                <li>#}
+{#                                    {% if sale_file.zip_file %}#}
+{#                                        <a href="{{ sale_file.zip_file }}" class="btn btn-primary">دانلود یکجای محتوا</a>#}
+{#                                    {% else %}#}
+{#                                        <a href="#" class="btn btn-danger">محتوایی موجود نیست</a>#}
+{#                                    {% endif %}#}
+{#                                </li>#}
                             </ul>
                         </div>
-                        <!-- end: Share (images) -->
+                        <!-- end: Share -->
 
                         <!-- Gallery -->
-                        <div class="nk-block">
+                        <div class="nk-block" style="margin-top: 2em;">
 
                             <!-- Title (images) -->
                             <div class="nk-block-head nk-block-head-sm">
@@ -310,10 +255,8 @@
                                             {% if sale_file.image1 %}
                                                 <a class="gallery-image popup-image" href="#">
                                                     <img class="w-100 rounded-top" src="{{ sale_file.image1.url }}" alt="" />
-                                                </a>
-                                            {% else %}
-                                                <a class="gallery-image popup-image" href="#">
-                                                    <img class="w-100 rounded-top" src="{% static 'dashboard/images/blank_file.jpg' %}" alt="" />
+                                                    <a href="{{ sale_file.image1.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
+{#                                                    <em class="icon ni ni-share" style="line-height: 25px; font-size: larger; color: black;"></em>#}
                                                 </a>
                                             {% endif %}
                                         </div>
@@ -324,10 +267,8 @@
                                             {% if sale_file.image2 %}
                                                 <a class="gallery-image popup-image" href="#">
                                                     <img class="w-100 rounded-top" src="{{ sale_file.image2.url }}" alt="" />
-                                                </a>
-                                            {% else %}
-                                                <a class="gallery-image popup-image" href="#">
-                                                    <img class="w-100 rounded-top" src="{% static 'dashboard/images/blank_file.jpg' %}" alt="" />
+                                                    <a href="{{ sale_file.image2.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
+{#                                                    <em class="icon ni ni-share" style="line-height: 25px; font-size: larger; color: black;"></em>#}
                                                 </a>
                                             {% endif %}
                                         </div>
@@ -338,10 +279,8 @@
                                             {% if sale_file.image3 %}
                                                 <a class="gallery-image popup-image" href="#">
                                                     <img class="w-100 rounded-top" src="{{ sale_file.image3.url }}" alt="" />
-                                                </a>
-                                            {% else %}
-                                                <a class="gallery-image popup-image" href="#">
-                                                    <img class="w-100 rounded-top" src="{% static 'dashboard/images/blank_file.jpg' %}" alt="" />
+                                                    <a href="{{ sale_file.image3.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
+{#                                                    <em class="icon ni ni-share" style="line-height: 25px; font-size: larger; color: black;"></em>#}
                                                 </a>
                                             {% endif %}
                                         </div>
@@ -352,10 +291,8 @@
                                             {% if sale_file.image4 %}
                                                 <a class="gallery-image popup-image" href="#">
                                                     <img class="w-100 rounded-top" src="{{ sale_file.image4.url }}" alt="" />
-                                                </a>
-                                            {% else %}
-                                                <a class="gallery-image popup-image" href="#">
-                                                    <img class="w-100 rounded-top" src="{% static 'dashboard/images/blank_file.jpg' %}" alt="" />
+                                                    <a href="{{ sale_file.image4.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
+{#                                                    <em class="icon ni ni-share" style="line-height: 25px; font-size: larger; color: black;"></em>#}
                                                 </a>
                                             {% endif %}
                                         </div>
@@ -366,10 +303,8 @@
                                             {% if sale_file.image5 %}
                                                 <a class="gallery-image popup-image" href="#">
                                                     <img class="w-100 rounded-top" src="{{ sale_file.image5.url }}" alt="" />
-                                                </a>
-                                            {% else %}
-                                                <a class="gallery-image popup-image" href="#">
-                                                    <img class="w-100 rounded-top" src="{% static 'dashboard/images/blank_file.jpg' %}" alt="" />
+                                                    <a href="{{ sale_file.image5.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
+{#                                                    <em class="icon ni ni-share" style="line-height: 25px; font-size: larger; color: black;"></em>#}
                                                 </a>
                                             {% endif %}
                                         </div>
@@ -380,10 +315,8 @@
                                             {% if sale_file.image6 %}
                                                 <a class="gallery-image popup-image" href="#">
                                                     <img class="w-100 rounded-top" src="{{ sale_file.image6.url }}" alt="" />
-                                                </a>
-                                            {% else %}
-                                                <a class="gallery-image popup-image" href="#">
-                                                    <img class="w-100 rounded-top" src="{% static 'dashboard/images/blank_file.jpg' %}" alt="" />
+                                                    <a href="{{ sale_file.image6.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
+{#                                                    <em class="icon ni ni-share" style="line-height: 25px; font-size: larger; color: black;"></em>#}
                                                 </a>
                                             {% endif %}
                                         </div>
@@ -394,10 +327,8 @@
                                             {% if sale_file.image7 %}
                                                 <a class="gallery-image popup-image" href="#">
                                                     <img class="w-100 rounded-top" src="{{ sale_file.image7.url }}" alt="" />
-                                                </a>
-                                            {% else %}
-                                                <a class="gallery-image popup-image" href="#">
-                                                    <img class="w-100 rounded-top" src="{% static 'dashboard/images/blank_file.jpg' %}" alt="" />
+                                                    <a href="{{ sale_file.image7.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
+{#                                                    <em class="icon ni ni-share" style="line-height: 25px; font-size: larger; color: black;"></em>#}
                                                 </a>
                                             {% endif %}
                                         </div>
@@ -408,10 +339,8 @@
                                             {% if sale_file.image8 %}
                                                 <a class="gallery-image popup-image" href="#">
                                                     <img class="w-100 rounded-top" src="{{ sale_file.image8.url }}" alt="" />
-                                                </a>
-                                            {% else %}
-                                                <a class="gallery-image popup-image" href="#">
-                                                    <img class="w-100 rounded-top" src="{% static 'dashboard/images/blank_file.jpg' %}" alt="" />
+                                                    <a href="{{ sale_file.image8.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
+{#                                                    <em class="icon ni ni-share" style="line-height: 25px; font-size: larger; color: black;"></em>#}
                                                 </a>
                                             {% endif %}
                                         </div>
@@ -422,10 +351,8 @@
                                             {% if sale_file.image9 %}
                                                 <a class="gallery-image popup-image" href="#">
                                                     <img class="w-100 rounded-top" src="{{ sale_file.image9.url }}" alt="" />
-                                                </a>
-                                            {% else %}
-                                                <a class="gallery-image popup-image" href="#">
-                                                    <img class="w-100 rounded-top" src="{% static 'dashboard/images/blank_file.jpg' %}" alt="" />
+                                                    <a href="{{ sale_file.image9.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
+{#                                                    <em class="icon ni ni-share" style="line-height: 25px; font-size: larger; color: black;"></em>#}
                                                 </a>
                                             {% endif %}
                                         </div>
@@ -459,6 +386,8 @@
                                                     <video controls loop muted width="100%">
                                                         <source src="{{ sale_file.video.url }}" type="video/mp4">
                                                     </video>
+                                                    <a href="{{ sale_file.video.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
+{#                                                    <em class="icon ni ni-share" style="line-height: 25px; font-size: larger; color: black;"></em>#}
                                                 </a>
                                             {% endif %}
                                         </div>
@@ -474,7 +403,7 @@
                         <!-- end: Gallery -->
 
                         <!-- Cards -->
-                        <div class="nk-block">
+                        <div class="nk-block" style="margin-top: 3em;">
                             <div class="row">
 
                                 <!-- Title (other) -->

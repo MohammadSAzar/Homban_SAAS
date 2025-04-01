@@ -1,8 +1,12 @@
+import os
+import zipfile
+
+from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404, reverse
 from django.contrib.auth import login
 from django.urls import reverse
 from django.views.generic import DetailView, CreateView, ListView
-from django.http import JsonResponse, HttpResponseRedirect
+from django.http import JsonResponse, HttpResponseRedirect, HttpResponse
 from django.contrib import messages
 
 from . import models, forms
@@ -17,7 +21,7 @@ def dashboard_view(request):
     return render(request, 'dashboard/dashboard.html')
 
 
-# --------------------------------- Sale Files ---------------------------------
+# --------------------------------- Sale Files --------------------------------
 class SaleFileListView(ListView):
     model = models.SaleFile
     template_name = 'dashboard/files/sale_file_list.html'
@@ -79,6 +83,12 @@ class SaleFileDetailView(DetailView):
     model = models.SaleFile
     context_object_name = 'sale_file'
     template_name = 'dashboard/files/sale_file_detail.html'
+
+
+class SaleFileGalleryView(DetailView):
+    model = models.SaleFile
+    context_object_name = 'sale_file'
+    template_name = 'dashboard/files/sale_file_gallery.html'
 
 
 # class SaleFileCreateView(CreateView):

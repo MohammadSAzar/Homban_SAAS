@@ -1,10 +1,15 @@
+import os
+import zipfile
+
 import random
 import string
 from jdatetime import date, timedelta
 
+from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.shortcuts import reverse
+from django.utils.html import format_html
 from django.utils.text import slugify
 from django.utils import timezone
 from django.utils.translation import gettext as _
@@ -246,6 +251,41 @@ class SaleFile(models.Model):
             return choices.booleans[0][1]
         else:
             return choices.booleans[1][1]
+
+    @property
+    def zip_file(self):
+        """Generates and returns the URL of a ZIP file containing all available media."""
+        media_files = [self.image1, self.image2, self.image3, self.image4, self.image5,
+                       self.image6, self.image7, self.image8, self.image9, self.video]
+
+        # Filter out None values (blank images/videos)
+        media_files = [file for file in media_files if file]
+        if not media_files:
+            return None
+
+        # Define ZIP file path
+        zip_filename = f"sale_{self.id}_media.zip"
+        zip_folder = os.path.join(settings.MEDIA_ROOT, "temp_zips")
+        os.makedirs(zip_folder, exist_ok=True)  # Ensure directory exists
+        zip_path = os.path.join(zip_folder, zip_filename)
+
+        # Create ZIP file
+        with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+            for media in media_files:
+                media_path = os.path.join(settings.MEDIA_ROOT, str(media))
+                if os.path.exists(media_path):
+                    zipf.write(media_path, os.path.basename(media_path))
+
+        # Return URL of the ZIP file
+        return f"{settings.MEDIA_URL}temp_zips/{zip_filename}"
+
+    def zip_file_admin(self):
+        zip_url = self.zip_file
+        if zip_url:
+            return format_html('<a href="{}" download>Download ZIP</a>', zip_url)
+        return "No media"
+
+    zip_file_admin.short_description = "Download ZIP"
 
     def save(self, *args, **kwargs):
         if self.pk is not None:

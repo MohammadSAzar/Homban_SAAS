@@ -61,7 +61,7 @@ class PersonAdmin(admin.ModelAdmin):
 class SaleFileAdmin(admin.ModelAdmin):
     list_display = (
         'title', 'code', 'source', 'status', 'sub_district', 'address', 'price_announced', 'price_min', 'price_per_meter',
-        'room', 'area', 'age', 'document', 'level', 'parking', 'elevator', 'warehouse', 'has_images', 'has_video',
+        'room', 'area', 'age', 'document', 'level', 'parking', 'elevator', 'warehouse', 'has_images', 'has_video', 'zip_file_admin',
         'datetime_created', 'datetime_expired')
     ordering = ('-datetime_created',)
     prepopulated_fields = {'slug': ('title',)}

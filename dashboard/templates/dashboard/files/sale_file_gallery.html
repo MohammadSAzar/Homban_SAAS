@@ -1,0 +1,235 @@
+{% load static %}
+{% load i18n %}
+{% load jalali_tags %}
+{% load number_converter %}
+{% load humanize %}
+{% load widget_tweaks %}
+
+<!DOCTYPE html>
+<html lang="fa" class="js" dir="rtl">
+
+    <head>
+        <!-- Meta -->
+        <base href="../" />
+        <meta charset="utf-8" />
+        <meta name="author" content="" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="" />
+
+        <!-- CSS -->
+        <link rel="stylesheet" href="{% static 'dashboard/assets/css/dashlite.rtl.css' %}" />
+        <link id="skin-default" rel="stylesheet" href="{% static 'dashboard/assets/css/theme.css' %}" />
+
+        <!-- JS -->
+        <script src="{% static 'dashboard/assets/js/bundle.js' %}"></script>
+        <script src="{% static 'dashboard/assets/js/scripts.js' %}"></script>
+        <script src="{% static 'dashboard/assets/js/jquery-3.7.1.min.js' %}"></script>
+
+        <!-- Favicon -->
+        <link rel="icon" type="image/png" href="{% static 'main/img/logos/ho-fav.png' %}">
+
+        <!-- Title -->
+        <title>گالری تصاویر: {{ sale_file.title|farsi_number }}</title>
+    </head>
+
+    <body class="bg-gray-100 all-projects-template muze-rtl">
+
+        <div class="nk-app-root">
+            <div class="nk-main">
+                <div class="nk-wrap">
+                    <div class="nk-content">
+                        <div class="container-fluid">
+                            <div class="nk-content-inner">
+                                <div class="nk-content-body">
+                                    <div class="nk-content">
+                                        <div class="container-fluid">
+                                            <div class="nk-content-inner">
+                                                <div class="nk-content-body">
+
+                                                    <!-- Title -->
+                                                    <div class="nk-block-head nk-block-head-sm">
+                                                        <div class="nk-block-between g-3">
+                                                            <div class="nk-block-head-content">
+                                                                <h5 class="nk-block-title page-title" style="line-height: 45px; text-align: justify;">گالری تصاویر و ویدئو فایل [{{ sale_file.title|farsi_number }}]</h5>
+                                                                <div class="nk-block-des text-soft" style="margin-top: 2em;">
+                                                                    {% if sale_file.zip_file %}
+                                                                        <a href="{{ sale_file.zip_file }}" class="btn btn-primary">دانلود یکجای محتوا</a>
+                                                                    {% else %}
+                                                                        <a href="#" class="btn btn-danger">محتوایی موجود نیست</a>
+                                                                    {% endif %}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Media -->
+                                                    <div class="nk-block">
+
+                                                        <!-- Title (images) -->
+                                                        <div class="nk-block-head nk-block-head-sm">
+                                                            <div class="nk-block-between g-3">
+                                                                <div class="nk-block-head-content">
+                                                                    <h5 class="nk-block-title">تصاویر</h5>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- Media (images) -->
+                                                        <div class="row g-gs">
+                                                            <!-- image1 -->
+                                                            <div class="col-sm-6 col-lg-4 col-xxl-4">
+                                                                <div class="gallery card">
+                                                                    {% if sale_file.image1 %}
+                                                                        <a class="gallery-image popup-image" href="#">
+                                                                            <img class="w-100 rounded-top" src="{{ sale_file.image1.url }}" alt="" />
+                                                                            <a href="{{ sale_file.image1.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
+                                                                        </a>
+                                                                    {% endif %}
+                                                                </div>
+                                                            </div>
+                                                            <!-- image2 -->
+                                                            <div class="col-sm-6 col-lg-4 col-xxl-4">
+                                                                <div class="gallery card">
+                                                                    {% if sale_file.image2 %}
+                                                                        <a class="gallery-image popup-image" href="#">
+                                                                            <img class="w-100 rounded-top" src="{{ sale_file.image2.url }}" alt="" />
+                                                                            <a href="{{ sale_file.image2.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
+                                                                        </a>
+                                                                    {% endif %}
+                                                                </div>
+                                                            </div>
+                                                            <!-- image3 -->
+                                                            <div class="col-sm-6 col-lg-4 col-xxl-4">
+                                                                <div class="gallery card">
+                                                                    {% if sale_file.image3 %}
+                                                                        <a class="gallery-image popup-image" href="#">
+                                                                            <img class="w-100 rounded-top" src="{{ sale_file.image3.url }}" alt="" />
+                                                                            <a href="{{ sale_file.image3.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
+                                                                        </a>
+                                                                    {% endif %}
+                                                                </div>
+                                                            </div>
+                                                            <!-- image4 -->
+                                                            <div class="col-sm-6 col-lg-4 col-xxl-4">
+                                                                <div class="gallery card">
+                                                                    {% if sale_file.image4 %}
+                                                                        <a class="gallery-image popup-image" href="#">
+                                                                            <img class="w-100 rounded-top" src="{{ sale_file.image4.url }}" alt="" />
+                                                                            <a href="{{ sale_file.image4.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
+                                                                        </a>
+                                                                    {% endif %}
+                                                                </div>
+                                                            </div>
+                                                            <!-- image5 -->
+                                                            <div class="col-sm-6 col-lg-4 col-xxl-4">
+                                                                <div class="gallery card">
+                                                                    {% if sale_file.image5 %}
+                                                                        <a class="gallery-image popup-image" href="#">
+                                                                            <img class="w-100 rounded-top" src="{{ sale_file.image5.url }}" alt="" />
+                                                                            <a href="{{ sale_file.image5.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
+                                                                        </a>
+                                                                    {% endif %}
+                                                                </div>
+                                                            </div>
+                                                            <!-- image6 -->
+                                                            <div class="col-sm-6 col-lg-4 col-xxl-4">
+                                                                <div class="gallery card">
+                                                                    {% if sale_file.image6 %}
+                                                                        <a class="gallery-image popup-image" href="#">
+                                                                            <img class="w-100 rounded-top" src="{{ sale_file.image6.url }}" alt="" />
+                                                                            <a href="{{ sale_file.image6.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
+                                                                        </a>
+                                                                    {% endif %}
+                                                                </div>
+                                                            </div>
+                                                            <!-- image7 -->
+                                                            <div class="col-sm-6 col-lg-4 col-xxl-4">
+                                                                <div class="gallery card">
+                                                                    {% if sale_file.image7 %}
+                                                                        <a class="gallery-image popup-image" href="#">
+                                                                            <img class="w-100 rounded-top" src="{{ sale_file.image7.url }}" alt="" />
+                                                                            <a href="{{ sale_file.image7.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
+                                                                        </a>
+                                                                    {% endif %}
+                                                                </div>
+                                                            </div>
+                                                            <!-- image8 -->
+                                                            <div class="col-sm-6 col-lg-4 col-xxl-4">
+                                                                <div class="gallery card">
+                                                                    {% if sale_file.image8 %}
+                                                                        <a class="gallery-image popup-image" href="#">
+                                                                            <img class="w-100 rounded-top" src="{{ sale_file.image8.url }}" alt="" />
+                                                                            <a href="{{ sale_file.image8.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
+                                                                        </a>
+                                                                    {% endif %}
+                                                                </div>
+                                                            </div>
+                                                            <!-- image9 -->
+                                                            <div class="col-sm-6 col-lg-4 col-xxl-4">
+                                                                <div class="gallery card">
+                                                                    {% if sale_file.image9 %}
+                                                                        <a class="gallery-image popup-image" href="#">
+                                                                            <img class="w-100 rounded-top" src="{{ sale_file.image9.url }}" alt="" />
+                                                                            <a href="{{ sale_file.image9.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
+                                                                        </a>
+                                                                    {% endif %}
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+
+                                                        <!-- Title (video) -->
+                                                        <div class="nk-block-head nk-block-head-sm">
+                                                            <div class="nk-block-between g-3">
+                                                                <div class="nk-block-head-content">
+                                                                    <h5 class="nk-block-title">ویدئو معرفی</h5>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- Media (video) -->
+                                                        <div class="row g-gs">
+
+                                                            <!-- video -->
+                                                            {% if sale_file.video %}
+                                                                <div class="col-sm-6 col-lg-4 col-xxl-4">
+                                                                    <div class="gallery card">
+                                                                        {% if sale_file.video %}
+                                                                            <a class="gallery-image popup-image" href="#">
+                                                                                <video controls loop muted width="100%">
+                                                                                    <source src="{{ sale_file.video.url }}" type="video/mp4">
+                                                                                </video>
+                                                                                <a href="{{ sale_file.video.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
+                                                                                </a>
+                                                                        {% endif %}
+                                                                    </div>
+                                                                </div>
+                                                            {% else %}
+                                                                <div class="nk-block-head-content">
+                                                                    <span class="nk-block-title">هنوز ویدئویی موجود نیست!</span>
+                                                                </div>
+                                                            {% endif %}
+                                                        </div>
+
+                                                    </div>
+                                                    <!-- end: Media -->
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </body>
+
+</html>
+
+
+
+
