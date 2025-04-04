@@ -8,18 +8,16 @@
 {% load widget_tweaks %}
 
 
-
 {% block title %}
     {% trans 'Sale Files' %}
 {% endblock %}
-
 
 
 {% block content %}
     <div class="nk-fmg">
 
         <!-- ّFilter -->
-        <div class="nk-fmg-aside" data-content="files-aside" data-toggle-overlay="true"  data-toggle-body="true" data-toggle-screen="lg" data-simplebar>
+        <div class="nk-fmg-aside" data-content="files-aside" data-toggle-overlay="true" data-toggle-body="true" data-toggle-screen="lg" data-simplebar>
             <div class="nk-fmg-aside-wrap">
                 <div class="nk-fmg-aside-top" data-simplebar>
                     <div class="nk-block nk-block-lg">
@@ -249,7 +247,7 @@
                 <div class="nk-fmg-actions">
                     <ul class="nk-block-tools g-3">
                         <li>
-                            <a href="#" class="btn btn-primary" data-bs-toggle="modal"><em class="icon ni ni-plus"></em><span>ایجاد فایل جدید</span></a>
+                            <a href="{% url 'sale_file_create' %}" class="btn btn-primary"><em class="icon ni ni-plus"></em><span>ایجاد فایل جدید</span></a>
                         </li>
                     </ul>
                 </div>
@@ -284,7 +282,7 @@
                                         <a href="#" class="btn btn-trigger btn-icon" data-bs-toggle="dropdown"><em class="icon ni ni-plus"></em></a>
                                         <div class="dropdown-menu dropdown-menu-end">
                                             <ul class="link-list-opt no-bdr">
-                                                <li><a href="#" data-bs-toggle="modal"><em class="icon ni ni-upload-cloud"></em><span>ایجاد فایل جدید</span></a></li>
+                                                <li><a href="{% url 'sale_file_create' %}"><em class="icon ni ni-upload-cloud"></em><span>ایجاد فایل جدید</span></a></li>
                                             </ul>
                                         </div>
                                     </div>
@@ -335,11 +333,11 @@
                                                 <!-- Cover -->
                                                 <a href="{{ file.get_absolute_url }}" class="nk-file-link">
                                                     <div class="nk-file-icon">
-                                                        <figure class="product-image--holder">
+                                                        <figure class="product-image--holder" style="height: 12.3em;!important; -webkit-line-clamp: 12.3;!important;">
                                                             {% if file.image1 %}
-                                                                <img src="{{ file.image1.url }}" alt="File Cover">
+                                                                <img src="{{ file.image1.url }}" alt="File Cover" style="height: 12.3em;!important; -webkit-line-clamp: 12.3;!important;">
                                                             {% else %}
-                                                                <img src="{% static 'dashboard/images/blank_file.jpg' %}" alt="File Cover">
+                                                                <img src="{% static 'dashboard/images/blank_file.jpg' %}" alt="File Cover" style="height: 12.3em;!important; -webkit-line-clamp: 12.3;!important;">
                                                             {% endif %}
                                                         </figure>
                                                     </div>
@@ -375,7 +373,7 @@
             <!-- end: List -->
         
             <!-- Pagination -->
-            <div class="nk-block-head nk-block-head-lg" style="margin-top: 1.5em;">
+            <div class="nk-block-head nk-block-head-lg"  style="margin-top: 1.5em;">
                 <div class="nk-block-between" style="justify-items: center; justify-content: center; text-align: center">
                     <div class="nk-block-head-content">
                         <div class="my-profile-pagination" style="margin-top: 1em;">

@@ -32,11 +32,8 @@ create_sale_file_fields = ['province', 'city', 'district', 'sub_district', 'addr
                            'toilet', 'hot_water', 'cooling', 'heating', 'floor']
 
 
-sale_file_required_fields = ['province', 'city', 'district', 'sub_district', 'address', 'price_announced', 'price_min', 'room', 'area',
-                             'age', 'document', 'level', 'parking', 'elevator', 'warehouse', 'title', 'description', 'source', 'person',
-                             'image1', 'image2', 'image3', 'image4', 'image5', 'image6', 'image7', 'image8', 'image9', 'video',
-                             'direction', 'file_levels', 'apartments_per_level', 'restoration', 'bench_stove', 'balcony', 'toilet',
-                             'hot_water', 'cooling', 'heating', 'floor']
+sale_file_required_fields = ['province', 'city', 'district', 'sub_district', 'address', 'price_announced', 'room', 'area',
+                             'age', 'document', 'level', 'parking', 'elevator', 'warehouse', 'title', 'description', 'source',]
 
 
 class SaleFileCreateForm(forms.ModelForm):
@@ -57,11 +54,14 @@ class SaleFileCreateForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
-        price = cleaned_data.get('price')
+        price_announced = cleaned_data.get('price_announced')
+        price_min = cleaned_data.get('price_min')
         area = cleaned_data.get('area')
 
-        if price and not checkers.file_price_checker(price):
-            self.add_error('price', 'قیمت فایل باید بین 1 تا 1000 میلیارد تومان باشد')
+        if price_announced and not checkers.file_price_checker(price_announced):
+            self.add_error('price_announced', 'قیمت فایل باید بین 1 تا 1000 میلیارد تومان باشد')
+        if price_min and not checkers.file_price_checker(price_min):
+            self.add_error('price_min', 'قیمت فایل باید بین 1 تا 1000 میلیارد تومان باشد')
         if area and not checkers.area_checker(area):
             self.add_error('area', 'متراژ فایل باید بین 20 تا 10000 متر باشد.')
 

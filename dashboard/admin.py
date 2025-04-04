@@ -60,8 +60,8 @@ class PersonAdmin(admin.ModelAdmin):
 @admin.register(models.SaleFile)
 class SaleFileAdmin(admin.ModelAdmin):
     list_display = (
-        'title', 'code', 'source', 'status', 'sub_district', 'address', 'price_announced', 'price_min', 'price_per_meter',
-        'room', 'area', 'age', 'document', 'level', 'parking', 'elevator', 'warehouse', 'has_images', 'has_video', 'zip_file_admin',
+        'title', 'code', 'source', 'status', 'sub_district', 'price_announced', 'price_min', 'price_per_meter', 'room', 'area',
+        'age', 'document', 'level', 'parking', 'elevator', 'warehouse', 'has_images', 'has_video', 'zip_file_admin',
         'datetime_created', 'datetime_expired')
     ordering = ('-datetime_created',)
     prepopulated_fields = {'slug': ('title',)}
@@ -72,7 +72,7 @@ class SaleFileAdmin(admin.ModelAdmin):
 @admin.register(models.RentFile)
 class RentFileAdmin(admin.ModelAdmin):
     list_display = (
-        'title', 'code', 'source', 'status', 'sub_district', 'address', 'deposit_announced', 'deposit_min', 'rent_announced', 'rent_min',
+        'title', 'code', 'source', 'status', 'sub_district', 'deposit_announced', 'deposit_min', 'rent_announced', 'rent_min',
         'convertable', 'room', 'area', 'age', 'document', 'level', 'parking', 'elevator', 'warehouse', 'has_images', 'has_video',
         'datetime_created', 'datetime_expired')
     ordering = ('-datetime_created',)
@@ -121,4 +121,6 @@ class TaskAdmin(admin.ModelAdmin):
     ordering = ('-datetime_created',)
     list_filter = ('type', 'status', 'agent',)
     readonly_fields = ('code', 'datetime_created',)
+
+
 

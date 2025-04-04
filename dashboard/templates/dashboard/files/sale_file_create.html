@@ -1,0 +1,666 @@
+{% extends '_base_dashboard.html' %}
+
+{% load static %}
+{% load i18n %}
+{% load jalali_tags %}
+{% load number_converter %}
+{% load humanize %}
+{% load widget_tweaks %}
+
+
+{% block title %}ایجاد فایل جدید{% endblock %}
+
+
+{% block content %}
+    <div class="components-preview wide-md mx-auto">
+        <div class="nk-block nk-block-lg">
+            <div class="card card-bordered card-preview">
+                <div class="card-inner">
+                    <div class="preview-block">
+
+                        <!-- Title -->
+                        <div class="nk-block-head nk-block-head-lg wide-sm">
+                            <div class="nk-block-head-content">
+                                <h6 class="nk-block-title page-title" style="line-height: 45px;">ایجاد فایل جدید (خرید و فروش)</h6>
+                            </div>
+                        </div>
+                        <!-- end: Title -->
+
+                        <!-- Form -->
+                        <form class="row gy-4" method="post" enctype="multipart/form-data" novalidate>
+                            {% csrf_token %}
+
+                            <!-- title -->
+                            <div class="col-lg-4 col-sm-4">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.title.id_for_label }}">عنوان آگهی</label>
+                                        {% render_field form.title id="title" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.title.errors %}
+                                        {% for error in form.title.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- source -->
+                            <div class="col-lg-3 col-sm-3">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.source.id_for_label }}">منبع آگهی</label>
+                                        {% render_field form.source id="source" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.source.errors %}
+                                        {% for error in form.source.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- person -->
+                            <div class="col-lg-5 col-sm-5">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.person.id_for_label }}">شخص آگهی‌دهنده (اگر منبع شخص بوده)</label>
+                                        {% render_field form.person id="person" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.person.errors %}
+                                        {% for error in form.person.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- price_announced -->
+                            <div class="col-lg-6 col-sm-6">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.price_announced.id_for_label }}">قیمت اعلامی (تومان)</label>
+                                        {% render_field form.price_announced id="price_announced" type="number" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.price_announced.errors %}
+                                        {% for error in form.price_announced.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- price_min -->
+                            <div class="col-lg-6 col-sm-6">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.price_min.id_for_label }}">حداقل قیمت (تومان)</label>
+                                        {% render_field form.price_min id="price_min" type="number" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.price_min.errors %}
+                                        {% for error in form.price_min.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- province -->
+                            <div class="col-lg-3 col-sm-3">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.province.id_for_label }}">استان</label>
+                                        {% render_field form.province id="province" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.province.errors %}
+                                        {% for error in form.province.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- city -->
+                            <div class="col-lg-3 col-sm-3">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.city.id_for_label }}">شهر</label>
+                                        {% render_field form.city id="city" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.city.errors %}
+                                        {% for error in form.city.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- district -->
+                            <div class="col-lg-3 col-sm-3">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.district.id_for_label }}">منطقه (محله)</label>
+                                        {% render_field form.district id="district" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.district.errors %}
+                                        {% for error in form.district.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- sub_district -->
+                            <div class="col-lg-3 col-sm-3">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.sub_district.id_for_label }}">زیرمحله</label>
+                                        {% render_field form.sub_district id="sub_district" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.sub_district.errors %}
+                                        {% for error in form.sub_district.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- area -->
+                            <div class="col-lg-3 col-sm-3">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.area.id_for_label }}">متراژ (متر)</label>
+                                        {% render_field form.area id="area" type="number" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.area.errors %}
+                                        {% for error in form.area.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- room -->
+                            <div class="col-lg-3 col-sm-3">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.room.id_for_label }}">تعداد اتاق</label>
+                                        {% render_field form.room id="room" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.room.errors %}
+                                        {% for error in form.room.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- age -->
+                            <div class="col-lg-3 col-sm-3">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.age.id_for_label }}">سن آپارتمان</label>
+                                        {% render_field form.age id="age" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.age.errors %}
+                                        {% for error in form.age.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- level -->
+                            <div class="col-lg-3 col-sm-3">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.level.id_for_label }}">طبقه آپارتمان</label>
+                                        {% render_field form.level id="level" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.level.errors %}
+                                        {% for error in form.level.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- document -->
+                            <div class="col-lg-3 col-sm-3">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.document.id_for_label }}">وضعیت سند</label>
+                                        {% render_field form.document id="document" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.document.errors %}
+                                        {% for error in form.document.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- parking -->
+                            <div class="col-lg-3 col-sm-3">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.parking.id_for_label }}">وضعیت پارکینگ</label>
+                                        {% render_field form.parking id="parking" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.parking.errors %}
+                                        {% for error in form.parking.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- elevator -->
+                            <div class="col-lg-3 col-sm-3">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.elevator.id_for_label }}">وضعیت آسانسور</label>
+                                        {% render_field form.elevator id="elevator" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.elevator.errors %}
+                                        {% for error in form.elevator.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- warehouse -->
+                            <div class="col-lg-3 col-sm-3">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.warehouse.id_for_label }}">وضعیت انباری</label>
+                                        {% render_field form.warehouse id="warehouse" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.warehouse.errors %}
+                                        {% for error in form.warehouse.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- address -->
+                            <div class="col-lg-5 col-sm-5">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.address.id_for_label }}">آدرس فایل</label>
+                                        {% render_field form.address id="address" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.address.errors %}
+                                        {% for error in form.address.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- description -->
+                            <div class="col-lg-7 col-sm-7">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.description.id_for_label }}">توضیحات آگهی</label>
+                                        {% render_field form.description id="description" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.description.errors %}
+                                        {% for error in form.description.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- spacer -->
+                            <div class="col-lg-12 col-sm-12">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label"></label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- image1 -->
+                            <div class="col-lg-3 col-sm-3">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.image1.id_for_label }}">عکس اول</label>
+                                        {% render_field form.image1 id="image1" type="file" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.image1.errors %}
+                                        {% for error in form.image1.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- image2 -->
+                            <div class="col-lg-3 col-sm-3">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.image2.id_for_label }}">عکس دوم</label>
+                                        {% render_field form.image2 id="image2" type="file" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.image2.errors %}
+                                        {% for error in form.image2.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- image3 -->
+                            <div class="col-lg-3 col-sm-3">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.image3.id_for_label }}">عکس سوم</label>
+                                        {% render_field form.image3 id="image3" type="file" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.image3.errors %}
+                                        {% for error in form.image3.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- image4 -->
+                            <div class="col-lg-3 col-sm-3">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.image4.id_for_label }}">عکس چهارم</label>
+                                        {% render_field form.image4 id="image4" type="file" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.image4.errors %}
+                                        {% for error in form.image4.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- image5 -->
+                            <div class="col-lg-4 col-sm-4">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.image5.id_for_label }}">عکس پنجم</label>
+                                        {% render_field form.image5 id="image5" type="file" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.image5.errors %}
+                                        {% for error in form.image5.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- image6 -->
+                            <div class="col-lg-4 col-sm-4">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.image6.id_for_label }}">عکس ششم</label>
+                                        {% render_field form.image6 id="image6" type="file" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.image6.errors %}
+                                        {% for error in form.image6.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- image7 -->
+                            <div class="col-lg-4 col-sm-4">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.image7.id_for_label }}">عکس هفتم</label>
+                                        {% render_field form.image7 id="image7" type="file" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.image7.errors %}
+                                        {% for error in form.image7.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- image8 -->
+                            <div class="col-lg-4 col-sm-4">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.image8.id_for_label }}">عکس هشتم</label>
+                                        {% render_field form.image8 id="image8" type="file" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.image8.errors %}
+                                        {% for error in form.image8.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- image9 -->
+                            <div class="col-lg-4 col-sm-4">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.image9.id_for_label }}">عکس نهم</label>
+                                        {% render_field form.image9 id="image9" type="file" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.image9.errors %}
+                                        {% for error in form.image9.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- video -->
+                            <div class="col-lg-4 col-sm-4">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.video.id_for_label }}">ویدئو معرفی</label>
+                                        {% render_field form.video id="video" type="file" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.video.errors %}
+                                        {% for error in form.video.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- spacer -->
+                            <div class="col-lg-12 col-sm-12">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label"></label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- direction -->
+                            <div class="col-lg-3 col-sm-3">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.direction.id_for_label }}">جهت آپارتمان</label>
+                                        {% render_field form.direction id="direction" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.direction.errors %}
+                                        {% for error in form.direction.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- file_levels -->
+                            <div class="col-lg-3 col-sm-3">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.file_levels.id_for_label }}">تعداد طبقات ساختمان</label>
+                                        {% render_field form.file_levels id="file_levels" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.file_levels.errors %}
+                                        {% for error in form.file_levels.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- apartments_per_level -->
+                            <div class="col-lg-3 col-sm-3">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.apartments_per_level.id_for_label }}">تعداد واحد در طبقه</label>
+                                        {% render_field form.apartments_per_level id="apartments_per_level" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.apartments_per_level.errors %}
+                                        {% for error in form.apartments_per_level.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- restoration -->
+                            <div class="col-lg-3 col-sm-3">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.restoration.id_for_label }}">وضعیت بازسازی</label>
+                                        {% render_field form.restoration id="restoration" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.restoration.errors %}
+                                        {% for error in form.restoration.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- bench_stove -->
+                            <div class="col-lg-3 col-sm-3">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.bench_stove.id_for_label }}">گاز رومیزی</label>
+                                        {% render_field form.bench_stove id="bench_stove" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.bench_stove.errors %}
+                                        {% for error in form.bench_stove.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- balcony -->
+                            <div class="col-lg-3 col-sm-3">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.balcony.id_for_label }}">بالکن</label>
+                                        {% render_field form.balcony id="balcony" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.balcony.errors %}
+                                        {% for error in form.balcony.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- floor -->
+                            <div class="col-lg-3 col-sm-3">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.floor.id_for_label }}">وضعیت کف</label>
+                                        {% render_field form.floor id="floor" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.flooe.errors %}
+                                        {% for error in form.flooe.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- toilet -->
+                            <div class="col-lg-3 col-sm-3">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.toilet.id_for_label }}">سرویس یهداشتی</label>
+                                        {% render_field form.toilet id="toilet" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.toilet.errors %}
+                                        {% for error in form.toilet.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- hot_water -->
+                            <div class="col-lg-4 col-sm-4">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.hot_water.id_for_label }}">سیستم تامین آب گرم</label>
+                                        {% render_field form.hot_water id="hot_water" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.hot_water.errors %}
+                                        {% for error in form.hot_water.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- heating -->
+                            <div class="col-lg-4 col-sm-4">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.heating.id_for_label }}">سیستم گرمایش</label>
+                                        {% render_field form.heating id="heating" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.heating.errors %}
+                                        {% for error in form.heating.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- cooling -->
+                            <div class="col-lg-4 col-sm-4">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.cooling.id_for_label }}">سیستم سرمایش</label>
+                                        {% render_field form.cooling id="cooling" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.cooling.errors %}
+                                        {% for error in form.cooling.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Submit -->
+                            <div class="nk-fmg-actions" style="margin-top: 3em;">
+                                <button type="submit" class="btn btn-primary" style="line-height: 30px;">ثبت اطلاعات</button>
+                            </div>
+                        </form>
+                        <!-- end: Form -->    
+                    
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+
+

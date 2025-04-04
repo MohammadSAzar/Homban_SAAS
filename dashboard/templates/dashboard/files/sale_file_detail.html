@@ -8,17 +8,15 @@
 {% load widget_tweaks %}
 
 
-
 {% block title %}
     {{ sale_file.title|farsi_number }}
 {% endblock %}
 
 
-
 {% block content %}
 
     <div class="nk-block">
-        <div class="row g-gs" >
+        <div class="row g-gs">
 
             <!-- Main (Sidebar) -->
             <div class="col-lg-4 col-xl-4 col-xxl-3">
@@ -34,6 +32,11 @@
                                     </div>
                                     <div class="badge bg-light rounded-pill ucap">خرید و فروش</div>
                                     <div style="font-size: 0.9em;">کد فایل: {{ sale_file.code }}</div>
+
+                                    <div style="font-size: 0.9em; margin-top: 1em;">
+                                        <a href="{% url 'sale_file_update' sale_file.slug sale_file.unique_url_id %}" class="btn btn-primary">بروزرسانی</a>
+                                        <a href="{% url 'sale_file_update' sale_file.slug sale_file.unique_url_id %}" class="btn btn-danger">پاک کردن</a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -169,7 +172,7 @@
             <!-- end: Main (Sidebar) -->
 
             <!-- Other -->
-            <div class="col-lg-8 col-xl-8 col-xxl-9 ">
+            <div class="col-lg-8 col-xl-8 col-xxl-9">
                 <div class="card">
                     <div class="card-inner">
 
@@ -247,122 +250,113 @@
 
                             <!-- Media (images) -->
                             <div class="row g-gs">
-
-                                {% if sale_file.image1 %}
+                                {% if sale_file.image1 or sale_file.image2 or sale_file.image3 or sale_file.image4 or sale_file.image5 or sale_file.image6 or sale_file.image7 or sale_file.image8 or sale_file.image9 %}
                                     <!-- image1 -->
-                                    <div class="col-sm-6 col-lg-4 col-xxl-4">
-                                        <div class="gallery card">
-                                            {% if sale_file.image1 %}
-                                                <a class="gallery-image popup-image" href="#">
-                                                    <img class="w-100 rounded-top" src="{{ sale_file.image1.url }}" alt="" />
-                                                    <a href="{{ sale_file.image1.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
-{#                                                    <em class="icon ni ni-share" style="line-height: 25px; font-size: larger; color: black;"></em>#}
-                                                </a>
-                                            {% endif %}
+                                    {% if sale_file.image1 %}
+                                        <div class="col-sm-6 col-lg-4 col-xxl-4">
+                                            <div class="gallery card">
+                                                {% if sale_file.image1 %}
+                                                    <a class="gallery-image popup-image" href="#" style="height: 20.25em;!important; -webkit-line-clamp: 20.25;!important;">
+                                                        <img class="w-100 rounded-top" src="{{ sale_file.image1.url }}">
+                                                        <a href="{{ sale_file.image1.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
+                                                    </a>
+                                                {% endif %}
+                                            </div>
                                         </div>
-                                    </div>
+                                    {% endif %}
                                     <!-- image2 -->
-                                    <div class="col-sm-6 col-lg-4 col-xxl-4">
-                                        <div class="gallery card">
-                                            {% if sale_file.image2 %}
-                                                <a class="gallery-image popup-image" href="#">
-                                                    <img class="w-100 rounded-top" src="{{ sale_file.image2.url }}" alt="" />
+                                    {% if sale_file.image2 %}
+                                        <div class="col-sm-6 col-lg-4 col-xxl-4">
+                                            <div class="gallery card">
+                                                <a class="gallery-image popup-image" href="#" style="height: 20.25em;!important; -webkit-line-clamp: 20.25;!important;">
+                                                    <img class="w-100 rounded-top" src="{{ sale_file.image2.url }}">
                                                     <a href="{{ sale_file.image2.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
-{#                                                    <em class="icon ni ni-share" style="line-height: 25px; font-size: larger; color: black;"></em>#}
                                                 </a>
-                                            {% endif %}
+                                            </div>
                                         </div>
-                                    </div>
+                                    {% endif %}
                                     <!-- image3 -->
-                                    <div class="col-sm-6 col-lg-4 col-xxl-4">
-                                        <div class="gallery card">
-                                            {% if sale_file.image3 %}
-                                                <a class="gallery-image popup-image" href="#">
-                                                    <img class="w-100 rounded-top" src="{{ sale_file.image3.url }}" alt="" />
+                                    {% if sale_file.image3 %}
+                                        <div class="col-sm-6 col-lg-4 col-xxl-4">
+                                            <div class="gallery card">
+                                                <a class="gallery-image popup-image" href="#" style="height: 20.25em;!important; -webkit-line-clamp: 20.25;!important;">
+                                                    <img class="w-100 rounded-top" src="{{ sale_file.image3.url }}">
                                                     <a href="{{ sale_file.image3.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
-{#                                                    <em class="icon ni ni-share" style="line-height: 25px; font-size: larger; color: black;"></em>#}
                                                 </a>
-                                            {% endif %}
+                                            </div>
                                         </div>
-                                    </div>
+                                    {% endif %}
                                     <!-- image4 -->
-                                    <div class="col-sm-6 col-lg-4 col-xxl-4">
-                                        <div class="gallery card">
-                                            {% if sale_file.image4 %}
-                                                <a class="gallery-image popup-image" href="#">
-                                                    <img class="w-100 rounded-top" src="{{ sale_file.image4.url }}" alt="" />
+                                    {% if sale_file.image4 %}
+                                        <div class="col-sm-6 col-lg-4 col-xxl-4">
+                                            <div class="gallery card">
+                                                <a class="gallery-image popup-image" href="#" style="height: 20.25em;!important; -webkit-line-clamp: 20.25;!important;">
+                                                    <img class="w-100 rounded-top" src="{{ sale_file.image4.url }}">
                                                     <a href="{{ sale_file.image4.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
-{#                                                    <em class="icon ni ni-share" style="line-height: 25px; font-size: larger; color: black;"></em>#}
                                                 </a>
-                                            {% endif %}
+                                            </div>
                                         </div>
-                                    </div>
+                                    {% endif %}
                                     <!-- image5 -->
-                                    <div class="col-sm-6 col-lg-4 col-xxl-4">
-                                        <div class="gallery card">
-                                            {% if sale_file.image5 %}
-                                                <a class="gallery-image popup-image" href="#">
-                                                    <img class="w-100 rounded-top" src="{{ sale_file.image5.url }}" alt="" />
+                                    {% if sale_file.image5 %}
+                                        <div class="col-sm-6 col-lg-4 col-xxl-4">
+                                            <div class="gallery card">
+                                                <a class="gallery-image popup-image" href="#" style="height: 20.25em;!important; -webkit-line-clamp: 20.25;!important;">
+                                                    <img class="w-100 rounded-top" src="{{ sale_file.image5.url }}">
                                                     <a href="{{ sale_file.image5.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
-{#                                                    <em class="icon ni ni-share" style="line-height: 25px; font-size: larger; color: black;"></em>#}
                                                 </a>
-                                            {% endif %}
+                                            </div>
                                         </div>
-                                    </div>
+                                    {% endif %}
                                     <!-- image6 -->
-                                    <div class="col-sm-6 col-lg-4 col-xxl-4">
-                                        <div class="gallery card">
-                                            {% if sale_file.image6 %}
-                                                <a class="gallery-image popup-image" href="#">
-                                                    <img class="w-100 rounded-top" src="{{ sale_file.image6.url }}" alt="" />
+                                    {% if sale_file.image6 %}
+                                        <div class="col-sm-6 col-lg-4 col-xxl-4">
+                                            <div class="gallery card">
+                                                <a class="gallery-image popup-image" href="#" style="height: 20.25em;!important; -webkit-line-clamp: 20.25;!important;">
+                                                    <img class="w-100 rounded-top" src="{{ sale_file.image6.url }}">
                                                     <a href="{{ sale_file.image6.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
-{#                                                    <em class="icon ni ni-share" style="line-height: 25px; font-size: larger; color: black;"></em>#}
                                                 </a>
-                                            {% endif %}
+                                            </div>
                                         </div>
-                                    </div>
+                                    {% endif %}
                                     <!-- image7 -->
-                                    <div class="col-sm-6 col-lg-4 col-xxl-4">
-                                        <div class="gallery card">
-                                            {% if sale_file.image7 %}
-                                                <a class="gallery-image popup-image" href="#">
-                                                    <img class="w-100 rounded-top" src="{{ sale_file.image7.url }}" alt="" />
+                                    {% if sale_file.image7 %}
+                                        <div class="col-sm-6 col-lg-4 col-xxl-4">
+                                            <div class="gallery card">
+                                                <a class="gallery-image popup-image" href="#" style="height: 20.25em;!important; -webkit-line-clamp: 20.25;!important;">
+                                                    <img class="w-100 rounded-top" src="{{ sale_file.image7.url }}">
                                                     <a href="{{ sale_file.image7.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
-{#                                                    <em class="icon ni ni-share" style="line-height: 25px; font-size: larger; color: black;"></em>#}
                                                 </a>
-                                            {% endif %}
+                                            </div>
                                         </div>
-                                    </div>
+                                    {% endif %}
                                     <!-- image8 -->
-                                    <div class="col-sm-6 col-lg-4 col-xxl-4">
-                                        <div class="gallery card">
-                                            {% if sale_file.image8 %}
-                                                <a class="gallery-image popup-image" href="#">
-                                                    <img class="w-100 rounded-top" src="{{ sale_file.image8.url }}" alt="" />
+                                    {% if sale_file.image8 %}
+                                        <div class="col-sm-6 col-lg-4 col-xxl-4">
+                                            <div class="gallery card">
+                                                <a class="gallery-image popup-image" href="#" style="height: 20.25em;!important; -webkit-line-clamp: 20.25;!important;">
+                                                    <img class="w-100 rounded-top" src="{{ sale_file.image8.url }}">
                                                     <a href="{{ sale_file.image8.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
-{#                                                    <em class="icon ni ni-share" style="line-height: 25px; font-size: larger; color: black;"></em>#}
                                                 </a>
-                                            {% endif %}
+                                            </div>
                                         </div>
-                                    </div>
+                                    {% endif %}
                                     <!-- image9 -->
-                                    <div class="col-sm-6 col-lg-4 col-xxl-4">
-                                        <div class="gallery card">
-                                            {% if sale_file.image9 %}
-                                                <a class="gallery-image popup-image" href="#">
-                                                    <img class="w-100 rounded-top" src="{{ sale_file.image9.url }}" alt="" />
+                                    {% if sale_file.image9 %}
+                                        <div class="col-sm-6 col-lg-4 col-xxl-4">
+                                            <div class="gallery card">
+                                                <a class="gallery-image popup-image" href="#" style="height: 20.25em;!important; -webkit-line-clamp: 20.25;!important;">
+                                                    <img class="w-100 rounded-top" src="{{ sale_file.image9.url }}">
                                                     <a href="{{ sale_file.image9.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
-{#                                                    <em class="icon ni ni-share" style="line-height: 25px; font-size: larger; color: black;"></em>#}
                                                 </a>
-                                            {% endif %}
+                                            </div>
                                         </div>
-                                    </div>
+                                    {% endif %}
                                 {% else %}
                                     <div class="nk-block-head-content">
                                         <span class="nk-block-title">هنوز تصویری موجود نیست!</span>
                                     </div>
                                 {% endif %}
-
                             </div>
 
                             <!-- Title (video) -->
@@ -376,7 +370,6 @@
 
                             <!-- Media (video) -->
                             <div class="row g-gs">
-
                                 <!-- video -->
                                 {% if sale_file.video %}
                                     <div class="col-sm-6 col-lg-4 col-xxl-4">

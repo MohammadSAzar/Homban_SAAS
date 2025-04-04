@@ -1,15 +1,9 @@
-import os
-import zipfile
-
-from django.conf import settings
-from django.shortcuts import render, redirect, get_object_or_404, reverse
-from django.contrib.auth import login
+from django.shortcuts import render
 from django.urls import reverse
-from django.views.generic import DetailView, CreateView, ListView
-from django.http import JsonResponse, HttpResponseRedirect, HttpResponse
+from django.views.generic import DetailView, CreateView, ListView, UpdateView
 from django.contrib import messages
 
-from . import models, forms, choices
+from . import models, forms
 
 
 # ----------------------------------- Bases -----------------------------------
@@ -122,28 +116,34 @@ class SaleFileGalleryView(DetailView):
     template_name = 'dashboard/files/sale_file_gallery.html'
 
 
-# class SaleFileCreateView(CreateView):
-#     model = models.SaleFile
-#     form_class = forms.SaleFileCreateForm
-#     template_name = 'restates/sale_file_create.html'
-#
-#     def post(self, request, *args, **kwargs):
-#         form = self.get_form()
-#         if form.is_valid():
-#             return self.form_valid(form)
-#         else:
-#             return self.form_invalid(form)
-#
-#     def form_valid(self, form):
-#         messages.success(self.request, "آگهی شما پس از تایید ادمین در سایت منتشر خواهد شد.")
-#         return super().form_valid(form)
-#
-#     def form_invalid(self, form):
-#         self.object = None
-#         return self.render_to_response(self.get_context_data(form=form))
-#
-#     def get_success_url(self):
-#         return reverse('profile_info_now')
+class SaleFileCreateView(CreateView):
+    model = models.SaleFile
+    form_class = forms.SaleFileCreateForm
+    template_name = 'dashboard/files/sale_file_create.html'
 
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+    def form_valid(self, form):
+        messages.success(self.request, "فایل شما پس از تایید مدیر در سایت منتشر خواهد شد.")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        self.object = None
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_success_url(self):
+        return reverse('sale_file_list')
+
+
+class SaleFileUpdateView(UpdateView):
+    model = models.SaleFile
+    form_class = forms.SaleFileCreateForm
+    template_name = 'dashboard/files/sale_file_update.html'
+    context_object_name = 'sale_file'
 
 
