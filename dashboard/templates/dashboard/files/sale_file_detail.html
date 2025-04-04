@@ -19,7 +19,7 @@
         <div class="row g-gs">
 
             <!-- Main (Sidebar) -->
-            <div class="col-lg-4 col-xl-4 col-xxl-3">
+            <div class="col-lg-4 col-xl-4 col-xxl-4">
                 <div class="card">
                     <div class="card-inner-group" >
 
@@ -35,7 +35,7 @@
 
                                     <div style="font-size: 0.9em; margin-top: 1em;">
                                         <a href="{% url 'sale_file_update' sale_file.slug sale_file.unique_url_id %}" class="btn btn-primary">بروزرسانی</a>
-                                        <a href="{% url 'sale_file_update' sale_file.slug sale_file.unique_url_id %}" class="btn btn-danger">پاک کردن</a>
+                                        <a href="{% url 'sale_file_delete' sale_file.slug sale_file.unique_url_id %}" class="btn btn-danger">پاک کردن</a>
                                     </div>
                                 </div>
                             </div>
@@ -59,21 +59,21 @@
                                 <div class="col-4">
                                     <div class="profile-stats">
                                         <span class="amount">{{ sale_file.area }}</span>
-                                        <span class="sub-text">متراژ (متر)</span>
+                                        <span class="sub-text">متراژ</span>
                                     </div>
                                 </div>
                                 <!-- َAge -->
                                 <div class="col-4">
                                     <div class="profile-stats">
                                         <span class="amount">{{ sale_file.age }}</span>
-                                        <span class="sub-text">سن (سال)</span>
+                                        <span class="sub-text">سن</span>
                                     </div>
                                 </div>
                                 <!-- Room -->
                                 <div class="col-4">
                                     <div class="profile-stats">
                                         <span class="amount">{{ sale_file.room }}</span>
-                                        <span class="sub-text">تعداد اتاق</span>
+                                        <span class="sub-text">تعداد</span>
                                     </div>
                                 </div>
                             </div>
@@ -86,7 +86,7 @@
                                 <!-- Total Price -->
                                 <div class="nk-tb-item">
                                     <div class="nk-tb-col"><span class="fw-bold">قیمت کل:</span></div>
-                                    <div class="nk-tb-col tb-col-sm">
+                                    <div class="nk-tb-col">
                                         <span class="tb-product">
                                             <span class="title" style="font-size: 1em;">{{ sale_file.price_announced|intcomma:False|farsi_number }} تومان</span>
                                         </span>
@@ -96,7 +96,7 @@
                                 <!-- Metric Price -->
                                 <div class="nk-tb-item">
                                     <div class="nk-tb-col"><span class="fw-bold">قیمت متری:</span></div>
-                                    <div class="nk-tb-col tb-col-sm">
+                                    <div class="nk-tb-col">
                                         <span class="tb-product">
                                             <span class="title" style="font-size: 1em;">{{ sale_file.price_per_meter|intcomma:False|farsi_number }} تومان</span>
                                         </span>
@@ -106,7 +106,7 @@
                                 <!-- Level -->
                                 <div class="nk-tb-item">
                                     <div class="nk-tb-col"><span class="fw-bold">طبقه</span></div>
-                                    <div class="nk-tb-col tb-col-sm">
+                                    <div class="nk-tb-col">
                                         <span class="tb-product">
                                             <span class="title">{{ sale_file.level }}</span>
                                         </span>
@@ -116,7 +116,7 @@
                                 <!-- Document -->
                                 <div class="nk-tb-item">
                                     <div class="nk-tb-col"><span class="fw-bold">وضعیت سند:</span></div>
-                                    <div class="nk-tb-col tb-col-sm">
+                                    <div class="nk-tb-col">
                                         <span class="tb-product">
                                             {% if sale_file.document == 'has' %}
                                                 <span class="title" style="font-size: 1em; color: green;">{{ sale_file.get_document_display }}</span>
@@ -172,7 +172,7 @@
             <!-- end: Main (Sidebar) -->
 
             <!-- Other -->
-            <div class="col-lg-8 col-xl-8 col-xxl-9">
+            <div class="col-lg-8 col-xl-8 col-xxl-8">
                 <div class="card">
                     <div class="card-inner">
 
@@ -249,114 +249,84 @@
                             </div>
 
                             <!-- Media (images) -->
-                            <div class="row g-gs">
-                                {% if sale_file.image1 or sale_file.image2 or sale_file.image3 or sale_file.image4 or sale_file.image5 or sale_file.image6 or sale_file.image7 or sale_file.image8 or sale_file.image9 %}
-                                    <!-- image1 -->
-                                    {% if sale_file.image1 %}
-                                        <div class="col-sm-6 col-lg-4 col-xxl-4">
-                                            <div class="gallery card">
-                                                {% if sale_file.image1 %}
-                                                    <a class="gallery-image popup-image" href="#" style="height: 20.25em;!important; -webkit-line-clamp: 20.25;!important;">
-                                                        <img class="w-100 rounded-top" src="{{ sale_file.image1.url }}">
-                                                        <a href="{{ sale_file.image1.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
-                                                    </a>
-                                                {% endif %}
-                                            </div>
-                                        </div>
-                                    {% endif %}
-                                    <!-- image2 -->
-                                    {% if sale_file.image2 %}
-                                        <div class="col-sm-6 col-lg-4 col-xxl-4">
-                                            <div class="gallery card">
-                                                <a class="gallery-image popup-image" href="#" style="height: 20.25em;!important; -webkit-line-clamp: 20.25;!important;">
-                                                    <img class="w-100 rounded-top" src="{{ sale_file.image2.url }}">
-                                                    <a href="{{ sale_file.image2.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
+                            <div class="nk-block nk-block-lg">
+                                <div class="card card-bordered card-preview">
+                                    <div class="card-inner">
+                                        <div class="example-carousel">
+                                            <div id="carouselExConInd" class="carousel slide" data-bs-ride="carousel">
+
+                                                <!-- Carousel -->
+                                                <div class="carousel-inner">
+                                                    {% if sale_file.image1 %}
+                                                        <div class="carousel-item active">
+                                                            <img src="{{ sale_file.image1.url }}" class="d-block w-100">
+                                                            <a href="{{ sale_file.image1.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
+                                                        </div>
+                                                    {% endif %}
+                                                    {% if sale_file.image2 %}
+                                                        <div class="carousel-item">
+                                                            <img src="{{ sale_file.image2.url }}" class="d-block w-100">
+                                                            <a href="{{ sale_file.image1.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
+                                                        </div>
+                                                    {% endif %}
+                                                    {% if sale_file.image3 %}
+                                                        <div class="carousel-item">
+                                                            <img src="{{ sale_file.image3.url }}" class="d-block w-100">
+                                                            <a href="{{ sale_file.image1.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
+                                                        </div>
+                                                    {% endif %}
+                                                    {% if sale_file.image4 %}
+                                                        <div class="carousel-item active">
+                                                            <img src="{{ sale_file.image4.url }}" class="d-block w-100">
+                                                            <a href="{{ sale_file.image1.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
+                                                        </div>
+                                                    {% endif %}
+                                                    {% if sale_file.image5 %}
+                                                        <div class="carousel-item">
+                                                            <img src="{{ sale_file.image5.url }}" class="d-block w-100">
+                                                            <a href="{{ sale_file.image1.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
+                                                        </div>
+                                                    {% endif %}
+                                                    {% if sale_file.image6 %}
+                                                        <div class="carousel-item">
+                                                            <img src="{{ sale_file.image6.url }}" class="d-block w-100">
+                                                                <a href="{{ sale_file.image1.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
+                                                        </div>
+                                                    {% endif %}
+                                                    {% if sale_file.image7 %}
+                                                        <div class="carousel-item active">
+                                                            <img src="{{ sale_file.image7.url }}" class="d-block w-100">
+                                                            <a href="{{ sale_file.image1.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
+                                                        </div>
+                                                    {% endif %}
+                                                    {% if sale_file.image8 %}
+                                                        <div class="carousel-item">
+                                                            <img src="{{ sale_file.image8.url }}" class="d-block w-100">
+                                                            <a href="{{ sale_file.image1.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
+                                                        </div>
+                                                    {% endif %}
+                                                    {% if sale_file.image9 %}
+                                                        <div class="carousel-item">
+                                                            <img src="{{ sale_file.image9.url }}" class="d-block w-100">
+                                                            <a href="{{ sale_file.image1.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+
+                                                <!-- Navigators -->
+                                                <a class="carousel-control-prev" href="#carouselExConInd" role="button" data-bs-slide="prev">
+                                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                                    <span class="visually-hidden">قبلی</span>
                                                 </a>
-                                            </div>
-                                        </div>
-                                    {% endif %}
-                                    <!-- image3 -->
-                                    {% if sale_file.image3 %}
-                                        <div class="col-sm-6 col-lg-4 col-xxl-4">
-                                            <div class="gallery card">
-                                                <a class="gallery-image popup-image" href="#" style="height: 20.25em;!important; -webkit-line-clamp: 20.25;!important;">
-                                                    <img class="w-100 rounded-top" src="{{ sale_file.image3.url }}">
-                                                    <a href="{{ sale_file.image3.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
+                                                <a class="carousel-control-next" href="#carouselExConInd" role="button" data-bs-slide="next">
+                                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                                    <span class="visually-hidden">بعدی</span>
                                                 </a>
+
                                             </div>
                                         </div>
-                                    {% endif %}
-                                    <!-- image4 -->
-                                    {% if sale_file.image4 %}
-                                        <div class="col-sm-6 col-lg-4 col-xxl-4">
-                                            <div class="gallery card">
-                                                <a class="gallery-image popup-image" href="#" style="height: 20.25em;!important; -webkit-line-clamp: 20.25;!important;">
-                                                    <img class="w-100 rounded-top" src="{{ sale_file.image4.url }}">
-                                                    <a href="{{ sale_file.image4.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
-                                                </a>
-                                            </div>
-                                        </div>
-                                    {% endif %}
-                                    <!-- image5 -->
-                                    {% if sale_file.image5 %}
-                                        <div class="col-sm-6 col-lg-4 col-xxl-4">
-                                            <div class="gallery card">
-                                                <a class="gallery-image popup-image" href="#" style="height: 20.25em;!important; -webkit-line-clamp: 20.25;!important;">
-                                                    <img class="w-100 rounded-top" src="{{ sale_file.image5.url }}">
-                                                    <a href="{{ sale_file.image5.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
-                                                </a>
-                                            </div>
-                                        </div>
-                                    {% endif %}
-                                    <!-- image6 -->
-                                    {% if sale_file.image6 %}
-                                        <div class="col-sm-6 col-lg-4 col-xxl-4">
-                                            <div class="gallery card">
-                                                <a class="gallery-image popup-image" href="#" style="height: 20.25em;!important; -webkit-line-clamp: 20.25;!important;">
-                                                    <img class="w-100 rounded-top" src="{{ sale_file.image6.url }}">
-                                                    <a href="{{ sale_file.image6.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
-                                                </a>
-                                            </div>
-                                        </div>
-                                    {% endif %}
-                                    <!-- image7 -->
-                                    {% if sale_file.image7 %}
-                                        <div class="col-sm-6 col-lg-4 col-xxl-4">
-                                            <div class="gallery card">
-                                                <a class="gallery-image popup-image" href="#" style="height: 20.25em;!important; -webkit-line-clamp: 20.25;!important;">
-                                                    <img class="w-100 rounded-top" src="{{ sale_file.image7.url }}">
-                                                    <a href="{{ sale_file.image7.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
-                                                </a>
-                                            </div>
-                                        </div>
-                                    {% endif %}
-                                    <!-- image8 -->
-                                    {% if sale_file.image8 %}
-                                        <div class="col-sm-6 col-lg-4 col-xxl-4">
-                                            <div class="gallery card">
-                                                <a class="gallery-image popup-image" href="#" style="height: 20.25em;!important; -webkit-line-clamp: 20.25;!important;">
-                                                    <img class="w-100 rounded-top" src="{{ sale_file.image8.url }}">
-                                                    <a href="{{ sale_file.image8.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
-                                                </a>
-                                            </div>
-                                        </div>
-                                    {% endif %}
-                                    <!-- image9 -->
-                                    {% if sale_file.image9 %}
-                                        <div class="col-sm-6 col-lg-4 col-xxl-4">
-                                            <div class="gallery card">
-                                                <a class="gallery-image popup-image" href="#" style="height: 20.25em;!important; -webkit-line-clamp: 20.25;!important;">
-                                                    <img class="w-100 rounded-top" src="{{ sale_file.image9.url }}">
-                                                    <a href="{{ sale_file.image9.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
-                                                </a>
-                                            </div>
-                                        </div>
-                                    {% endif %}
-                                {% else %}
-                                    <div class="nk-block-head-content">
-                                        <span class="nk-block-title">هنوز تصویری موجود نیست!</span>
                                     </div>
-                                {% endif %}
+                                </div>
                             </div>
 
                             <!-- Title (video) -->
@@ -798,7 +768,6 @@
     </div>
 
 {% endblock %}
-
 
 
 

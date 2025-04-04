@@ -1,6 +1,6 @@
 from django.shortcuts import render
-from django.urls import reverse
-from django.views.generic import DetailView, CreateView, ListView, UpdateView
+from django.urls import reverse, reverse_lazy
+from django.views.generic import DetailView, CreateView, ListView, UpdateView, DeleteView
 from django.contrib import messages
 
 from . import models, forms
@@ -146,4 +146,14 @@ class SaleFileUpdateView(UpdateView):
     template_name = 'dashboard/files/sale_file_update.html'
     context_object_name = 'sale_file'
 
+
+class SaleFileDeleteView(DeleteView):
+    model = models.SaleFile
+    template_name = 'dashboard/files/sale_file_delete.html'
+    success_url = reverse_lazy('sale_file_list')
+    context_object_name = 'sale_file'
+
+    # def test_func(self):
+    #     obj = self.get_object()
+    #     return obj.user == self.request.user
 
