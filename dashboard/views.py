@@ -129,7 +129,7 @@ class SaleFileCreateView(CreateView):
             return self.form_invalid(form)
 
     def form_valid(self, form):
-        messages.success(self.request, "فایل شما پس از تایید مدیر در سایت منتشر خواهد شد.")
+        messages.success(self.request, "فایل شما در سامانه ثبت شد (این فایل توسط مدیر بررسی خواهد شد).")
         return super().form_valid(form)
 
     def form_invalid(self, form):
@@ -146,6 +146,14 @@ class SaleFileUpdateView(UpdateView):
     template_name = 'dashboard/files/sale_file_update.html'
     context_object_name = 'sale_file'
 
+    def form_valid(self, form):
+        messages.success(self.request, "تغییرات شما در سامانه ثبت شد (این تغییرات توسط مدیر بررسی خواهد شد).")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        self.object = None
+        return self.render_to_response(self.get_context_data(form=form))
+
 
 class SaleFileDeleteView(DeleteView):
     model = models.SaleFile
@@ -153,7 +161,14 @@ class SaleFileDeleteView(DeleteView):
     success_url = reverse_lazy('sale_file_list')
     context_object_name = 'sale_file'
 
-    # def test_func(self):
-    #     obj = self.get_object()
-    #     return obj.user == self.request.user
+    def form_valid(self, form):
+        messages.error(self.request, "فایل مربوطه از سامانه حذف شد.")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        self.object = None
+        return self.render_to_response(self.get_context_data(form=form))
+
+
+
 

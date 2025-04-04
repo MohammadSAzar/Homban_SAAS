@@ -16,6 +16,28 @@
 {% block content %}
 
     <div class="nk-block">
+
+        <!-- Messages1 -->
+        <div id="successModal" class="modal">
+            <div class="modal-content">
+                <h4 class="modal-title" style="padding: 20px 20px 10px 0;!important;">عملیات با موفقیت انجام شد (عملیات مربوطه توسط مدیر بررسی خواهد شد)..</h4>
+                <button class="modal-my-button">بستن پیام</button>
+            </div>
+        </div>
+        <script>
+            $(document).ready(function() {
+                var messages = "{% for message in messages %}{{ message }}{% if not forloop.last %}\\n{% endif %}{% endfor %}";
+                if (messages) {
+                    $('#modal-message').text(messages);
+                    $('#successModal').show();
+                }
+                $('.modal-my-button').on('click', function() {
+                    $('#successModal').hide();
+                });
+            });
+        </script>
+
+        <!-- Main -->
         <div class="row g-gs">
 
             <!-- Main (Sidebar) -->

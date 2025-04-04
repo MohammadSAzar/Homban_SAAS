@@ -12,6 +12,17 @@
 
 
 {% block content %}
+    
+    <!-- Messages2 -->
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <!-- Main -->
     <div class="components-preview wide-md mx-auto">
         <div class="nk-block nk-block-lg">
             <div class="card card-bordered card-preview">
@@ -660,6 +671,7 @@
             </div>
         </div>
     </div>
+
 {% endblock %}
 
 
