@@ -1,0 +1,45 @@
+{% extends '_base_dashboard.html' %}
+
+{% load static %}
+{% load i18n %}
+{% load jalali_tags %}
+{% load number_converter %}
+{% load humanize %}
+{% load widget_tweaks %}
+
+
+{% block title %}حذف فایل {{ sale_file.title|linebreaksbr|farsi_number }}{% endblock %}
+
+
+{% block content %}
+    <div class="components-preview wide-md mx-auto">
+        <div class="nk-block nk-block-lg">
+            <div class="card card-bordered card-preview">
+                <div class="card-inner">
+                    <div class="preview-block">
+
+                        <!-- Text -->
+                        <div class="nk-block-head-content">
+                            <p class="nk-block-title" style="line-height: 45px; font-size: 1.4em;">آیا از حذف فایل {{ sale_file.title|linebreaksbr|farsi_number }} مطمئن هستید؟</p>
+                        </div>
+                        <!-- end: Title -->
+
+                        <!-- Form -->
+                        <form class="row gy-4" method="post">
+                            {% csrf_token %}
+                            <div class="nk-fmg-actions" style="margin-top: 3em;">
+                                <button type="submit" class="btn btn-danger" style="line-height: 30px;">حذف فایل</button>
+                            </div>
+                        </form>
+                        <!-- end: Form -->
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+
+
+

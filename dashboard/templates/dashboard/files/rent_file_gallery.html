@@ -1,0 +1,203 @@
+{% load static %}
+{% load i18n %}
+{% load jalali_tags %}
+{% load number_converter %}
+{% load humanize %}
+{% load widget_tweaks %}
+
+<!DOCTYPE html>
+<html lang="fa" class="js" dir="rtl">
+
+    <head>
+        <!-- Meta -->
+        <base href="../" />
+        <meta charset="utf-8" />
+        <meta name="author" content="" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="" />
+
+        <!-- CSS -->
+        <link rel="stylesheet" href="{% static 'dashboard/assets/css/dashlite.rtl.css' %}" />
+        <link id="skin-default" rel="stylesheet" href="{% static 'dashboard/assets/css/theme.css' %}" />
+
+        <!-- JS -->
+        <script src="{% static 'dashboard/assets/js/bundle.js' %}"></script>
+        <script src="{% static 'dashboard/assets/js/scripts.js' %}"></script>
+        <script src="{% static 'dashboard/assets/js/jquery-3.7.1.min.js' %}"></script>
+
+        <!-- Favicon -->
+        <link rel="icon" type="image/png" href="{% static 'main/img/logos/ho-fav.png' %}">
+
+        <!-- Title -->
+        <title>گالری تصاویر: {{ sale_file.title|farsi_number }}</title>
+    </head>
+
+    <body class="bg-gray-100 all-projects-template muze-rtl">
+
+        <div class="nk-app-root">
+            <div class="nk-main">
+                <div class="nk-wrap">
+                    <div class="nk-content">
+                        <div class="container-fluid">
+                            <div class="nk-content-inner">
+                                <div class="nk-content-body">
+                                    <div class="nk-content">
+                                        <div class="container-fluid">
+                                            <div class="nk-content-inner">
+                                                <div class="nk-content-body">
+                                                    <div class="nk-block">
+
+                                                        <!-- Title -->
+                                                        <div class="nk-block-head nk-block-head-lg wide-sm">
+                                                            <div class="nk-block-head-content">
+                                                                <h6 class="nk-block-title page-title" style="line-height: 45px;">گالری تصاویر و ویدئو فایل {{ sale_file.title|linebreaksbr|farsi_number }}</h6>
+                                                                <!-- Share -->
+                                                                {% if sale_file.zip_file %}
+                                                                    <a href="{{ sale_file.zip_file }}" class="btn btn-primary">دانلود یکجای محتوا</a>
+                                                                {% else %}
+                                                                    <a href="#" class="btn btn-danger">محتوایی موجود نیست</a>
+                                                                {% endif %}
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- Media -->
+                                                        <div class="row g-gs">
+
+                                                            <!-- Images -->
+                                                            <div class="col-sm-6 col-lg-4 col-xxl-4">
+                                                                <!-- Title -->
+                                                                <div class="nk-block-head nk-block-head-sm">
+                                                                    <div class="nk-block-between g-3">
+                                                                        <div class="nk-block-head-content">
+                                                                            <h5 class="nk-block-title">تصاویر</h5>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <!-- Items -->
+                                                                <div class="gallery card">
+                                                                    <div class="example-carousel">
+                                                                        <div id="carouselExConInd" class="carousel slide" data-bs-ride="carousel">
+
+                                                                            <!-- Carousel -->
+                                                                            <div class="carousel-inner">
+                                                                                {% if sale_file.image1 %}
+                                                                                    <div class="carousel-item active">
+                                                                                        <img src="{{ sale_file.image1.url }}" class="d-block w-100">
+                                                                                        <a href="{{ sale_file.image1.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
+                                                                                    </div>
+                                                                                {% endif %}
+                                                                                {% if sale_file.image2 %}
+                                                                                    <div class="carousel-item">
+                                                                                        <img src="{{ sale_file.image2.url }}" class="d-block w-100">
+                                                                                        <a href="{{ sale_file.image1.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
+                                                                                    </div>
+                                                                                {% endif %}
+                                                                                {% if sale_file.image3 %}
+                                                                                    <div class="carousel-item">
+                                                                                        <img src="{{ sale_file.image3.url }}" class="d-block w-100">
+                                                                                        <a href="{{ sale_file.image1.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
+                                                                                    </div>
+                                                                                {% endif %}
+                                                                                {% if sale_file.image4 %}
+                                                                                    <div class="carousel-item active">
+                                                                                        <img src="{{ sale_file.image4.url }}" class="d-block w-100">
+                                                                                        <a href="{{ sale_file.image1.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
+                                                                                    </div>
+                                                                                {% endif %}
+                                                                                {% if sale_file.image5 %}
+                                                                                    <div class="carousel-item">
+                                                                                        <img src="{{ sale_file.image5.url }}" class="d-block w-100">
+                                                                                        <a href="{{ sale_file.image1.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
+                                                                                    </div>
+                                                                                {% endif %}
+                                                                                {% if sale_file.image6 %}
+                                                                                    <div class="carousel-item">
+                                                                                        <img src="{{ sale_file.image6.url }}" class="d-block w-100">
+                                                                                            <a href="{{ sale_file.image1.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
+                                                                                    </div>
+                                                                                {% endif %}
+                                                                                {% if sale_file.image7 %}
+                                                                                    <div class="carousel-item active">
+                                                                                        <img src="{{ sale_file.image7.url }}" class="d-block w-100">
+                                                                                        <a href="{{ sale_file.image1.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
+                                                                                    </div>
+                                                                                {% endif %}
+                                                                                {% if sale_file.image8 %}
+                                                                                    <div class="carousel-item">
+                                                                                        <img src="{{ sale_file.image8.url }}" class="d-block w-100">
+                                                                                        <a href="{{ sale_file.image1.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
+                                                                                    </div>
+                                                                                {% endif %}
+                                                                                {% if sale_file.image9 %}
+                                                                                    <div class="carousel-item">
+                                                                                        <img src="{{ sale_file.image9.url }}" class="d-block w-100">
+                                                                                        <a href="{{ sale_file.image1.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
+                                                                                    </div>
+                                                                                {% endif %}
+                                                                            </div>
+
+                                                                            <!-- Navigators -->
+                                                                            <a class="carousel-control-prev" href="#carouselExConInd" role="button" data-bs-slide="prev">
+                                                                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                                                                <span class="visually-hidden">قبلی</span>
+                                                                            </a>
+                                                                            <a class="carousel-control-next" href="#carouselExConInd" role="button" data-bs-slide="next">
+                                                                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                                                                <span class="visually-hidden">بعدی</span>
+                                                                            </a>
+
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <!-- Video -->
+                                                            <div class="col-sm-6 col-lg-4 col-xxl-4">
+                                                                <!-- Title -->
+                                                                <div class="nk-block-head nk-block-head-sm">
+                                                                    <div class="nk-block-between g-3">
+                                                                        <div class="nk-block-head-content">
+                                                                            <h5 class="nk-block-title">ویدئو معرفی</h5>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <!-- Items -->
+                                                                {% if sale_file.video %}
+                                                                    <div class="gallery card">
+                                                                        {% if sale_file.video %}
+                                                                            <a class="gallery-image popup-image" href="#">
+                                                                                <video controls loop muted width="100%">
+                                                                                    <source src="{{ sale_file.video.url }}" type="video/mp4">
+                                                                                </video>
+                                                                                <a href="{{ sale_file.video.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
+                                                                                </a>
+                                                                        {% endif %}
+                                                                    </div>
+                                                                {% else %}
+                                                                    <div class="nk-block-head-content">
+                                                                        <span class="nk-block-title">هنوز ویدئویی موجود نیست!</span>
+                                                                    </div>
+                                                                {% endif %}
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </body>
+
+</html>
+
+
+
+

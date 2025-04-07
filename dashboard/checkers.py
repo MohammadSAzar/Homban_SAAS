@@ -5,7 +5,7 @@ max_area = 100000  # m2
 min_deposit_price = 0  # TOOMAN
 max_deposit_price = 100000000000  # TOOMAN
 min_rent_price = 0  # TOOMAN
-max_rent_price = 1000000000  # TOOMAN
+max_rent_price = 10000000000  # TOOMAN
 
 
 def rent_file_deposit_price_checker(price):
