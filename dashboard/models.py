@@ -17,7 +17,7 @@ from django.utils.translation import gettext as _
 from . import choices
 
 
-# -------------------------------- CODES ---------------------------------
+# -------------------------------- CODES ----------------------------------
 def generate_unique_id():
     return ''.join(random.choices(string.ascii_letters + string.digits, k=20))
 
@@ -26,7 +26,7 @@ def generate_unique_code():
     return ''.join(random.choices(string.digits + string.digits, k=6))
 
 
-# -------------------------------- TIMES ---------------------------------
+# -------------------------------- TIMES ----------------------------------
 def next_seven_days_shamsi():
     days = []
     today = date.today()
@@ -126,7 +126,7 @@ def next_month_shamsi():
     return final_days
 
 
-# --------------------------------- CUM ------------------------------------
+# --------------------------------- CUM -------------------------------------
 class CustomUserModel(AbstractUser):
     TITLE_CHOICES = [
         ('bs', _('Boss')),
@@ -138,7 +138,7 @@ class CustomUserModel(AbstractUser):
     REQUIRED_FIELDS = []
 
 
-# --------------------------------- LOCs -----------------------------------
+# --------------------------------- LOCs ------------------------------------
 class Province(models.Model):
     name = models.CharField(max_length=100, verbose_name=_('Province'))
 
@@ -171,7 +171,7 @@ class SubDistrict(models.Model):
         return self.name
 
 
-# --------------------------------- FILE ----------------------------------
+# --------------------------------- FILE -----------------------------------
 class Person(models.Model):
     name = models.CharField(max_length=100, verbose_name=_('Name'))
     phone_number = models.CharField(max_length=11, unique=True, verbose_name=_('Phone Number'))
@@ -367,17 +367,48 @@ class RentFile(models.Model):
 
     @property
     def has_images(self):
-        if self.image1:
-            return choices.booleans[0][1]
-        else:
-            return choices.booleans[1][1]
+        if self.image1 or self.image2 or self.image3 or self.image4 or self.image5 or self.image6 or self.image7 or self.image8 or self.image9:
+            return True
 
     @property
     def has_video(self):
         if self.video:
-            return choices.booleans[0][1]
-        else:
-            return choices.booleans[1][1]
+            return True
+
+    @property
+    def zip_file(self):
+        """Generates and returns the URL of a ZIP file containing all available media."""
+        media_files = [self.image1, self.image2, self.image3, self.image4, self.image5,
+                       self.image6, self.image7, self.image8, self.image9, self.video]
+
+        # Filter out None values (blank images/videos)
+        media_files = [file for file in media_files if file]
+        if not media_files:
+            return None
+
+        # Define ZIP file path
+        zip_filename = f"sale_{self.id}_media.zip"
+        zip_folder = os.path.join(settings.MEDIA_ROOT, "temp_zips")
+        os.makedirs(zip_folder, exist_ok=True)  # Ensure directory exists
+        zip_path = os.path.join(zip_folder, zip_filename)
+
+        # Create ZIP file
+        with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+            for media in media_files:
+                media_path = os.path.join(settings.MEDIA_ROOT, str(media))
+                if os.path.exists(media_path):
+                    zipf.write(media_path, os.path.basename(media_path))
+
+        # Return URL of the ZIP file
+        return f"{settings.MEDIA_URL}temp_zips/{zip_filename}"
+
+    def zip_file_admin(self):
+        zip_url = self.zip_file
+        if zip_url:
+            return format_html('<a href="{}" download>Download ZIP</a>', zip_url)
+        return "No media"
+
+    zip_file_admin.short_description = "Download ZIP"
 
     def save(self, *args, **kwargs):
         if self.pk is not None:
@@ -405,7 +436,7 @@ class RentFile(models.Model):
         return reverse('rent_file_detail', args=[self.slug, self.unique_url_id])
 
 
-# --------------------------------- SERVs ---------------------------------
+# --------------------------------- SERVs ----------------------------------
 class Customer(models.Model):
     name = models.CharField(max_length=100, verbose_name=_('Name'))
     phone_number = models.CharField(max_length=11, unique=True, verbose_name=_('Phone Number'))
@@ -540,7 +571,7 @@ class Trade(models.Model):
         return reverse('trade_detail', args=[self.code])
 
 
-# --------------------------------- MNGs --------------------------------
+# --------------------------------- MNGs ---------------------------------
 class Task(models.Model):
     DATES = next_month_shamsi
     title = models.CharField(max_length=200, verbose_name=_('Title'))

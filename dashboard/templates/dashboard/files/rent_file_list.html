@@ -17,7 +17,7 @@
     <div class="nk-fmg">
 
         <!-- ّFilter -->
-        <div class="nk-fmg-aside" data-content="files-aside" data-toggle-overlay="true" data-toggle-body="true" data-toggle-screen="lg" data-simplebar>
+        <div class="nk-fmg-aside" data-content="files-aside"  data-toggle-overlay="true" data-toggle-body="true" data-toggle-screen="lg" data-simplebar>
             <div class="nk-fmg-aside-wrap">
                 <div class="nk-fmg-aside-top" data-simplebar>
                     <div class="nk-block nk-block-lg">
@@ -364,7 +364,7 @@
 
                                                 <!-- Code / Sub-district -->
                                                 <div class="nk-file-name">
-                                                    <div class="nk-file-name-text" style="margin-bottom: 0.5em;">
+                                                    <div class="nk-file-name-text" style="margin-bottom: 0.5em; height: 3em;!important; -webkit-line-clamp: 2;!important;">
                                                         <span style="font-size: 0.8em;">کد: {{ file.code }} / <span style="color: green; font-size: 1.1em;">{{ file.sub_district }}</span></span>
                                                     </div>
                                                 </div>
@@ -391,12 +391,12 @@
 
                                                 <!-- Deposit -->
                                                 <div class="nk-file-name">
-                                                    <span class="title" style="font-size: 0.8em; color: green;">قیمت: {{ file.deposit_announced|intcomma:False|farsi_number }} تومان</span>
+                                                    <span class="title" style="font-size: 0.8em; color: green;">رهن: {{ file.deposit_announced|intcomma:False|farsi_number }} تومان</span>
                                                 </div>
                                             
                                                 <!-- Rent -->
                                                 <div class="nk-file-name">
-                                                    <span class="title" style="font-size: 0.8em; color: green;">قیمت: {{ file.rent_announced|intcomma:False|farsi_number }} تومان</span>
+                                                    <span class="title" style="font-size: 0.8em; color: green;">اجاره: {{ file.rent_announced|intcomma:False|farsi_number }} تومان</span>
                                                 </div>
 
                                                 <!-- More -->
@@ -417,7 +417,7 @@
             <!-- end: List -->
         
             <!-- Pagination -->
-            <div class="nk-block-head nk-block-head-lg"  style="margin-top: 1.5em;">
+            <div class="nk-block-head nk-block-head-lg" style="margin-top: 1.5em;">
                 <div class="nk-block-between" style="justify-items: center; justify-content: center; text-align: center">
                     <div class="nk-block-head-content">
                         <div class="my-profile-pagination" style="margin-top: 1em;">
@@ -463,6 +463,7 @@
 
     </div>
 {% endblock %}
+
 
 
 

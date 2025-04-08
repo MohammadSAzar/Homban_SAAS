@@ -26,19 +26,19 @@
     <div class="components-preview wide-md mx-auto">
         <div class="nk-block nk-block-lg">
             <div class="card card-bordered card-preview">
-                <div class="card-inner">
-                    <div class="preview-block">
+                <div class="card-inner" >
+                    <div class="preview-block" >
 
                         <!-- Title -->
                         <div class="nk-block-head nk-block-head-lg wide-sm">
                             <div class="nk-block-head-content">
-                                <h6 class="nk-block-title page-title" style="line-height: 45px;">ایجاد فایل جدید (خرید و فروش)</h6>
+                                <h6 class="nk-block-title page-title" style="line-height: 45px;">ایجاد فایل جدید (رهن و اجاره)</h6>
                             </div>
                         </div>
                         <!-- end: Title -->
 
                         <!-- Form -->
-                        <form class="row gy-4" method="post" enctype="multipart/form-data" novalidate>
+                        <form class="row gy-4" method="post"  enctype="multipart/form-data" novalidate>
                             {% csrf_token %}
 
                             <!-- title -->
@@ -86,30 +86,60 @@
                                 </div>
                             </div>
 
-                            <!-- price_announced -->
+                            <!-- deposit_announced -->
                             <div class="col-lg-6 col-sm-6">
                                 <div class="form-group">
                                     <div class="form-control-wrap">
-                                        <label class="form-label" for="{{ form.price_announced.id_for_label }}">قیمت اعلامی (تومان)</label>
-                                        {% render_field form.price_announced id="price_announced" type="number" class="form-control form-control-xl form-control-outlined" %}
+                                        <label class="form-label" for="{{ form.deposit_announced.id_for_label }}">رهن اعلامی (تومان)</label>
+                                        {% render_field form.deposit_announced id="deposit_announced" type="number" class="form-control form-control-xl form-control-outlined" %}
                                     </div>
-                                    {% if form.price_announced.errors %}
-                                        {% for error in form.price_announced.errors %}
+                                    {% if form.deposit_announced.errors %}
+                                        {% for error in form.deposit_announced.errors %}
                                             <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
                                         {% endfor %}
                                     {% endif %}
                                 </div>
                             </div>
 
-                            <!-- price_min -->
+                            <!-- deposit_min -->
                             <div class="col-lg-6 col-sm-6">
                                 <div class="form-group">
                                     <div class="form-control-wrap">
-                                        <label class="form-label" for="{{ form.price_min.id_for_label }}">حداقل قیمت (تومان)</label>
-                                        {% render_field form.price_min id="price_min" type="number" class="form-control form-control-xl form-control-outlined" %}
+                                        <label class="form-label" for="{{ form.deposit_min.id_for_label }}">حداقل رهن (تومان)</label>
+                                        {% render_field form.deposit_min id="deposit_min" type="number" class="form-control form-control-xl form-control-outlined" %}
                                     </div>
-                                    {% if form.price_min.errors %}
-                                        {% for error in form.price_min.errors %}
+                                    {% if form.deposit_min.errors %}
+                                        {% for error in form.deposit_min.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- rent_announced -->
+                            <div class="col-lg-6 col-sm-6">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.rent_announced.id_for_label }}">اجاره اعلامی (تومان)</label>
+                                        {% render_field form.rent_announced id="rent_announced" type="number" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.rent_announced.errors %}
+                                        {% for error in form.rent_announced.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- rent_min -->
+                            <div class="col-lg-6 col-sm-6">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.rent_min.id_for_label }}">حداقل اجاره (تومان)</label>
+                                        {% render_field form.rent_min id="rent_min" type="number" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.rent_min.errors %}
+                                        {% for error in form.rent_min.errors %}
                                             <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
                                         {% endfor %}
                                     {% endif %}
@@ -176,8 +206,23 @@
                                 </div>
                             </div>
 
+                            <!-- convertable -->
+                            <div class="col-lg-4 col-sm-4">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.convertable.id_for_label }}">قابل تبدیل</label>
+                                        {% render_field form.convertable id="convertable" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.convertable.errors %}
+                                        {% for error in form.convertable.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
                             <!-- area -->
-                            <div class="col-lg-3 col-sm-3">
+                            <div class="col-lg-4 col-sm-4">
                                 <div class="form-group">
                                     <div class="form-control-wrap">
                                         <label class="form-label" for="{{ form.area.id_for_label }}">متراژ (متر)</label>
@@ -192,7 +237,7 @@
                             </div>
 
                             <!-- room -->
-                            <div class="col-lg-3 col-sm-3">
+                            <div class="col-lg-4 col-sm-4">
                                 <div class="form-group">
                                     <div class="form-control-wrap">
                                         <label class="form-label" for="{{ form.room.id_for_label }}">تعداد اتاق</label>
@@ -207,7 +252,7 @@
                             </div>
 
                             <!-- age -->
-                            <div class="col-lg-3 col-sm-3">
+                            <div class="col-lg-4 col-sm-4">
                                 <div class="form-group">
                                     <div class="form-control-wrap">
                                         <label class="form-label" for="{{ form.age.id_for_label }}">سن آپارتمان</label>
@@ -222,7 +267,7 @@
                             </div>
 
                             <!-- level -->
-                            <div class="col-lg-3 col-sm-3">
+                            <div class="col-lg-4 col-sm-4">
                                 <div class="form-group">
                                     <div class="form-control-wrap">
                                         <label class="form-label" for="{{ form.level.id_for_label }}">طبقه آپارتمان</label>
@@ -237,7 +282,7 @@
                             </div>
 
                             <!-- document -->
-                            <div class="col-lg-3 col-sm-3">
+                            <div class="col-lg-4 col-sm-4">
                                 <div class="form-group">
                                     <div class="form-control-wrap">
                                         <label class="form-label" for="{{ form.document.id_for_label }}">وضعیت سند</label>
@@ -252,7 +297,7 @@
                             </div>
 
                             <!-- parking -->
-                            <div class="col-lg-3 col-sm-3">
+                            <div class="col-lg-4 col-sm-4">
                                 <div class="form-group">
                                     <div class="form-control-wrap">
                                         <label class="form-label" for="{{ form.parking.id_for_label }}">وضعیت پارکینگ</label>
@@ -267,7 +312,7 @@
                             </div>
 
                             <!-- elevator -->
-                            <div class="col-lg-3 col-sm-3">
+                            <div class="col-lg-4 col-sm-4">
                                 <div class="form-group">
                                     <div class="form-control-wrap">
                                         <label class="form-label" for="{{ form.elevator.id_for_label }}">وضعیت آسانسور</label>
@@ -282,7 +327,7 @@
                             </div>
 
                             <!-- warehouse -->
-                            <div class="col-lg-3 col-sm-3">
+                            <div class="col-lg-4 col-sm-4">
                                 <div class="form-group">
                                     <div class="form-control-wrap">
                                         <label class="form-label" for="{{ form.warehouse.id_for_label }}">وضعیت انباری</label>
@@ -673,6 +718,5 @@
     </div>
 
 {% endblock %}
-
 
 

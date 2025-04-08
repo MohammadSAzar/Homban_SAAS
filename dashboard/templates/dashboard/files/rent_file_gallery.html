@@ -29,7 +29,7 @@
         <link rel="icon" type="image/png" href="{% static 'main/img/logos/ho-fav.png' %}">
 
         <!-- Title -->
-        <title>گالری تصاویر: {{ sale_file.title|farsi_number }}</title>
+        <title>گالری تصاویر: {{ rent_file.title|farsi_number }}</title>
     </head>
 
     <body class="bg-gray-100 all-projects-template muze-rtl">
@@ -48,12 +48,12 @@
                                                     <div class="nk-block">
 
                                                         <!-- Title -->
-                                                        <div class="nk-block-head nk-block-head-lg wide-sm">
+                                                        <div class="nk-block-head  nk-block-head-lg wide-sm">
                                                             <div class="nk-block-head-content">
-                                                                <h6 class="nk-block-title page-title" style="line-height: 45px;">گالری تصاویر و ویدئو فایل {{ sale_file.title|linebreaksbr|farsi_number }}</h6>
+                                                                <h6 class="nk-block-title page-title" style="line-height: 45px;">گالری تصاویر و ویدئو فایل {{ rent_file.title|linebreaksbr|farsi_number }}</h6>
                                                                 <!-- Share -->
-                                                                {% if sale_file.zip_file %}
-                                                                    <a href="{{ sale_file.zip_file }}" class="btn btn-primary">دانلود یکجای محتوا</a>
+                                                                {% if rent_file.zip_file %}
+                                                                    <a href="{{ rent_file.zip_file }}" class="btn btn-primary">دانلود یکجای محتوا</a>
                                                                 {% else %}
                                                                     <a href="#" class="btn btn-danger">محتوایی موجود نیست</a>
                                                                 {% endif %}
@@ -80,58 +80,58 @@
 
                                                                             <!-- Carousel -->
                                                                             <div class="carousel-inner">
-                                                                                {% if sale_file.image1 %}
+                                                                                {% if rent_file.image1 %}
                                                                                     <div class="carousel-item active">
-                                                                                        <img src="{{ sale_file.image1.url }}" class="d-block w-100">
-                                                                                        <a href="{{ sale_file.image1.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
+                                                                                        <img src="{{ rent_file.image1.url }}" class="d-block w-100">
+                                                                                        <a href="{{ rent_file.image1.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
                                                                                     </div>
                                                                                 {% endif %}
-                                                                                {% if sale_file.image2 %}
+                                                                                {% if rent_file.image2 %}
                                                                                     <div class="carousel-item">
-                                                                                        <img src="{{ sale_file.image2.url }}" class="d-block w-100">
-                                                                                        <a href="{{ sale_file.image1.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
+                                                                                        <img src="{{ rent_file.image2.url }}" class="d-block w-100">
+                                                                                        <a href="{{ rent_file.image1.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
                                                                                     </div>
                                                                                 {% endif %}
-                                                                                {% if sale_file.image3 %}
+                                                                                {% if rent_file.image3 %}
                                                                                     <div class="carousel-item">
-                                                                                        <img src="{{ sale_file.image3.url }}" class="d-block w-100">
-                                                                                        <a href="{{ sale_file.image1.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
+                                                                                        <img src="{{ rent_file.image3.url }}" class="d-block w-100">
+                                                                                        <a href="{{ rent_file.image1.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
                                                                                     </div>
                                                                                 {% endif %}
-                                                                                {% if sale_file.image4 %}
+                                                                                {% if rent_file.image4 %}
                                                                                     <div class="carousel-item active">
-                                                                                        <img src="{{ sale_file.image4.url }}" class="d-block w-100">
-                                                                                        <a href="{{ sale_file.image1.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
+                                                                                        <img src="{{ rent_file.image4.url }}" class="d-block w-100">
+                                                                                        <a href="{{ rent_file.image1.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
                                                                                     </div>
                                                                                 {% endif %}
-                                                                                {% if sale_file.image5 %}
+                                                                                {% if rent_file.image5 %}
                                                                                     <div class="carousel-item">
-                                                                                        <img src="{{ sale_file.image5.url }}" class="d-block w-100">
-                                                                                        <a href="{{ sale_file.image1.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
+                                                                                        <img src="{{ rent_file.image5.url }}" class="d-block w-100">
+                                                                                        <a href="{{ rent_file.image1.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
                                                                                     </div>
                                                                                 {% endif %}
-                                                                                {% if sale_file.image6 %}
+                                                                                {% if rent_file.image6 %}
                                                                                     <div class="carousel-item">
-                                                                                        <img src="{{ sale_file.image6.url }}" class="d-block w-100">
-                                                                                            <a href="{{ sale_file.image1.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
+                                                                                        <img src="{{ rent_file.image6.url }}" class="d-block w-100">
+                                                                                            <a href="{{ rent_file.image1.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
                                                                                     </div>
                                                                                 {% endif %}
-                                                                                {% if sale_file.image7 %}
+                                                                                {% if rent_file.image7 %}
                                                                                     <div class="carousel-item active">
-                                                                                        <img src="{{ sale_file.image7.url }}" class="d-block w-100">
-                                                                                        <a href="{{ sale_file.image1.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
+                                                                                        <img src="{{ rent_file.image7.url }}" class="d-block w-100">
+                                                                                        <a href="{{ rent_file.image1.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
                                                                                     </div>
                                                                                 {% endif %}
-                                                                                {% if sale_file.image8 %}
+                                                                                {% if rent_file.image8 %}
                                                                                     <div class="carousel-item">
-                                                                                        <img src="{{ sale_file.image8.url }}" class="d-block w-100">
-                                                                                        <a href="{{ sale_file.image1.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
+                                                                                        <img src="{{ rent_file.image8.url }}" class="d-block w-100">
+                                                                                        <a href="{{ rent_file.image1.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
                                                                                     </div>
                                                                                 {% endif %}
-                                                                                {% if sale_file.image9 %}
+                                                                                {% if rent_file.image9 %}
                                                                                     <div class="carousel-item">
-                                                                                        <img src="{{ sale_file.image9.url }}" class="d-block w-100">
-                                                                                        <a href="{{ sale_file.image1.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
+                                                                                        <img src="{{ rent_file.image9.url }}" class="d-block w-100">
+                                                                                        <a href="{{ rent_file.image1.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
                                                                                     </div>
                                                                                 {% endif %}
                                                                             </div>
@@ -162,14 +162,14 @@
                                                                     </div>
                                                                 </div>
                                                                 <!-- Items -->
-                                                                {% if sale_file.video %}
+                                                                {% if rent_file.video %}
                                                                     <div class="gallery card">
-                                                                        {% if sale_file.video %}
+                                                                        {% if rent_file.video %}
                                                                             <a class="gallery-image popup-image" href="#">
                                                                                 <video controls loop muted width="100%">
-                                                                                    <source src="{{ sale_file.video.url }}" type="video/mp4">
+                                                                                    <source src="{{ rent_file.video.url }}" type="video/mp4">
                                                                                 </video>
-                                                                                <a href="{{ sale_file.video.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
+                                                                                <a href="{{ rent_file.video.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
                                                                                 </a>
                                                                         {% endif %}
                                                                     </div>
@@ -197,6 +197,7 @@
     </body>
 
 </html>
+
 
 
 
