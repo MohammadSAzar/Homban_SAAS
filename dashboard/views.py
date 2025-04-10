@@ -333,6 +333,69 @@ class RentFileDeleteView(DeleteView):
         return self.render_to_response(self.get_context_data(form=form))
 
 
+# --------------------------------- People --------------------------------
+class PersonListView(ListView):
+    model = models.Person
+    template_name = 'dashboard/people/person_list.html'
+    context_object_name = 'persons'
+    paginate_by = 12
+
+
+class PersonCreateView(CreateView):
+    model = models.Person
+    form_class = forms.PersonCreateForm
+    template_name = 'dashboard/people/person_create.html'
+
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+    def form_valid(self, form):
+        messages.success(self.request, "فرد آگهی‌دهنده سامانه ثبت شد (این اطلاعات توسط مدیر بررسی خواهد شد).")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        self.object = None
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_success_url(self):
+        return reverse('person_list')
+
+
+class PersonUpdateView(UpdateView):
+    model = models.Person
+    form_class = forms.PersonCreateForm
+    template_name = 'dashboard/people/person_update.html'
+    context_object_name = 'person'
+
+    def form_valid(self, form):
+        messages.success(self.request, "تغییرات شما در سامانه ثبت شد (این تغییرات توسط مدیر بررسی خواهد شد).")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        self.object = None
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_success_url(self):
+        return reverse_lazy('person_list')
+
+
+class PersonDeleteView(DeleteView):
+    model = models.Person
+    template_name = 'dashboard/people/person_delete.html'
+    success_url = reverse_lazy('person_list')
+    context_object_name = 'person'
+
+    def form_valid(self, form):
+        messages.error(self.request, "فرد مربوطه از سامانه حذف شد.")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        self.object = None
+        return self.render_to_response(self.get_context_data(form=form))
 
 
 

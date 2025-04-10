@@ -175,10 +175,19 @@ class SubDistrict(models.Model):
 class Person(models.Model):
     name = models.CharField(max_length=100, verbose_name=_('Name'))
     phone_number = models.CharField(max_length=11, unique=True, verbose_name=_('Phone Number'))
-    description = models.TextField(max_length=1000, blank=True, null=True, verbose_name=_('Description'))
+    slug = models.SlugField(max_length=255, null=True, blank=True, unique=True, allow_unicode=True)
+    description = models.TextField(max_length=150, blank=True, null=True, verbose_name=_('Description'))
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name, allow_unicode=True)
+        super(Person, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.name
+
+    def get_absolute_url(self):
+        return reverse('person_detail', args=[self.slug])
 
 
 class SaleFile(models.Model):

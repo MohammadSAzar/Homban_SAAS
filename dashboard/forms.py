@@ -219,3 +219,24 @@ class RentFileFilterForm(forms.Form):
         return cleaned_data
 
 
+# -------------------------------- People --------------------------------
+class PersonCreateForm(forms.ModelForm):
+    class Meta:
+        model = models.Person
+        fields = ['name', 'phone_number', 'description']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.required = True
+
+    def clean(self):
+        cleaned_data = super().clean()
+        phone_number = cleaned_data.get('phone_number')
+
+        if phone_number and not checkers.phone_checker(phone_number):
+            self.add_error('phone_number', 'شماره تلفن همراه وارد شده صحیح نیست')
+
+        return cleaned_data
+
+

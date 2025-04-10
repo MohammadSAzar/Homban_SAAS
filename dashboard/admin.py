@@ -55,6 +55,7 @@ class SubDistrictAdmin(admin.ModelAdmin):
 @admin.register(models.Person)
 class PersonAdmin(admin.ModelAdmin):
     list_display = ('name', 'phone_number')
+    prepopulated_fields = {'slug': ('name',)}
 
 
 @admin.register(models.SaleFile)

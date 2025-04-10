@@ -19,6 +19,11 @@ urlpatterns = [
     re_path(r'rent-file/delete/(?P<slug>[-\w]+)/(?P<unique_url_id>[-\w]+)/', views.RentFileDeleteView.as_view(), name='rent_file_delete'),
     re_path(r'rent-file/(?P<slug>[-\w]+)/(?P<unique_url_id>[-\w]+)/', views.RentFileDetailView.as_view(), name='rent_file_detail'),
     re_path(r'rent-file/create/', views.RentFileCreateView.as_view(), name='rent_file_create'),
+    # persons
+    path('persons/', views.PersonListView.as_view(), name='person_list'),
+    re_path(r'person/update/(?P<slug>[-\w]+)/', views.PersonUpdateView.as_view(), name='person_update'),
+    re_path(r'person/delete/(?P<slug>[-\w]+)/', views.PersonDeleteView.as_view(), name='person_delete'),
+    re_path(r'person/create/', views.PersonCreateView.as_view(), name='person_create'),
 ]
 
 
