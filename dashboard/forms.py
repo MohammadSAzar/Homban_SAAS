@@ -73,6 +73,8 @@ class SaleFileFilterForm(forms.Form):
     city = forms.ModelChoiceField(queryset=models.City.objects.all(), required=False, label=_('City'))
     district = forms.ModelChoiceField(queryset=models.District.objects.all(), required=False, label=_('District'))
     sub_district = forms.ModelChoiceField(queryset=models.SubDistrict.objects.all(), required=False, label=_('Sub-District'))
+    person = forms.ModelChoiceField(queryset=models.Person.objects.all(), required=False, label=_('Person'))
+    source = forms.ChoiceField(choices=[('', '---------')] + choices.sources, required=False, label=_('Source'))
     min_price = forms.IntegerField(required=False, label=_('Min Price'))
     max_price = forms.IntegerField(required=False, label=_('Max Price'))
     min_area = forms.IntegerField(required=False, label=_('Min Area'))
@@ -169,6 +171,8 @@ class RentFileFilterForm(forms.Form):
     city = forms.ModelChoiceField(queryset=models.City.objects.all(), required=False, label=_('City'))
     district = forms.ModelChoiceField(queryset=models.District.objects.all(), required=False, label=_('District'))
     sub_district = forms.ModelChoiceField(queryset=models.SubDistrict.objects.all(), required=False, label=_('Sub-District'))
+    person = forms.ModelChoiceField(queryset=models.Person.objects.all(), required=False, label=_('Person'))
+    source = forms.ChoiceField(choices=[('', '---------')] + choices.sources, required=False, label=_('Source'))
     min_deposit = forms.IntegerField(required=False, label=_('Min Deposit'))
     max_deposit = forms.IntegerField(required=False, label=_('Max Deposit'))
     min_rent = forms.IntegerField(required=False, label=_('Min Rent'))
@@ -236,6 +240,71 @@ class PersonCreateForm(forms.ModelForm):
 
         if phone_number and not checkers.phone_checker(phone_number):
             self.add_error('phone_number', 'شماره تلفن همراه وارد شده صحیح نیست')
+
+        return cleaned_data
+
+
+class BuyerCreateForm(forms.ModelForm):
+    class Meta:
+        model = models.Buyer
+        fields = ['name', 'phone_number', 'description', 'province', 'city', 'district', 'budget_announced', 'budget_max',
+                  'budget_status', 'room_max', 'room_min', 'area_max', 'area_min', 'age_max', 'age_min',
+                  'document', 'parking', 'elevator', 'warehouse']
+        widgets = {
+            'province': forms.Select(attrs={'id': 'province'}),
+            'city': forms.Select(attrs={'id': 'city'}),
+            'district': forms.Select(attrs={'id': 'district'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.required = True
+
+    def clean(self):
+        cleaned_data = super().clean()
+        phone_number = cleaned_data.get('phone_number')
+        budget_announced = cleaned_data.get('budget_announced')
+        budget_max = cleaned_data.get('budget_max')
+        area_max = cleaned_data.get('area_max')
+        area_min = cleaned_data.get('area_min')
+
+        if phone_number and not checkers.phone_checker(phone_number):
+            self.add_error('phone_number', 'شماره تلفن همراه وارد شده صحیح نیست')
+        if budget_announced and not checkers.file_price_checker(budget_announced):
+            self.add_error('budget_announced', 'بودجه خریدار باید بین 1 تا 1000 میلیارد تومان باشد')
+        if budget_max and not checkers.file_price_checker(budget_max):
+            self.add_error('budget_max', 'بودجه خریدار باید بین 1 تا 1000 میلیارد تومان باشد')
+        if area_max and not checkers.area_checker(area_max):
+            self.add_error('area_max', 'متراژ درخواستی خریدار باید بین 20 تا 10000 متر باشد.')
+        if area_min and not checkers.area_checker(area_min):
+            self.add_error('area_min', 'متراژ درخواستی خریدار باید بین 20 تا 10000 متر باشد.')
+
+        return cleaned_data
+
+
+class BuyerFilterForm(forms.Form):
+    province = forms.ModelChoiceField(queryset=models.Province.objects.all(), required=False, label=_('Province'))
+    city = forms.ModelChoiceField(queryset=models.City.objects.all(), required=False, label=_('City'))
+    district = forms.ModelChoiceField(queryset=models.District.objects.all(), required=False, label=_('District'))
+    min_budget = forms.IntegerField(required=False, label=_('Min Budget'))
+    max_budget = forms.IntegerField(required=False, label=_('Max Budget'))
+    budget_status = forms.ChoiceField(choices=[('', '---------')] + choices.budgets, required=False, label=_('Budget Status'))
+    document = forms.ChoiceField(choices=[('', '---------')] + choices.booleans, required=False, label=_('Document'))
+    parking = forms.ChoiceField(choices=[('', '---------')] + choices.booleans, required=False, label=_('Parking'))
+    elevator = forms.ChoiceField(choices=[('', '---------')] + choices.booleans, required=False, label=_('Elevator'))
+    warehouse = forms.ChoiceField(choices=[('', '---------')] + choices.booleans, required=False, label=_('Warehouse'))
+
+    def clean(self):
+        cleaned_data = super().clean()
+        min_budget = cleaned_data.get('min_budget')
+        max_budget = cleaned_data.get('max_budget')
+
+        if min_budget and not checkers.file_price_checker(min_budget):
+            self.add_error('min_budget', 'بودجه مشتری باید بین 1 تا 1000 میلیارد تومان باشد')
+
+        if max_budget and not checkers.file_price_checker(max_budget):
+            self.add_error('max_budget', 'بودجه مشتری باید بین 1 تا 1000 میلیارد تومان باشد')
 
         return cleaned_data
 

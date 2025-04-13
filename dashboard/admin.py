@@ -83,9 +83,10 @@ class RentFileAdmin(admin.ModelAdmin):
 
 
 # --------------------------------- SERVs ---------------------------------
-@admin.register(models.Customer)
-class CustomerAdmin(admin.ModelAdmin):
-    list_display = ('name', 'phone_number', 'code', 'budget_announced', 'budget_max', 'budget_status', 'datetime_created')
+@admin.register(models.Buyer)
+class BuyerAdmin(admin.ModelAdmin):
+    list_display = ('name', 'phone_number', 'code', 'province', 'city', 'district', 'budget_announced', 'budget_status',
+                    'datetime_created')
     ordering = ('-datetime_created',)
     readonly_fields = ('code', 'datetime_created',)
 

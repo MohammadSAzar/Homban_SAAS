@@ -17,7 +17,7 @@
     <div class="nk-fmg">
 
         <!-- ّFilter -->
-        <div class="nk-fmg-aside" data-content="files-aside"  data-toggle-overlay="true" data-toggle-body="true" data-toggle-screen="lg" data-simplebar>
+        <div class="nk-fmg-aside" data-content="files-aside" data-toggle-overlay="true" data-toggle-body="true" data-toggle-screen="lg" data-simplebar>
             <div class="nk-fmg-aside-wrap">
                 <div class="nk-fmg-aside-top" data-simplebar>
                     <div class="nk-block nk-block-lg">
@@ -35,138 +35,275 @@
                                                 <label class="form-label" for="{{ filter_form.province.id_for_label }}">استان</label>
                                                 {% render_field filter_form.province type="text" id="province" class="form-control" %}
                                             </div>
+                                            {% if filter_form.province.errors %}
+                                                {% for error in filter_form.province.errors %}
+                                                    <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                                {% endfor %}
+                                            {% endif %}
                                             
                                             <!-- city -->
                                             <div class="form-group">
                                                 <label class="form-label" for="{{ filter_form.city.id_for_label }}">شهر</label>
                                                 {% render_field filter_form.city type="text" id="city" class="form-control" %}
                                             </div>
+                                            {% if filter_form.city.errors %}
+                                                {% for error in filter_form.city.errors %}
+                                                    <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                                {% endfor %}
+                                            {% endif %}
                                             
                                             <!-- district -->
                                             <div class="form-group">
                                                 <label class="form-label" for="{{ filter_form.district.id_for_label }}">محله</label>
                                                 {% render_field filter_form.district type="text" id="district" class="form-control" %}
                                             </div>
+                                            {% if filter_form.district.errors %}
+                                                {% for error in filter_form.district.errors %}
+                                                    <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                                {% endfor %}
+                                            {% endif %}
                                             
                                             <!-- sub_district -->
                                             <div class="form-group">
                                                 <label class="form-label" for="{{ filter_form.sub_district.id_for_label }}">زیرمحله</label>
                                                 {% render_field filter_form.sub_district type="text" id="sub_district" class="form-control" %}
                                             </div>
+                                            {% if filter_form.sub_district.errors %}
+                                                {% for error in filter_form.sub_district.errors %}
+                                                    <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                                {% endfor %}
+                                            {% endif %}
+                                        
+                                            <!-- source -->
+                                            <div class="form-group">
+                                                <label class="form-label" for="{{ filter_form.source.id_for_label }}">منبع آگهی</label>
+                                                {% render_field filter_form.source type="text" id="source" class="form-control" %}
+                                            </div>
+                                            {% if filter_form.source.errors %}
+                                                {% for error in filter_form.source.errors %}
+                                                    <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                                {% endfor %}
+                                            {% endif %}
+                                            
+                                            <!-- person -->
+                                            <div class="form-group">
+                                                <label class="form-label" for="{{ filter_form.person.id_for_label }}">فرد آگهی‌دهنده</label>
+                                                {% render_field filter_form.person type="text" id="person" class="form-control" %}
+                                            </div>
+                                            {% if filter_form.person.errors %}
+                                                {% for error in filter_form.person.errors %}
+                                                    <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                                {% endfor %}
+                                            {% endif %}
                                             
                                             <!-- max_deposit -->
                                             <div class="form-group">
                                                 <label class="form-label" for="{{ filter_form.max_deposit.id_for_label }}">حداکثر رهن</label>
                                                 {% render_field filter_form.max_deposit type="number" id="max_deposit" class="form-control" %}
                                             </div>
+                                            {% if filter_form.max_deposit.errors %}
+                                                {% for error in filter_form.max_deposit.errors %}
+                                                    <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                                {% endfor %}
+                                            {% endif %}
                                             
                                             <!-- min_deposit -->
                                             <div class="form-group">
                                                 <label class="form-label" for="{{ filter_form.min_deposit.id_for_label }}">حداقل رهن</label>
                                                 {% render_field filter_form.min_deposit type="number" id="min_deposit" class="form-control" %}
                                             </div>
+                                            {% if filter_form.min_deposit.errors %}
+                                                {% for error in filter_form.min_deposit.errors %}
+                                                    <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                                {% endfor %}
+                                            {% endif %}
                                             
                                             <!-- max_rent -->
                                             <div class="form-group">
                                                 <label class="form-label" for="{{ filter_form.max_rent.id_for_label }}">حداکثر اجاره</label>
                                                 {% render_field filter_form.max_rent type="number" id="max_rent" class="form-control" %}
                                             </div>
+                                            {% if filter_form.max_rent.errors %}
+                                                {% for error in filter_form.max_rent.errors %}
+                                                    <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                                {% endfor %}
+                                            {% endif %}
                                             
                                             <!-- min_rent -->
                                             <div class="form-group">
                                                 <label class="form-label" for="{{ filter_form.min_rent.id_for_label }}">حداقل اجاره</label>
                                                 {% render_field filter_form.min_rent type="number" id="min_rent" class="form-control" %}
                                             </div>
+                                            {% if filter_form.min_rent.errors %}
+                                                {% for error in filter_form.min_rent.errors %}
+                                                    <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                                {% endfor %}
+                                            {% endif %}
                                             
                                             <!-- convertable -->
                                             <div class="form-group">
                                                 <label class="form-label" for="{{ filter_form.convertable.id_for_label }}">قابل تبدیل (رهن و اجاره)</label>
                                                 {% render_field filter_form.convertable type="text" id="convertable" class="form-control" %}
                                             </div>
+                                            {% if filter_form.convertable.errors %}
+                                                {% for error in filter_form.convertable.errors %}
+                                                    <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                                {% endfor %}
+                                            {% endif %}
                                             
                                             <!-- max_area -->
                                             <div class="form-group">
                                                 <label class="form-label" for="{{ filter_form.max_area.id_for_label }}">حداکثر متراژ</label>
                                                 {% render_field filter_form.max_area type="number" id="max_area" class="form-control" %}
                                             </div>
+                                            {% if filter_form.max_area.errors %}
+                                                {% for error in filter_form.max_area.errors %}
+                                                    <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                                {% endfor %}
+                                            {% endif %}
                                             
                                             <!-- min_area -->
                                             <div class="form-group">
                                                 <label class="form-label" for="{{ filter_form.min_area.id_for_label }}">حداقل متراژ</label>
                                                 {% render_field filter_form.min_area type="number" id="min_area" class="form-control" %}
                                             </div>
+                                            {% if filter_form.min_area.errors %}
+                                                {% for error in filter_form.min_area.errors %}
+                                                    <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                                {% endfor %}
+                                            {% endif %}
                                             
                                             <!-- max_room -->
                                             <div class="form-group">
                                                 <label class="form-label" for="{{ filter_form.max_room.id_for_label }}">حداکثر تعداد اتاق</label>
                                                 {% render_field filter_form.max_room type="text" id="max_room" class="form-control" %}
                                             </div>
+                                            {% if filter_form.max_room.errors %}
+                                                {% for error in filter_form.max_room.errors %}
+                                                    <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                                {% endfor %}
+                                            {% endif %}
                                             
                                             <!-- min_room -->
                                             <div class="form-group">
                                                 <label class="form-label" for="{{ filter_form.min_room.id_for_label }}">حداقل تعداد اتاق</label>
                                                 {% render_field filter_form.min_room type="text" id="min_room" class="form-control" %}
                                             </div>
+                                            {% if filter_form.min_room.errors %}
+                                                {% for error in filter_form.min_room.errors %}
+                                                    <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                                {% endfor %}
+                                            {% endif %}
                                             
                                             <!-- max_age -->
                                             <div class="form-group">
                                                 <label class="form-label" for="{{ filter_form.max_age.id_for_label }}">حداکثر سن</label>
                                                 {% render_field filter_form.max_age type="text" id="max_age" class="form-control" %}
                                             </div>
+                                            {% if filter_form.max_age.errors %}
+                                                {% for error in filter_form.max_age.errors %}
+                                                    <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                                {% endfor %}
+                                            {% endif %}
                                             
                                             <!-- min_age -->
                                             <div class="form-group">
                                                 <label class="form-label" for="{{ filter_form.min_age.id_for_label }}">حداقل سن</label>
                                                 {% render_field filter_form.min_age type="text" id="min_age" class="form-control" %}
                                             </div>
+                                            {% if filter_form.min_age.errors %}
+                                                {% for error in filter_form.min_age.errors %}
+                                                    <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                                {% endfor %}
+                                            {% endif %}
                                             
                                             <!-- max_level -->
                                             <div class="form-group">
                                                 <label class="form-label" for="{{ filter_form.max_level.id_for_label }}">حداکثر طبقه</label>
                                                 {% render_field filter_form.max_level type="text" id="max_level" class="form-control" %}
                                             </div>
+                                            {% if filter_form.max_level.errors %}
+                                                {% for error in filter_form.max_level.errors %}
+                                                    <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                                {% endfor %}
+                                            {% endif %}
                                             
                                             <!-- min_level -->
                                             <div class="form-group">
                                                 <label class="form-label" for="{{ filter_form.min_level.id_for_label }}">حداقل طبقه</label>
                                                 {% render_field filter_form.min_level type="text" id="min_level" class="form-control" %}
                                             </div>
+                                            {% if filter_form.min_level.errors %}
+                                                {% for error in filter_form.min_level.errors %}
+                                                    <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                                {% endfor %}
+                                            {% endif %}
                                             
                                             <!-- document -->
                                             <div class="form-group">
                                                 <label class="form-label" for="{{ filter_form.document.id_for_label }}">وضعیت سند</label>
                                                 {% render_field filter_form.document type="text" id="document" class="form-control" %}
                                             </div>
+                                            {% if filter_form.document.errors %}
+                                                {% for error in filter_form.document.errors %}
+                                                    <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                                {% endfor %}
+                                            {% endif %}
                                             
                                             <!-- parking -->
                                             <div class="form-group">
                                                 <label class="form-label" for="{{ filter_form.parking.id_for_label }}">وضعیت پارکینگ</label>
                                                 {% render_field filter_form.parking type="text" id="parking" class="form-control" %}
                                             </div>
+                                            {% if filter_form.parking.errors %}
+                                                {% for error in filter_form.parking.errors %}
+                                                    <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                                {% endfor %}
+                                            {% endif %}
                                             
                                             <!-- elevator -->
                                             <div class="form-group">
                                                 <label class="form-label" for="{{ filter_form.elevator.id_for_label }}">وضعیت آسانسور</label>
                                                 {% render_field filter_form.elevator type="text" id="elevator" class="form-control" %}
                                             </div>
+                                            {% if filter_form.elevator.errors %}
+                                                {% for error in filter_form.elevator.errors %}
+                                                    <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                                {% endfor %}
+                                            {% endif %}
                                             
                                             <!-- warehouse -->
                                             <div class="form-group">
                                                 <label class="form-label" for="{{ filter_form.warehouse.id_for_label }}">وضعیت انباری</label>
                                                 {% render_field filter_form.warehouse type="text" id="warehouse" class="form-control" %}
                                             </div>
+                                            {% if filter_form.warehouse.errors %}
+                                                {% for error in filter_form.warehouse.errors %}
+                                                    <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                                {% endfor %}
+                                            {% endif %}
                                             
                                             <!-- images -->
                                             <div class="form-group">
                                                 <label class="form-label" for="{{ filter_form.has_images.id_for_label }}">عکس داشته باشد؟</label>
                                                 {% render_field filter_form.has_images type="text" id="has_images" class="form-control" %}
                                             </div>
+                                            {% if filter_form.has_images.errors %}
+                                                {% for error in filter_form.has_images.errors %}
+                                                    <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                                {% endfor %}
+                                            {% endif %}
                                             
                                             <!-- video -->
                                             <div class="form-group">
                                                 <label class="form-label" for="{{ filter_form.has_video.id_for_label }}">ویدئو معرفی داشته باشد؟</label>
                                                 {% render_field filter_form.has_video type="text" id="has_video" class="form-control" %}
                                             </div>
+                                            {% if filter_form.has_video.errors %}
+                                                {% for error in filter_form.has_video.errors %}
+                                                    <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                                {% endfor %}
+                                            {% endif %}
 
                                             <!-- button -->
                                             <div class="form-group" style="width: 100%;!important;">
@@ -253,7 +390,7 @@
         <div class="nk-fmg-body">
 
             <!-- File create message -->
-            <div id="successModal" class="modal">
+            <div id="successModal"  class="modal">
                 <div class="modal-content">
                     <h5 class="modal-title" style="padding: 20px 20px 10px 0;!important;">عملیات با موفقیت انجام شد (عملیات مربوطه توسط مدیر بررسی خواهد شد).</h5>
                     <button class="modal-my-button">بستن پیام</button>
@@ -274,7 +411,7 @@
             <!-- end: File create message -->
 
             <!-- Upper Navbar -->
-            <div class="nk-fmg-body-head d-none d-lg-flex" >
+            <div class=" nk-fmg-body-head d-none d-lg-flex" >
 
                 <!-- Search -->
                 <div class="nk-fmg-search">
@@ -295,7 +432,7 @@
             <!-- end: Upper Navbar -->
 
             <!-- List -->
-            <div class="nk-fmg-body-content">
+            <div class=" nk-fmg-body-content">
 
                 <!-- Upper + Mobile -->
                 <div class="nk-block-head nk-block-head-sm" style="margin-bottom: 1.2em;">
@@ -417,7 +554,7 @@
             <!-- end: List -->
         
             <!-- Pagination -->
-            <div class="nk-block-head nk-block-head-lg" style="margin-top: 1.5em;">
+            <div class="nk-block-head  nk-block-head-lg" style="margin-top: 1.5em;">
                 <div class="nk-block-between" style="justify-items: center; justify-content: center; text-align: center">
                     <div class="nk-block-head-content">
                         <div class="my-profile-pagination" style="margin-top: 1em;">
@@ -463,6 +600,7 @@
 
     </div>
 {% endblock %}
+
 
 
 

@@ -4,20 +4,19 @@
 {% load i18n %}
 {% load jalali_tags %}
 {% load number_converter %}
-{% load humanize %}
 {% load widget_tweaks %}
+{% load humanize %}
 
 
-{% block title %}
-    {% trans 'Sale Files' %}
-{% endblock %}
+{% block title %}{% trans 'Buyers' %}{% endblock %}
 
 
 {% block content %}
+
     <div class="nk-fmg">
 
         <!-- ّFilter -->
-        <div class="nk-fmg-aside" data-content="files-aside"  data-toggle-overlay="true" data-toggle-body="true" data-toggle-screen="lg" data-simplebar>
+        <div class="nk-fmg-aside" data-content="files-aside" data-toggle-overlay="true"  data-toggle-body="true" data-toggle-screen="lg" data-simplebar>
             <div class="nk-fmg-aside-wrap">
                 <div class="nk-fmg-aside-top" data-simplebar>
                     <div class="nk-block nk-block-lg">
@@ -27,9 +26,9 @@
                                     <div class="card-inner">
 
                                         <!-- Form -->
-                                        <form id="filter-form" method="get" action="{% url 'sale_file_list' %}" enctype="multipart/form-data">
+                                        <form id="filter-form" method="get" action="{% url 'buyer_list' %}" enctype="multipart/form-data">
                                             {% csrf_token %}
-    
+
                                             <!-- province -->
                                             <div class="form-group">
                                                 <label class="form-label" for="{{ filter_form.province.id_for_label }}">استان</label>
@@ -40,7 +39,7 @@
                                                     <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
                                                 {% endfor %}
                                             {% endif %}
-                                            
+
                                             <!-- city -->
                                             <div class="form-group">
                                                 <label class="form-label" for="{{ filter_form.city.id_for_label }}">شهر</label>
@@ -51,7 +50,7 @@
                                                     <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
                                                 {% endfor %}
                                             {% endif %}
-                                            
+
                                             <!-- district -->
                                             <div class="form-group">
                                                 <label class="form-label" for="{{ filter_form.district.id_for_label }}">محله</label>
@@ -62,146 +61,36 @@
                                                     <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
                                                 {% endfor %}
                                             {% endif %}
-                                            
-                                            <!-- sub_district -->
+
+                                            <!-- max_budget -->
                                             <div class="form-group">
-                                                <label class="form-label" for="{{ filter_form.sub_district.id_for_label }}">زیرمحله</label>
-                                                {% render_field filter_form.sub_district type="text" id="sub_district" class="form-control" %}
+                                                <label class="form-label" for="{{ filter_form.max_budget.id_for_label }}">حداکثر بودجه</label>
+                                                {% render_field filter_form.max_budget type="number" id="max_budget" class="form-control" %}
                                             </div>
-                                            {% if filter_form.sub_district.errors %}
-                                                {% for error in filter_form.sub_district.errors %}
+                                            {% if filter_form.max_budget.errors %}
+                                                {% for error in filter_form.max_budget.errors %}
                                                     <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
                                                 {% endfor %}
                                             {% endif %}
-                                            
-                                            <!-- source -->
+
+                                            <!-- min_budget -->
                                             <div class="form-group">
-                                                <label class="form-label" for="{{ filter_form.source.id_for_label }}">منبع آگهی</label>
-                                                {% render_field filter_form.source type="text" id="source" class="form-control" %}
+                                                <label class="form-label" for="{{ filter_form.min_budget.id_for_label }}">حداقل بودجه</label>
+                                                {% render_field filter_form.min_budget type="number" id="min_budget" class="form-control" %}
                                             </div>
-                                            {% if filter_form.source.errors %}
-                                                {% for error in filter_form.source.errors %}
+                                            {% if filter_form.min_budget.errors %}
+                                                {% for error in filter_form.min_budget.errors %}
                                                     <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
                                                 {% endfor %}
                                             {% endif %}
-                                            
-                                            <!-- person -->
+
+                                            <!-- budget status -->
                                             <div class="form-group">
-                                                <label class="form-label" for="{{ filter_form.person.id_for_label }}">فرد آگهی‌دهنده</label>
-                                                {% render_field filter_form.person type="text" id="person" class="form-control" %}
+                                                <label class="form-label" for="{{ filter_form.budget_status.id_for_label }}">وضعیت بودجه</label>
+                                                {% render_field filter_form.budget_status type="text" id="budget_status" class="form-control" %}
                                             </div>
-                                            {% if filter_form.person.errors %}
-                                                {% for error in filter_form.person.errors %}
-                                                    <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
-                                                {% endfor %}
-                                            {% endif %}
-                                            
-                                            <!-- max_price -->
-                                            <div class="form-group">
-                                                <label class="form-label" for="{{ filter_form.max_price.id_for_label }}">حداکثر قیمت</label>
-                                                {% render_field filter_form.max_price type="number" id="max_price" class="form-control" %}
-                                            </div>
-                                            {% if filter_form.max_price.errors %}
-                                                {% for error in filter_form.max_price.errors %}
-                                                    <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
-                                                {% endfor %}
-                                            {% endif %}
-                                            
-                                            <!-- min_price -->
-                                            <div class="form-group">
-                                                <label class="form-label" for="{{ filter_form.min_price.id_for_label }}">حداقل قیمت</label>
-                                                {% render_field filter_form.min_price type="number" id="min_price" class="form-control" %}
-                                            </div>
-                                            {% if filter_form.min_price.errors %}
-                                                {% for error in filter_form.min_price.errors %}
-                                                    <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
-                                                {% endfor %}
-                                            {% endif %}
-                                            
-                                            <!-- max_area -->
-                                            <div class="form-group">
-                                                <label class="form-label" for="{{ filter_form.max_area.id_for_label }}">حداکثر متراژ</label>
-                                                {% render_field filter_form.max_area type="number" id="max_area" class="form-control" %}
-                                            </div>
-                                            {% if filter_form.max_area.errors %}
-                                                {% for error in filter_form.max_area.errors %}
-                                                    <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
-                                                {% endfor %}
-                                            {% endif %}
-                                            
-                                            <!-- min_area -->
-                                            <div class="form-group">
-                                                <label class="form-label" for="{{ filter_form.min_area.id_for_label }}">حداقل متراژ</label>
-                                                {% render_field filter_form.min_area type="number" id="min_area" class="form-control" %}
-                                            </div>
-                                            {% if filter_form.min_area.errors %}
-                                                {% for error in filter_form.min_area.errors %}
-                                                    <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
-                                                {% endfor %}
-                                            {% endif %}
-                                            
-                                            <!-- max_room -->
-                                            <div class="form-group">
-                                                <label class="form-label" for="{{ filter_form.max_room.id_for_label }}">حداکثر تعداد اتاق</label>
-                                                {% render_field filter_form.max_room type="text" id="max_room" class="form-control" %}
-                                            </div>
-                                            {% if filter_form.max_room.errors %}
-                                                {% for error in filter_form.max_room.errors %}
-                                                    <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
-                                                {% endfor %}
-                                            {% endif %}
-                                            
-                                            <!-- min_room -->
-                                            <div class="form-group">
-                                                <label class="form-label" for="{{ filter_form.min_room.id_for_label }}">حداقل تعداد اتاق</label>
-                                                {% render_field filter_form.min_room type="text" id="min_room" class="form-control" %}
-                                            </div>
-                                            {% if filter_form.min_room.errors %}
-                                                {% for error in filter_form.min_room.errors %}
-                                                    <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
-                                                {% endfor %}
-                                            {% endif %}
-                                            
-                                            <!-- max_age -->
-                                            <div class="form-group">
-                                                <label class="form-label" for="{{ filter_form.max_age.id_for_label }}">حداکثر سن</label>
-                                                {% render_field filter_form.max_age type="text" id="max_age" class="form-control" %}
-                                            </div>
-                                            {% if filter_form.max_age.errors %}
-                                                {% for error in filter_form.max_age.errors %}
-                                                    <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
-                                                {% endfor %}
-                                            {% endif %}
-                                            
-                                            <!-- min_age -->
-                                            <div class="form-group">
-                                                <label class="form-label" for="{{ filter_form.min_age.id_for_label }}">حداقل سن</label>
-                                                {% render_field filter_form.min_age type="text" id="min_age" class="form-control" %}
-                                            </div>
-                                            {% if filter_form.min_age.errors %}
-                                                {% for error in filter_form.min_age.errors %}
-                                                    <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
-                                                {% endfor %}
-                                            {% endif %}
-                                            
-                                            <!-- max_level -->
-                                            <div class="form-group">
-                                                <label class="form-label" for="{{ filter_form.max_level.id_for_label }}">حداکثر طبقه</label>
-                                                {% render_field filter_form.max_level type="text" id="max_level" class="form-control" %}
-                                            </div>
-                                            {% if filter_form.max_level.errors %}
-                                                {% for error in filter_form.max_level.errors %}
-                                                    <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
-                                                {% endfor %}
-                                            {% endif %}
-                                            
-                                            <!-- min_level -->
-                                            <div class="form-group">
-                                                <label class="form-label" for="{{ filter_form.min_level.id_for_label }}">حداقل طبقه</label>
-                                                {% render_field filter_form.min_level type="text" id="min_level" class="form-control" %}
-                                            </div>
-                                            {% if filter_form.min_level.errors %}
-                                                {% for error in filter_form.min_level.errors %}
+                                            {% if filter_form.budget_status.errors %}
+                                                {% for error in filter_form.budget_status.errors %}
                                                     <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
                                                 {% endfor %}
                                             {% endif %}
@@ -216,7 +105,7 @@
                                                     <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
                                                 {% endfor %}
                                             {% endif %}
-                                            
+
                                             <!-- parking -->
                                             <div class="form-group">
                                                 <label class="form-label" for="{{ filter_form.parking.id_for_label }}">وضعیت پارکینگ</label>
@@ -227,7 +116,7 @@
                                                     <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
                                                 {% endfor %}
                                             {% endif %}
-                                            
+
                                             <!-- elevator -->
                                             <div class="form-group">
                                                 <label class="form-label" for="{{ filter_form.elevator.id_for_label }}">وضعیت آسانسور</label>
@@ -238,7 +127,7 @@
                                                     <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
                                                 {% endfor %}
                                             {% endif %}
-                                            
+
                                             <!-- warehouse -->
                                             <div class="form-group">
                                                 <label class="form-label" for="{{ filter_form.warehouse.id_for_label }}">وضعیت انباری</label>
@@ -249,28 +138,6 @@
                                                     <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
                                                 {% endfor %}
                                             {% endif %}
-                                            
-                                            <!-- images -->
-                                            <div class="form-group">
-                                                <label class="form-label" for="{{ filter_form.has_images.id_for_label }}">عکس داشته باشد؟</label>
-                                                {% render_field filter_form.has_images type="text" id="has_images" class="form-control" %}
-                                            </div>
-                                            {% if filter_form.has_images.errors %}
-                                                {% for error in filter_form.has_images.errors %}
-                                                    <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
-                                                {% endfor %}
-                                            {% endif %}
-                                            
-                                            <!-- video -->
-                                            <div class="form-group">
-                                                <label class="form-label" for="{{ filter_form.has_video.id_for_label }}">ویدئو معرفی داشته باشد؟</label>
-                                                {% render_field filter_form.has_video type="text" id="has_video" class="form-control" %}
-                                            </div>
-                                            {% if filter_form.has_video.errors %}
-                                                {% for error in filter_form.has_video.errors %}
-                                                    <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
-                                                {% endfor %}
-                                            {% endif %}
 
                                             <!-- button -->
                                             <div class="form-group" style="width: 100%;!important;">
@@ -278,7 +145,7 @@
                                             </div>
                                         </form>
                                         <!-- end: Form -->
-                                        
+
                                         <!-- JS for filter Form -->
                                         <script>
                                             function submitFormAndRefresh() {
@@ -286,12 +153,12 @@
                                                 location.reload();
                                             }
                                         </script>
-        
+
                                         <script>
                                             document.addEventListener('DOMContentLoaded', function() {
                                                 const province = document.getElementById('province').value;
                                                 const city = document.getElementById('city').value;
-        
+
                                                 if (province) {
                                                     updateCities(province);
                                                 }
@@ -299,7 +166,7 @@
                                                     updateDistricts(city);
                                                 }
                                             });
-        
+
                                             function updateCities(provinceId) {
                                                 const url = `/get-cities/?province_id=${provinceId}`;
                                                 fetch(url)
@@ -310,14 +177,14 @@
                                                         data.cities.forEach(city => {
                                                             citySelect.innerHTML += `<option value="${city.id}">${city.name}</option>`;
                                                         });
-        
+
                                                         const selectedCity = '{{ request.GET.city }}';
                                                         if (selectedCity) {
                                                             citySelect.value = selectedCity;
                                                         }
                                                     });
                                             }
-        
+
                                             function updateDistricts(cityId) {
                                                 const url = `/get-districts/?city_id=${cityId}`;
                                                 fetch(url)
@@ -328,14 +195,14 @@
                                                         data.districts.forEach(district => {
                                                             districtSelect.innerHTML += `<option value="${district.id}">${district.name}</option>`;
                                                         });
-        
+
                                                         const selectedDistrict = '{{ request.GET.district }}';
                                                         if (selectedDistrict) {
                                                             districtSelect.value = selectedDistrict;
                                                         }
                                                     });
                                             }
-        
+
                                             function submitFormAndRefresh() {
                                                 document.getElementById('filter-form').submit();
                                                 location.reload();
@@ -354,10 +221,10 @@
         <!-- end: Filter -->
 
         <!-- Main -->
-        <div class="nk-fmg-body">
+        <div class=" nk-fmg-body">
 
-            <!-- File create message -->
-            <div id="successModal"  class="modal">
+            <!-- Message -->
+            <div id="successModal" class="modal">
                 <div class="modal-content">
                     <h5 class="modal-title" style="padding: 20px 20px 10px 0;!important;">عملیات با موفقیت انجام شد (عملیات مربوطه توسط مدیر بررسی خواهد شد).</h5>
                     <button class="modal-my-button">بستن پیام</button>
@@ -375,22 +242,22 @@
                     });
                 });
             </script>
-            <!-- end: File create message -->
-
+            <!-- end: Message -->
+        
             <!-- Upper Navbar -->
-            <div class="nk-fmg-body-head  d-none d-lg-flex" >
+            <div class="nk-fmg-body-head d-none d-lg-flex" >
 
                 <!-- Search -->
                 <div class="nk-fmg-search">
                     <em class="icon ni ni-search"></em>
-                    <input type="text" class="form-control border-transparent form-focus-none" placeholder="جستجو در میان فایل‌ها"/>
+                    <input type="text" class="form-control border-transparent form-focus-none" placeholder="جستجو در میان خریداران"/>
                 </div>
 
                 <!-- Add Link -->
                 <div class="nk-fmg-actions">
                     <ul class="nk-block-tools g-3">
                         <li>
-                            <a href="{% url 'sale_file_create' %}" class="btn btn-primary"><em class="icon ni ni-plus"></em><span>ایجاد فایل جدید</span></a>
+                            <a href="{% url 'buyer_create' %}" class="btn btn-primary"><em class="icon ni ni-plus"></em><span>ایجاد خریدار جدید</span></a>
                         </li>
                     </ul>
                 </div>
@@ -399,7 +266,7 @@
             <!-- end: Upper Navbar -->
 
             <!-- List -->
-            <div class=" nk-fmg-body-content">
+            <div class="nk-fmg-body-content">
 
                 <!-- Upper + Mobile -->
                 <div class="nk-block-head nk-block-head-sm" style="margin-bottom: 1.2em;">
@@ -407,7 +274,7 @@
 
                         <!-- Title -->
                         <div class="nk-block-head-content">
-                            <h5 class="nk-block-title page-title">فایل‌های فروش</h5>
+                            <h5 class="nk-block-title page-title">خریداران</h5>
                         </div>
 
                         <!-- Mobile Navbar -->
@@ -425,7 +292,7 @@
                                         <a href="#" class="btn btn-trigger btn-icon" data-bs-toggle="dropdown"><em class="icon ni ni-plus"></em></a>
                                         <div class="dropdown-menu dropdown-menu-end">
                                             <ul class="link-list-opt no-bdr">
-                                                <li><a href="{% url 'sale_file_create' %}"><em class="icon ni ni-upload-cloud"></em><span>ایجاد فایل جدید</span></a></li>
+                                                <li><a href="{% url 'buyer_create' %}"><em class="icon ni ni-upload-cloud"></em><span>ایجاد خریدار جدید</span></a></li>
                                             </ul>
                                         </div>
                                     </div>
@@ -443,7 +310,7 @@
                         <div class="search-wrap px-2 d-lg-none" data-search="search">
                             <div class="search-content">
                                 <a href="#" class="search-back btn btn-icon toggle-search" data-target="search"><em class="icon ni ni-arrow-left"></em></a>
-                                <input type="text" class="form-control border-transparent form-focus-none" placeholder="جستجو در میان فایل‌ها"/>
+                                <input type="text" class="form-control border-transparent form-focus-none" placeholder="جستجو در میان خریداران"/>
                                 <button class="search-submit btn btn-icon">
                                     <em class="icon ni ni-search"></em>
                                 </button>
@@ -454,69 +321,65 @@
                 </div>
                 <!-- end: Upper + Mobile -->
 
-                <!-- Files -->
-                <div class="nk-fmg-quick-list nk-block">
-                    <div class="toggle-expand-content expanded" data-content="quick-access">
-                        <div class="nk-files nk-files-view-grid">
-                            <div class="nk-files-list">
+                <!-- Buyers -->
+                <div class="nk-block" >
+                    <div class="row g-gs">
+                        {% for buyer in buyers %}
+                            <div class="col-sm-6 col-lg-6 col-xxl-6">
+                                <div class="card h-100">
+                                    <div class="card-inner">
+                                        <div class="project">
 
-                                <!-- Loop -->
-                                {% for file in sale_files %}
-                                    <div class="nk-file-item nk-file">
-                                        <div class="nk-file-info">
-                                            <div class="nk-file-title">
-
-                                                <!-- Code / Sub-district -->
-                                                <div class="nk-file-name">
-                                                    <div class="nk-file-name-text" style="margin-bottom: 0.5em; height: 3em;!important; -webkit-line-clamp: 2;!important;">
-                                                        <span style="font-size: 0.8em;">کد: {{ file.code }} / <span style="color: green; font-size: 1.1em;">{{ file.sub_district }}</span></span>
+                                            <!-- Name & Code & Phone -->
+                                            <div class="project-head">
+                                                <div class="project-title">
+                                                    <div class="project-info">
+                                                        <h5 class="title" style="font-size: 1.1em;">{{ buyer.name }} | {{ buyer.code }}</h5>
                                                     </div>
                                                 </div>
-
-                                                <!-- Cover -->
-                                                <a href="{{ file.get_absolute_url }}" class="nk-file-link">
-                                                    <div class="nk-file-icon">
-                                                        <figure class="product-image--holder" style="height: 12.3em;!important; -webkit-line-clamp: 12.3;!important;">
-                                                            {% if file.image1 %}
-                                                                <img src="{{ file.image1.url }}" alt="File Cover" style="height: 12.3em;!important; -webkit-line-clamp: 12.3;!important;">
-                                                            {% else %}
-                                                                <img src="{% static 'dashboard/images/blank_file.jpg' %}" alt="File Cover" style="height: 12.3em;!important; -webkit-line-clamp: 12.3;!important;">
-                                                            {% endif %}
-                                                        </figure>
-                                                    </div>
-                                                </a>
-
-                                                <!-- Title -->
-                                                <div class="nk-file-name">
-                                                    <div class="nk-file-name-text" style="height: 4em;!important; -webkit-line-clamp: 2;!important;">
-                                                        <span class="title" style="font-size: 0.9em;">{{ file.title|linebreaksbr|farsi_number }}</span>
-                                                    </div>
-                                                </div>
-
-                                                <!-- Price -->
-                                                <div class="nk-file-name">
-                                                    <span class="title" style="font-size: 0.8em; color: green;">قیمت: {{ file.price_announced|intcomma:False|farsi_number }} تومان</span>
-                                                </div>
-
-                                                <!-- More -->
-                                                <a href="{{ file.get_absolute_url }}" class="btn btn-primary" style="margin-top: 1em;"><em class="icon ni ni-eye"></em><span>مشاهده</span></a>
-
                                             </div>
+
+                                            <!-- Location -->
+                                            <div style="height: 4em;!important; -webkit-line-clamp: 2;!important;">
+                                                <div class="project-head" style="margin-bottom: 0.5em;!important;">
+                                                    <div class="project-title">
+                                                        <div class="project-info">
+                                                            <span class="sub-text" style="font-size: 0.75em; line-height: 25px;">{{ buyer.province }} | {{ buyer.city }} | {{ buyer.district }}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Info -->
+                                            <div style="height: 4em;!important; -webkit-line-clamp: 2;!important;">
+                                                <div class="project-head" style="margin-bottom: 0.5em;!important;">
+                                                    <div class="project-title">
+                                                        <div class="project-info">
+                                                            <h6 class="sub-text" style="font-size: 0.9em; line-height: 25px;">بودجه: {{ buyer.budget_announced|intcomma:False|farsi_number }} تومان</h6>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- More -->
+                                            <div class="project-meta" style="float: left;">
+                                                <a href="{{ buyer.get_absolute_url }}" class="btn btn-primary" style="margin-top: 1em;"><em class="icon ni ni-eye"></em><span>مشاهده</span></a>
+                                            </div>
+
                                         </div>
                                     </div>
-                                {% endfor %}
-
+                                </div>
                             </div>
-                        </div>
+                        {% endfor %}
                     </div>
                 </div>
-                <!-- end: Files -->
+                <!-- end: Buyers -->
 
             </div>
             <!-- end: List -->
-        
+
             <!-- Pagination -->
-            <div class="nk-block-head  nk-block-head-lg" style="margin-top: 1.5em;">
+            <div class="nk-block-head nk-block-head-lg" style="margin-top: 1.5em;">
                 <div class="nk-block-between" style="justify-items: center; justify-content: center; text-align: center">
                     <div class="nk-block-head-content">
                         <div class="my-profile-pagination" style="margin-top: 1em;">
@@ -561,7 +424,10 @@
         <!-- end: Main -->
 
     </div>
+
 {% endblock %}
+
+
 
 
 

@@ -37,7 +37,7 @@
             <div class="nk-main">
 
                 <!-- Sidebar -->
-                <div class="nk-sidebar nk-sidebar-fixed " data-content="sidebarMenu">
+                <div class="nk-sidebar nk-sidebar-fixed" data-content="sidebarMenu">
 
                     <!-- Logo -->
                     <div class="nk-sidebar-element nk-sidebar-head" style="justify-content: center;">
@@ -70,11 +70,11 @@
                                             </a>
                                         </li>
 
-                                        <!-- Items -->
+                                        <!-- Files -->
                                         <li class="nk-menu-item has-sub">
                                             <a href="#" class="nk-menu-link nk-menu-toggle">
                                                 <span class="nk-menu-icon"><em class="icon ni ni-file"></em></span>
-                                                <span class="nk-menu-text">{% trans 'Items' %}</span>
+                                                <span class="nk-menu-text">{% trans 'Files' %}</span>
                                             </a>
                                             <ul class="nk-menu-sub">
                                                 <li class="nk-menu-item">
@@ -83,8 +83,21 @@
                                                 <li class="nk-menu-item">
                                                     <a href="{% url 'rent_file_list' %}" class="nk-menu-link"><span class="nk-menu-text">{% trans 'Rent Files' %}</span></a>
                                                 </li>
+                                            </ul>
+                                        </li>
+
+                                        <!-- People -->
+                                        <li class="nk-menu-item has-sub">
+                                            <a href="#" class="nk-menu-link nk-menu-toggle">
+                                                <span class="nk-menu-icon"><em class="icon ni ni-users"></em></span>
+                                                <span class="nk-menu-text">{% trans 'People' %}</span>
+                                            </a>
+                                            <ul class="nk-menu-sub">
                                                 <li class="nk-menu-item">
-                                                    <a href="#" class="nk-menu-link"><span class="nk-menu-text">{% trans 'Customers' %}</span></a>
+                                                    <a href="{% url 'buyer_list' %}" class="nk-menu-link"><span class="nk-menu-text">{% trans 'Buyers' %}</span></a>
+                                                </li>
+                                                <li class="nk-menu-item">
+                                                    <a href="#" class="nk-menu-link"><span class="nk-menu-text">{% trans 'Rentors' %}</span></a>
                                                 </li>
                                                 <li class="nk-menu-item">
                                                     <a href="{% url 'person_list' %}" class="nk-menu-link"><span class="nk-menu-text">{% trans 'Persons' %}</span></a>
@@ -230,7 +243,6 @@
     </body>
 
 </html>
-
 
 
 

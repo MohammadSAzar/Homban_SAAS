@@ -33,19 +33,80 @@
         });
     </script>
 
-    <!-- Title -->
-    <div class="nk-block-head nk-block-head-sm">
-        <div class="nk-block-between">
-            <div class="nk-block-head-content">
-                <h5 class="nk-block-title page-title">افراد آگهی‌دهنده</h5>
-                <a href="{% url 'person_create' %}" class="btn btn-primary" style="margin-top: 0.8em;"><em class="icon ni ni-plus"></em><span>ایجاد فرد آگهی‌دهنده جدید</span></a>
+    <!-- Upper Navbar -->
+    <div class="nk-fmg-body-head d-none d-lg-flex" >
+
+        <!-- Search -->
+        <div class="nk-fmg-search">
+            <em class="icon ni ni-search"></em>
+            <input type="text" class="form-control border-transparent form-focus-none" placeholder="جستجو در میان خریداران"/>
+        </div>
+
+        <!-- Add Link -->
+        <div class="nk-fmg-actions">
+            <ul class="nk-block-tools g-3">
+                <li>
+                    <a href="{% url 'person_create' %}" class="btn btn-primary"><em class="icon ni ni-plus"></em><span>ایجاد آگهی‌دهنده جدید</span></a>
+                </li>
+            </ul>
+        </div>
+
+    </div>
+    <!-- end: Upper Navbar -->
+    
+
+    <!-- List -->
+    <div class="nk-block">
+
+        <!-- Upper + Mobile -->
+        <div class="nk-block-head nk-block-head-sm" style="margin-bottom: 1.2em;">
+            <div class="nk-block-between position-relative">
+
+                <!-- Title -->
+                <div class="nk-block-head-content" style="margin-top: 2em;">
+                    <h5 class="nk-block-title page-title">افراد آگهی‌دهنده</h5>
+                </div>
+
+                <!-- Mobile Navbar -->
+                <div class="nk-block-head-content">
+                    <ul class="nk-block-tools g-1">
+
+                        <!-- Search -->
+                        <li class="d-lg-none">
+                            <a href="#" class="btn btn-trigger btn-icon search-toggle toggle-search" data-target="search"><em class="icon ni ni-search"></em></a>
+                        </li>
+
+                        <!-- Add Link -->
+                        <li class="d-lg-none">
+                            <div class="dropdown">
+                                <a href="#" class="btn btn-trigger btn-icon" data-bs-toggle="dropdown"><em class="icon ni ni-plus"></em></a>
+                                <div class="dropdown-menu dropdown-menu-end">
+                                    <ul class="link-list-opt no-bdr">
+                                        <li><a href="{% url 'person_create' %}"><em class="icon ni ni-upload-cloud"></em><span>ایجاد آگهی‌دهنده جدید</span></a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </li>
+
+                    </ul>
+                </div>
+
+                <!-- Mobile Search Box -->
+                <div class="search-wrap px-2 d-lg-none" data-search="search">
+                    <div class="search-content">
+                        <a href="#" class="search-back btn btn-icon toggle-search" data-target="search"><em class="icon ni ni-arrow-left"></em></a>
+                        <input type="text" class="form-control border-transparent form-focus-none" placeholder="جستجو در میان افراد آگهی‌دهنده"/>
+                        <button class="search-submit btn btn-icon">
+                            <em class="icon ni ni-search"></em>
+                        </button>
+                    </div>
+                </div>
+
             </div>
         </div>
-    </div>
-    <!-- end: Title -->
+        <!-- end: Upper + Mobile -->
 
-    <!-- Persons -->
-    <div class="nk-block">
+        <!-- Person -->
         <div class="row g-gs">
             {% for person in persons %}
             <div class="col-sm-6 col-lg-4 col-xxl-4">
@@ -114,10 +175,55 @@
             </div>
             {% endfor %}
         </div>
+        <!-- end: Person -->
+    
     </div>
-    <!-- end: Persons -->
+    <!-- end: List -->
+    
+    <!-- Pagination -->
+    <div class="nk-block-head nk-block-head-lg" style="margin-top: 1.5em;">
+        <div class="nk-block-between" style="justify-items: center; justify-content: center; text-align: center">
+            <div class="nk-block-head-content">
+                <div class="my-profile-pagination" style="margin-top: 1em;">
+                    {% if page_obj.has_previous %}
+                        <a href="{% url 'sale_file_list' %}?page=1">&laquo; ابتدا</a>
+                    {% else %}
+                        <span class="my-profile-disabled">&laquo; ابتدا</span>
+                    {% endif %}
+
+                    {% if page_obj.has_previous %}
+                        <a href="{% url 'sale_file_list' %}?page={{ page_obj.previous_page_number }}">‹ قبلی</a>
+                    {% else %}
+                        <span class="my-profile-disabled">‹ قبلی</span>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if num == page_obj.number %}
+                            <span class="my-profile-current">{{ num }}</span>
+                        {% else %}
+                            <a href="{% url 'sale_file_list' %}?page={{ num }}">{{ num }}</a>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                        <a href="{% url 'sale_file_list' %}?page={{ page_obj.next_page_number }}">بعدی ›</a>
+                    {% else %}
+                        <span class="my-profile-disabled">بعدی ›</span>
+                    {% endif %}
+
+                    {% if page_obj.has_next %}
+                        <a href="{% url 'sale_file_list' %}?page={{ page_obj.paginator.num_pages }}">انتها &raquo;</a>
+                    {% else %}
+                        <span class="my-profile-disabled">انتها &raquo;</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- end: Pagination -->
 
 {% endblock %}
+
 
 
 

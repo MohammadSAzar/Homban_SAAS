@@ -1,0 +1,345 @@
+{% extends '_base_dashboard.html' %}
+
+{% load static %}
+{% load i18n %}
+{% load jalali_tags %}
+{% load number_converter %}
+{% load humanize %}
+{% load widget_tweaks %}
+
+
+{% block title %}ایجاد خریدار جدید{% endblock %}
+
+
+{% block content %}
+    
+    <!-- Messages2 -->
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <!-- Main -->
+    <div class="components-preview wide-md mx-auto">
+        <div class="nk-block nk-block-lg">
+            <div class="card card-bordered card-preview">
+                <div class="card-inner" >
+                    <div class="preview-block" >
+
+                        <!-- Title -->
+                        <div class="nk-block-head nk-block-head-lg wide-sm">
+                            <div class="nk-block-head-content">
+                                <h6 class="nk-block-title page-title" style="line-height: 45px;">ایجاد خریدار جدید</h6>
+                            </div>
+                        </div>
+                        <!-- end: Title -->
+
+                        <!-- Form -->
+                        <form class="row gy-4" method="post"  enctype="multipart/form-data" novalidate>
+                            {% csrf_token %}
+
+                            <!-- name -->
+                            <div class="col-lg-6 col-sm-6">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.name.id_for_label }}">نام فرد</label>
+                                        {% render_field form.name id="name" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.name.errors %}
+                                        {% for error in form.name.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- phone_number -->
+                            <div class="col-lg-6 col-sm-6">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.phone_number.id_for_label }}">شماره تلفن همراه</label>
+                                        {% render_field form.phone_number id="phone_number" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.phone_number.errors %}
+                                        {% for error in form.phone_number.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- province -->
+                            <div class="col-lg-4 col-sm-4">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.province.id_for_label }}">استان</label>
+                                        {% render_field form.province id="province" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.province.errors %}
+                                        {% for error in form.province.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- city -->
+                            <div class="col-lg-4 col-sm-4">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.city.id_for_label }}">شهر</label>
+                                        {% render_field form.city id="city" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.city.errors %}
+                                        {% for error in form.city.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- district -->
+                            <div class="col-lg-4 col-sm-4">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.district.id_for_label }}">محله (منطقه)</label>
+                                        {% render_field form.district id="district" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.district.errors %}
+                                        {% for error in form.district.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+    
+                            <!-- budget_announced -->
+                            <div class="col-lg-4 col-sm-4">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.budget_announced.id_for_label }}">بودجه اعلامی</label>
+                                        {% render_field form.budget_announced id="budget_announced" type="number" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.budget_announced.errors %}
+                                        {% for error in form.budget_announced.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- budget_max -->
+                            <div class="col-lg-4 col-sm-4">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.budget_max.id_for_label }}">حداکثر بودجه</label>
+                                        {% render_field form.budget_max id="budget_max" type="number" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.budget_max.errors %}
+                                        {% for error in form.budget_max.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <!-- budget_status -->
+                            <div class="col-lg-4 col-sm-4">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.budget_status.id_for_label }}">وضعیت بودجه</label>
+                                        {% render_field form.budget_status id="budget_status" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.budget_status.errors %}
+                                        {% for error in form.budget_status.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <!-- room_min -->
+                            <div class="col-lg-3 col-sm-3">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.room_min.id_for_label }}">اتاق (حداقل)</label>
+                                        {% render_field form.room_min id="room_min" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.room_min.errors %}
+                                        {% for error in form.room_min.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <!-- room_max -->
+                            <div class="col-lg-3 col-sm-3">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.room_max.id_for_label }}">اتاق (حداکثر)</label>
+                                        {% render_field form.room_max id="room_max" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.room_max.errors %}
+                                        {% for error in form.room_max.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <!-- area_min -->
+                            <div class="col-lg-3 col-sm-3">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.area_min.id_for_label }}">متراژ (حداقل)</label>
+                                        {% render_field form.area_min id="area_min" type="number" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.area_min.errors %}
+                                        {% for error in form.area_min.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <!-- area_max -->
+                            <div class="col-lg-3 col-sm-3">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.area_max.id_for_label }}">متراژ (حداکثر)</label>
+                                        {% render_field form.area_max id="area_max" type="number" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.area_max.errors %}
+                                        {% for error in form.area_max.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <!-- age_min -->
+                            <div class="col-lg-4 col-sm-4">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.age_min.id_for_label }}">سن (حداقل)</label>
+                                        {% render_field form.age_min id="age_min" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.age_min.errors %}
+                                        {% for error in form.age_min.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <!-- age_max -->
+                            <div class="col-lg-4 col-sm-4">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.age_max.id_for_label }}">سن (حداکثر)</label>
+                                        {% render_field form.age_max id="age_max" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.age_max.errors %}
+                                        {% for error in form.age_max.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <!-- document -->
+                            <div class="col-lg-4 col-sm-4">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.document.id_for_label }}">وضعیت سند</label>
+                                        {% render_field form.document id="document" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.document.errors %}
+                                        {% for error in form.document.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <!-- parking -->
+                            <div class="col-lg-4 col-sm-4">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.parking.id_for_label }}">وضعیت پارکینگ</label>
+                                        {% render_field form.parking id="parking" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.parking.errors %}
+                                        {% for error in form.parking.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <!-- elevator -->
+                            <div class="col-lg-4 col-sm-4">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.elevator.id_for_label }}">وضعیت آسانسور</label>
+                                        {% render_field form.elevator id="elevator" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.elevator.errors %}
+                                        {% for error in form.elevator.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <!-- warehouse -->
+                            <div class="col-lg-4 col-sm-4">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.warehouse.id_for_label }}">وضعیت انباری</label>
+                                        {% render_field form.warehouse id="warehouse" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.warehouse.errors %}
+                                        {% for error in form.warehouse.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <!-- description -->
+                            <div class="col-lg-12 col-sm-12">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.description.id_for_label }}">توضیحات</label>
+                                        {% render_field form.description id="description" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.description.errors %}
+                                        {% for error in form.description.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        
+                            <!-- Submit -->
+                            <div class="nk-fmg-actions" style="margin-top: 3em;">
+                                <button type="submit" class="btn btn-primary" style="line-height: 30px;">ثبت اطلاعات</button>
+                            </div>
+                        
+                        </form>
+                        <!-- end: Form -->    
+                    
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+

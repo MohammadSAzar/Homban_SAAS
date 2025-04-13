@@ -23,7 +23,7 @@ class SaleFileListView(ListView):
     paginate_by = 12
 
     def get_queryset(self):
-        queryset_default = models.SaleFile.objects.select_related('province', 'city', 'district', 'sub_district')
+        queryset_default = models.SaleFile.objects.select_related('province', 'city', 'district', 'sub_district', 'person')
         form = forms.SaleFileFilterForm(self.request.GET)
 
         if form.is_valid():
@@ -36,6 +36,10 @@ class SaleFileListView(ListView):
                 queryset_filtered = queryset_filtered.filter(district=form.cleaned_data['district'])
             if form.cleaned_data['sub_district']:
                 queryset_filtered = queryset_filtered.filter(sub_district=form.cleaned_data['sub_district'])
+            if form.cleaned_data['person']:
+                queryset_filtered = queryset_filtered.filter(person=form.cleaned_data['person'])
+            if form.cleaned_data['source']:
+                queryset_filtered = queryset_filtered.filter(source=form.cleaned_data['source'])
             if form.cleaned_data['document']:
                 queryset_filtered = queryset_filtered.filter(document=form.cleaned_data['document'])
             if form.cleaned_data['parking']:
@@ -178,7 +182,7 @@ class RentFileListView(ListView):
     paginate_by = 12
 
     def get_queryset(self):
-        queryset_default = models.RentFile.objects.select_related('province', 'city', 'district', 'sub_district')
+        queryset_default = models.RentFile.objects.select_related('province', 'city', 'district', 'sub_district', 'person')
         form = forms.RentFileFilterForm(self.request.GET)
 
         if form.is_valid():
@@ -191,6 +195,10 @@ class RentFileListView(ListView):
                 queryset_filtered = queryset_filtered.filter(district=form.cleaned_data['district'])
             if form.cleaned_data['sub_district']:
                 queryset_filtered = queryset_filtered.filter(sub_district=form.cleaned_data['sub_district'])
+            if form.cleaned_data['person']:
+                queryset_filtered = queryset_filtered.filter(person=form.cleaned_data['person'])
+            if form.cleaned_data['source']:
+                queryset_filtered = queryset_filtered.filter(source=form.cleaned_data['source'])
             if form.cleaned_data['document']:
                 queryset_filtered = queryset_filtered.filter(document=form.cleaned_data['document'])
             if form.cleaned_data['convertable']:
@@ -333,12 +341,12 @@ class RentFileDeleteView(DeleteView):
         return self.render_to_response(self.get_context_data(form=form))
 
 
-# --------------------------------- People --------------------------------
+# --------------------------------- Persons --------------------------------
 class PersonListView(ListView):
     model = models.Person
     template_name = 'dashboard/people/person_list.html'
     context_object_name = 'persons'
-    paginate_by = 12
+    paginate_by = 6
 
 
 class PersonCreateView(CreateView):
@@ -391,6 +399,123 @@ class PersonDeleteView(DeleteView):
 
     def form_valid(self, form):
         messages.error(self.request, "فرد مربوطه از سامانه حذف شد.")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        self.object = None
+        return self.render_to_response(self.get_context_data(form=form))
+
+
+# --------------------------------- Customers --------------------------------
+class BuyerListView(ListView):
+    model = models.Buyer
+    template_name = 'dashboard/people/buyer_list.html'
+    context_object_name = 'buyers'
+    paginate_by = 6
+
+    def get_queryset(self):
+        queryset_default = models.Buyer.objects.select_related('province', 'city', 'district')
+        form = forms.BuyerFilterForm(self.request.GET)
+
+        if form.is_valid():
+            queryset_filtered = queryset_default
+            if form.cleaned_data['province']:
+                queryset_filtered = queryset_filtered.filter(province=form.cleaned_data['province'])
+            if form.cleaned_data['city']:
+                queryset_filtered = queryset_filtered.filter(city=form.cleaned_data['city'])
+            if form.cleaned_data['district']:
+                queryset_filtered = queryset_filtered.filter(district=form.cleaned_data['district'])
+            if form.cleaned_data['document']:
+                queryset_filtered = queryset_filtered.filter(document=form.cleaned_data['document'])
+            if form.cleaned_data['parking']:
+                queryset_filtered = queryset_filtered.filter(parking=form.cleaned_data['parking'])
+            if form.cleaned_data['elevator']:
+                queryset_filtered = queryset_filtered.filter(elevator=form.cleaned_data['elevator'])
+            if form.cleaned_data['warehouse']:
+                queryset_filtered = queryset_filtered.filter(warehouse=form.cleaned_data['warehouse'])
+
+            queryset_filtered = list(queryset_filtered)
+
+            # queryset_final = queryset_filtered
+            if form.cleaned_data['min_budget']:
+                queryset_filtered = [obj for obj in queryset_filtered if
+                                     obj.budget_announced and obj.budget_announced >= form.cleaned_data['min_budget']]
+            if form.cleaned_data['max_budget']:
+                queryset_filtered = [obj for obj in queryset_filtered if
+                                     obj.budget_announced and obj.budget_announced <= form.cleaned_data['max_budget']]
+
+            return queryset_filtered
+        return queryset_default
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        form = forms.BuyerFilterForm(self.request.GET)
+
+        if self.request.GET.get('province'):
+            form.fields['city'].queryset = models.City.objects.filter(province_id=self.request.GET.get('province'))
+        if self.request.GET.get('city'):
+            form.fields['district'].queryset = models.District.objects.filter(city_id=self.request.GET.get('city'))
+
+        context['filter_form'] = form
+        return context
+
+
+class BuyerDetailView(DetailView):
+    model = models.Buyer
+    context_object_name = 'buyer'
+    template_name = 'dashboard/people/buyer_detail.html'
+
+
+class BuyerCreateView(CreateView):
+    model = models.Buyer
+    form_class = forms.BuyerCreateForm
+    template_name = 'dashboard/people/buyer_create.html'
+
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+    def form_valid(self, form):
+        messages.success(self.request, "خریدار جدید سامانه ثبت شد (این اطلاعات توسط مدیر بررسی خواهد شد).")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        self.object = None
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_success_url(self):
+        return reverse('buyer_list')
+
+
+class BuyerUpdateView(UpdateView):
+    model = models.Buyer
+    form_class = forms.BuyerCreateForm
+    template_name = 'dashboard/people/buyer_update.html'
+    context_object_name = 'buyer'
+
+    def form_valid(self, form):
+        messages.success(self.request, "تغییرات شما در سامانه ثبت شد (این تغییرات توسط مدیر بررسی خواهد شد).")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        self.object = None
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_success_url(self):
+        return reverse_lazy('buyer_list')
+
+
+class BuyerDeleteView(DeleteView):
+    model = models.Buyer
+    template_name = 'dashboard/people/buyer_delete.html'
+    success_url = reverse_lazy('buyer_list')
+    context_object_name = 'buyer'
+
+    def form_valid(self, form):
+        messages.error(self.request, "خریدار مربوطه از سامانه حذف شد.")
         return super().form_valid(form)
 
     def form_invalid(self, form):
