@@ -447,9 +447,9 @@ class RentFile(models.Model):
 
 class Buyer(models.Model):
     # locations
-    province = models.ForeignKey(Province, on_delete=models.SET_NULL, null=True, blank=True, related_name='customers', verbose_name=_('Province'))
-    city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True, blank=True, related_name='customers', verbose_name=_('City'))
-    district = models.ForeignKey(District, on_delete=models.SET_NULL, null=True, blank=True, related_name='customers', verbose_name=_('District'))
+    province = models.ForeignKey(Province, on_delete=models.SET_NULL, null=True, blank=True, related_name='buyers', verbose_name=_('Province'))
+    city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True, blank=True, related_name='buyers', verbose_name=_('City'))
+    district = models.ForeignKey(District, on_delete=models.SET_NULL, null=True, blank=True, related_name='buyers', verbose_name=_('District'))
     # properties
     budget_announced = models.PositiveBigIntegerField(blank=True, null=True, verbose_name=_('Announced Budget'))
     budget_max = models.PositiveBigIntegerField(blank=True, null=True, verbose_name=_('Max Budget'))
@@ -486,49 +486,48 @@ class Buyer(models.Model):
         return reverse('buyer_detail', args=[self.pk, self.code])
 
 
-# class Buyer(models.Model):
-#     # locations
-#     province = models.ForeignKey(Province, on_delete=models.SET_NULL, null=True, blank=True, related_name='customers', verbose_name=_('Province'))
-#     city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True, blank=True, related_name='customers', verbose_name=_('City'))
-#     district = models.ForeignKey(District, on_delete=models.SET_NULL, null=True, blank=True, related_name='customers', verbose_name=_('District'))
-#     sub_district1 = models.ForeignKey(SubDistrict, on_delete=models.SET_NULL, null=True, blank=True, related_name='customers_sub_district1', verbose_name=_('Sub-District1'))
-#     sub_district2 = models.ForeignKey(SubDistrict, on_delete=models.SET_NULL, null=True, blank=True, related_name='customers_sub_district2', verbose_name=_('Sub-District2'))
-#     sub_district3 = models.ForeignKey(SubDistrict, on_delete=models.SET_NULL, null=True, blank=True, related_name='customers_sub_district3', verbose_name=_('Sub-District3'))
-#     # info
-#     name = models.CharField(max_length=100, verbose_name=_('Name'))
-#     phone_number = models.CharField(max_length=11, unique=True, verbose_name=_('Phone Number'))
-#     type = models.CharField(max_length=10, blank=True, null=True, choices=choices.types, verbose_name=_('Type of Customer'))
-#     budget_announced = models.PositiveBigIntegerField(blank=True, null=True, verbose_name=_('Announced Budget'))
-#     budget_max = models.PositiveBigIntegerField(blank=True, null=True, verbose_name=_('Max Budget'))
-#     deposit_announced = models.PositiveBigIntegerField(blank=True, null=True, verbose_name=_('Announced Deposit'))
-#     deposit_max = models.PositiveBigIntegerField(blank=True, null=True, verbose_name=_('Max Deposit'))
-#     rent_announced = models.PositiveBigIntegerField(blank=True, null=True, verbose_name=_('Announced Rent'))
-#     rent_max = models.PositiveBigIntegerField(blank=True, null=True, verbose_name=_('Max Rent'))
-#     convertable = models.CharField(max_length=15, choices=choices.beings, blank=True, null=True, verbose_name=_('Convertable'))
-#     budget_status = models.CharField(max_length=15, choices=choices.budgets, blank=True, null=True, verbose_name=_('Budget Status'))
-#     room_min = models.CharField(max_length=15, choices=choices.rooms, verbose_name=_('Min Rooms'))
-#     room_max = models.CharField(max_length=15, choices=choices.rooms, verbose_name=_('Max Rooms'))
-#     area_min = models.PositiveIntegerField(default='1', verbose_name=_('Min Area'))
-#     area_max = models.PositiveIntegerField(default='1', verbose_name=_('Max Area'))
-#     age_min = models.CharField(max_length=15, choices=choices.ages, default='1', verbose_name=_('Min Age'))
-#     age_max = models.CharField(max_length=15, choices=choices.ages, default='1', verbose_name=_('Max Age'))
-#     description = models.TextField(max_length=2000, blank=True, null=True, verbose_name=_('Description'))
-#     code = models.CharField(max_length=6, null=True, unique=True, blank=True, verbose_name=_('Code'))
-#     datetime_created = models.DateTimeField(default=timezone.now, verbose_name=_('Date and Time of Creation'))
-#
-#     def save(self, *args, **kwargs):
-#         if not self.code:
-#             self.code = generate_unique_code()
-#         super(Customer, self).save(*args, **kwargs)
-#
-#     def __str__(self):
-#         return f'{self.name} / {self.code} / {self.budget_announced}'
-#
-#     class Meta:
-#         ordering = ('-datetime_created',)
-#
-#     def get_absolute_url(self):
-#         return reverse('customer_detail', args=[self.code])
+class Renter(models.Model):
+    # locations
+    province = models.ForeignKey(Province, on_delete=models.SET_NULL, null=True, blank=True, related_name='renters', verbose_name=_('Province'))
+    city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True, blank=True, related_name='renters', verbose_name=_('City'))
+    district = models.ForeignKey(District, on_delete=models.SET_NULL, null=True, blank=True, related_name='renters', verbose_name=_('District'))
+    # properties
+    deposit_announced = models.PositiveBigIntegerField(blank=True, null=True, verbose_name=_('Announced Deposit'))
+    deposit_max = models.PositiveBigIntegerField(blank=True, null=True, verbose_name=_('Max Deposit'))
+    rent_announced = models.PositiveBigIntegerField(blank=True, null=True, verbose_name=_('Announced Rent'))
+    rent_max = models.PositiveBigIntegerField(blank=True, null=True, verbose_name=_('Max Rent'))
+    budget_status = models.CharField(max_length=15, choices=choices.budgets, blank=True, null=True, verbose_name=_('Budget Status'))
+    convertable = models.CharField(max_length=15, choices=choices.beings, verbose_name=_('Convertable'))
+    room_min = models.CharField(max_length=15, choices=choices.rooms, verbose_name=_('Min Rooms'))
+    room_max = models.CharField(max_length=15, choices=choices.rooms, verbose_name=_('Max Rooms'))
+    area_min = models.PositiveIntegerField(default='1', verbose_name=_('Min Area'))
+    area_max = models.PositiveIntegerField(default='1', verbose_name=_('Max Area'))
+    age_min = models.CharField(max_length=15, choices=choices.ages, default='1', verbose_name=_('Min Age'))
+    age_max = models.CharField(max_length=15, choices=choices.ages, default='1', verbose_name=_('Max Age'))
+    document = models.CharField(max_length=15, choices=choices.booleans, verbose_name=_('Document'))
+    parking = models.CharField(max_length=15, choices=choices.booleans, verbose_name=_('Parking'))
+    elevator = models.CharField(max_length=15, choices=choices.booleans, verbose_name=_('Elevator'))
+    warehouse = models.CharField(max_length=15, choices=choices.booleans, verbose_name=_('Warehouse'))
+    # info
+    name = models.CharField(max_length=100, verbose_name=_('Name'))
+    phone_number = models.CharField(max_length=11, unique=True, verbose_name=_('Phone Number'))
+    description = models.TextField(max_length=2000, blank=True, null=True, verbose_name=_('Description'))
+    code = models.CharField(max_length=6, null=True, unique=True, blank=True, verbose_name=_('Code'))
+    datetime_created = models.DateTimeField(default=timezone.now, verbose_name=_('Date and Time of Creation'))
+
+    def save(self, *args, **kwargs):
+        if not self.code:
+            self.code = generate_unique_code()
+        super(Renter, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return f'{self.name} / {self.code} / {self.deposit_announced} / {self.rent_announced}'
+
+    class Meta:
+        ordering = ('-datetime_created',)
+
+    def get_absolute_url(self):
+        return reverse('renter_detail', args=[self.pk, self.code])
 
 
 # --------------------------------- SERVs ----------------------------------

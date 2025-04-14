@@ -8,7 +8,7 @@
 {% load widget_tweaks %}
 
 
-{% block title %}بروزرسانی خریدار {{ buyer.name|farsi_number }}{% endblock %}
+{% block title %}بروزرسانی مستاجر {{ renter.name|farsi_number }}{% endblock %}
 
 
 {% block content %}
@@ -32,13 +32,13 @@
                         <!-- Title -->
                         <div class="nk-block-head nk-block-head-lg wide-sm">
                             <div class="nk-block-head-content">
-                                <h6 class="nk-block-title page-title" style="line-height: 45px;">بروزرسانی خریدار {{ buyer.name|farsi_number }}</h6>
+                                <h6 class="nk-block-title page-title" style="line-height: 45px;">بروزرسانی مستاجر {{ renter.name|farsi_number }}</h6>
                             </div>
                         </div>
                         <!-- end: Title -->
 
                         <!-- Form -->
-                        <form class="row gy-4" method="post"  enctype="multipart/form-data" novalidate>
+                        <form class="row gy-4"  method="post" enctype="multipart/form-data" novalidate>
                             {% csrf_token %}
 
                             <!-- name -->
@@ -116,30 +116,60 @@
                                 </div>
                             </div>
     
-                            <!-- budget_announced -->
+                            <!-- deposit_announced -->
                             <div class="col-lg-4 col-sm-4">
                                 <div class="form-group">
                                     <div class="form-control-wrap">
-                                        <label class="form-label" for="{{ form.budget_announced.id_for_label }}">بودجه اعلامی</label>
-                                        {% render_field form.budget_announced id="budget_announced" type="number" class="form-control form-control-xl form-control-outlined" %}
+                                        <label class="form-label" for="{{ form.deposit_announced.id_for_label }}">ودیعه اعلامی</label>
+                                        {% render_field form.deposit_announced id="deposit_announced" type="number" class="form-control form-control-xl form-control-outlined" %}
                                     </div>
-                                    {% if form.budget_announced.errors %}
-                                        {% for error in form.budget_announced.errors %}
+                                    {% if form.deposit_announced.errors %}
+                                        {% for error in form.deposit_announced.errors %}
                                             <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
                                         {% endfor %}
                                     {% endif %}
                                 </div>
                             </div>
 
-                            <!-- budget_max -->
+                            <!-- deposit_max -->
                             <div class="col-lg-4 col-sm-4">
                                 <div class="form-group">
                                     <div class="form-control-wrap">
-                                        <label class="form-label" for="{{ form.budget_max.id_for_label }}">حداکثر بودجه</label>
-                                        {% render_field form.budget_max id="budget_max" type="number" class="form-control form-control-xl form-control-outlined" %}
+                                        <label class="form-label" for="{{ form.deposit_max.id_for_label }}">حداکثر ودیعه</label>
+                                        {% render_field form.deposit_max id="deposit_max" type="number" class="form-control form-control-xl form-control-outlined" %}
                                     </div>
-                                    {% if form.budget_max.errors %}
-                                        {% for error in form.budget_max.errors %}
+                                    {% if form.deposit_max.errors %}
+                                        {% for error in form.deposit_max.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        
+                            <!-- rent_announced -->
+                            <div class="col-lg-4 col-sm-4">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.rent_announced.id_for_label }}">اجاره اعلامی</label>
+                                        {% render_field form.rent_announced id="rent_announced" type="number" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.rent_announced.errors %}
+                                        {% for error in form.rent_announced.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- rent_max -->
+                            <div class="col-lg-4 col-sm-4">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.rent_max.id_for_label }}">حداکثر اجاره</label>
+                                        {% render_field form.rent_max id="rent_max" type="number" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.rent_max.errors %}
+                                        {% for error in form.rent_max.errors %}
                                             <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
                                         {% endfor %}
                                     {% endif %}
@@ -160,6 +190,22 @@
                                     {% endif %}
                                 </div>
                             </div>
+                        
+                            <!-- convertable -->
+                            <div class="col-lg-4 col-sm-4">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.convertable.id_for_label }}">قابل تبدیل</label>
+                                        {% render_field form.convertable id="convertable" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.convertable.errors %}
+                                        {% for error in form.convertable.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
                         
                             <!-- room_min -->
                             <div class="col-lg-3 col-sm-3">
@@ -341,6 +387,8 @@
     </div>
 
 {% endblock %}
+
+
 
 
 

@@ -30,7 +30,7 @@ class CustomUserAdmin(BaseUserAdmin):
 admin.site.register(models.CustomUserModel, CustomUserAdmin)
 
 
-# --------------------------------- LOCs -----------------------------------
+# --------------------------------- LOC -----------------------------------
 @admin.register(models.Province)
 class ProvinceAdmin(admin.ModelAdmin):
     list_display = ('name',)
@@ -82,7 +82,7 @@ class RentFileAdmin(admin.ModelAdmin):
     readonly_fields = ('code', 'datetime_created', 'datetime_expired',)
 
 
-# --------------------------------- SERVs ---------------------------------
+# --------------------------------- PPL ---------------------------------
 @admin.register(models.Buyer)
 class BuyerAdmin(admin.ModelAdmin):
     list_display = ('name', 'phone_number', 'code', 'province', 'city', 'district', 'budget_announced', 'budget_status',
@@ -91,6 +91,15 @@ class BuyerAdmin(admin.ModelAdmin):
     readonly_fields = ('code', 'datetime_created',)
 
 
+@admin.register(models.Renter)
+class RenterAdmin(admin.ModelAdmin):
+    list_display = ('name', 'phone_number', 'code', 'province', 'city', 'district', 'deposit_announced',  'rent_announced',
+                    'budget_status', 'convertable', 'datetime_created')
+    ordering = ('-datetime_created',)
+    readonly_fields = ('code', 'datetime_created',)
+
+
+# --------------------------------- SERV ---------------------------------
 @admin.register(models.Visit)
 class VisitAdmin(admin.ModelAdmin):
     list_display = ('type', 'code', 'sale_file', 'rent_file', 'customer', 'status', 'datetime_created')

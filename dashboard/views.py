@@ -406,7 +406,7 @@ class PersonDeleteView(DeleteView):
         return self.render_to_response(self.get_context_data(form=form))
 
 
-# --------------------------------- Customers --------------------------------
+# --------------------------------- Buyers --------------------------------
 class BuyerListView(ListView):
     model = models.Buyer
     template_name = 'dashboard/people/buyer_list.html'
@@ -425,6 +425,8 @@ class BuyerListView(ListView):
                 queryset_filtered = queryset_filtered.filter(city=form.cleaned_data['city'])
             if form.cleaned_data['district']:
                 queryset_filtered = queryset_filtered.filter(district=form.cleaned_data['district'])
+            if form.cleaned_data['budget_status']:
+                queryset_filtered = queryset_filtered.filter(budget_status=form.cleaned_data['budget_status'])
             if form.cleaned_data['document']:
                 queryset_filtered = queryset_filtered.filter(document=form.cleaned_data['document'])
             if form.cleaned_data['parking']:
@@ -521,6 +523,134 @@ class BuyerDeleteView(DeleteView):
     def form_invalid(self, form):
         self.object = None
         return self.render_to_response(self.get_context_data(form=form))
+
+
+# --------------------------------- Renters --------------------------------
+class RenterListView(ListView):
+    model = models.Renter
+    template_name = 'dashboard/people/renter_list.html'
+    context_object_name = 'renters'
+    paginate_by = 6
+
+    def get_queryset(self):
+        queryset_default = models.Renter.objects.select_related('province', 'city', 'district')
+        form = forms.RenterFilterForm(self.request.GET)
+
+        if form.is_valid():
+            queryset_filtered = queryset_default
+            if form.cleaned_data['province']:
+                queryset_filtered = queryset_filtered.filter(province=form.cleaned_data['province'])
+            if form.cleaned_data['city']:
+                queryset_filtered = queryset_filtered.filter(city=form.cleaned_data['city'])
+            if form.cleaned_data['district']:
+                queryset_filtered = queryset_filtered.filter(district=form.cleaned_data['district'])
+            if form.cleaned_data['budget_status']:
+                queryset_filtered = queryset_filtered.filter(budget_status=form.cleaned_data['budget_status'])
+            if form.cleaned_data['convertable']:
+                queryset_filtered = queryset_filtered.filter(convertable=form.cleaned_data['convertable'])
+            if form.cleaned_data['document']:
+                queryset_filtered = queryset_filtered.filter(document=form.cleaned_data['document'])
+            if form.cleaned_data['parking']:
+                queryset_filtered = queryset_filtered.filter(parking=form.cleaned_data['parking'])
+            if form.cleaned_data['elevator']:
+                queryset_filtered = queryset_filtered.filter(elevator=form.cleaned_data['elevator'])
+            if form.cleaned_data['warehouse']:
+                queryset_filtered = queryset_filtered.filter(warehouse=form.cleaned_data['warehouse'])
+
+            queryset_filtered = list(queryset_filtered)
+
+            # queryset_final = queryset_filtered
+            if form.cleaned_data['min_deposit']:
+                queryset_filtered = [obj for obj in queryset_filtered if
+                                     obj.deposit_announced and obj.deposit_announced >= form.cleaned_data['min_deposit']]
+            if form.cleaned_data['max_deposit']:
+                queryset_filtered = [obj for obj in queryset_filtered if
+                                     obj.deposit_announced and obj.deposit_announced <= form.cleaned_data['max_deposit']]
+            if form.cleaned_data['min_rent']:
+                queryset_filtered = [obj for obj in queryset_filtered if
+                                     obj.rent_announced and obj.rent_announced >= form.cleaned_data['min_rent']]
+            if form.cleaned_data['max_rent']:
+                queryset_filtered = [obj for obj in queryset_filtered if
+                                     obj.rent_announced and obj.rent_announced <= form.cleaned_data['max_rent']]
+
+            return queryset_filtered
+        return queryset_default
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        form = forms.RenterFilterForm(self.request.GET)
+
+        if self.request.GET.get('province'):
+            form.fields['city'].queryset = models.City.objects.filter(province_id=self.request.GET.get('province'))
+        if self.request.GET.get('city'):
+            form.fields['district'].queryset = models.District.objects.filter(city_id=self.request.GET.get('city'))
+
+        context['filter_form'] = form
+        return context
+
+
+class RenterDetailView(DetailView):
+    model = models.Renter
+    context_object_name = 'renter'
+    template_name = 'dashboard/people/renter_detail.html'
+
+
+class RenterCreateView(CreateView):
+    model = models.Renter
+    form_class = forms.RenterCreateForm
+    template_name = 'dashboard/people/renter_create.html'
+
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+    def form_valid(self, form):
+        messages.success(self.request, "خریدار جدید سامانه ثبت شد (این اطلاعات توسط مدیر بررسی خواهد شد).")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        self.object = None
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_success_url(self):
+        return reverse('renter_list')
+
+
+class RenterUpdateView(UpdateView):
+    model = models.Renter
+    form_class = forms.RenterCreateForm
+    template_name = 'dashboard/people/renter_update.html'
+    context_object_name = 'renter'
+
+    def form_valid(self, form):
+        messages.success(self.request, "تغییرات شما در سامانه ثبت شد (این تغییرات توسط مدیر بررسی خواهد شد).")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        self.object = None
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_success_url(self):
+        return reverse_lazy('renter_list')
+
+
+class RenterDeleteView(DeleteView):
+    model = models.Renter
+    template_name = 'dashboard/people/renter_delete.html'
+    success_url = reverse_lazy('renter_list')
+    context_object_name = 'renter'
+
+    def form_valid(self, form):
+        messages.error(self.request, "مستاجر مربوطه از سامانه حذف شد.")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        self.object = None
+        return self.render_to_response(self.get_context_data(form=form))
+
 
 
 

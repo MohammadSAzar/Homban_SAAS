@@ -30,6 +30,12 @@ urlpatterns = [
     re_path(r'buyer/delete/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/', views.BuyerDeleteView.as_view(), name='buyer_delete'),
     re_path(r'buyer/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/', views.BuyerDetailView.as_view(), name='buyer_detail'),
     re_path(r'buyers/create/', views.BuyerCreateView.as_view(), name='buyer_create'),
+    # buyers
+    path('renters/', views.RenterListView.as_view(), name='renter_list'),
+    re_path(r'renter/update/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/', views.RenterUpdateView.as_view(), name='renter_update'),
+    re_path(r'renter/delete/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/', views.RenterDeleteView.as_view(), name='renter_delete'),
+    re_path(r'renter/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/', views.RenterDetailView.as_view(), name='renter_detail'),
+    re_path(r'renters/create/', views.RenterCreateView.as_view(), name='renter_create'),
 ]
 
 
