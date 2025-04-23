@@ -4,6 +4,7 @@ from django.views.generic import DetailView, CreateView, ListView, UpdateView, D
 from django.contrib import messages
 
 from . import models, forms
+from .permissions import PermissionRequiredMixin, ReadOnlyPermissionMixin
 
 
 # ----------------------------------- Bases -----------------------------------
@@ -16,8 +17,9 @@ def dashboard_view(request):
 
 
 # --------------------------------- Locations --------------------------------
-class LocationListView(TemplateView):
+class LocationListView(ReadOnlyPermissionMixin, TemplateView):
     template_name = 'dashboard/locations/location_list.html'
+    permission_model = 'Location'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -30,10 +32,12 @@ class LocationListView(TemplateView):
         return context
 
 
-class ProvinceCreateView(CreateView):
+class ProvinceCreateView(PermissionRequiredMixin, CreateView):
     model = models.Province
     form_class = forms.ProvinceCreateForm
     template_name = 'dashboard/locations/province_create.html'
+    permission_model = 'Province'
+    permission_action = 'create'
 
     def post(self, request, *args, **kwargs):
         form = self.get_form()
@@ -54,10 +58,12 @@ class ProvinceCreateView(CreateView):
         return reverse('location_list')
 
 
-class CityCreateView(CreateView):
+class CityCreateView(PermissionRequiredMixin, CreateView):
     model = models.City
     form_class = forms.CityCreateForm
     template_name = 'dashboard/locations/city_create.html'
+    permission_model = 'City'
+    permission_action = 'create'
 
     def post(self, request, *args, **kwargs):
         form = self.get_form()
@@ -78,10 +84,12 @@ class CityCreateView(CreateView):
         return reverse('location_list')
 
 
-class DistrictCreateView(CreateView):
+class DistrictCreateView(PermissionRequiredMixin, CreateView):
     model = models.District
     form_class = forms.DistrictCreateForm
     template_name = 'dashboard/locations/district_create.html'
+    permission_model = 'District'
+    permission_action = 'create'
 
     def post(self, request, *args, **kwargs):
         form = self.get_form()
@@ -102,10 +110,12 @@ class DistrictCreateView(CreateView):
         return reverse('location_list')
 
 
-class SubDistrictCreateView(CreateView):
+class SubDistrictCreateView(PermissionRequiredMixin, CreateView):
     model = models.SubDistrict
     form_class = forms.SubDistrictCreateForm
     template_name = 'dashboard/locations/sub_district_create.html'
+    permission_model = 'SubDistrict'
+    permission_action = 'create'
 
     def post(self, request, *args, **kwargs):
         form = self.get_form()
@@ -126,11 +136,13 @@ class SubDistrictCreateView(CreateView):
         return reverse('location_list')
 
 
-class ProvinceUpdateView(UpdateView):
+class ProvinceUpdateView(PermissionRequiredMixin, UpdateView):
     model = models.Province
     form_class = forms.ProvinceCreateForm
     template_name = 'dashboard/locations/province_update.html'
     context_object_name = 'province'
+    permission_model = 'Province'
+    permission_action = 'update'
 
     def form_valid(self, form):
         messages.success(self.request, "تغییرات شما در سامانه ثبت شد (این تغییرات توسط مدیر بررسی خواهد شد).")
@@ -144,11 +156,13 @@ class ProvinceUpdateView(UpdateView):
         return reverse_lazy('location_list')
 
 
-class CityUpdateView(UpdateView):
+class CityUpdateView(PermissionRequiredMixin, UpdateView):
     model = models.City
     form_class = forms.CityCreateForm
     template_name = 'dashboard/locations/city_update.html'
     context_object_name = 'city'
+    permission_model = 'City'
+    permission_action = 'update'
 
     def form_valid(self, form):
         messages.success(self.request, "تغییرات شما در سامانه ثبت شد (این تغییرات توسط مدیر بررسی خواهد شد).")
@@ -162,11 +176,13 @@ class CityUpdateView(UpdateView):
         return reverse_lazy('location_list')
 
 
-class DistrictUpdateView(UpdateView):
+class DistrictUpdateView(PermissionRequiredMixin, UpdateView):
     model = models.District
     form_class = forms.DistrictCreateForm
     template_name = 'dashboard/locations/district_update.html'
     context_object_name = 'district'
+    permission_model = 'District'
+    permission_action = 'update'
 
     def form_valid(self, form):
         messages.success(self.request, "تغییرات شما در سامانه ثبت شد (این تغییرات توسط مدیر بررسی خواهد شد).")
@@ -180,11 +196,13 @@ class DistrictUpdateView(UpdateView):
         return reverse_lazy('location_list')
 
 
-class SubDistrictUpdateView(UpdateView):
+class SubDistrictUpdateView(PermissionRequiredMixin, UpdateView):
     model = models.SubDistrict
     form_class = forms.SubDistrictCreateForm
     template_name = 'dashboard/locations/sub_district_update.html'
     context_object_name = 'sub_district'
+    permission_model = 'SubDistrict'
+    permission_action = 'update'
 
     def form_valid(self, form):
         messages.success(self.request, "تغییرات شما در سامانه ثبت شد (این تغییرات توسط مدیر بررسی خواهد شد).")
@@ -198,11 +216,13 @@ class SubDistrictUpdateView(UpdateView):
         return reverse_lazy('location_list')
 
 
-class ProvinceDeleteView(DeleteView):
+class ProvinceDeleteView(PermissionRequiredMixin, DeleteView):
     model = models.Province
     template_name = 'dashboard/locations/province_delete.html'
     success_url = reverse_lazy('location_list')
     context_object_name = 'province'
+    permission_model = 'Province'
+    permission_action = 'delete'
 
     def form_valid(self, form):
         messages.error(self.request, "استان مربوطه از سامانه حذف شد.")
@@ -213,11 +233,13 @@ class ProvinceDeleteView(DeleteView):
         return self.render_to_response(self.get_context_data(form=form))
 
 
-class CityDeleteView(DeleteView):
+class CityDeleteView(PermissionRequiredMixin, DeleteView):
     model = models.City
     template_name = 'dashboard/locations/city_delete.html'
     success_url = reverse_lazy('location_list')
     context_object_name = 'city'
+    permission_model = 'City'
+    permission_action = 'delete'
 
     def form_valid(self, form):
         messages.error(self.request, "شهر مربوطه از سامانه حذف شد.")
@@ -228,11 +250,13 @@ class CityDeleteView(DeleteView):
         return self.render_to_response(self.get_context_data(form=form))
 
 
-class DistrictDeleteView(DeleteView):
+class DistrictDeleteView(PermissionRequiredMixin, DeleteView):
     model = models.District
     template_name = 'dashboard/locations/district_delete.html'
     success_url = reverse_lazy('location_list')
     context_object_name = 'district'
+    permission_model = 'District'
+    permission_action = 'delete'
 
     def form_valid(self, form):
         messages.error(self.request, "محله (منطقه) مربوطه از سامانه حذف شد.")
@@ -243,11 +267,13 @@ class DistrictDeleteView(DeleteView):
         return self.render_to_response(self.get_context_data(form=form))
 
 
-class SubDistrictDeleteView(DeleteView):
+class SubDistrictDeleteView(PermissionRequiredMixin, DeleteView):
     model = models.SubDistrict
     template_name = 'dashboard/locations/sub_district_delete.html'
     success_url = reverse_lazy('location_list')
     context_object_name = 'sub_district'
+    permission_model = 'SubDistrict'
+    permission_action = 'delete'
 
     def form_valid(self, form):
         messages.error(self.request, "زیرمحله مربوطه از سامانه حذف شد.")
@@ -259,11 +285,12 @@ class SubDistrictDeleteView(DeleteView):
 
 
 # --------------------------------- Sale Files --------------------------------
-class SaleFileListView(ListView):
+class SaleFileListView(ReadOnlyPermissionMixin, ListView):
     model = models.SaleFile
     template_name = 'dashboard/files/sale_file_list.html'
     context_object_name = 'sale_files'
     paginate_by = 12
+    permission_model = 'SaleFile'
 
     def get_queryset(self):
         queryset_default = models.SaleFile.objects.select_related('province', 'city', 'district', 'sub_district', 'person')
@@ -351,10 +378,11 @@ class SaleFileListView(ListView):
         return context
 
 
-class SaleFileDetailView(DetailView):
+class SaleFileDetailView(ReadOnlyPermissionMixin, DetailView):
     model = models.SaleFile
     context_object_name = 'sale_file'
     template_name = 'dashboard/files/sale_file_detail.html'
+    permission_model = 'SaleFile'
 
 
 class SaleFileGalleryView(DetailView):
@@ -363,10 +391,12 @@ class SaleFileGalleryView(DetailView):
     template_name = 'dashboard/files/sale_file_gallery.html'
 
 
-class SaleFileCreateView(CreateView):
+class SaleFileCreateView(PermissionRequiredMixin, CreateView):
     model = models.SaleFile
     form_class = forms.SaleFileCreateForm
     template_name = 'dashboard/files/sale_file_create.html'
+    permission_model = 'SaleFile'
+    permission_action = 'create'
 
     def post(self, request, *args, **kwargs):
         form = self.get_form()
@@ -387,11 +417,13 @@ class SaleFileCreateView(CreateView):
         return reverse('sale_file_list')
 
 
-class SaleFileUpdateView(UpdateView):
+class SaleFileUpdateView(PermissionRequiredMixin, UpdateView):
     model = models.SaleFile
     form_class = forms.SaleFileCreateForm
     template_name = 'dashboard/files/sale_file_update.html'
     context_object_name = 'sale_file'
+    permission_model = 'SaleFile'
+    permission_action = 'update'
 
     def form_valid(self, form):
         messages.success(self.request, "تغییرات شما در سامانه ثبت شد (این تغییرات توسط مدیر بررسی خواهد شد).")
@@ -402,11 +434,13 @@ class SaleFileUpdateView(UpdateView):
         return self.render_to_response(self.get_context_data(form=form))
 
 
-class SaleFileDeleteView(DeleteView):
+class SaleFileDeleteView(PermissionRequiredMixin, DeleteView):
     model = models.SaleFile
     template_name = 'dashboard/files/sale_file_delete.html'
     success_url = reverse_lazy('sale_file_list')
     context_object_name = 'sale_file'
+    permission_model = 'SaleFile'
+    permission_action = 'delete'
 
     def form_valid(self, form):
         messages.error(self.request, "فایل مربوطه از سامانه حذف شد.")
@@ -418,11 +452,12 @@ class SaleFileDeleteView(DeleteView):
 
 
 # --------------------------------- Rent Files --------------------------------
-class RentFileListView(ListView):
+class RentFileListView(ReadOnlyPermissionMixin, ListView):
     model = models.RentFile
     template_name = 'dashboard/files/rent_file_list.html'
     context_object_name = 'rent_files'
     paginate_by = 12
+    permission_model = 'RentFile'
 
     def get_queryset(self):
         queryset_default = models.RentFile.objects.select_related('province', 'city', 'district', 'sub_district', 'person')
@@ -518,10 +553,11 @@ class RentFileListView(ListView):
         return context
 
 
-class RentFileDetailView(DetailView):
+class RentFileDetailView(ReadOnlyPermissionMixin, DetailView):
     model = models.RentFile
     context_object_name = 'rent_file'
     template_name = 'dashboard/files/rent_file_detail.html'
+    permission_model = 'RentFile'
 
 
 class RentFileGalleryView(DetailView):
@@ -530,10 +566,12 @@ class RentFileGalleryView(DetailView):
     template_name = 'dashboard/files/rent_file_gallery.html'
 
 
-class RentFileCreateView(CreateView):
+class RentFileCreateView(PermissionRequiredMixin, CreateView):
     model = models.RentFile
     form_class = forms.RentFileCreateForm
     template_name = 'dashboard/files/rent_file_create.html'
+    permission_model = 'RentFile'
+    permission_action = 'create'
 
     def post(self, request, *args, **kwargs):
         form = self.get_form()
@@ -554,11 +592,13 @@ class RentFileCreateView(CreateView):
         return reverse('rent_file_list')
 
 
-class RentFileUpdateView(UpdateView):
+class RentFileUpdateView(PermissionRequiredMixin, UpdateView):
     model = models.RentFile
     form_class = forms.RentFileCreateForm
     template_name = 'dashboard/files/rent_file_update.html'
     context_object_name = 'rent_file'
+    permission_model = 'RentFile'
+    permission_action = 'update'
 
     def form_valid(self, form):
         messages.success(self.request, "تغییرات شما در سامانه ثبت شد (این تغییرات توسط مدیر بررسی خواهد شد).")
@@ -569,11 +609,13 @@ class RentFileUpdateView(UpdateView):
         return self.render_to_response(self.get_context_data(form=form))
 
 
-class RentFileDeleteView(DeleteView):
+class RentFileDeleteView(PermissionRequiredMixin, DeleteView):
     model = models.RentFile
     template_name = 'dashboard/files/rent_file_delete.html'
     success_url = reverse_lazy('rent_file_list')
     context_object_name = 'rent_file'
+    permission_model = 'RentFile'
+    permission_action = 'delete'
 
     def form_valid(self, form):
         messages.error(self.request, "فایل مربوطه از سامانه حذف شد.")
@@ -585,17 +627,20 @@ class RentFileDeleteView(DeleteView):
 
 
 # --------------------------------- Persons --------------------------------
-class PersonListView(ListView):
+class PersonListView(ReadOnlyPermissionMixin, ListView):
     model = models.Person
     template_name = 'dashboard/people/person_list.html'
     context_object_name = 'persons'
     paginate_by = 6
+    permission_model = 'Person'
 
 
-class PersonCreateView(CreateView):
+class PersonCreateView(PermissionRequiredMixin, CreateView):
     model = models.Person
     form_class = forms.PersonCreateForm
     template_name = 'dashboard/people/person_create.html'
+    permission_model = 'Person'
+    permission_action = 'create'
 
     def post(self, request, *args, **kwargs):
         form = self.get_form()
@@ -616,11 +661,13 @@ class PersonCreateView(CreateView):
         return reverse('person_list')
 
 
-class PersonUpdateView(UpdateView):
+class PersonUpdateView(PermissionRequiredMixin, UpdateView):
     model = models.Person
     form_class = forms.PersonCreateForm
     template_name = 'dashboard/people/person_update.html'
     context_object_name = 'person'
+    permission_model = 'Person'
+    permission_action = 'update'
 
     def form_valid(self, form):
         messages.success(self.request, "تغییرات شما در سامانه ثبت شد (این تغییرات توسط مدیر بررسی خواهد شد).")
@@ -634,11 +681,13 @@ class PersonUpdateView(UpdateView):
         return reverse_lazy('person_list')
 
 
-class PersonDeleteView(DeleteView):
+class PersonDeleteView(PermissionRequiredMixin, DeleteView):
     model = models.Person
     template_name = 'dashboard/people/person_delete.html'
     success_url = reverse_lazy('person_list')
     context_object_name = 'person'
+    permission_model = 'Person'
+    permission_action = 'delete'
 
     def form_valid(self, form):
         messages.error(self.request, "فرد مربوطه از سامانه حذف شد.")
@@ -650,11 +699,12 @@ class PersonDeleteView(DeleteView):
 
 
 # --------------------------------- Buyers --------------------------------
-class BuyerListView(ListView):
+class BuyerListView(ReadOnlyPermissionMixin, ListView):
     model = models.Buyer
     template_name = 'dashboard/people/buyer_list.html'
     context_object_name = 'buyers'
     paginate_by = 6
+    permission_model = 'Buyer'
 
     def get_queryset(self):
         queryset_default = models.Buyer.objects.select_related('province', 'city', 'district')
@@ -705,16 +755,19 @@ class BuyerListView(ListView):
         return context
 
 
-class BuyerDetailView(DetailView):
+class BuyerDetailView(ReadOnlyPermissionMixin, DetailView):
     model = models.Buyer
     context_object_name = 'buyer'
     template_name = 'dashboard/people/buyer_detail.html'
+    permission_model = 'Buyer'
 
 
-class BuyerCreateView(CreateView):
+class BuyerCreateView(PermissionRequiredMixin, CreateView):
     model = models.Buyer
     form_class = forms.BuyerCreateForm
     template_name = 'dashboard/people/buyer_create.html'
+    permission_model = 'Buyer'
+    permission_action = 'create'
 
     def post(self, request, *args, **kwargs):
         form = self.get_form()
@@ -735,11 +788,13 @@ class BuyerCreateView(CreateView):
         return reverse('buyer_list')
 
 
-class BuyerUpdateView(UpdateView):
+class BuyerUpdateView(PermissionRequiredMixin, UpdateView):
     model = models.Buyer
     form_class = forms.BuyerCreateForm
     template_name = 'dashboard/people/buyer_update.html'
     context_object_name = 'buyer'
+    permission_model = 'Buyer'
+    permission_action = 'update'
 
     def form_valid(self, form):
         messages.success(self.request, "تغییرات شما در سامانه ثبت شد (این تغییرات توسط مدیر بررسی خواهد شد).")
@@ -753,11 +808,13 @@ class BuyerUpdateView(UpdateView):
         return reverse_lazy('buyer_list')
 
 
-class BuyerDeleteView(DeleteView):
+class BuyerDeleteView(PermissionRequiredMixin, DeleteView):
     model = models.Buyer
     template_name = 'dashboard/people/buyer_delete.html'
     success_url = reverse_lazy('buyer_list')
     context_object_name = 'buyer'
+    permission_model = 'Buyer'
+    permission_action = 'delete'
 
     def form_valid(self, form):
         messages.error(self.request, "خریدار مربوطه از سامانه حذف شد.")
@@ -769,11 +826,12 @@ class BuyerDeleteView(DeleteView):
 
 
 # --------------------------------- Renters --------------------------------
-class RenterListView(ListView):
+class RenterListView(ReadOnlyPermissionMixin, ListView):
     model = models.Renter
     template_name = 'dashboard/people/renter_list.html'
     context_object_name = 'renters'
     paginate_by = 6
+    permission_model = 'Renter'
 
     def get_queryset(self):
         queryset_default = models.Renter.objects.select_related('province', 'city', 'district')
@@ -832,16 +890,19 @@ class RenterListView(ListView):
         return context
 
 
-class RenterDetailView(DetailView):
+class RenterDetailView(ReadOnlyPermissionMixin, DetailView):
     model = models.Renter
     context_object_name = 'renter'
     template_name = 'dashboard/people/renter_detail.html'
+    permission_model = 'Renter'
 
 
-class RenterCreateView(CreateView):
+class RenterCreateView(PermissionRequiredMixin, CreateView):
     model = models.Renter
     form_class = forms.RenterCreateForm
     template_name = 'dashboard/people/renter_create.html'
+    permission_model = 'Renter'
+    permission_action = 'create'
 
     def post(self, request, *args, **kwargs):
         form = self.get_form()
@@ -862,11 +923,13 @@ class RenterCreateView(CreateView):
         return reverse('renter_list')
 
 
-class RenterUpdateView(UpdateView):
+class RenterUpdateView(PermissionRequiredMixin, UpdateView):
     model = models.Renter
     form_class = forms.RenterCreateForm
     template_name = 'dashboard/people/renter_update.html'
     context_object_name = 'renter'
+    permission_model = 'Renter'
+    permission_action = 'update'
 
     def form_valid(self, form):
         messages.success(self.request, "تغییرات شما در سامانه ثبت شد (این تغییرات توسط مدیر بررسی خواهد شد).")
@@ -880,11 +943,13 @@ class RenterUpdateView(UpdateView):
         return reverse_lazy('renter_list')
 
 
-class RenterDeleteView(DeleteView):
+class RenterDeleteView(PermissionRequiredMixin, DeleteView):
     model = models.Renter
     template_name = 'dashboard/people/renter_delete.html'
     success_url = reverse_lazy('renter_list')
     context_object_name = 'renter'
+    permission_model = 'Renter'
+    permission_action = 'delete'
 
     def form_valid(self, form):
         messages.error(self.request, "مستاجر مربوطه از سامانه حذف شد.")

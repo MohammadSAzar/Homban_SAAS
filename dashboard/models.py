@@ -132,6 +132,7 @@ class CustomUserModel(AbstractUser):
         ('bs', _('Boss')),
         ('fp', _('File Person')),
         ('cp', _('Customer Person')),
+        ('bt', _('Both')),
     ]
     title = models.CharField(max_length=10, choices=TITLE_CHOICES, blank=True, null=True, verbose_name=_('Title'))
     email = models.EmailField(unique=False, blank=True, null=True)
