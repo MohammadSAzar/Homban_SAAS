@@ -391,4 +391,50 @@ class RenterFilterForm(forms.Form):
         return cleaned_data
 
 
+# --------------------------------- Locations ---------------------------------
+class ProvinceCreateForm(forms.ModelForm):
+    class Meta:
+        model = models.Province
+        fields = ['name']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.required = True
+
+
+class CityCreateForm(forms.ModelForm):
+    class Meta:
+        model = models.City
+        fields = ['name', 'province']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.required = True
+
+
+class DistrictCreateForm(forms.ModelForm):
+    class Meta:
+        model = models.District
+        fields = ['name', 'city']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.required = True
+
+
+class SubDistrictCreateForm(forms.ModelForm):
+    class Meta:
+        model = models.SubDistrict
+        fields = ['name', 'district', 'description']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.required = True
+
+
+
 

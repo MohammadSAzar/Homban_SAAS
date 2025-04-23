@@ -1,0 +1,61 @@
+{% extends '_base_dashboard.html' %}
+
+{% load static %}
+{% load i18n %}
+{% load jalali_tags %}
+{% load number_converter %}
+{% load humanize %}
+{% load widget_tweaks %}
+
+
+{% block title %}حذف شهر {{ city.name }}{% endblock %}
+
+
+{% block content %}
+    
+    <!-- Messages2 -->
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <!-- Main -->
+    <div class="components-preview wide-md mx-auto">
+        <div class="nk-block nk-block-lg">
+            <div class="card card-bordered card-preview">
+                <div class="card-inner" >
+                    <div class="preview-block" >
+
+                        <!-- Title -->
+                        <div class="nk-block-head nk-block-head-lg wide-sm">
+                            <div class="nk-block-head-content">
+                                <h6 class="nk-block-title page-title" style="line-height: 45px;">حذف شهر {{ city.name }}</h6>
+                            </div>
+                        </div>
+                        <!-- end: Title -->
+
+                        <!-- Form -->
+                        <form class="row gy-4" method="post">
+                            {% csrf_token %}
+                            <div class="nk-fmg-actions" style="margin-top: 3em;">
+                                <button type="submit" class="btn btn-danger" style="line-height: 30px;">حذف شهر</button>
+                            </div>
+                        </form>
+                        <!-- end: Form -->    
+                    
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+
+
+
+
+

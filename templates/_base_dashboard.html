@@ -64,9 +64,17 @@
 
                                         <!-- Main -->
                                         <li class="nk-menu-item has-sub">
-                                            <a href="{% url 'dashboard' %}" class="nk-menu-link nk-menu-toggle">
+                                            <a href="{% url 'dashboard' %}" class="nk-menu-link">
                                                 <span class="nk-menu-icon"><em class="icon ni ni-tile-thumb"></em></span>
                                                 <span class="nk-menu-text">{% trans 'Dashboard First Page' %}</span>
+                                            </a>
+                                        </li>
+
+                                        <!-- Locations -->
+                                        <li class="nk-menu-item has-sub">
+                                            <a href="{% url 'location_list' %}" class="nk-menu-link">
+                                                <span class="nk-menu-icon"><em class="icon ni ni-location"></em></span>
+                                                <span class="nk-menu-text">{% trans 'Locations' %}</span>
                                             </a>
                                         </li>
 

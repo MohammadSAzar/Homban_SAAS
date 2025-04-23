@@ -1,0 +1,91 @@
+{% extends '_base_dashboard.html' %}
+
+{% load static %}
+{% load i18n %}
+{% load jalali_tags %}
+{% load number_converter %}
+{% load humanize %}
+{% load widget_tweaks %}
+
+
+{% block title %}ایجاد محله (منطقه) جدید{% endblock %}
+
+
+{% block content %}
+    
+    <!-- Messages2 -->
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <!-- Main -->
+    <div class="components-preview wide-md mx-auto">
+        <div class="nk-block nk-block-lg">
+            <div class="card card-bordered card-preview">
+                <div class="card-inner" >
+                    <div class="preview-block" >
+
+                        <!-- Title -->
+                        <div class="nk-block-head nk-block-head-lg wide-sm">
+                            <div class="nk-block-head-content">
+                                <h6 class="nk-block-title page-title" style="line-height: 45px;">ایجاد محله (منطقه) جدید</h6>
+                            </div>
+                        </div>
+                        <!-- end: Title -->
+
+                        <!-- Form -->
+                        <form class="row gy-4" method="post" enctype="multipart/form-data" novalidate>
+                            {% csrf_token %}
+
+                            <!-- name -->
+                            <div class="col-lg-6 col-sm-6">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.name.id_for_label }}">نام محله (منطقه)</label>
+                                        {% render_field form.name id="name" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.name.errors %}
+                                        {% for error in form.name.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- city -->
+                            <div class="col-lg-6 col-sm-6">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.city.id_for_label }}">شهر</label>
+                                        {% render_field form.city id="city" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.city.errors %}
+                                        {% for error in form.city.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        
+                            <!-- Submit -->
+                            <div class="nk-fmg-actions" style="margin-top: 3em;">
+                                <button type="submit" class="btn btn-primary" style="line-height: 30px;">ثبت اطلاعات</button>
+                            </div>
+                        </form>
+                        <!-- end: Form -->    
+                    
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+
+
+

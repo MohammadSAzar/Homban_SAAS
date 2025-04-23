@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.urls import reverse, reverse_lazy
-from django.views.generic import DetailView, CreateView, ListView, UpdateView, DeleteView
+from django.views.generic import DetailView, CreateView, ListView, UpdateView, DeleteView, TemplateView
 from django.contrib import messages
 
 from . import models, forms
@@ -13,6 +13,249 @@ def home_view(request):
 
 def dashboard_view(request):
     return render(request, 'dashboard/dashboard.html')
+
+
+# --------------------------------- Locations --------------------------------
+class LocationListView(TemplateView):
+    template_name = 'dashboard/locations/location_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context['provinces'] = models.Province.objects.all()
+        context['cities'] = models.City.objects.all()
+        context['districts'] = models.District.objects.all()
+        context['sub_districts'] = models.SubDistrict.objects.all()
+
+        return context
+
+
+class ProvinceCreateView(CreateView):
+    model = models.Province
+    form_class = forms.ProvinceCreateForm
+    template_name = 'dashboard/locations/province_create.html'
+
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+    def form_valid(self, form):
+        messages.success(self.request, "استان جدید در سامانه ثبت شد (این اطلاعات توسط مدیر بررسی خواهد شد).")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        self.object = None
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_success_url(self):
+        return reverse('location_list')
+
+
+class CityCreateView(CreateView):
+    model = models.City
+    form_class = forms.CityCreateForm
+    template_name = 'dashboard/locations/city_create.html'
+
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+    def form_valid(self, form):
+        messages.success(self.request, "شهر جدید در سامانه ثبت شد (این اطلاعات توسط مدیر بررسی خواهد شد).")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        self.object = None
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_success_url(self):
+        return reverse('location_list')
+
+
+class DistrictCreateView(CreateView):
+    model = models.District
+    form_class = forms.DistrictCreateForm
+    template_name = 'dashboard/locations/district_create.html'
+
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+    def form_valid(self, form):
+        messages.success(self.request, "منطقه (محله) جدید در سامانه ثبت شد (این اطلاعات توسط مدیر بررسی خواهد شد).")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        self.object = None
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_success_url(self):
+        return reverse('location_list')
+
+
+class SubDistrictCreateView(CreateView):
+    model = models.SubDistrict
+    form_class = forms.SubDistrictCreateForm
+    template_name = 'dashboard/locations/sub_district_create.html'
+
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+    def form_valid(self, form):
+        messages.success(self.request, "زیرمحله جدید در سامانه ثبت شد (این اطلاعات توسط مدیر بررسی خواهد شد).")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        self.object = None
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_success_url(self):
+        return reverse('location_list')
+
+
+class ProvinceUpdateView(UpdateView):
+    model = models.Province
+    form_class = forms.ProvinceCreateForm
+    template_name = 'dashboard/locations/province_update.html'
+    context_object_name = 'province'
+
+    def form_valid(self, form):
+        messages.success(self.request, "تغییرات شما در سامانه ثبت شد (این تغییرات توسط مدیر بررسی خواهد شد).")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        self.object = None
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_success_url(self):
+        return reverse_lazy('location_list')
+
+
+class CityUpdateView(UpdateView):
+    model = models.City
+    form_class = forms.CityCreateForm
+    template_name = 'dashboard/locations/city_update.html'
+    context_object_name = 'city'
+
+    def form_valid(self, form):
+        messages.success(self.request, "تغییرات شما در سامانه ثبت شد (این تغییرات توسط مدیر بررسی خواهد شد).")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        self.object = None
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_success_url(self):
+        return reverse_lazy('location_list')
+
+
+class DistrictUpdateView(UpdateView):
+    model = models.District
+    form_class = forms.DistrictCreateForm
+    template_name = 'dashboard/locations/district_update.html'
+    context_object_name = 'district'
+
+    def form_valid(self, form):
+        messages.success(self.request, "تغییرات شما در سامانه ثبت شد (این تغییرات توسط مدیر بررسی خواهد شد).")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        self.object = None
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_success_url(self):
+        return reverse_lazy('location_list')
+
+
+class SubDistrictUpdateView(UpdateView):
+    model = models.SubDistrict
+    form_class = forms.SubDistrictCreateForm
+    template_name = 'dashboard/locations/sub_district_update.html'
+    context_object_name = 'sub_district'
+
+    def form_valid(self, form):
+        messages.success(self.request, "تغییرات شما در سامانه ثبت شد (این تغییرات توسط مدیر بررسی خواهد شد).")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        self.object = None
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_success_url(self):
+        return reverse_lazy('location_list')
+
+
+class ProvinceDeleteView(DeleteView):
+    model = models.Province
+    template_name = 'dashboard/locations/province_delete.html'
+    success_url = reverse_lazy('location_list')
+    context_object_name = 'province'
+
+    def form_valid(self, form):
+        messages.error(self.request, "استان مربوطه از سامانه حذف شد.")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        self.object = None
+        return self.render_to_response(self.get_context_data(form=form))
+
+
+class CityDeleteView(DeleteView):
+    model = models.City
+    template_name = 'dashboard/locations/city_delete.html'
+    success_url = reverse_lazy('location_list')
+    context_object_name = 'city'
+
+    def form_valid(self, form):
+        messages.error(self.request, "شهر مربوطه از سامانه حذف شد.")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        self.object = None
+        return self.render_to_response(self.get_context_data(form=form))
+
+
+class DistrictDeleteView(DeleteView):
+    model = models.District
+    template_name = 'dashboard/locations/district_delete.html'
+    success_url = reverse_lazy('location_list')
+    context_object_name = 'district'
+
+    def form_valid(self, form):
+        messages.error(self.request, "محله (منطقه) مربوطه از سامانه حذف شد.")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        self.object = None
+        return self.render_to_response(self.get_context_data(form=form))
+
+
+class SubDistrictDeleteView(DeleteView):
+    model = models.SubDistrict
+    template_name = 'dashboard/locations/sub_district_delete.html'
+    success_url = reverse_lazy('location_list')
+    context_object_name = 'sub_district'
+
+    def form_valid(self, form):
+        messages.error(self.request, "زیرمحله مربوطه از سامانه حذف شد.")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        self.object = None
+        return self.render_to_response(self.get_context_data(form=form))
 
 
 # --------------------------------- Sale Files --------------------------------
@@ -362,7 +605,7 @@ class PersonCreateView(CreateView):
             return self.form_invalid(form)
 
     def form_valid(self, form):
-        messages.success(self.request, "فرد آگهی‌دهنده سامانه ثبت شد (این اطلاعات توسط مدیر بررسی خواهد شد).")
+        messages.success(self.request, "فرد آگهی‌دهنده در سامانه ثبت شد (این اطلاعات توسط مدیر بررسی خواهد شد).")
         return super().form_valid(form)
 
     def form_invalid(self, form):

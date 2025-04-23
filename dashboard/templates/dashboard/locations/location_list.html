@@ -1,0 +1,325 @@
+{% extends '_base_dashboard.html' %}
+
+{% load static %}
+{% load i18n %}
+{% load jalali_tags %}
+{% load number_converter %}
+{% load widget_tweaks %}
+{% load humanize %}
+
+
+{% block title %}{% trans 'Locations' %}{% endblock %}
+
+
+{% block content %}
+
+    <!-- Message -->
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <h4 class="modal-title" style="padding: 20px 20px 10px 0;!important;">عملیات با موفقیت انجام شد (اطلاعات مربوطه توسط مدیر بررسی خواهد شد).</h4>
+            <button class="modal-my-button">بستن پیام</button>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function() {
+            var messages = "{% for message in messages %}{{ message }}{% if not forloop.last %}\\n{% endif %}{% endfor %}";
+            if (messages) {
+                $('#modal-message').text(messages);
+                $('#successModal').show();
+            }
+            $('.modal-my-button').on('click', function() {
+                $('#successModal').hide();
+            });
+        });
+    </script>
+
+    <!-- Province -->
+    <div class="nk-block nk-block-lg">
+        <!-- Title -->
+        <div class="nk-block-head">
+            <div class="nk-block-head-content">
+                <h5 class="nk-block-title">لیست استان‌ها</h5>
+                <div class="nk-block-des">
+                    <a href="{% url 'province_create' %}" class="btn btn-primary" style="margin-top: 10px;">ایجاد استان جدید</a>
+                </div>
+            </div>
+        </div>
+        <!-- Table -->
+        <table class="nowrap nk-tb-list is-separate" data-auto-responsive="false">
+            <!-- Head -->
+            <thead>
+                <tr class="nk-tb-item nk-tb-head">
+                    <th class="nk-tb-col"><span>استان</span></th>
+                    <th class="nk-tb-col nk-tb-col-tools">
+                        <ul class="nk-tb-actions gx-1 my-n1">
+                            <li class="me-n1">
+                                <div class="dropdown">
+                                    <a href="#" class="dropdown-toggle btn btn-icon btn-trigger" data-bs-toggle="dropdown">اعمال</a>
+                                </div>
+                            </li>
+                        </ul>
+                    </th>
+                </tr>
+            </thead>
+            <!-- Body -->
+            <tbody>
+                {% for province in provinces %}
+                    <tr class="nk-tb-item">
+                        <!-- Name -->
+                        <td class="nk-tb-col">
+                            <span class="tb-lead">{{ province.name }}</span>
+                        </td>
+                        <!-- Actions -->
+                        <td class="nk-tb-col nk-tb-col-tools">
+                            <ul class="nk-tb-actions gx-1 my-n1">
+                                <li class="me-n1">
+                                    <div class="dropdown">
+                                        <a href="#" class="dropdown-toggle btn btn-icon btn-trigger" data-bs-toggle="dropdown"><em class="icon ni ni-more-h"></em></a>
+                                        <div class="dropdown-menu dropdown-menu-end">
+                                            <ul class="link-list-opt no-bdr">
+                                                <li>
+                                                    <a href="{% url 'province_delete' province.pk province.slug %}"><em class="icon ni ni-delete"></em><span>حذف</span></a>
+                                                </li>
+                                                <li>
+                                                    <a href="{% url 'province_update' province.pk province.slug %}"><em class="icon ni ni-edit"></em><span>تغییر</span></a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <!-- end: Province -->
+
+    <!-- City -->
+    <div class="nk-block nk-block-lg">
+        <!-- Title -->
+        <div class="nk-block-head">
+            <div class="nk-block-head-content">
+                <h5 class="nk-block-title">لیست شهرها</h5>
+                <div class="nk-block-des">
+                    <a href="{% url 'city_create' %}" class="btn btn-primary" style="margin-top: 10px;">ایجاد شهر جدید</a>
+                </div>
+            </div>
+        </div>
+        <!-- Table -->
+        <table class="nowrap nk-tb-list is-separate" data-auto-responsive="false">
+            <!-- Head -->
+            <thead>
+                <tr class="nk-tb-item nk-tb-head">
+                    <th class="nk-tb-col"><span>شهر</span></th>
+                    <th class="nk-tb-col"><span>استان</span></th>
+                    <th class="nk-tb-col nk-tb-col-tools">
+                        <ul class="nk-tb-actions gx-1 my-n1">
+                            <li class="me-n1">
+                                <div class="dropdown">
+                                    <a href="#" class="dropdown-toggle btn btn-icon btn-trigger" data-bs-toggle="dropdown">اعمال</a>
+                                </div>
+                            </li>
+                        </ul>
+                    </th>
+                </tr>
+                <!-- .nk-tb-item -->
+            </thead>
+            <!-- Body -->
+            <tbody>
+                {% for city in cities %}
+                    <tr class="nk-tb-item">
+                        <!-- Name -->
+                        <td class="nk-tb-col">
+                            <span class="tb-lead">{{ city.name }}</span>
+                        </td>
+                        <!-- Province -->
+                        <td class="nk-tb-col">
+                            <span class="tb-lead">{{ city.province }}</span>
+                        </td>
+                        <!-- Actions -->
+                        <td class="nk-tb-col nk-tb-col-tools">
+                            <ul class="nk-tb-actions gx-1 my-n1">
+                                <li class="me-n1">
+                                    <div class="dropdown">
+                                        <a href="#" class="dropdown-toggle btn btn-icon btn-trigger" data-bs-toggle="dropdown"><em class="icon ni ni-more-h"></em></a>
+                                        <div class="dropdown-menu dropdown-menu-end">
+                                            <ul class="link-list-opt no-bdr">
+                                                <li>
+                                                    <a href="{% url 'city_delete' city.pk city.slug %}"><em class="icon ni ni-delete"></em><span>حذف</span></a>
+                                                </li>
+                                                <li>
+                                                    <a href="{% url 'city_update' city.pk city.slug %}"><em class="icon ni ni-edit"></em><span>تغییر</span></a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <!-- end: City -->
+
+    <!-- District -->
+    <div class="nk-block nk-block-lg">
+        <!-- Title -->
+        <div class="nk-block-head">
+            <div class="nk-block-head-content">
+                <h5 class="nk-block-title">لیست محلات (مناطق)</h5>
+                <div class="nk-block-des">
+                    <a href="{% url 'district_create' %}" class="btn btn-primary" style="margin-top: 10px;">ایجاد محله (منطقه) جدید</a>
+                </div>
+            </div>
+        </div>
+        <!-- Table -->
+        <table class="nowrap nk-tb-list is-separate" data-auto-responsive="false">
+            <!-- Head -->
+            <thead>
+                <tr class="nk-tb-item nk-tb-head">
+                    <th class="nk-tb-col"><span>محله (منطقه)</span></th>
+                    <th class="nk-tb-col"><span>شهر</span></th>
+                    <th class="nk-tb-col"><span>استان</span></th>
+                    <th class="nk-tb-col nk-tb-col-tools">
+                        <ul class="nk-tb-actions gx-1 my-n1">
+                            <li class="me-n1">
+                                <div class="dropdown">
+                                    <a href="#" class="dropdown-toggle btn btn-icon btn-trigger" data-bs-toggle="dropdown">اعمال</a>
+                                </div>
+                            </li>
+                        </ul>
+                    </th>
+                </tr>
+            </thead>
+            <!-- Body -->
+            <tbody>
+                {% for district in districts %}
+                    <tr class="nk-tb-item">
+                        <!-- Name -->
+                        <td class="nk-tb-col">
+                            <span class="tb-lead">{{ district.name }}</span>
+                        </td>
+                        <!-- City -->
+                        <td class="nk-tb-col">
+                            <span class="tb-lead">{{ district.city }}</span>
+                        </td>
+                        <!-- Province -->
+                        <td class="nk-tb-col">
+                            <span class="tb-lead">{{ district.city.province }}</span>
+                        </td>
+                        <!-- Actions -->
+                        <td class="nk-tb-col nk-tb-col-tools">
+                            <ul class="nk-tb-actions gx-1 my-n1">
+                                <li class="me-n1">
+                                    <div class="dropdown">
+                                        <a href="#" class="dropdown-toggle btn btn-icon btn-trigger" data-bs-toggle="dropdown"><em class="icon ni ni-more-h"></em></a>
+                                        <div class="dropdown-menu dropdown-menu-end">
+                                            <ul class="link-list-opt no-bdr">
+                                                <li>
+                                                    <a href="{% url 'district_delete' district.pk district.slug %}"><em class="icon ni ni-delete"></em><span>حذف</span></a>
+                                                </li>
+                                                <li>
+                                                    <a href="{% url 'district_update' district.pk district.slug %}"><em class="icon ni ni-edit"></em><span>تغییر</span></a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </td>
+                    </tr>
+                {% endfor %}
+
+            </tbody>
+        </table>
+    </div>
+    <!-- end: District -->
+    
+    <!-- SubDistrict -->
+    <div class="nk-block nk-block-lg">
+        <!-- Title -->
+        <div class="nk-block-head">
+            <div class="nk-block-head-content">
+                <h5 class="nk-block-title">لیست زیرمحله‌ها</h5>
+                <div class="nk-block-des">
+                    <a href="{% url 'sub_district_create' %}" class="btn btn-primary" style="margin-top: 10px;">ایجاد زیرمحله جدید</a>
+                </div>
+            </div>
+        </div>
+        <!-- Table -->
+        <table class="nowrap nk-tb-list is-separate" data-auto-responsive="false">
+            <!-- Head -->
+            <thead>
+                <tr class="nk-tb-item nk-tb-head">
+                    <th class="nk-tb-col"><span>زیرمحله</span></th>
+                    <th class="nk-tb-col"><span>محله</span></th>
+                    <th class="nk-tb-col"><span>شهر</span></th>
+                    <th class="nk-tb-col tb-col-md"><span>استان</span></th>
+                    <th class="nk-tb-col nk-tb-col-tools">
+                        <ul class="nk-tb-actions gx-1 my-n1">
+                            <li class="me-n1">
+                                <div class="dropdown">
+                                    <a href="#" class="dropdown-toggle btn btn-icon btn-trigger" data-bs-toggle="dropdown">اعمال</a>
+                                </div>
+                            </li>
+                        </ul>
+                    </th>
+                </tr>
+            </thead>
+            <!-- Body -->
+            <tbody>
+                {% for sub_district in sub_districts %}
+                    <tr class="nk-tb-item">
+                        <!-- Name -->
+                        <td class="nk-tb-col">
+                            <span class="tb-lead">{{ sub_district.name }}</span>
+                        </td>
+                        <!-- District -->
+                        <td class="nk-tb-col">
+                            <span class="tb-lead">{{ sub_district.district }}</span>
+                        </td>
+                        <!-- City -->
+                        <td class="nk-tb-col">
+                            <span class="tb-lead">{{ sub_district.district.city }}</span>
+                        </td>
+                        <!-- Province -->
+                        <td class="nk-tb-col tb-col-md">
+                            <span class="tb-lead">{{ sub_district.district.city.province }}</span>
+                        </td>
+                        <!-- Actions -->
+                        <td class="nk-tb-col nk-tb-col-tools">
+                            <ul class="nk-tb-actions gx-1 my-n1">
+                                <li class="me-n1">
+                                    <div class="dropdown">
+                                        <a href="#" class="dropdown-toggle btn btn-icon btn-trigger" data-bs-toggle="dropdown"><em class="icon ni ni-more-h"></em></a>
+                                        <div class="dropdown-menu dropdown-menu-end">
+                                            <ul class="link-list-opt no-bdr">
+                                                <li>
+                                                    <a href="{% url 'sub_district_delete' sub_district.pk sub_district.slug %}"><em class="icon ni ni-delete"></em><span>حذف</span></a>
+                                                </li>
+                                                <li>
+                                                    <a href="{% url 'sub_district_update' sub_district.pk sub_district.slug %}"><em class="icon ni ni-edit"></em><span>تغییر</span></a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <!-- end: SubDistrict -->
+
+{% endblock %}
+
+
+
+
+

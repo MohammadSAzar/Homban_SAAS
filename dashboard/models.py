@@ -142,24 +142,45 @@ class CustomUserModel(AbstractUser):
 class Province(models.Model):
     name = models.CharField(max_length=100, verbose_name=_('Province'))
 
+    @property
+    def slug(self):
+        return slugify(self.name, allow_unicode=True)
+
     def __str__(self):
         return self.name
+
+    def get_absolute_url(self):
+        return reverse('province_detail', args=[self.pk, self.name])
 
 
 class City(models.Model):
     name = models.CharField(max_length=100, verbose_name=_('City'))
     province = models.ForeignKey(Province, on_delete=models.CASCADE, related_name='cities')
 
+    @property
+    def slug(self):
+        return slugify(self.name, allow_unicode=True)
+
     def __str__(self):
         return self.name
+
+    def get_absolute_url(self):
+        return reverse('city_detail', args=[self.pk, self.name])
 
 
 class District(models.Model):
-    name = models.CharField(max_length=100, default='_', verbose_name=_('District Name'))
+    name = models.CharField(max_length=100, default='', verbose_name=_('District Name'))
     city = models.ForeignKey(City, on_delete=models.CASCADE, related_name='districts')
+
+    @property
+    def slug(self):
+        return slugify(self.name, allow_unicode=True)
 
     def __str__(self):
         return self.name
+
+    def get_absolute_url(self):
+        return reverse('district_detail', args=[self.pk, self.name])
 
 
 class SubDistrict(models.Model):
@@ -167,8 +188,15 @@ class SubDistrict(models.Model):
     district = models.ForeignKey(District, on_delete=models.CASCADE, related_name='sub_districts')
     description = models.TextField(max_length=1000, blank=True, null=True, default='', verbose_name=_('Description'))
 
+    @property
+    def slug(self):
+        return slugify(self.name, allow_unicode=True)
+
     def __str__(self):
         return self.name
+
+    def get_absolute_url(self):
+        return reverse('sub_district_detail', args=[self.pk, self.name])
 
 
 # --------------------------------- FILE -----------------------------------
