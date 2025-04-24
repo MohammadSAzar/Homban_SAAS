@@ -174,8 +174,9 @@ budgets = [
 
 # --------------------------------- MNGs --------------------------------
 task_types = [
-    ('CS', 'نقد'),
-    ('UC', 'غیر نقد'),
+    ('fp', _('For File Person')),
+    ('cp', _('For Customer Person')),
+    ('bt', _('For Dual Person')),
 ]
 
 task_statuses = [

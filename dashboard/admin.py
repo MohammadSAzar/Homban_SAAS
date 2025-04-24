@@ -128,10 +128,11 @@ class TradeAdmin(admin.ModelAdmin):
 # --------------------------------- MNGs ----------------------------------
 @admin.register(models.Task)
 class TaskAdmin(admin.ModelAdmin):
-    list_display = ('agent', 'type', 'status', 'title', 'code', 'datetime_created',)
+    list_display = ('title', 'type', 'agent', 'sub_district', 'code', 'deadline',)
     ordering = ('-datetime_created',)
     list_filter = ('type', 'status', 'agent',)
     readonly_fields = ('code', 'datetime_created',)
+    prepopulated_fields = {'slug': ('title',)}
 
 
 

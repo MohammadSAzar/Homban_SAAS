@@ -1,0 +1,238 @@
+{% extends '_base_dashboard.html' %}
+
+{% load static %}
+{% load i18n %}
+{% load jalali_tags %}
+{% load number_converter %}
+{% load widget_tweaks %}
+{% load humanize %}
+
+
+{% block title %}وظایف مربوط به فایل‌ها{% endblock %}
+
+
+{% block content %}
+
+    <!-- Message -->
+    <div id="successModal"  class="modal">
+        <div class="modal-content">
+            <h4 class="modal-title" style="padding: 20px 20px 10px 0;!important;">وظیفه جدید در سامانه ثبت شد.</h4>
+            <button class="modal-my-button">بستن پیام</button>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function() {
+            var messages = "{% for message in messages %}{{ message }}{% if not forloop.last %}\\n{% endif %}{% endfor %}";
+            if (messages) {
+                $('#modal-message').text(messages);
+                $('#successModal').show();
+            }
+            $('.modal-my-button').on('click', function() {
+                $('#successModal').hide();
+            });
+        });
+    </script>
+
+    <!-- Upper Navbar -->
+    <div class="nk-fmg-body-head d-none d-lg-flex" >
+
+        <!-- Search -->
+        <div class="nk-fmg-search">
+            <em class="icon ni ni-search"></em>
+            <input type="text" class="form-control border-transparent form-focus-none" placeholder="جستجو در میان وظایف مربوط به فایل‌ها"/>
+        </div>
+
+    </div>
+    <!-- end: Upper Navbar -->
+    
+
+    <!-- List -->
+    <div class="nk-block">
+
+        <!-- Upper + Mobile -->
+        <div class="nk-block-head nk-block-head-sm" style="margin-bottom: 1.2em;">
+            <div class="nk-block-between position-relative">
+
+                <!-- Title -->
+                <div class="nk-block-head-content" style="margin-top: 2em;">
+                    <h5 class="nk-block-title page-title">وظایف مربوط به فایل‌ها</h5>
+                </div>
+
+                <!-- Mobile Navbar -->
+                <div class=" nk-block-head-content">
+                    <ul class="nk-block-tools g-1">
+
+                        <!-- Search -->
+                        <li class="d-lg-none">
+                            <a href="#" class="btn btn-trigger btn-icon search-toggle toggle-search" data-target="search"><em class="icon ni ni-search"></em></a>
+                        </li>
+
+                    </ul>
+                </div>
+
+                <!-- Mobile Search Box -->
+                <div class="search-wrap  px-2 d-lg-none" data-search="search">
+                    <div class="search-content">
+                        <a href="#" class="search-back btn btn-icon toggle-search" data-target="search"><em class="icon ni ni-arrow-left"></em></a>
+                        <input type="text" class="form-control border-transparent form-focus-none" placeholder="جستجو در میان وظایف مربوط به فایل‌ها"/>
+                        <button class="search-submit btn btn-icon">
+                            <em class="icon ni ni-search"></em>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <!-- end: Upper + Mobile -->
+
+        <!-- Tasks -->
+        <div class="row  g-gs">
+            {% for task in tasks %}
+                {% if task.type == 'fp' %}
+                    <div class="col-sm-6 col-lg-6 col-xxl-6">
+                        <div class="card h-100">
+                            <div class="card-inner">
+                                <div class="project">
+
+                                    <!-- Up -->
+                                    <div class="project-head">
+                                        <div class="project-title">
+                                            <div class="project-info">
+                                                <h6 class="title">{{ task.title }} | {{ task.code }}</h6>
+                                                <span class="sub-text" style="font-size: 0.95em; margin-top: 0.7em;">{{ task.agent.get_title_display }} | {{ task.sub_district }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Description -->
+                                    <div class="project-details">
+                                        <p style="height: 8em;!important; -webkit-line-clamp: 4;!important;">{{ task.description|linebreaksbr|farsi_number }}</p>
+                                    </div>
+
+                                    <!-- Middle -->
+                                    <div  style="height: 8em;!important; -webkit-line-clamp: 4;!important;">
+                                        <h6 class="title" style="margin-bottom: 0.7em;">فایل فروش/اجاره مربوطه:</h6>
+                                        <!-- Sale -->
+                                        {% if task.sale_file %}
+                                            <div class="project-head" style="margin-bottom: 0.5em;!important;">
+                                                <div class="project-title">
+                                                    <div class="project-info">
+                                                        <a href="{{ task.sale_file.get_absolute_url }}">
+                                                            <span class="sub-text" style="font-size: 0.85em;">فروش: {{ task.sale_file.title|linebreaksbr|farsi_number }}</span>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% else %}
+                                            <div class="project-head" style="margin-bottom: 0.5em;!important;">
+                                                <div class="project-title">
+                                                    <div class="project-info">
+                                                        <span class="sub-text" style="font-size: 0.85em;">فروش: ----</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+
+                                        <!-- Rent -->
+                                        {% if task.rent_file %}
+                                            <div class="project-head" style="margin-bottom: 0.5em;!important;">
+                                                <div class="project-title">
+                                                    <div class="project-info">
+                                                        <a href="{{ task.rent_file.get_absolute_url }}">
+                                                            <span class="sub-text" style="font-size: 0.85em;">اجاره: {{ task.rent_file.title|linebreaksbr|farsi_number }}</span>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% else %}
+                                            <div class="project-head" style="margin-bottom: 0.5em;!important;">
+                                                <div class="project-title">
+                                                    <div class="project-info">
+                                                        <span class="sub-text" style="font-size: 0.85em;">اجاره: ----</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+
+                                    <!-- Bottom -->
+                                    <div class="project-head">
+                                        <div class="project-title">
+                                            <div class="project-info">
+                                                <span class="sub-text" style="font-size: 0.95em; margin-top: 0.7em;">ددلاین: {{ task.deadline }}</span>
+                                                <span class="sub-text" style="font-size: 0.95em; margin-top: 0.7em;">وضعیت: {{ task.get_status_display }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Edit - Delete -->
+                                    <div class="project-meta">
+                                        <a href="#" class="btn btn-primary justify-center" style="margin-top: 1em;"><em class="icon ni ni-edit"></em><span>تغییر</span></a>
+                                        <a href="#" class="btn btn-danger justify-center" style="margin-top: 1em;"><em class="icon ni ni-delete"></em><span>حذف</span></a>
+                                    </div>
+
+                                    <!-- Result -->
+                                    <div class="project-meta">
+                                        <a href="#" class="btn btn-primary justify-center" style="margin-top: 1em; width: 100%"><em class="icon ni ni-edit-alt-fill"></em>ثبت نتیجه</a>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+        <!-- end: Tasks -->
+    
+    </div>
+    <!-- end: List -->
+    
+    <!-- Pagination -->
+    <div class="nk-block-head  nk-block-head-lg" style="margin-top: 1.5em;">
+        <div class="nk-block-between" style="justify-items: center; justify-content: center; text-align: center">
+            <div class="nk-block-head-content">
+                <div class="my-profile-pagination" style="margin-top: 1em;">
+                    {% if page_obj.has_previous %}
+                        <a href="{% url 'sale_file_list' %}?page=1">&laquo; ابتدا</a>
+                    {% else %}
+                        <span class="my-profile-disabled">&laquo; ابتدا</span>
+                    {% endif %}
+
+                    {% if page_obj.has_previous %}
+                        <a href="{% url 'sale_file_list' %}?page={{ page_obj.previous_page_number }}">‹ قبلی</a>
+                    {% else %}
+                        <span class="my-profile-disabled">‹ قبلی</span>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if num == page_obj.number %}
+                            <span class="my-profile-current">{{ num }}</span>
+                        {% else %}
+                            <a href="{% url 'sale_file_list' %}?page={{ num }}">{{ num }}</a>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                        <a href="{% url 'sale_file_list' %}?page={{ page_obj.next_page_number }}">بعدی ›</a>
+                    {% else %}
+                        <span class="my-profile-disabled">بعدی ›</span>
+                    {% endif %}
+
+                    {% if page_obj.has_next %}
+                        <a href="{% url 'sale_file_list' %}?page={{ page_obj.paginator.num_pages }}">انتها &raquo;</a>
+                    {% else %}
+                        <span class="my-profile-disabled">انتها &raquo;</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- end: Pagination -->
+
+{% endblock %}
+
+
+
+
+

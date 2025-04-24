@@ -50,6 +50,13 @@ urlpatterns = [
     re_path(r'renter/delete/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/', views.RenterDeleteView.as_view(), name='renter_delete'),
     re_path(r'renter/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/', views.RenterDetailView.as_view(), name='renter_detail'),
     re_path(r'renters/create/', views.RenterCreateView.as_view(), name='renter_create'),
+    # tasks
+    path('tasks/for-files/', views.TaskFPListView.as_view(), name='task_fp_list'),
+    path('tasks/for-customers/', views.TaskCPListView.as_view(), name='task_cp_list'),
+    path('tasks/dual/', views.TaskBTListView.as_view(), name='task_bt_list'),
+    # re_path(r'person/update/(?P<slug>[-\w]+)/', views.PersonUpdateView.as_view(), name='person_update'),
+    # re_path(r'person/delete/(?P<slug>[-\w]+)/', views.PersonDeleteView.as_view(), name='person_delete'),
+    re_path(r'task/create/', views.TaskCreateView.as_view(), name='task_create'),
 ]
 
 

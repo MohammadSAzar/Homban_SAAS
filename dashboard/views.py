@@ -960,5 +960,77 @@ class RenterDeleteView(PermissionRequiredMixin, DeleteView):
         return self.render_to_response(self.get_context_data(form=form))
 
 
+# --------------------------------- Tasks --------------------------------
+class TaskFPListView(ReadOnlyPermissionMixin, ListView):
+    model = models.Task
+    template_name = 'dashboard/tasks/task_fp_list.html'
+    context_object_name = 'tasks'
+    paginate_by = 12
+    permission_model = 'Task'
+
+    def get_queryset(self):
+        queryset = models.Task.objects.select_related('agent', 'sub_district', 'sale_file', 'rent_file')
+        return queryset
+
+
+class TaskCPListView(ReadOnlyPermissionMixin, ListView):
+    model = models.Task
+    template_name = 'dashboard/tasks/task_cp_list.html'
+    context_object_name = 'tasks'
+    paginate_by = 12
+    permission_model = 'Task'
+
+    def get_queryset(self):
+        queryset = models.Task.objects.select_related('agent', 'sub_district', 'buyer', 'renter')
+        return queryset
+
+
+class TaskBTListView(ReadOnlyPermissionMixin, ListView):
+    model = models.Task
+    template_name = 'dashboard/tasks/task_bt_list.html'
+    context_object_name = 'tasks'
+    paginate_by = 12
+    permission_model = 'Task'
+
+    def get_queryset(self):
+        queryset = models.Task.objects.select_related('agent', 'sub_district', 'buyer', 'renter', 'sale_file', 'rent_file')
+        return queryset
+
+
+class TaskCreateView(PermissionRequiredMixin, CreateView):
+    model = models.Task
+    form_class = forms.TaskCreateForm
+    template_name = 'dashboard/tasks/task_create.html'
+    permission_model = 'Task'
+    permission_action = 'create'
+
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+    def form_valid(self, form):
+        messages.success(self.request, "وظیفه جدید در سامانه ثبت شد.")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        self.object = None
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_success_url(self):
+        task_type = self.object.type
+        if task_type == 'cp':
+            return reverse('task_cp_list')
+        elif task_type == 'fp':
+            return reverse('task_fp_list')
+        elif task_type == 'bt':
+            return reverse('task_bt_list')
+        return reverse('dashboard')
+
+
+
+
 
 

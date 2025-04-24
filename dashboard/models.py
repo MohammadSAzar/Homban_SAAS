@@ -132,7 +132,7 @@ class CustomUserModel(AbstractUser):
         ('bs', _('Boss')),
         ('fp', _('File Person')),
         ('cp', _('Customer Person')),
-        ('bt', _('Both')),
+        ('bt', _('Dual Person')),
     ]
     title = models.CharField(max_length=10, choices=TITLE_CHOICES, blank=True, null=True, verbose_name=_('Title'))
     email = models.EmailField(unique=False, blank=True, null=True)
@@ -673,15 +673,20 @@ class Task(models.Model):
     sale_file = models.ForeignKey(SaleFile, on_delete=models.SET_NULL, null=True, blank=True, related_name='tasks', verbose_name=_('Sale File'))
     rent_file = models.ForeignKey(RentFile, on_delete=models.SET_NULL, null=True, blank=True, related_name='tasks', verbose_name=_('Rent File'))
     buyer = models.ForeignKey(Buyer, on_delete=models.SET_NULL, null=True, blank=True, related_name='tasks', verbose_name=_('Buyer'))
+    renter = models.ForeignKey(Renter, on_delete=models.SET_NULL, null=True, blank=True, related_name='tasks', verbose_name=_('Renter'))
+    sub_district = models.ForeignKey(SubDistrict, on_delete=models.SET_NULL, null=True, blank=True, related_name='tasks', verbose_name=_('Sub-District'))
     code = models.CharField(max_length=6, null=True, unique=True, blank=True)
     description = models.TextField(max_length=1000, blank=True, null=True, verbose_name=_('Description'))
     result = models.TextField(max_length=1000, blank=True, null=True, verbose_name=_('Result'))
     status = models.CharField(max_length=10, choices=choices.task_statuses, default='OP',  verbose_name=_('Status'))
+    slug = models.SlugField(max_length=255, null=True, blank=True, unique=True, allow_unicode=True)
     datetime_created = models.DateTimeField(auto_now_add=True, verbose_name=_('Date and Time of Creation'))
 
     def save(self, *args, **kwargs):
         if not self.code:
             self.code = generate_unique_code()
+        if not self.slug:
+            self.slug = slugify(self.title, allow_unicode=True)
         super(Task, self).save(*args, **kwargs)
 
     def __str__(self):
@@ -691,7 +696,7 @@ class Task(models.Model):
         ordering = ('-datetime_created',)
 
     def get_absolute_url(self):
-        return reverse('task_detail', args=[self.code])
+        return reverse('task_detail', args=[self.pk, self.slug])
 
 
 

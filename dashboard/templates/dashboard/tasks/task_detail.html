@@ -1,0 +1,193 @@
+{% extends '_base_dashboard.html' %}
+
+{% load static %}
+{% load i18n %}
+{% load jalali_tags %}
+{% load number_converter %}
+{% load widget_tweaks %}
+{% load humanize %}
+
+
+{% block title %}{{ renter.name|farsi_number }}{% endblock %}
+
+
+{% block content %}
+
+    <div class="card">
+        <div class="card-aside-wrap">
+            <div class="card-inner card-inner-lg">
+
+                <!-- Name -->
+                <div class="nk-block-head nk-block-head-lg">
+                    <div class="nk-block-between">
+                        <div class="nk-block-head-content">
+                            <h5 class="nk-block-title">مستاجر: {{ renter.name|farsi_number }}</h5>
+                            <div style="font-size: 0.9em; margin-top: 1em;">
+                                <a href="{% url 'renter_update' renter.pk renter.code %}" class="btn btn-primary" style="margin-left: 10px;">بروزرسانی</a>
+                                <a href="{% url 'renter_delete' renter.pk renter.code %}" class="btn btn-danger">پاک کردن</a>
+                            </div>
+                            <div class="nk-block-des" style="margin-top: 10px;">
+                                <p>{{ renter.phone_number }}</p>
+                            </div>
+                            <div class="nk-block-des">
+                                <p>کد: {{ renter.code }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- end: Title -->
+
+                <!-- Info -->
+                <div class="nk-block">
+
+                    <!-- Main -->
+                    <div class="nk-data  data-list">
+                        <!-- Title -->
+                        <div class="data-head">
+                            <h6 class="title">اطلاعات اصلی</h6>
+                        </div>
+                        <!-- province -->
+                        <div class="data-item" data-bs-toggle="modal" data-bs-target="#profile-edit">
+                            <div class="data-col">
+                                <span class="data-label">استان:</span>
+                                <span class="data-value">{{ renter.province }}</span>
+                            </div>
+                        </div>
+                        <!-- city -->
+                        <div class="data-item" data-bs-toggle="modal" data-bs-target="#profile-edit">
+                            <div class="data-col">
+                                <span class="data-label">شهر:</span>
+                                <span class="data-value">{{ renter.city }}</span>
+                            </div>
+                        </div>
+                        <!-- district -->
+                        <div class="data-item" data-bs-toggle="modal" data-bs-target="#profile-edit">
+                            <div class="data-col">
+                                <span class="data-label">محله (منطقه):</span>
+                                <span class="data-value">{{ renter.district }}</span>
+                            </div>
+                        </div>
+                        <!-- deposit_announced -->
+                        <div class="data-item" data-bs-toggle="modal" data-bs-target="#profile-edit">
+                            <div class="data-col">
+                                <span class="data-label">ودیعه اعلامی:</span>
+                                <span class="data-value">{{ renter.deposit_announced|intcomma:False|farsi_number }} تومان</span>
+                            </div>
+                        </div>
+                        <!-- deposit_max -->
+                        <div class="data-item" data-bs-toggle="modal" data-bs-target="#profile-edit">
+                            <div class="data-col">
+                                <span class="data-label">حداکثر ودیعه:</span>
+                                <span class="data-value">{{ renter.deposit_max|intcomma:False|farsi_number }} تومان</span>
+                            </div>
+                        </div>
+                        <!-- rent_announced -->
+                        <div class="data-item" data-bs-toggle="modal" data-bs-target="#profile-edit">
+                            <div class="data-col">
+                                <span class="data-label">اجاره اعلامی:</span>
+                                <span class="data-value">{{ renter.rent_announced|intcomma:False|farsi_number }} تومان</span>
+                            </div>
+                        </div>
+                        <!-- rent_max -->
+                        <div class="data-item" data-bs-toggle="modal" data-bs-target="#profile-edit">
+                            <div class="data-col">
+                                <span class="data-label">حداکثر اجاره:</span>
+                                <span class="data-value">{{ renter.rent_max|intcomma:False|farsi_number }} تومان</span>
+                            </div>
+                        </div>
+                        <!-- budget_status -->
+                        <div class="data-item" data-bs-toggle="modal" data-bs-target="#profile-edit">
+                            <div class="data-col">
+                                <span class="data-label">وضعیت بودجه:</span>
+                                <span class="data-value">{{ renter.get_budget_status_display }}</span>
+                            </div>
+                        </div>
+                        <!-- convertable -->
+                        <div class="data-item" data-bs-toggle="modal" data-bs-target="#profile-edit">
+                            <div class="data-col">
+                                <span class="data-label">قابل تبدیل:</span>
+                                <span class="data-value">{{ renter.get_convertable_display }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Other -->
+                    <div class="nk-data  data-list">
+                        <!-- Title -->
+                        <div class="data-head">
+                            <h6 class="title">سایر اطلاعات</h6>
+                        </div>
+                        <!-- area -->
+                        <div class="data-item" data-bs-toggle="modal" data-bs-target="#profile-edit">
+                            <div class="data-col">
+                                <span class="data-label">متراژ:</span>
+                                <span class="data-value">حداکثر: {{ renter.area_max }}</span>
+                                <span class="data-value" style="margin-right: 7px; margin-left: 7px;">|</span>
+                                <span class="data-value"> حداقل: {{ renter.area_min }}</span>
+                            </div>
+                        </div>
+                        <!-- room -->
+                        <div class="data-item" data-bs-toggle="modal" data-bs-target="#profile-edit">
+                            <div class="data-col">
+                                <span class="data-label">اتاق:</span>
+                                <span class="data-value">حداکثر: {{ renter.get_room_max_display }}</span>
+                                <span class="data-value" style="margin-right: 7px; margin-left: 7px;">|</span>
+                                <span class="data-value">حداقل: {{ renter.get_room_min_display }}</span>
+                            </div>
+                        </div>
+                        <!-- age -->
+                        <div class="data-item" data-bs-toggle="modal" data-bs-target="#profile-edit">
+                            <div class="data-col">
+                                <span class="data-label">سن:</span>
+                                <span class="data-value">حداکثر: {{ renter.get_age_max_display }}</span>
+                                <span class="data-value" style="margin-right: 7px; margin-left: 7px;">|</span>
+                                <span class="data-value">حداقل: {{ renter.get_age_min_display }}</span>
+                            </div>
+                        </div>
+                        <!-- document -->
+                        <div class="data-item" data-bs-toggle="modal" data-bs-target="#profile-edit">
+                            <div class="data-col">
+                                <span class="data-label">وضعیت سند:</span>
+                                <span class="data-value">{{ renter.get_document_display }}</span>
+                            </div>
+                        </div>
+                        <!-- parking -->
+                        <div class="data-item" data-bs-toggle="modal" data-bs-target="#profile-edit">
+                            <div class="data-col">
+                                <span class="data-label">وضعیت پارکینگ:</span>
+                                <span class="data-value">{{ renter.get_parking_display }}</span>
+                            </div>
+                        </div>
+                        <!-- elevator -->
+                        <div class="data-item" data-bs-toggle="modal" data-bs-target="#profile-edit">
+                            <div class="data-col">
+                                <span class="data-label">وضعیت آسانسور:</span>
+                                <span class="data-value">{{ renter.get_elevator_display }}</span>
+                            </div>
+                        </div>
+                        <!-- warehouse -->
+                        <div class="data-item" data-bs-toggle="modal" data-bs-target="#profile-edit">
+                            <div class="data-col">
+                                <span class="data-label">وضعیت انباری:</span>
+                                <span class="data-value">{{ renter.get_warehouse_display }}</span>
+                            </div>
+                        </div>
+                        <!-- description -->
+                        <div class="data-item" data-bs-toggle="modal" data-bs-target="#profile-edit">
+                            <div class="data-col">
+                                <span class="data-label">توضیحات:</span>
+                                <span class="data-value">{{ renter.description|linebreaksbr|farsi_number|safe }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- end: Info -->
+
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+

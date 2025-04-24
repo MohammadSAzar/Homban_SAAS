@@ -436,5 +436,19 @@ class SubDistrictCreateForm(forms.ModelForm):
             field.required = True
 
 
+# --------------------------------- Tasks ---------------------------------
+task_required_fields = ['title', 'type', 'agent', 'deadline', 'sub_district', 'description']
+
+
+class TaskCreateForm(forms.ModelForm):
+    class Meta:
+        model = models.Task
+        fields = ['title', 'type', 'agent', 'deadline', 'sale_file', 'rent_file', 'buyer', 'renter', 'sub_district', 'description']
+
+    def __init__(self, *args, **kwargs):
+        super(TaskCreateForm, self).__init__(*args, **kwargs)
+        for field in task_required_fields:
+            self.fields[field].required = True
+
 
 

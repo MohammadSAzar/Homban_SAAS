@@ -143,7 +143,16 @@
                                                     <a href="#" class="nk-menu-link"><span class="nk-menu-text">{% trans 'Agents' %}</span></a>
                                                 </li>
                                                 <li class="nk-menu-item">
-                                                    <a href="#" class="nk-menu-link"><span class="nk-menu-text">{% trans 'Tasks' %}</span></a>
+                                                    <a href="{% url 'task_create' %}" class="nk-menu-link"><span class="nk-menu-text">{% trans 'Create New Task' %}</span></a>
+                                                </li>
+                                                <li class="nk-menu-item">
+                                                    <a href="{% url 'task_fp_list' %}" class="nk-menu-link"><span class="nk-menu-text">{% trans 'FP Tasks' %}</span></a>
+                                                </li>
+                                                <li class="nk-menu-item">
+                                                    <a href="{% url 'task_cp_list' %}" class="nk-menu-link"><span class="nk-menu-text">{% trans 'CP Tasks' %}</span></a>
+                                                </li>
+                                                <li class="nk-menu-item">
+                                                    <a href="{% url 'task_bt_list' %}" class="nk-menu-link"><span class="nk-menu-text">{% trans 'BT Tasks' %}</span></a>
                                                 </li>
                                             </ul>
                                         </li>
