@@ -3,7 +3,8 @@ import zipfile
 
 import random
 import string
-from jdatetime import date, timedelta
+from jdatetime import date, timedelta, datetime
+# from datetime import datetime, timedelta
 
 from django.conf import settings
 from django.db import models
@@ -93,50 +94,56 @@ def last_month_shamsi():
     return final_days
 
 
+# def next_month_shamsi():
+#     days = []
+#     today = date.today()
+#     for i in range(1, 31):
+#         next_day = today + timedelta(days=i)
+#         days.append({
+#             'result_day': next_day.strftime('%A'),
+#             'result_date': next_day.strftime('%Y/%m/%d')
+#         })
+#     for j in range(0, 30):
+#         if days[j]['result_day'] == 'Monday' or days[j]['result_day'] == 'monday':
+#             days[j]['result_day'] = 'دوشنبه'
+#         if days[j]['result_day'] == 'Tuesday' or days[j]['result_day'] == 'tuesday':
+#             days[j]['result_day'] = 'سه‌شنبه'
+#         if days[j]['result_day'] == 'Wednesday' or days[j]['result_day'] == 'wednesday':
+#             days[j]['result_day'] = 'چهارشنبه'
+#         if days[j]['result_day'] == 'Thursday' or days[j]['result_day'] == 'thursday':
+#             days[j]['result_day'] = 'پنج‌شنبه'
+#         if days[j]['result_day'] == 'Friday' or days[j]['result_day'] == 'friday':
+#             days[j]['result_day'] = 'جمعه'
+#         if days[j]['result_day'] == 'Saturday' or days[j]['result_day'] == 'saturday':
+#             days[j]['result_day'] = 'شنبه'
+#         if days[j]['result_day'] == 'Sunday' or days[j]['result_day'] == 'sunday':
+#             days[j]['result_day'] = 'یکشنبه'
+#     final_days = []
+#     for k in range(0, 30):
+#         converted_day = str(days[k]['result_day'] + ' - ' + days[k]['result_date'])
+#         final_days.append((
+#             'result_day', converted_day,
+#         ))
+#     return final_days
 def next_month_shamsi():
     days = []
-    today = date.today()
+    today = datetime.today()
     for i in range(1, 31):
         next_day = today + timedelta(days=i)
-        days.append({
-            'result_day': next_day.strftime('%A'),
-            'result_date': next_day.strftime('%Y/%m/%d')
-        })
-    for j in range(0, 30):
-        if days[j]['result_day'] == 'Monday' or days[j]['result_day'] == 'monday':
-            days[j]['result_day'] = 'دوشنبه'
-        if days[j]['result_day'] == 'Tuesday' or days[j]['result_day'] == 'tuesday':
-            days[j]['result_day'] = 'سه‌شنبه'
-        if days[j]['result_day'] == 'Wednesday' or days[j]['result_day'] == 'wednesday':
-            days[j]['result_day'] = 'چهارشنبه'
-        if days[j]['result_day'] == 'Thursday' or days[j]['result_day'] == 'thursday':
-            days[j]['result_day'] = 'پنج‌شنبه'
-        if days[j]['result_day'] == 'Friday' or days[j]['result_day'] == 'friday':
-            days[j]['result_day'] = 'جمعه'
-        if days[j]['result_day'] == 'Saturday' or days[j]['result_day'] == 'saturday':
-            days[j]['result_day'] = 'شنبه'
-        if days[j]['result_day'] == 'Sunday' or days[j]['result_day'] == 'sunday':
-            days[j]['result_day'] = 'یکشنبه'
-    final_days = []
-    for k in range(0, 30):
-        converted_day = str(days[k]['result_day'] + ' - ' + days[k]['result_date'])
-        final_days.append((
-            'result_day', converted_day,
-        ))
-    return final_days
-
-
-# --------------------------------- CUM -------------------------------------
-class CustomUserModel(AbstractUser):
-    TITLE_CHOICES = [
-        ('bs', _('Boss')),
-        ('fp', _('File Person')),
-        ('cp', _('Customer Person')),
-        ('bt', _('Dual Person')),
-    ]
-    title = models.CharField(max_length=10, choices=TITLE_CHOICES, blank=True, null=True, verbose_name=_('Title'))
-    email = models.EmailField(unique=False, blank=True, null=True)
-    REQUIRED_FIELDS = []
+        weekday_en = next_day.strftime('%A')
+        date_str = next_day.strftime('%Y/%m/%d')
+        weekday_fa = {
+            'Monday': 'دوشنبه',
+            'Tuesday': 'سه‌شنبه',
+            'Wednesday': 'چهارشنبه',
+            'Thursday': 'پنج‌شنبه',
+            'Friday': 'جمعه',
+            'Saturday': 'شنبه',
+            'Sunday': 'یکشنبه',
+        }.get(weekday_en, weekday_en)
+        label = f"{weekday_fa} - {date_str}"
+        days.append((date_str, label))
+    return days
 
 
 # --------------------------------- LOCs ------------------------------------
@@ -198,6 +205,27 @@ class SubDistrict(models.Model):
 
     def get_absolute_url(self):
         return reverse('sub_district_detail', args=[self.pk, self.name])
+
+
+# --------------------------------- CUM -------------------------------------
+class CustomUserModel(AbstractUser):
+    TITLE_CHOICES = [
+        ('bs', _('Boss')),
+        ('fp', _('File Person')),
+        ('cp', _('Customer Person')),
+        ('bt', _('Dual Person')),
+    ]
+    title = models.CharField(max_length=10, choices=TITLE_CHOICES, blank=True, null=True, verbose_name=_('Title'))
+    sub_district = models.ForeignKey(SubDistrict, on_delete=models.SET_NULL, null=True, blank=True, related_name='agents', verbose_name=_('Sub-District'))
+    email = models.EmailField(unique=False, blank=True, null=True)
+    REQUIRED_FIELDS = []
+
+    @property
+    def is_boss(self):
+        if self.title == 'bs':
+            return choices.beings[0]
+        else:
+            return choices.beings[1]
 
 
 # --------------------------------- FILE -----------------------------------
@@ -665,22 +693,24 @@ class Trade(models.Model):
 
 # --------------------------------- MNGs ---------------------------------
 class Task(models.Model):
-    DATES = next_month_shamsi
     title = models.CharField(max_length=200, verbose_name=_('Title'))
-    deadline = models.CharField(max_length=200, choices=DATES, verbose_name=_('Deadline'))
+    deadline = models.CharField(max_length=200, verbose_name=_('Deadline'))
     type = models.CharField(max_length=10, choices=choices.task_types,  verbose_name=_('Type of Task'))
     agent = models.ForeignKey(CustomUserModel, on_delete=models.SET_NULL, null=True, blank=True, related_name='tasks', verbose_name=_('Agent'))
     sale_file = models.ForeignKey(SaleFile, on_delete=models.SET_NULL, null=True, blank=True, related_name='tasks', verbose_name=_('Sale File'))
     rent_file = models.ForeignKey(RentFile, on_delete=models.SET_NULL, null=True, blank=True, related_name='tasks', verbose_name=_('Rent File'))
     buyer = models.ForeignKey(Buyer, on_delete=models.SET_NULL, null=True, blank=True, related_name='tasks', verbose_name=_('Buyer'))
     renter = models.ForeignKey(Renter, on_delete=models.SET_NULL, null=True, blank=True, related_name='tasks', verbose_name=_('Renter'))
-    sub_district = models.ForeignKey(SubDistrict, on_delete=models.SET_NULL, null=True, blank=True, related_name='tasks', verbose_name=_('Sub-District'))
     code = models.CharField(max_length=6, null=True, unique=True, blank=True)
     description = models.TextField(max_length=1000, blank=True, null=True, verbose_name=_('Description'))
     result = models.TextField(max_length=1000, blank=True, null=True, verbose_name=_('Result'))
     status = models.CharField(max_length=10, choices=choices.task_statuses, default='OP',  verbose_name=_('Status'))
     slug = models.SlugField(max_length=255, null=True, blank=True, unique=True, allow_unicode=True)
     datetime_created = models.DateTimeField(auto_now_add=True, verbose_name=_('Date and Time of Creation'))
+
+    @property
+    def sub_district(self):
+        return self.agent.sub_district
 
     def save(self, *args, **kwargs):
         if not self.code:

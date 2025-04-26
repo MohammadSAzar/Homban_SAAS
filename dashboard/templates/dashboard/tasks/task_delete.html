@@ -8,7 +8,7 @@
 {% load widget_tweaks %}
 
 
-{% block title %}حذف فرد آگهی‌دهنده {{ person.name }}{% endblock %}
+{% block title %}حذف وظیفه "{{ task.title|linebreaksbr|farsi_number }}"{% endblock %}
 
 
 {% block content %}
@@ -32,7 +32,7 @@
                         <!-- Title -->
                         <div class="nk-block-head nk-block-head-lg wide-sm">
                             <div class="nk-block-head-content">
-                                <h6 class="nk-block-title page-title" style="line-height: 45px;">حذف فرد آگهی‌دهنده {{ person.name }}</h6>
+                                <h6 class="nk-block-title page-title" style="line-height: 45px;">حذف وظیفه "{{ task.title|linebreaksbr|farsi_number }}"</h6>
                             </div>
                         </div>
                         <!-- end: Title -->
@@ -41,7 +41,7 @@
                         <form class="row gy-4" method="post">
                             {% csrf_token %}
                             <div class="nk-fmg-actions" style="margin-top: 3em;">
-                                <button type="submit" class="btn btn-danger" style="line-height: 30px;">حذف فرد</button>
+                                <button type="submit" class="btn btn-danger" style="line-height: 30px;">حذف وظیفه</button>
                             </div>
                         </form>
                         <!-- end: Form -->    
@@ -53,9 +53,6 @@
     </div>
 
 {% endblock %}
-
-
-
 
 
 

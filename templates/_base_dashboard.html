@@ -181,7 +181,7 @@
                 <div class="nk-wrap">
 
                     <!-- Header -->
-                    <div class="nk-header nk-header-fixed is-light">
+                    <div class="nk-header  nk-header-fixed is-light">
                         <div class="container-fluid">
                             <div class="nk-header-wrap">
 
@@ -206,7 +206,7 @@
                                             <!-- Name -->
                                             <a href="#" class="dropdown-toggle" data-bs-toggle="dropdown">
                                                 <div class="user-toggle">
-                                                    <div class="user-name dropdown-indicator" style="font-size: 1.6em; padding-top: 0.5em;">{{ user }}</div>
+                                                    <div class="user-name dropdown-indicator" style="font-size: 1em; padding-top: 0.5em;">{{ user.get_title_display }} / {{ user.sub_district }}</div>
                                                 </div>
                                             </a>
 
@@ -234,7 +234,7 @@
                     <!-- end: Header -->
 
                     <!-- Content -->
-                    <div class="nk-content">
+                    <div class=" nk-content">
                         <div class="container-fluid">
                             <div class="nk-content-inner">
 

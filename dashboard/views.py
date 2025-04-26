@@ -2,8 +2,10 @@ from django.shortcuts import render
 from django.urls import reverse, reverse_lazy
 from django.views.generic import DetailView, CreateView, ListView, UpdateView, DeleteView, TemplateView
 from django.contrib import messages
+from django.contrib.auth import get_user_model
 
-from . import models, forms
+
+from . import models, forms, choices
 from .permissions import PermissionRequiredMixin, ReadOnlyPermissionMixin
 
 
@@ -293,87 +295,158 @@ class SaleFileListView(ReadOnlyPermissionMixin, ListView):
     permission_model = 'SaleFile'
 
     def get_queryset(self):
-        queryset_default = models.SaleFile.objects.select_related('province', 'city', 'district', 'sub_district', 'person')
-        form = forms.SaleFileFilterForm(self.request.GET)
+        if self.request.user.title == 'fp':
+            sub_district = self.request.user.sub_district
+            queryset_default = (models.SaleFile.objects.select_related('province', 'city', 'district', 'sub_district', 'person')
+                                .filter(sub_district=sub_district))
+            form = forms.SaleFileAgentFilterForm(self.request.GET)
 
-        if form.is_valid():
-            queryset_filtered = queryset_default
-            if form.cleaned_data['province']:
-                queryset_filtered = queryset_filtered.filter(province=form.cleaned_data['province'])
-            if form.cleaned_data['city']:
-                queryset_filtered = queryset_filtered.filter(city=form.cleaned_data['city'])
-            if form.cleaned_data['district']:
-                queryset_filtered = queryset_filtered.filter(district=form.cleaned_data['district'])
-            if form.cleaned_data['sub_district']:
-                queryset_filtered = queryset_filtered.filter(sub_district=form.cleaned_data['sub_district'])
-            if form.cleaned_data['person']:
-                queryset_filtered = queryset_filtered.filter(person=form.cleaned_data['person'])
-            if form.cleaned_data['source']:
-                queryset_filtered = queryset_filtered.filter(source=form.cleaned_data['source'])
-            if form.cleaned_data['document']:
-                queryset_filtered = queryset_filtered.filter(document=form.cleaned_data['document'])
-            if form.cleaned_data['parking']:
-                queryset_filtered = queryset_filtered.filter(parking=form.cleaned_data['parking'])
-            if form.cleaned_data['elevator']:
-                queryset_filtered = queryset_filtered.filter(elevator=form.cleaned_data['elevator'])
-            if form.cleaned_data['warehouse']:
-                queryset_filtered = queryset_filtered.filter(warehouse=form.cleaned_data['warehouse'])
+            if form.is_valid():
+                queryset_filtered = queryset_default
+                if form.cleaned_data['person']:
+                    queryset_filtered = queryset_filtered.filter(person=form.cleaned_data['person'])
+                if form.cleaned_data['source']:
+                    queryset_filtered = queryset_filtered.filter(source=form.cleaned_data['source'])
+                if form.cleaned_data['document']:
+                    queryset_filtered = queryset_filtered.filter(document=form.cleaned_data['document'])
+                if form.cleaned_data['parking']:
+                    queryset_filtered = queryset_filtered.filter(parking=form.cleaned_data['parking'])
+                if form.cleaned_data['elevator']:
+                    queryset_filtered = queryset_filtered.filter(elevator=form.cleaned_data['elevator'])
+                if form.cleaned_data['warehouse']:
+                    queryset_filtered = queryset_filtered.filter(warehouse=form.cleaned_data['warehouse'])
 
-            queryset_filtered = list(queryset_filtered)
+                queryset_filtered = list(queryset_filtered)
 
-            if form.cleaned_data['has_images'] == 'has':
-                queryset_filtered = [obj for obj in queryset_filtered if obj.has_images]
-            if form.cleaned_data['has_images'] == 'hasnt':
-                queryset_filtered = [obj for obj in queryset_filtered if not obj.has_images]
-            if form.cleaned_data['has_video'] == 'has':
-                queryset_filtered = [obj for obj in queryset_filtered if obj.has_video]
-            if form.cleaned_data['has_video'] == 'hasnt':
-                queryset_filtered = [obj for obj in queryset_filtered if not obj.has_video]
+                if form.cleaned_data['has_images'] == 'has':
+                    queryset_filtered = [obj for obj in queryset_filtered if obj.has_images]
+                if form.cleaned_data['has_images'] == 'hasnt':
+                    queryset_filtered = [obj for obj in queryset_filtered if not obj.has_images]
+                if form.cleaned_data['has_video'] == 'has':
+                    queryset_filtered = [obj for obj in queryset_filtered if obj.has_video]
+                if form.cleaned_data['has_video'] == 'hasnt':
+                    queryset_filtered = [obj for obj in queryset_filtered if not obj.has_video]
 
-            # queryset_final = queryset_filtered
-            if form.cleaned_data['min_price']:
-                queryset_filtered = [obj for obj in queryset_filtered if
-                                     obj.price_announced and obj.price_announced >= form.cleaned_data['min_price']]
-            if form.cleaned_data['max_price']:
-                queryset_filtered = [obj for obj in queryset_filtered if
-                                     obj.price_announced and obj.price_announced <= form.cleaned_data['max_price']]
-            if form.cleaned_data['min_area']:
-                queryset_filtered = [obj for obj in queryset_filtered if obj.area >= form.cleaned_data['min_area']]
-            if form.cleaned_data['max_area']:
-                queryset_filtered = [obj for obj in queryset_filtered if obj.area <= form.cleaned_data['max_area']]
-            if form.cleaned_data['min_room']:
-                queryset_filtered = [obj for obj in queryset_filtered if
-                                     int(obj.room) >= int(form.cleaned_data['min_room'])]
-            if form.cleaned_data['max_room']:
-                queryset_filtered = [obj for obj in queryset_filtered if
-                                     int(obj.room) <= int(form.cleaned_data['max_room'])]
-            if form.cleaned_data['min_age']:
-                queryset_filtered = [obj for obj in queryset_filtered if
-                                     int(obj.age) >= int(form.cleaned_data['min_age'])]
-            if form.cleaned_data['max_age']:
-                queryset_filtered = [obj for obj in queryset_filtered if
-                                     int(obj.age) <= int(form.cleaned_data['max_age'])]
-            if form.cleaned_data['min_level']:
-                queryset_filtered = [obj for obj in queryset_filtered if
-                                     int(obj.level) >= int(form.cleaned_data['min_level'])]
-            if form.cleaned_data['max_level']:
-                queryset_filtered = [obj for obj in queryset_filtered if
-                                     int(obj.level) <= int(form.cleaned_data['max_level'])]
+                # queryset_final = queryset_filtered
+                if form.cleaned_data['min_price']:
+                    queryset_filtered = [obj for obj in queryset_filtered if
+                                         obj.price_announced and obj.price_announced >= form.cleaned_data[
+                                             'min_price']]
+                if form.cleaned_data['max_price']:
+                    queryset_filtered = [obj for obj in queryset_filtered if
+                                         obj.price_announced and obj.price_announced <= form.cleaned_data[
+                                             'max_price']]
+                if form.cleaned_data['min_area']:
+                    queryset_filtered = [obj for obj in queryset_filtered if
+                                         obj.area >= form.cleaned_data['min_area']]
+                if form.cleaned_data['max_area']:
+                    queryset_filtered = [obj for obj in queryset_filtered if
+                                         obj.area <= form.cleaned_data['max_area']]
+                if form.cleaned_data['min_room']:
+                    queryset_filtered = [obj for obj in queryset_filtered if
+                                         int(obj.room) >= int(form.cleaned_data['min_room'])]
+                if form.cleaned_data['max_room']:
+                    queryset_filtered = [obj for obj in queryset_filtered if
+                                         int(obj.room) <= int(form.cleaned_data['max_room'])]
+                if form.cleaned_data['min_age']:
+                    queryset_filtered = [obj for obj in queryset_filtered if
+                                         int(obj.age) >= int(form.cleaned_data['min_age'])]
+                if form.cleaned_data['max_age']:
+                    queryset_filtered = [obj for obj in queryset_filtered if
+                                         int(obj.age) <= int(form.cleaned_data['max_age'])]
+                if form.cleaned_data['min_level']:
+                    queryset_filtered = [obj for obj in queryset_filtered if
+                                         int(obj.level) >= int(form.cleaned_data['min_level'])]
+                if form.cleaned_data['max_level']:
+                    queryset_filtered = [obj for obj in queryset_filtered if
+                                         int(obj.level) <= int(form.cleaned_data['max_level'])]
 
-            return queryset_filtered
-        return queryset_default
+                return queryset_filtered
+            return queryset_default
+
+        else:
+            queryset_default = models.SaleFile.objects.select_related('province', 'city', 'district', 'sub_district', 'person')
+            form = forms.SaleFileFilterForm(self.request.GET)
+
+            if form.is_valid():
+                queryset_filtered = queryset_default
+                if form.cleaned_data['province']:
+                    queryset_filtered = queryset_filtered.filter(province=form.cleaned_data['province'])
+                if form.cleaned_data['city']:
+                    queryset_filtered = queryset_filtered.filter(city=form.cleaned_data['city'])
+                if form.cleaned_data['district']:
+                    queryset_filtered = queryset_filtered.filter(district=form.cleaned_data['district'])
+                if form.cleaned_data['sub_district']:
+                    queryset_filtered = queryset_filtered.filter(sub_district=form.cleaned_data['sub_district'])
+                if form.cleaned_data['person']:
+                    queryset_filtered = queryset_filtered.filter(person=form.cleaned_data['person'])
+                if form.cleaned_data['source']:
+                    queryset_filtered = queryset_filtered.filter(source=form.cleaned_data['source'])
+                if form.cleaned_data['document']:
+                    queryset_filtered = queryset_filtered.filter(document=form.cleaned_data['document'])
+                if form.cleaned_data['parking']:
+                    queryset_filtered = queryset_filtered.filter(parking=form.cleaned_data['parking'])
+                if form.cleaned_data['elevator']:
+                    queryset_filtered = queryset_filtered.filter(elevator=form.cleaned_data['elevator'])
+                if form.cleaned_data['warehouse']:
+                    queryset_filtered = queryset_filtered.filter(warehouse=form.cleaned_data['warehouse'])
+
+                queryset_filtered = list(queryset_filtered)
+
+                if form.cleaned_data['has_images'] == 'has':
+                    queryset_filtered = [obj for obj in queryset_filtered if obj.has_images]
+                if form.cleaned_data['has_images'] == 'hasnt':
+                    queryset_filtered = [obj for obj in queryset_filtered if not obj.has_images]
+                if form.cleaned_data['has_video'] == 'has':
+                    queryset_filtered = [obj for obj in queryset_filtered if obj.has_video]
+                if form.cleaned_data['has_video'] == 'hasnt':
+                    queryset_filtered = [obj for obj in queryset_filtered if not obj.has_video]
+
+                # queryset_final = queryset_filtered
+                if form.cleaned_data['min_price']:
+                    queryset_filtered = [obj for obj in queryset_filtered if
+                                         obj.price_announced and obj.price_announced >= form.cleaned_data['min_price']]
+                if form.cleaned_data['max_price']:
+                    queryset_filtered = [obj for obj in queryset_filtered if
+                                         obj.price_announced and obj.price_announced <= form.cleaned_data['max_price']]
+                if form.cleaned_data['min_area']:
+                    queryset_filtered = [obj for obj in queryset_filtered if obj.area >= form.cleaned_data['min_area']]
+                if form.cleaned_data['max_area']:
+                    queryset_filtered = [obj for obj in queryset_filtered if obj.area <= form.cleaned_data['max_area']]
+                if form.cleaned_data['min_room']:
+                    queryset_filtered = [obj for obj in queryset_filtered if
+                                         int(obj.room) >= int(form.cleaned_data['min_room'])]
+                if form.cleaned_data['max_room']:
+                    queryset_filtered = [obj for obj in queryset_filtered if
+                                         int(obj.room) <= int(form.cleaned_data['max_room'])]
+                if form.cleaned_data['min_age']:
+                    queryset_filtered = [obj for obj in queryset_filtered if
+                                         int(obj.age) >= int(form.cleaned_data['min_age'])]
+                if form.cleaned_data['max_age']:
+                    queryset_filtered = [obj for obj in queryset_filtered if
+                                         int(obj.age) <= int(form.cleaned_data['max_age'])]
+                if form.cleaned_data['min_level']:
+                    queryset_filtered = [obj for obj in queryset_filtered if
+                                         int(obj.level) >= int(form.cleaned_data['min_level'])]
+                if form.cleaned_data['max_level']:
+                    queryset_filtered = [obj for obj in queryset_filtered if
+                                         int(obj.level) <= int(form.cleaned_data['max_level'])]
+
+                return queryset_filtered
+            return queryset_default
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        form = forms.SaleFileFilterForm(self.request.GET)
-
-        if self.request.GET.get('province'):
-            form.fields['city'].queryset = models.City.objects.filter(province_id=self.request.GET.get('province'))
-        if self.request.GET.get('city'):
-            form.fields['district'].queryset = models.District.objects.filter(city_id=self.request.GET.get('city'))
-        if self.request.GET.get('district'):
-            form.fields['sub_district'].queryset = models.SubDistrict.objects.filter(district_id=self.request.GET.get('district'))
-
+        if self.request.user.title == 'fp':
+            form = forms.SaleFileAgentFilterForm(self.request.GET)
+        else:
+            form = forms.SaleFileFilterForm(self.request.GET)
+            if self.request.GET.get('province'):
+                form.fields['city'].queryset = models.City.objects.filter(province_id=self.request.GET.get('province'))
+            if self.request.GET.get('city'):
+                form.fields['district'].queryset = models.District.objects.filter(city_id=self.request.GET.get('city'))
+            if self.request.GET.get('district'):
+                form.fields['sub_district'].queryset = models.SubDistrict.objects.filter(district_id=self.request.GET.get('district'))
         context['filter_form'] = form
         return context
 
@@ -460,95 +533,171 @@ class RentFileListView(ReadOnlyPermissionMixin, ListView):
     permission_model = 'RentFile'
 
     def get_queryset(self):
-        queryset_default = models.RentFile.objects.select_related('province', 'city', 'district', 'sub_district', 'person')
-        form = forms.RentFileFilterForm(self.request.GET)
+        if self.request.user.title == 'fp':
+            sub_district = self.request.user.sub_district
+            queryset_default = (
+                models.RentFile.objects.select_related('province', 'city', 'district', 'sub_district', 'person')
+                .filter(sub_district=sub_district))
+            form = forms.RentFileAgentFilterForm(self.request.GET)
+            if form.is_valid():
+                queryset_filtered = queryset_default
+                if form.cleaned_data['person']:
+                    queryset_filtered = queryset_filtered.filter(person=form.cleaned_data['person'])
+                if form.cleaned_data['source']:
+                    queryset_filtered = queryset_filtered.filter(source=form.cleaned_data['source'])
+                if form.cleaned_data['document']:
+                    queryset_filtered = queryset_filtered.filter(document=form.cleaned_data['document'])
+                if form.cleaned_data['convertable']:
+                    queryset_filtered = queryset_filtered.filter(convertable=form.cleaned_data['convertable'])
+                if form.cleaned_data['parking']:
+                    queryset_filtered = queryset_filtered.filter(parking=form.cleaned_data['parking'])
+                if form.cleaned_data['elevator']:
+                    queryset_filtered = queryset_filtered.filter(elevator=form.cleaned_data['elevator'])
+                if form.cleaned_data['warehouse']:
+                    queryset_filtered = queryset_filtered.filter(warehouse=form.cleaned_data['warehouse'])
 
-        if form.is_valid():
-            queryset_filtered = queryset_default
-            if form.cleaned_data['province']:
-                queryset_filtered = queryset_filtered.filter(province=form.cleaned_data['province'])
-            if form.cleaned_data['city']:
-                queryset_filtered = queryset_filtered.filter(city=form.cleaned_data['city'])
-            if form.cleaned_data['district']:
-                queryset_filtered = queryset_filtered.filter(district=form.cleaned_data['district'])
-            if form.cleaned_data['sub_district']:
-                queryset_filtered = queryset_filtered.filter(sub_district=form.cleaned_data['sub_district'])
-            if form.cleaned_data['person']:
-                queryset_filtered = queryset_filtered.filter(person=form.cleaned_data['person'])
-            if form.cleaned_data['source']:
-                queryset_filtered = queryset_filtered.filter(source=form.cleaned_data['source'])
-            if form.cleaned_data['document']:
-                queryset_filtered = queryset_filtered.filter(document=form.cleaned_data['document'])
-            if form.cleaned_data['convertable']:
-                queryset_filtered = queryset_filtered.filter(convertable=form.cleaned_data['convertable'])
-            if form.cleaned_data['parking']:
-                queryset_filtered = queryset_filtered.filter(parking=form.cleaned_data['parking'])
-            if form.cleaned_data['elevator']:
-                queryset_filtered = queryset_filtered.filter(elevator=form.cleaned_data['elevator'])
-            if form.cleaned_data['warehouse']:
-                queryset_filtered = queryset_filtered.filter(warehouse=form.cleaned_data['warehouse'])
+                queryset_filtered = list(queryset_filtered)
 
-            queryset_filtered = list(queryset_filtered)
+                if form.cleaned_data['has_images'] == 'has':
+                    queryset_filtered = [obj for obj in queryset_filtered if obj.has_images]
+                if form.cleaned_data['has_images'] == 'hasnt':
+                    queryset_filtered = [obj for obj in queryset_filtered if not obj.has_images]
+                if form.cleaned_data['has_video'] == 'has':
+                    queryset_filtered = [obj for obj in queryset_filtered if obj.has_video]
+                if form.cleaned_data['has_video'] == 'hasnt':
+                    queryset_filtered = [obj for obj in queryset_filtered if not obj.has_video]
 
-            if form.cleaned_data['has_images'] == 'has':
-                queryset_filtered = [obj for obj in queryset_filtered if obj.has_images]
-            if form.cleaned_data['has_images'] == 'hasnt':
-                queryset_filtered = [obj for obj in queryset_filtered if not obj.has_images]
-            if form.cleaned_data['has_video'] == 'has':
-                queryset_filtered = [obj for obj in queryset_filtered if obj.has_video]
-            if form.cleaned_data['has_video'] == 'hasnt':
-                queryset_filtered = [obj for obj in queryset_filtered if not obj.has_video]
+                # queryset_final = queryset_filtered
+                if form.cleaned_data['min_deposit']:
+                    queryset_filtered = [obj for obj in queryset_filtered if
+                                         obj.deposit_announced and obj.deposit_announced >= form.cleaned_data[
+                                             'min_deposit']]
+                if form.cleaned_data['max_deposit']:
+                    queryset_filtered = [obj for obj in queryset_filtered if
+                                         obj.deposit_announced and obj.deposit_announced <= form.cleaned_data[
+                                             'max_deposit']]
+                if form.cleaned_data['min_rent']:
+                    queryset_filtered = [obj for obj in queryset_filtered if
+                                         obj.rent_announced and obj.rent_announced >= form.cleaned_data['min_rent']]
+                if form.cleaned_data['max_rent']:
+                    queryset_filtered = [obj for obj in queryset_filtered if
+                                         obj.rent_announced and obj.rent_announced <= form.cleaned_data['max_rent']]
+                if form.cleaned_data['min_area']:
+                    queryset_filtered = [obj for obj in queryset_filtered if obj.area >= form.cleaned_data['min_area']]
+                if form.cleaned_data['max_area']:
+                    queryset_filtered = [obj for obj in queryset_filtered if obj.area <= form.cleaned_data['max_area']]
+                if form.cleaned_data['min_room']:
+                    queryset_filtered = [obj for obj in queryset_filtered if
+                                         int(obj.room) >= int(form.cleaned_data['min_room'])]
+                if form.cleaned_data['max_room']:
+                    queryset_filtered = [obj for obj in queryset_filtered if
+                                         int(obj.room) <= int(form.cleaned_data['max_room'])]
+                if form.cleaned_data['min_age']:
+                    queryset_filtered = [obj for obj in queryset_filtered if
+                                         int(obj.age) >= int(form.cleaned_data['min_age'])]
+                if form.cleaned_data['max_age']:
+                    queryset_filtered = [obj for obj in queryset_filtered if
+                                         int(obj.age) <= int(form.cleaned_data['max_age'])]
+                if form.cleaned_data['min_level']:
+                    queryset_filtered = [obj for obj in queryset_filtered if
+                                         int(obj.level) >= int(form.cleaned_data['min_level'])]
+                if form.cleaned_data['max_level']:
+                    queryset_filtered = [obj for obj in queryset_filtered if
+                                         int(obj.level) <= int(form.cleaned_data['max_level'])]
 
-            # queryset_final = queryset_filtered
-            if form.cleaned_data['min_deposit']:
-                queryset_filtered = [obj for obj in queryset_filtered if
-                                     obj.deposit_announced and obj.deposit_announced >= form.cleaned_data['min_deposit']]
-            if form.cleaned_data['max_deposit']:
-                queryset_filtered = [obj for obj in queryset_filtered if
-                                     obj.deposit_announced and obj.deposit_announced <= form.cleaned_data['max_deposit']]
-            if form.cleaned_data['min_rent']:
-                queryset_filtered = [obj for obj in queryset_filtered if
-                                     obj.rent_announced and obj.rent_announced >= form.cleaned_data['min_rent']]
-            if form.cleaned_data['max_rent']:
-                queryset_filtered = [obj for obj in queryset_filtered if
-                                     obj.rent_announced and obj.rent_announced <= form.cleaned_data['max_rent']]
-            if form.cleaned_data['min_area']:
-                queryset_filtered = [obj for obj in queryset_filtered if obj.area >= form.cleaned_data['min_area']]
-            if form.cleaned_data['max_area']:
-                queryset_filtered = [obj for obj in queryset_filtered if obj.area <= form.cleaned_data['max_area']]
-            if form.cleaned_data['min_room']:
-                queryset_filtered = [obj for obj in queryset_filtered if
-                                     int(obj.room) >= int(form.cleaned_data['min_room'])]
-            if form.cleaned_data['max_room']:
-                queryset_filtered = [obj for obj in queryset_filtered if
-                                     int(obj.room) <= int(form.cleaned_data['max_room'])]
-            if form.cleaned_data['min_age']:
-                queryset_filtered = [obj for obj in queryset_filtered if
-                                     int(obj.age) >= int(form.cleaned_data['min_age'])]
-            if form.cleaned_data['max_age']:
-                queryset_filtered = [obj for obj in queryset_filtered if
-                                     int(obj.age) <= int(form.cleaned_data['max_age'])]
-            if form.cleaned_data['min_level']:
-                queryset_filtered = [obj for obj in queryset_filtered if
-                                     int(obj.level) >= int(form.cleaned_data['min_level'])]
-            if form.cleaned_data['max_level']:
-                queryset_filtered = [obj for obj in queryset_filtered if
-                                     int(obj.level) <= int(form.cleaned_data['max_level'])]
+                return queryset_filtered
+            return queryset_default
+        else:
+            queryset_default = models.RentFile.objects.select_related('province', 'city', 'district', 'sub_district', 'person')
+            form = forms.RentFileFilterForm(self.request.GET)
 
-            return queryset_filtered
-        return queryset_default
+            if form.is_valid():
+                queryset_filtered = queryset_default
+                if form.cleaned_data['province']:
+                    queryset_filtered = queryset_filtered.filter(province=form.cleaned_data['province'])
+                if form.cleaned_data['city']:
+                    queryset_filtered = queryset_filtered.filter(city=form.cleaned_data['city'])
+                if form.cleaned_data['district']:
+                    queryset_filtered = queryset_filtered.filter(district=form.cleaned_data['district'])
+                if form.cleaned_data['sub_district']:
+                    queryset_filtered = queryset_filtered.filter(sub_district=form.cleaned_data['sub_district'])
+                if form.cleaned_data['person']:
+                    queryset_filtered = queryset_filtered.filter(person=form.cleaned_data['person'])
+                if form.cleaned_data['source']:
+                    queryset_filtered = queryset_filtered.filter(source=form.cleaned_data['source'])
+                if form.cleaned_data['document']:
+                    queryset_filtered = queryset_filtered.filter(document=form.cleaned_data['document'])
+                if form.cleaned_data['convertable']:
+                    queryset_filtered = queryset_filtered.filter(convertable=form.cleaned_data['convertable'])
+                if form.cleaned_data['parking']:
+                    queryset_filtered = queryset_filtered.filter(parking=form.cleaned_data['parking'])
+                if form.cleaned_data['elevator']:
+                    queryset_filtered = queryset_filtered.filter(elevator=form.cleaned_data['elevator'])
+                if form.cleaned_data['warehouse']:
+                    queryset_filtered = queryset_filtered.filter(warehouse=form.cleaned_data['warehouse'])
+
+                queryset_filtered = list(queryset_filtered)
+
+                if form.cleaned_data['has_images'] == 'has':
+                    queryset_filtered = [obj for obj in queryset_filtered if obj.has_images]
+                if form.cleaned_data['has_images'] == 'hasnt':
+                    queryset_filtered = [obj for obj in queryset_filtered if not obj.has_images]
+                if form.cleaned_data['has_video'] == 'has':
+                    queryset_filtered = [obj for obj in queryset_filtered if obj.has_video]
+                if form.cleaned_data['has_video'] == 'hasnt':
+                    queryset_filtered = [obj for obj in queryset_filtered if not obj.has_video]
+
+                # queryset_final = queryset_filtered
+                if form.cleaned_data['min_deposit']:
+                    queryset_filtered = [obj for obj in queryset_filtered if
+                                         obj.deposit_announced and obj.deposit_announced >= form.cleaned_data['min_deposit']]
+                if form.cleaned_data['max_deposit']:
+                    queryset_filtered = [obj for obj in queryset_filtered if
+                                         obj.deposit_announced and obj.deposit_announced <= form.cleaned_data['max_deposit']]
+                if form.cleaned_data['min_rent']:
+                    queryset_filtered = [obj for obj in queryset_filtered if
+                                         obj.rent_announced and obj.rent_announced >= form.cleaned_data['min_rent']]
+                if form.cleaned_data['max_rent']:
+                    queryset_filtered = [obj for obj in queryset_filtered if
+                                         obj.rent_announced and obj.rent_announced <= form.cleaned_data['max_rent']]
+                if form.cleaned_data['min_area']:
+                    queryset_filtered = [obj for obj in queryset_filtered if obj.area >= form.cleaned_data['min_area']]
+                if form.cleaned_data['max_area']:
+                    queryset_filtered = [obj for obj in queryset_filtered if obj.area <= form.cleaned_data['max_area']]
+                if form.cleaned_data['min_room']:
+                    queryset_filtered = [obj for obj in queryset_filtered if
+                                         int(obj.room) >= int(form.cleaned_data['min_room'])]
+                if form.cleaned_data['max_room']:
+                    queryset_filtered = [obj for obj in queryset_filtered if
+                                         int(obj.room) <= int(form.cleaned_data['max_room'])]
+                if form.cleaned_data['min_age']:
+                    queryset_filtered = [obj for obj in queryset_filtered if
+                                         int(obj.age) >= int(form.cleaned_data['min_age'])]
+                if form.cleaned_data['max_age']:
+                    queryset_filtered = [obj for obj in queryset_filtered if
+                                         int(obj.age) <= int(form.cleaned_data['max_age'])]
+                if form.cleaned_data['min_level']:
+                    queryset_filtered = [obj for obj in queryset_filtered if
+                                         int(obj.level) >= int(form.cleaned_data['min_level'])]
+                if form.cleaned_data['max_level']:
+                    queryset_filtered = [obj for obj in queryset_filtered if
+                                         int(obj.level) <= int(form.cleaned_data['max_level'])]
+
+                return queryset_filtered
+            return queryset_default
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        form = forms.RentFileFilterForm(self.request.GET)
-
-        if self.request.GET.get('province'):
-            form.fields['city'].queryset = models.City.objects.filter(province_id=self.request.GET.get('province'))
-        if self.request.GET.get('city'):
-            form.fields['district'].queryset = models.District.objects.filter(city_id=self.request.GET.get('city'))
-        if self.request.GET.get('district'):
-            form.fields['sub_district'].queryset = models.SubDistrict.objects.filter(district_id=self.request.GET.get('district'))
-
+        if self.request.user.title == 'fp':
+            form = forms.RentFileAgentFilterForm(self.request.GET)
+        else:
+            form = forms.RentFileFilterForm(self.request.GET)
+            if self.request.GET.get('province'):
+                form.fields['city'].queryset = models.City.objects.filter(province_id=self.request.GET.get('province'))
+            if self.request.GET.get('city'):
+                form.fields['district'].queryset = models.District.objects.filter(city_id=self.request.GET.get('city'))
+            if self.request.GET.get('district'):
+                form.fields['sub_district'].queryset = models.SubDistrict.objects.filter(district_id=self.request.GET.get('district'))
         context['filter_form'] = form
         return context
 
@@ -960,7 +1109,7 @@ class RenterDeleteView(PermissionRequiredMixin, DeleteView):
         return self.render_to_response(self.get_context_data(form=form))
 
 
-# --------------------------------- Tasks --------------------------------
+# ---------------------------------- Tasks ---------------------------------
 class TaskFPListView(ReadOnlyPermissionMixin, ListView):
     model = models.Task
     template_name = 'dashboard/tasks/task_fp_list.html'
@@ -969,8 +1118,15 @@ class TaskFPListView(ReadOnlyPermissionMixin, ListView):
     permission_model = 'Task'
 
     def get_queryset(self):
-        queryset = models.Task.objects.select_related('agent', 'sub_district', 'sale_file', 'rent_file')
-        return queryset
+        if self.request.user.title == 'bs':
+            queryset = models.Task.objects.select_related('agent', 'sale_file', 'rent_file')
+            return queryset
+        elif self.request.user.title == 'fp':
+            agent = self.request.user
+            queryset = models.Task.objects.select_related('agent', 'sale_file', 'rent_file').filter(agent=agent)
+            return queryset
+        else:
+            return models.Task.objects.none()
 
 
 class TaskCPListView(ReadOnlyPermissionMixin, ListView):
@@ -981,8 +1137,15 @@ class TaskCPListView(ReadOnlyPermissionMixin, ListView):
     permission_model = 'Task'
 
     def get_queryset(self):
-        queryset = models.Task.objects.select_related('agent', 'sub_district', 'buyer', 'renter')
-        return queryset
+        if self.request.user.title == 'bs':
+            queryset = models.Task.objects.select_related('agent', 'sale_file', 'rent_file')
+            return queryset
+        elif self.request.user.title == 'cp':
+            agent = self.request.user
+            queryset = models.Task.objects.select_related('agent', 'sale_file', 'rent_file').filter(agent=agent)
+            return queryset
+        else:
+            return models.Task.objects.none()
 
 
 class TaskBTListView(ReadOnlyPermissionMixin, ListView):
@@ -993,8 +1156,15 @@ class TaskBTListView(ReadOnlyPermissionMixin, ListView):
     permission_model = 'Task'
 
     def get_queryset(self):
-        queryset = models.Task.objects.select_related('agent', 'sub_district', 'buyer', 'renter', 'sale_file', 'rent_file')
-        return queryset
+        if self.request.user.title == 'bs':
+            queryset = models.Task.objects.select_related('agent', 'sale_file', 'rent_file')
+            return queryset
+        elif self.request.user.title == 'bt':
+            agent = self.request.user
+            queryset = models.Task.objects.select_related('agent', 'sale_file', 'rent_file').filter(agent=agent)
+            return queryset
+        else:
+            return models.Task.objects.none()
 
 
 class TaskCreateView(PermissionRequiredMixin, CreateView):
@@ -1030,7 +1200,75 @@ class TaskCreateView(PermissionRequiredMixin, CreateView):
         return reverse('dashboard')
 
 
+class TaskUpdateView(PermissionRequiredMixin, UpdateView):
+    model = models.Task
+    form_class = forms.TaskCreateForm
+    template_name = 'dashboard/tasks/task_update.html'
+    context_object_name = 'task'
+    permission_model = 'Task'
+    permission_action = 'update'
 
+    def form_valid(self, form):
+        messages.success(self.request, "تغییرات شما در سامانه ثبت شد.")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        self.object = None
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_success_url(self):
+        task_type = self.object.type
+        if task_type == 'cp':
+            return reverse('task_cp_list')
+        elif task_type == 'fp':
+            return reverse('task_fp_list')
+        elif task_type == 'bt':
+            return reverse('task_bt_list')
+        return reverse('dashboard')
+
+
+class TaskDeleteView(PermissionRequiredMixin, DeleteView):
+    model = models.Task
+    template_name = 'dashboard/tasks/task_delete.html'
+    success_url = reverse_lazy('dashboard')
+    context_object_name = 'task'
+    permission_model = 'Task'
+    permission_action = 'delete'
+
+    def form_valid(self, form):
+        messages.error(self.request, "وظیفه مربوطه از سامانه حذف شد.")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        self.object = None
+        return self.render_to_response(self.get_context_data(form=form))
+
+
+class TaskResultView(PermissionRequiredMixin, UpdateView):
+    model = models.Task
+    form_class = forms.TaskResultForm
+    template_name = 'dashboard/tasks/task_result.html'
+    context_object_name = 'task'
+    permission_model = 'Task'
+    permission_action = 'update'
+
+    def form_valid(self, form):
+        messages.success(self.request, "تغییرات شما در سامانه ثبت شد (و توسط مدیر مشاهده خواهد شد).")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        self.object = None
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_success_url(self):
+        task_type = self.object.type
+        if task_type == 'cp':
+            return reverse('task_cp_list')
+        elif task_type == 'fp':
+            return reverse('task_fp_list')
+        elif task_type == 'bt':
+            return reverse('task_bt_list')
+        return reverse('dashboard')
 
 
 

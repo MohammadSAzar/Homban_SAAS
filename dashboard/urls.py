@@ -54,9 +54,11 @@ urlpatterns = [
     path('tasks/for-files/', views.TaskFPListView.as_view(), name='task_fp_list'),
     path('tasks/for-customers/', views.TaskCPListView.as_view(), name='task_cp_list'),
     path('tasks/dual/', views.TaskBTListView.as_view(), name='task_bt_list'),
-    # re_path(r'person/update/(?P<slug>[-\w]+)/', views.PersonUpdateView.as_view(), name='person_update'),
-    # re_path(r'person/delete/(?P<slug>[-\w]+)/', views.PersonDeleteView.as_view(), name='person_delete'),
+    re_path(r'task/update/(?P<pk>[-\w]+)/(?P<slug>[-\w]+)/', views.TaskUpdateView.as_view(), name='task_update'),
+    re_path(r'task/result/(?P<pk>[-\w]+)/(?P<slug>[-\w]+)/', views.TaskResultView.as_view(), name='task_result'),
+    re_path(r'task/delete/(?P<pk>[-\w]+)/(?P<slug>[-\w]+)/', views.TaskDeleteView.as_view(), name='task_delete'),
     re_path(r'task/create/', views.TaskCreateView.as_view(), name='task_create'),
 ]
+
 
 

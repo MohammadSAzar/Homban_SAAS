@@ -31,47 +31,55 @@
                                             {% csrf_token %}
     
                                             <!-- province -->
-                                            <div class="form-group">
-                                                <label class="form-label" for="{{ filter_form.province.id_for_label }}">استان</label>
-                                                {% render_field filter_form.province type="text" id="province" class="form-control" %}
-                                            </div>
-                                            {% if filter_form.province.errors %}
-                                                {% for error in filter_form.province.errors %}
-                                                    <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
-                                                {% endfor %}
+                                            {% if request.user.title != 'fp' %}
+                                                <div class="form-group">
+                                                    <label class="form-label" for="{{ filter_form.province.id_for_label }}">استان</label>
+                                                    {% render_field filter_form.province type="text" id="province" class="form-control" %}
+                                                </div>
+                                                {% if filter_form.province.errors %}
+                                                    {% for error in filter_form.province.errors %}
+                                                        <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                                    {% endfor %}
+                                                {% endif %}
                                             {% endif %}
                                             
                                             <!-- city -->
-                                            <div class="form-group">
-                                                <label class="form-label" for="{{ filter_form.city.id_for_label }}">شهر</label>
-                                                {% render_field filter_form.city type="text" id="city" class="form-control" %}
-                                            </div>
-                                            {% if filter_form.city.errors %}
-                                                {% for error in filter_form.city.errors %}
-                                                    <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
-                                                {% endfor %}
+                                            {% if request.user.title != 'fp' %}
+                                                <div class="form-group">
+                                                    <label class="form-label" for="{{ filter_form.city.id_for_label }}">شهر</label>
+                                                    {% render_field filter_form.city type="text" id="city" class="form-control" %}
+                                                </div>
+                                                {% if filter_form.city.errors %}
+                                                    {% for error in filter_form.city.errors %}
+                                                        <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                                    {% endfor %}
+                                                {% endif %}
                                             {% endif %}
                                             
                                             <!-- district -->
-                                            <div class="form-group">
-                                                <label class="form-label" for="{{ filter_form.district.id_for_label }}">محله</label>
-                                                {% render_field filter_form.district type="text" id="district" class="form-control" %}
-                                            </div>
-                                            {% if filter_form.district.errors %}
-                                                {% for error in filter_form.district.errors %}
-                                                    <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
-                                                {% endfor %}
+                                            {% if request.user.title != 'fp' %}
+                                                <div class="form-group">
+                                                    <label class="form-label" for="{{ filter_form.district.id_for_label }}">محله</label>
+                                                    {% render_field filter_form.district type="text" id="district" class="form-control" %}
+                                                </div>
+                                                {% if filter_form.district.errors %}
+                                                    {% for error in filter_form.district.errors %}
+                                                        <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                                    {% endfor %}
+                                                {% endif %}
                                             {% endif %}
                                             
                                             <!-- sub_district -->
-                                            <div class="form-group">
-                                                <label class="form-label" for="{{ filter_form.sub_district.id_for_label }}">زیرمحله</label>
-                                                {% render_field filter_form.sub_district type="text" id="sub_district" class="form-control" %}
-                                            </div>
-                                            {% if filter_form.sub_district.errors %}
-                                                {% for error in filter_form.sub_district.errors %}
-                                                    <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
-                                                {% endfor %}
+                                            {% if request.user.title != 'fp' %}
+                                                <div class="form-group">
+                                                    <label class="form-label" for="{{ filter_form.sub_district.id_for_label }}">زیرمحله</label>
+                                                    {% render_field filter_form.sub_district type="text" id="sub_district" class="form-control" %}
+                                                </div>
+                                                {% if filter_form.sub_district.errors %}
+                                                    {% for error in filter_form.sub_district.errors %}
+                                                        <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                                    {% endfor %}
+                                                {% endif %}
                                             {% endif %}
                                         
                                             <!-- source -->

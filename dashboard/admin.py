@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
 from . import models
-from .forms import AdminCustomUserCreationForm, AdminCustomUserChangeForm
+from .forms import AdminCustomUserCreationForm, AdminCustomUserChangeForm, TaskAdminForm
 
 
 # --------------------------------- CUM -----------------------------------
@@ -10,10 +10,10 @@ class CustomUserAdmin(BaseUserAdmin):
     form = AdminCustomUserChangeForm
     add_form = AdminCustomUserCreationForm
 
-    list_display = ('username', 'title',)
+    list_display = ('username', 'title', 'sub_district',)
     list_filter = ('title',)
     fieldsets = (
-        (None, {'fields': ('username', 'password',)}),
+        (None, {'fields': ('username', 'password', 'sub_district',)}),
         ('Permissions', {'fields': ('title',)}),
     )
     add_fieldsets = (
@@ -128,9 +128,11 @@ class TradeAdmin(admin.ModelAdmin):
 # --------------------------------- MNGs ----------------------------------
 @admin.register(models.Task)
 class TaskAdmin(admin.ModelAdmin):
+    form = TaskAdminForm
     list_display = ('title', 'type', 'agent', 'sub_district', 'code', 'deadline',)
     ordering = ('-datetime_created',)
-    list_filter = ('type', 'status', 'agent',)
+    list_filter = ['type', 'status', 'deadline']
+    search_fields = ['title', 'agent__username', 'code']
     readonly_fields = ('code', 'datetime_created',)
     prepopulated_fields = {'slug': ('title',)}
 
