@@ -1061,7 +1061,7 @@ class RenterCreateView(PermissionRequiredMixin, CreateView):
             return self.form_invalid(form)
 
     def form_valid(self, form):
-        messages.success(self.request, "خریدار جدید سامانه ثبت شد (این اطلاعات توسط مدیر بررسی خواهد شد).")
+        messages.success(self.request, "موجر جدید سامانه ثبت شد (این اطلاعات توسط مدیر بررسی خواهد شد).")
         return super().form_valid(form)
 
     def form_invalid(self, form):

@@ -340,11 +340,18 @@ class PersonCreateForm(forms.ModelForm):
 
 
 class BuyerCreateForm(forms.ModelForm):
+    sub_districts = forms.ModelMultipleChoiceField(
+        queryset=models.SubDistrict.objects.all(),
+        widget=forms.SelectMultiple(attrs={'class': 'select2'}),
+        required=False,
+        label='Interested Sub-Districts'
+    )
+
     class Meta:
         model = models.Buyer
-        fields = ['name', 'phone_number', 'description', 'province', 'city', 'district', 'budget_announced', 'budget_max',
-                  'budget_status', 'room_max', 'room_min', 'area_max', 'area_min', 'age_max', 'age_min',
-                  'document', 'parking', 'elevator', 'warehouse']
+        fields = ['name', 'phone_number', 'description', 'province', 'city', 'district', 'sub_districts',
+                  'budget_announced', 'budget_max', 'budget_status', 'room_max', 'room_min', 'area_max', 'area_min',
+                  'age_max', 'age_min', 'document', 'parking', 'elevator', 'warehouse']
         widgets = {
             'province': forms.Select(attrs={'id': 'province'}),
             'city': forms.Select(attrs={'id': 'city'}),
@@ -405,11 +412,19 @@ class BuyerFilterForm(forms.Form):
 
 
 class RenterCreateForm(forms.ModelForm):
+    sub_districts = forms.ModelMultipleChoiceField(
+        queryset=models.SubDistrict.objects.all(),
+        widget=forms.SelectMultiple(attrs={'class': 'select2'}),
+        required=False,
+        label='Interested Sub-Districts'
+    )
+
     class Meta:
         model = models.Renter
-        fields = ['name', 'phone_number', 'description', 'province', 'city', 'district', 'deposit_announced', 'deposit_max',
-                  'rent_announced', 'rent_max', 'budget_status', 'convertable', 'room_max', 'room_min', 'area_max', 'area_min',
-                  'age_max', 'age_min', 'document', 'parking', 'elevator', 'warehouse']
+        fields = ['name', 'phone_number', 'description', 'province', 'city', 'district', 'sub_districts',
+                  'deposit_announced', 'deposit_max', 'rent_announced', 'rent_max', 'budget_status', 'convertable',
+                  'room_max', 'room_min', 'area_max', 'area_min', 'age_max', 'age_min', 'document',
+                  'parking', 'elevator', 'warehouse']
         widgets = {
             'province': forms.Select(attrs={'id': 'province'}),
             'city': forms.Select(attrs={'id': 'city'}),

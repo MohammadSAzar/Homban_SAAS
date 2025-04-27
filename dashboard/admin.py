@@ -89,6 +89,7 @@ class BuyerAdmin(admin.ModelAdmin):
                     'datetime_created')
     ordering = ('-datetime_created',)
     readonly_fields = ('code', 'datetime_created',)
+    filter_horizontal = ('sub_districts',)
 
 
 @admin.register(models.Renter)
@@ -97,6 +98,7 @@ class RenterAdmin(admin.ModelAdmin):
                     'budget_status', 'convertable', 'datetime_created')
     ordering = ('-datetime_created',)
     readonly_fields = ('code', 'datetime_created',)
+    filter_horizontal = ('sub_districts',)
 
 
 # --------------------------------- SERV ---------------------------------

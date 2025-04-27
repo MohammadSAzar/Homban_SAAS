@@ -507,6 +507,7 @@ class Buyer(models.Model):
     province = models.ForeignKey(Province, on_delete=models.SET_NULL, null=True, blank=True, related_name='buyers', verbose_name=_('Province'))
     city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True, blank=True, related_name='buyers', verbose_name=_('City'))
     district = models.ForeignKey(District, on_delete=models.SET_NULL, null=True, blank=True, related_name='buyers', verbose_name=_('District'))
+    sub_districts = models.ManyToManyField(SubDistrict, blank=True, related_name='buyers', verbose_name=_('Sub-Districts'))
     # properties
     budget_announced = models.PositiveBigIntegerField(blank=True, null=True, verbose_name=_('Announced Budget'))
     budget_max = models.PositiveBigIntegerField(blank=True, null=True, verbose_name=_('Max Budget'))
@@ -548,6 +549,7 @@ class Renter(models.Model):
     province = models.ForeignKey(Province, on_delete=models.SET_NULL, null=True, blank=True, related_name='renters', verbose_name=_('Province'))
     city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True, blank=True, related_name='renters', verbose_name=_('City'))
     district = models.ForeignKey(District, on_delete=models.SET_NULL, null=True, blank=True, related_name='renters', verbose_name=_('District'))
+    sub_districts = models.ManyToManyField(SubDistrict, blank=True, related_name='renters', verbose_name=_('Sub-Districts'))
     # properties
     deposit_announced = models.PositiveBigIntegerField(blank=True, null=True, verbose_name=_('Announced Deposit'))
     deposit_max = models.PositiveBigIntegerField(blank=True, null=True, verbose_name=_('Max Deposit'))
