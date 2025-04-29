@@ -131,7 +131,7 @@ class TradeAdmin(admin.ModelAdmin):
 @admin.register(models.Task)
 class TaskAdmin(admin.ModelAdmin):
     form = TaskAdminForm
-    list_display = ('title', 'type', 'agent', 'sub_district', 'code', 'deadline',)
+    list_display = ('title', 'status', 'type', 'agent', 'sub_district', 'code', 'deadline',)
     ordering = ('-datetime_created',)
     list_filter = ['type', 'status', 'deadline']
     search_fields = ['title', 'agent__username', 'code']

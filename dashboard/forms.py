@@ -567,7 +567,7 @@ class SubDistrictCreateForm(forms.ModelForm):
             field.required = True
 
 
-# --------------------------------- Tasks ---------------------------------
+# ---------------------------------- Tasks ----------------------------------
 task_required_fields = ['title', 'type', 'agent', 'deadline', 'description']
 task_result_required_fields = ['result', 'status']
 
@@ -593,17 +593,16 @@ class TaskResultForm(forms.ModelForm):
         model = models.Task
         fields = ['result', 'status']
 
-    def __init__(self, *args, **kwargs):
-        super(TaskResultForm, self).__init__(*args, **kwargs)
-        for field in task_result_required_fields:
-            self.fields[field].required = True
-
     def clean(self):
         cleaned_data = super().clean()
         status = cleaned_data.get('status')
+        result = cleaned_data.get('result')
 
-        if status != 'UR':
-            self.add_error('status', "برای ثبت نتیجه، وضعیت را به 'تحویل داده شده' تغییر دهید.")
+        if result != '':
+            if status != 'UR':
+                self.add_error('status', "برای ثبت نتیجه، وضعیت را به 'تحویل داده شده' تغییر دهید.")
+        if status == 'CL':
+            self.add_error('status', "بستن وظیفه فقط از طریق پنل مدیر ممکن است.")
 
         return cleaned_data
 
@@ -621,4 +620,6 @@ class TaskAdminForm(forms.ModelForm):
             required=False,
             label=self.fields['deadline'].label,
         )
+
+
 

@@ -1174,6 +1174,13 @@ class TaskBTListView(ReadOnlyPermissionMixin, ListView):
             return models.Task.objects.none()
 
 
+class TaskDetailView(ReadOnlyPermissionMixin, DetailView):
+    model = models.Task
+    context_object_name = 'task'
+    template_name = 'dashboard/tasks/task_detail.html'
+    permission_model = 'Task'
+
+
 class TaskCreateView(PermissionRequiredMixin, CreateView):
     model = models.Task
     form_class = forms.TaskCreateForm
