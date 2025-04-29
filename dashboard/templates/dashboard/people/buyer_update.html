@@ -72,7 +72,7 @@
                             </div>
 
                             <!-- province -->
-                            <div class="col-lg-4 col-sm-4">
+                            <div class="col-lg-2 col-sm-2">
                                 <div class="form-group">
                                     <div class="form-control-wrap">
                                         <label class="form-label" for="{{ form.province.id_for_label }}">استان</label>
@@ -87,7 +87,7 @@
                             </div>
 
                             <!-- city -->
-                            <div class="col-lg-4 col-sm-4">
+                            <div class="col-lg-2 col-sm-2">
                                 <div class="form-group">
                                     <div class="form-control-wrap">
                                         <label class="form-label" for="{{ form.city.id_for_label }}">شهر</label>
@@ -102,7 +102,7 @@
                             </div>
 
                             <!-- district -->
-                            <div class="col-lg-4 col-sm-4">
+                            <div class="col-lg-3 col-sm-3">
                                 <div class="form-group">
                                     <div class="form-control-wrap">
                                         <label class="form-label" for="{{ form.district.id_for_label }}">محله (منطقه)</label>
@@ -115,7 +115,109 @@
                                     {% endif %}
                                 </div>
                             </div>
-    
+                        
+                            <!-- sub_districts -->
+                            <div class="col-lg-5 col-sm-5">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.sub_districts.id_for_label }}">زیرمحله‌ها</label>
+                                        <input type="text" id="sub_districts_trigger" readonly placeholder="زیرمحله را انتخاب کنید..." class="form-control form-control-xl form-control-outlined" style="cursor: pointer;">
+                                        <div style="display: none;">
+                                            {% render_field form.sub_districts id="sub_districts" class="hidden-real-subdistricts" %}
+                                        </div>
+                                    </div>
+                                    {% if form.sub_districts.errors %}
+                                        {% for error in form.sub_districts.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        
+                            <!-- sub_districts modal -->
+                            <div class="modal fade" id="subDistrictsModal" tabindex="-1" aria-labelledby="subDistrictsModalLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-scrollable">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="subDistrictsModalLabel">انتخاب زیرمحله‌ها</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="بستن"></button>
+                                        </div>
+                                        <div class="modal-body" style="max-height: 400px; overflow-y: auto;">
+                                            <div id="subDistrictsModalBody">
+                                            {% for subdistrict in form.fields.sub_districts.queryset %}
+                                                <div class="form-check mb-2">
+                                                    <input
+                                                        class="form-check-input" style="margin-top: 0.35rem;"
+                                                        type="checkbox"
+                                                        name="sub_districts"
+                                                        value="{{ subdistrict.id }}"
+                                                        id="subdistrict_{{ subdistrict.id }}"
+                                                    >
+                                                    <label class="form-check-label" for="subdistrict_{{ subdistrict.id }}">
+                                                        {{ subdistrict.name }}
+                                                    </label>
+                                                </div>
+                                            {% endfor %}
+                                          </div>
+                                      </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-primary" id="confirmSubDistricts">تأیید</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- sub_districts JS -->
+                            <script>
+                                document.addEventListener('DOMContentLoaded', function() {
+                                    var subDistrictsField = document.getElementById('sub_districts');
+                                    var triggerInput = document.getElementById('sub_districts_trigger');
+                                    var confirmButton = document.getElementById('confirmSubDistricts');
+                            
+                                    // Pre-select checkboxes and update trigger input on page load (for edit mode)
+                                    var selectedSubDistricts = Array.from(subDistrictsField.options)
+                                        .filter(option => option.selected)
+                                        .map(option => option.value);
+                            
+                                    var selectedNames = [];
+                            
+                                    document.querySelectorAll('#subDistrictsModalBody input[type="checkbox"]').forEach(function(checkbox) {
+                                        if (selectedSubDistricts.includes(checkbox.value)) {
+                                            checkbox.checked = true;
+                                            selectedNames.push(checkbox.nextElementSibling.innerText.trim());
+                                        }
+                                    });
+                            
+                                    triggerInput.value = selectedNames.join(', ');
+                            
+                                    // Open modal
+                                    triggerInput.addEventListener('click', function() {
+                                        var modal = new bootstrap.Modal(document.getElementById('subDistrictsModal'));
+                                        modal.show();
+                                    });
+                            
+                                    // Confirm and sync with hidden field
+                                    confirmButton.addEventListener('click', function() {
+                                        var selectedIds = [];
+                                        var selectedNames = [];
+                            
+                                        document.querySelectorAll('#subDistrictsModalBody input[type="checkbox"]:checked').forEach(function(checkbox) {
+                                            selectedIds.push(checkbox.value);
+                                            selectedNames.push(checkbox.nextElementSibling.innerText.trim());
+                                        });
+                            
+                                        for (var i = 0; i < subDistrictsField.options.length; i++) {
+                                            subDistrictsField.options[i].selected = selectedIds.includes(subDistrictsField.options[i].value);
+                                        }
+                            
+                                        triggerInput.value = selectedNames.join(', ');
+                            
+                                        var modal = bootstrap.Modal.getInstance(document.getElementById('subDistrictsModal'));
+                                        modal.hide();
+                                    });
+                                });
+                            </script>
+                        
                             <!-- budget_announced -->
                             <div class="col-lg-4 col-sm-4">
                                 <div class="form-group">

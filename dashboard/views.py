@@ -856,7 +856,7 @@ class BuyerListView(ReadOnlyPermissionMixin, ListView):
     permission_model = 'Buyer'
 
     def get_queryset(self):
-        queryset_default = models.Buyer.objects.select_related('province', 'city', 'district')
+        queryset_default = models.Buyer.objects.select_related('province', 'city', 'district').prefetch_related('sub_districts')
         form = forms.BuyerFilterForm(self.request.GET)
 
         if form.is_valid():
@@ -867,6 +867,8 @@ class BuyerListView(ReadOnlyPermissionMixin, ListView):
                 queryset_filtered = queryset_filtered.filter(city=form.cleaned_data['city'])
             if form.cleaned_data['district']:
                 queryset_filtered = queryset_filtered.filter(district=form.cleaned_data['district'])
+            if form.cleaned_data['sub_districts']:
+                queryset_filtered = queryset_filtered.filter(sub_districts__in=form.cleaned_data['sub_districts']).distinct()
             if form.cleaned_data['budget_status']:
                 queryset_filtered = queryset_filtered.filter(budget_status=form.cleaned_data['budget_status'])
             if form.cleaned_data['document']:
@@ -888,7 +890,10 @@ class BuyerListView(ReadOnlyPermissionMixin, ListView):
                 queryset_filtered = [obj for obj in queryset_filtered if
                                      obj.budget_announced and obj.budget_announced <= form.cleaned_data['max_budget']]
 
+            print(queryset_filtered, 'PUSSY')
+
             return queryset_filtered
+        print(queryset_default, 'COCK')
         return queryset_default
 
     def get_context_data(self, **kwargs):
@@ -983,7 +988,7 @@ class RenterListView(ReadOnlyPermissionMixin, ListView):
     permission_model = 'Renter'
 
     def get_queryset(self):
-        queryset_default = models.Renter.objects.select_related('province', 'city', 'district')
+        queryset_default = models.Renter.objects.select_related('province', 'city', 'district').prefetch_related('sub_districts')
         form = forms.RenterFilterForm(self.request.GET)
 
         if form.is_valid():
@@ -994,6 +999,8 @@ class RenterListView(ReadOnlyPermissionMixin, ListView):
                 queryset_filtered = queryset_filtered.filter(city=form.cleaned_data['city'])
             if form.cleaned_data['district']:
                 queryset_filtered = queryset_filtered.filter(district=form.cleaned_data['district'])
+            if form.cleaned_data['sub_districts']:
+                queryset_filtered = queryset_filtered.filter(sub_districts__in=form.cleaned_data['sub_districts']).distinct()
             if form.cleaned_data['budget_status']:
                 queryset_filtered = queryset_filtered.filter(budget_status=form.cleaned_data['budget_status'])
             if form.cleaned_data['convertable']:

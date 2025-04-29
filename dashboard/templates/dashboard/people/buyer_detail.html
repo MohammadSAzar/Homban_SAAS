@@ -67,6 +67,17 @@
                                 <span class="data-value">{{ buyer.district }}</span>
                             </div>
                         </div>
+                        <!-- sun_district -->
+                        <div class="data-item" data-bs-toggle="modal" data-bs-target="#profile-edit">
+                            <div class="data-col">
+                                <span class="data-label">زیرمحله‌ها:</span>
+                                <span class="data-value">
+                                    {% for sub_district in buyer.sub_districts.all %}
+                                        {{ sub_district }} |
+                                    {% endfor %}
+                                </span>
+                            </div>
+                        </div>
                         <!-- budget_announced -->
                         <div class="data-item" data-bs-toggle="modal" data-bs-target="#profile-edit">
                             <div class="data-col">

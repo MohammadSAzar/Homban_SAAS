@@ -319,6 +319,15 @@ class RentFileAgentFilterForm(forms.Form):
 
 
 # -------------------------------- People --------------------------------
+buyer_required_fields = ['name', 'phone_number', 'description', 'province', 'city', 'district', 'sub_districts',
+                         'budget_announced', 'budget_status', 'room_max', 'room_min', 'area_max', 'area_min',
+                         'age_max', 'age_min', 'document', 'parking', 'elevator', 'warehouse']
+
+renter_required_fields = ['name', 'phone_number', 'description', 'province', 'city', 'district', 'sub_districts',
+                          'deposit_announced', 'rent_announced', 'budget_status', 'convertable', 'room_max', 'room_min',
+                          'area_max', 'area_min', 'age_max', 'age_min', 'document', 'parking', 'elevator', 'warehouse']
+
+
 class PersonCreateForm(forms.ModelForm):
     class Meta:
         model = models.Person
@@ -360,8 +369,8 @@ class BuyerCreateForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        for field in self.fields.values():
-            field.required = True
+        for field in buyer_required_fields:
+            self.fields[field].required = True
 
     def clean(self):
         cleaned_data = super().clean()
@@ -386,6 +395,12 @@ class BuyerCreateForm(forms.ModelForm):
 
 
 class BuyerFilterForm(forms.Form):
+    sub_districts = forms.ModelMultipleChoiceField(
+        queryset=models.SubDistrict.objects.all(),
+        widget=forms.SelectMultiple(attrs={'class': 'select2'}),
+        required=False,
+        label='Sub-Districts'
+    )
     province = forms.ModelChoiceField(queryset=models.Province.objects.all(), required=False, label=_('Province'))
     city = forms.ModelChoiceField(queryset=models.City.objects.all(), required=False, label=_('City'))
     district = forms.ModelChoiceField(queryset=models.District.objects.all(), required=False, label=_('District'))
@@ -433,8 +448,8 @@ class RenterCreateForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        for field in self.fields.values():
-            field.required = True
+        for field in renter_required_fields:
+            self.fields[field].required = True
 
     def clean(self):
         cleaned_data = super().clean()
@@ -465,6 +480,12 @@ class RenterCreateForm(forms.ModelForm):
 
 
 class RenterFilterForm(forms.Form):
+    sub_districts = forms.ModelMultipleChoiceField(
+        queryset=models.SubDistrict.objects.all(),
+        widget=forms.SelectMultiple(attrs={'class': 'select2'}),
+        required=False,
+        label='Sub-Districts'
+    )
     province = forms.ModelChoiceField(queryset=models.Province.objects.all(), required=False, label=_('Province'))
     city = forms.ModelChoiceField(queryset=models.City.objects.all(), required=False, label=_('City'))
     district = forms.ModelChoiceField(queryset=models.District.objects.all(), required=False, label=_('District'))
