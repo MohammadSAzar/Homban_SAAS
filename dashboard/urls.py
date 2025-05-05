@@ -35,8 +35,8 @@ urlpatterns = [
     re_path(r'location/sub_district/create/', views.SubDistrictCreateView.as_view(), name='sub_district_create'),
     # persons
     path('persons/', views.PersonListView.as_view(), name='person_list'),
-    re_path(r'person/update/(?P<slug>[-\w]+)/', views.PersonUpdateView.as_view(), name='person_update'),
-    re_path(r'person/delete/(?P<slug>[-\w]+)/', views.PersonDeleteView.as_view(), name='person_delete'),
+    re_path(r'person/update/(?P<pk>[-\w]+)/', views.PersonUpdateView.as_view(), name='person_update'),
+    re_path(r'person/delete/(?P<pk>[-\w]+)/', views.PersonDeleteView.as_view(), name='person_delete'),
     re_path(r'person/create/', views.PersonCreateView.as_view(), name='person_create'),
     # buyers
     path('buyers/', views.BuyerListView.as_view(), name='buyer_list'),
@@ -54,6 +54,9 @@ urlpatterns = [
     path('tasks/for-files/', views.TaskFPListView.as_view(), name='task_fp_list'),
     path('tasks/for-customers/', views.TaskCPListView.as_view(), name='task_cp_list'),
     path('tasks/dual/', views.TaskBTListView.as_view(), name='task_bt_list'),
+    path('tasks/boss/under-review/', views.TaskBossURListView.as_view(), name='task_bs_ur_list'),
+    path('tasks/boss/open/', views.TaskBossOPListView.as_view(), name='task_bs_op_list'),
+    path('tasks/boss/close/', views.TaskBossCLListView.as_view(), name='task_bs_cl_list'),
     re_path(r'task/update/(?P<pk>[-\w]+)/(?P<slug>[-\w]+)/', views.TaskUpdateView.as_view(), name='task_update'),
     re_path(r'task/result/(?P<pk>[-\w]+)/(?P<slug>[-\w]+)/', views.TaskResultView.as_view(), name='task_result'),
     re_path(r'task/detail/(?P<pk>[-\w]+)/(?P<slug>[-\w]+)/', views.TaskDetailView.as_view(), name='task_detail'),

@@ -38,11 +38,11 @@
                         <!-- end: Title -->
 
                         <!-- Form -->
-                        <form class="row gy-4" method="post"  enctype="multipart/form-data" novalidate>
+                        <form class="row gy-4" method="post" enctype="multipart/form-data" novalidate>
                             {% csrf_token %}
 
                             <!-- type -->
-                            <div class="col-lg-4 col-sm-4">
+                            <div class="col-lg-6 col-sm-6">
                                 <div class="form-group">
                                     <div class="form-control-wrap">
                                         <label class="form-label" for="{{ form.type.id_for_label }}">نوع وظیفه</label>
@@ -57,7 +57,7 @@
                             </div>
 
                             <!-- agent -->
-                            <div class="col-lg-4 col-sm-4">
+                            <div class="col-lg-6 col-sm-6">
                                 <div class="form-group">
                                     <div class="form-control-wrap">
                                         <label class="form-label" for="{{ form.agent.id_for_label }}">مشاور</label>
@@ -65,21 +65,6 @@
                                     </div>
                                     {% if form.agent.errors %}
                                         {% for error in form.agent.errors %}
-                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
-                                        {% endfor %}
-                                    {% endif %}
-                                </div>
-                            </div>
-                            
-                            <!-- sub_district -->
-                            <div class="col-lg-4 col-sm-4">
-                                <div class="form-group">
-                                    <div class="form-control-wrap">
-                                        <label class="form-label" for="{{ form.sub_district.id_for_label }}">زیرمحله</label>
-                                        {% render_field form.sub_district id="sub_district" type="text" class="form-control form-control-xl form-control-outlined" %}
-                                    </div>
-                                    {% if form.sub_district.errors %}
-                                        {% for error in form.sub_district.errors %}
                                             <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
                                         {% endfor %}
                                     {% endif %}

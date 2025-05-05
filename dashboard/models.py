@@ -94,37 +94,6 @@ def last_month_shamsi():
     return final_days
 
 
-# def next_month_shamsi():
-#     days = []
-#     today = date.today()
-#     for i in range(1, 31):
-#         next_day = today + timedelta(days=i)
-#         days.append({
-#             'result_day': next_day.strftime('%A'),
-#             'result_date': next_day.strftime('%Y/%m/%d')
-#         })
-#     for j in range(0, 30):
-#         if days[j]['result_day'] == 'Monday' or days[j]['result_day'] == 'monday':
-#             days[j]['result_day'] = 'دوشنبه'
-#         if days[j]['result_day'] == 'Tuesday' or days[j]['result_day'] == 'tuesday':
-#             days[j]['result_day'] = 'سه‌شنبه'
-#         if days[j]['result_day'] == 'Wednesday' or days[j]['result_day'] == 'wednesday':
-#             days[j]['result_day'] = 'چهارشنبه'
-#         if days[j]['result_day'] == 'Thursday' or days[j]['result_day'] == 'thursday':
-#             days[j]['result_day'] = 'پنج‌شنبه'
-#         if days[j]['result_day'] == 'Friday' or days[j]['result_day'] == 'friday':
-#             days[j]['result_day'] = 'جمعه'
-#         if days[j]['result_day'] == 'Saturday' or days[j]['result_day'] == 'saturday':
-#             days[j]['result_day'] = 'شنبه'
-#         if days[j]['result_day'] == 'Sunday' or days[j]['result_day'] == 'sunday':
-#             days[j]['result_day'] = 'یکشنبه'
-#     final_days = []
-#     for k in range(0, 30):
-#         converted_day = str(days[k]['result_day'] + ' - ' + days[k]['result_date'])
-#         final_days.append((
-#             'result_day', converted_day,
-#         ))
-#     return final_days
 def next_month_shamsi():
     days = []
     today = datetime.today()

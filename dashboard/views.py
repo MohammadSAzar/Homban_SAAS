@@ -890,10 +890,8 @@ class BuyerListView(ReadOnlyPermissionMixin, ListView):
                 queryset_filtered = [obj for obj in queryset_filtered if
                                      obj.budget_announced and obj.budget_announced <= form.cleaned_data['max_budget']]
 
-            print(queryset_filtered, 'PUSSY')
 
             return queryset_filtered
-        print(queryset_default, 'COCK')
         return queryset_default
 
     def get_context_data(self, **kwargs):
@@ -1117,6 +1115,51 @@ class RenterDeleteView(PermissionRequiredMixin, DeleteView):
 
 
 # ---------------------------------- Tasks ---------------------------------
+class TaskBossURListView(ReadOnlyPermissionMixin, ListView):
+    model = models.Task
+    template_name = 'dashboard/tasks/task_bs_ur_list.html'
+    context_object_name = 'tasks'
+    paginate_by = 12
+    permission_model = 'Task'
+
+    def get_queryset(self):
+        if self.request.user.title == 'bs':
+            queryset = models.Task.objects.select_related('agent', 'sale_file', 'rent_file', 'agent__sub_district').filter(status='UR')
+            return queryset
+        else:
+            return models.Task.objects.none()
+
+
+class TaskBossOPListView(ReadOnlyPermissionMixin, ListView):
+    model = models.Task
+    template_name = 'dashboard/tasks/task_bs_op_list.html'
+    context_object_name = 'tasks'
+    paginate_by = 12
+    permission_model = 'Task'
+
+    def get_queryset(self):
+        if self.request.user.title == 'bs':
+            queryset = models.Task.objects.select_related('agent', 'sale_file', 'rent_file', 'agent__sub_district').filter(status='OP')
+            return queryset
+        else:
+            return models.Task.objects.none()
+
+
+class TaskBossCLListView(ReadOnlyPermissionMixin, ListView):
+    model = models.Task
+    template_name = 'dashboard/tasks/task_bs_cl_list.html'
+    context_object_name = 'tasks'
+    paginate_by = 12
+    permission_model = 'Task'
+
+    def get_queryset(self):
+        if self.request.user.title == 'bs':
+            queryset = models.Task.objects.select_related('agent', 'sale_file', 'rent_file', 'agent__sub_district').filter(status='CL')
+            return queryset
+        else:
+            return models.Task.objects.none()
+
+
 class TaskFPListView(ReadOnlyPermissionMixin, ListView):
     model = models.Task
     template_name = 'dashboard/tasks/task_fp_list.html'
@@ -1126,11 +1169,11 @@ class TaskFPListView(ReadOnlyPermissionMixin, ListView):
 
     def get_queryset(self):
         if self.request.user.title == 'bs':
-            queryset = models.Task.objects.select_related('agent', 'sale_file', 'rent_file')
+            queryset = models.Task.objects.select_related('agent', 'sale_file', 'rent_file', 'agent__sub_district')
             return queryset
         elif self.request.user.title == 'fp':
             agent = self.request.user
-            queryset = models.Task.objects.select_related('agent', 'sale_file', 'rent_file').filter(agent=agent)
+            queryset = models.Task.objects.select_related('agent', 'sale_file', 'rent_file', 'agent__sub_district').filter(agent=agent)
             return queryset
         else:
             return models.Task.objects.none()
@@ -1145,11 +1188,11 @@ class TaskCPListView(ReadOnlyPermissionMixin, ListView):
 
     def get_queryset(self):
         if self.request.user.title == 'bs':
-            queryset = models.Task.objects.select_related('agent', 'sale_file', 'rent_file')
+            queryset = models.Task.objects.select_related('agent', 'sale_file', 'rent_file', 'agent__sub_district')
             return queryset
         elif self.request.user.title == 'cp':
             agent = self.request.user
-            queryset = models.Task.objects.select_related('agent', 'sale_file', 'rent_file').filter(agent=agent)
+            queryset = models.Task.objects.select_related('agent', 'sale_file', 'rent_file', 'agent__sub_district').filter(agent=agent)
             return queryset
         else:
             return models.Task.objects.none()
@@ -1164,11 +1207,11 @@ class TaskBTListView(ReadOnlyPermissionMixin, ListView):
 
     def get_queryset(self):
         if self.request.user.title == 'bs':
-            queryset = models.Task.objects.select_related('agent', 'sale_file', 'rent_file')
+            queryset = models.Task.objects.select_related('agent', 'sale_file', 'rent_file', 'agent__sub_district')
             return queryset
         elif self.request.user.title == 'bt':
             agent = self.request.user
-            queryset = models.Task.objects.select_related('agent', 'sale_file', 'rent_file').filter(agent=agent)
+            queryset = models.Task.objects.select_related('agent', 'sale_file', 'rent_file', 'agent__sub_district').filter(agent=agent)
             return queryset
         else:
             return models.Task.objects.none()

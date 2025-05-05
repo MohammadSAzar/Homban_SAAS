@@ -1,0 +1,105 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-05-03 15:40+0330\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+#: .\_base_dashboard.html:69
+msgid "Dashboard First Page"
+msgstr "داشبورد"
+
+#: .\_base_dashboard.html:77
+msgid "Locations"
+msgstr "لوکیشن‌ها"
+
+#: .\_base_dashboard.html:85
+msgid "Files"
+msgstr "فایل‌ها"
+
+#: .\_base_dashboard.html:89
+msgid "Sale Files"
+msgstr "فایل‌های فروش"
+
+#: .\_base_dashboard.html:92
+msgid "Rent Files"
+msgstr "فایل‌های اجاره"
+
+#: .\_base_dashboard.html:101
+msgid "People"
+msgstr "افراد"
+
+#: .\_base_dashboard.html:105
+msgid "Buyers"
+msgstr "خریداران"
+
+#: .\_base_dashboard.html:108
+msgid "Renters"
+msgstr "موجرها"
+
+#: .\_base_dashboard.html:111
+msgid "Persons"
+msgstr "آگهی‌دهندگان"
+
+#: .\_base_dashboard.html:120
+msgid "Services"
+msgstr "خدمات"
+
+#: .\_base_dashboard.html:124
+msgid "Visits"
+msgstr "بازدیدها"
+
+#: .\_base_dashboard.html:127
+msgid "Sessions"
+msgstr "نشست‌ها"
+
+#: .\_base_dashboard.html:130
+msgid "Trades"
+msgstr "معاملات"
+
+#: .\_base_dashboard.html:139
+msgid "Team"
+msgstr "تیم"
+
+#: .\_base_dashboard.html:143
+msgid "Agents"
+msgstr "مشاوران"
+
+#: .\_base_dashboard.html:146
+msgid "Create New Task"
+msgstr "ایجاد وظیفه جدید"
+
+#: .\_base_dashboard.html:149
+msgid "FP Tasks"
+msgstr "وظایف مشاور فایل‌ها"
+
+#: .\_base_dashboard.html:152
+msgid "CP Tasks"
+msgstr "وظایف مشاور مشتریان"
+
+#: .\_base_dashboard.html:155
+msgid "BT Tasks"
+msgstr "وظایف مشاور دوگانه"
+
+#: .\_base_dashboard.html:164
+msgid "Online Chat"
+msgstr "چت آنلاین"
+
+#: .\_base_dashboard.html:220
+msgid "Exit"
+msgstr "خروج"
+
+
+
