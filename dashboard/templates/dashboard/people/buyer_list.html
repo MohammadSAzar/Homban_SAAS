@@ -337,57 +337,59 @@
                 <div class="nk-block" >
                     <div class="row g-gs">
                         {% for buyer in buyers %}
-                            <div class="col-sm-6 col-lg-6 col-xxl-6">
-                                <div class="card h-100">
-                                    <div class="card-inner">
-                                        <div class="project">
-
-                                            <!-- Name & Code & Phone -->
-                                            <div class="project-head">
-                                                <div class="project-title">
-                                                    <div class="project-info">
-                                                        <h5 class="title" style="font-size: 1.1em;">{{ buyer.name }} | {{ buyer.code }}</h5>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <!-- Location -->
-                                            <div style="height: 4em;!important; -webkit-line-clamp: 2;!important;">
-                                                <div class="project-head" style="margin-bottom: 0.5em;!important;">
+                            {% if buyer.status == 'acc' %}
+                                <div class="col-sm-6 col-lg-6 col-xxl-6">
+                                    <div class="card h-100">
+                                        <div class="card-inner">
+                                            <div class="project">
+    
+                                                <!-- Name & Code & Phone -->
+                                                <div class="project-head">
                                                     <div class="project-title">
                                                         <div class="project-info">
-                                                            <span class="sub-text" style="font-size: 0.75em; line-height: 25px;">
-                                                                {% for sub_district in buyer.sub_districts.all %}
-                                                                    {{ sub_district.name }} |
-                                                                {% empty %}
-                                                                    <span>هیچ زیرمحله‌ای انتخاب نشده است</span>
-                                                                {% endfor %}
-                                                            </span>
+                                                            <h5 class="title" style="font-size: 1.1em;">{{ buyer.name }} | {{ buyer.code }}</h5>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
-
-                                            <!-- Info -->
-                                            <div style="height: 4em;!important; -webkit-line-clamp: 2;!important;">
-                                                <div class="project-head" style="margin-bottom: 0.5em;!important;">
-                                                    <div class="project-title">
-                                                        <div class="project-info">
-                                                            <h6 class="sub-text" style="font-size: 0.9em; line-height: 25px;">بودجه: {{ buyer.budget_announced|intcomma:False|farsi_number }} تومان</h6>
+    
+                                                <!-- Location -->
+                                                <div style="height: 4em;!important; -webkit-line-clamp: 2;!important;">
+                                                    <div class="project-head" style="margin-bottom: 0.5em;!important;">
+                                                        <div class="project-title">
+                                                            <div class="project-info">
+                                                                <span class="sub-text" style="font-size: 0.75em; line-height: 25px;">
+                                                                    {% for sub_district in buyer.sub_districts.all %}
+                                                                        {{ sub_district.name }} |
+                                                                    {% empty %}
+                                                                        <span>هیچ زیرمحله‌ای انتخاب نشده است</span>
+                                                                    {% endfor %}
+                                                                </span>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
+    
+                                                <!-- Info -->
+                                                <div style="height: 4em;!important; -webkit-line-clamp: 2;!important;">
+                                                    <div class="project-head" style="margin-bottom: 0.5em;!important;">
+                                                        <div class="project-title">
+                                                            <div class="project-info">
+                                                                <h6 class="sub-text" style="font-size: 0.9em; line-height: 25px;">بودجه: {{ buyer.budget_announced|intcomma:False|farsi_number }} تومان</h6>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+    
+                                                <!-- More -->
+                                                <div class="project-meta" style="float: left;">
+                                                    <a href="{{ buyer.get_absolute_url }}" class="btn btn-primary" style="margin-top: 1em;"><em class="icon ni ni-eye"></em><span>مشاهده</span></a>
+                                                </div>
+    
                                             </div>
-
-                                            <!-- More -->
-                                            <div class="project-meta" style="float: left;">
-                                                <a href="{{ buyer.get_absolute_url }}" class="btn btn-primary" style="margin-top: 1em;"><em class="icon ni ni-eye"></em><span>مشاهده</span></a>
-                                            </div>
-
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            {% endif %}   
                         {% endfor %}
                     </div>
                 </div>
@@ -447,9 +449,6 @@
 
 
 
-
-
-    <button type="submit" class="btn btn-primary">اعمال فیلتر</button>
 
 
 

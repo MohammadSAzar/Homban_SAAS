@@ -55,7 +55,6 @@ class SubDistrictAdmin(admin.ModelAdmin):
 @admin.register(models.Person)
 class PersonAdmin(admin.ModelAdmin):
     list_display = ('name', 'phone_number')
-    prepopulated_fields = {'slug': ('name',)}
 
 
 @admin.register(models.SaleFile)
@@ -65,7 +64,6 @@ class SaleFileAdmin(admin.ModelAdmin):
         'age', 'document', 'level', 'parking', 'elevator', 'warehouse', 'has_images', 'has_video', 'zip_file_admin',
         'datetime_created', 'datetime_expired')
     ordering = ('-datetime_created',)
-    prepopulated_fields = {'slug': ('title',)}
     list_filter = ('status', 'sub_district',)
     readonly_fields = ('code', 'datetime_created', 'datetime_expired',)
 
@@ -77,7 +75,6 @@ class RentFileAdmin(admin.ModelAdmin):
         'convertable', 'room', 'area', 'age', 'document', 'level', 'parking', 'elevator', 'warehouse', 'has_images', 'has_video',
         'datetime_created', 'datetime_expired')
     ordering = ('-datetime_created',)
-    prepopulated_fields = {'slug': ('title',)}
     list_filter = ('status', 'sub_district',)
     readonly_fields = ('code', 'datetime_created', 'datetime_expired',)
 
@@ -121,7 +118,7 @@ class SessionAdmin(admin.ModelAdmin):
 @admin.register(models.Trade)
 class TradeAdmin(admin.ModelAdmin):
     list_display = ('type', 'code', 'session', 'followup_code', 'date', 'price', 'deposit', 'rent',
-                    'owner', 'customer', 'datetime_created')
+                    'owner', 'buyer', 'renter', 'datetime_created')
     ordering = ('-datetime_created',)
     list_filter = ('type',)
     readonly_fields = ('code', 'datetime_created',)
@@ -131,12 +128,11 @@ class TradeAdmin(admin.ModelAdmin):
 @admin.register(models.Task)
 class TaskAdmin(admin.ModelAdmin):
     form = TaskAdminForm
-    list_display = ('title', 'status', 'type', 'agent', 'sub_district', 'code', 'deadline',)
+    list_display = ('title', 'status', 'type', 'agent', 'code', 'deadline',)
     ordering = ('-datetime_created',)
     list_filter = ['type', 'status', 'deadline']
     search_fields = ['title', 'agent__username', 'code']
     readonly_fields = ('code', 'datetime_created',)
-    prepopulated_fields = {'slug': ('title',)}
 
 
 

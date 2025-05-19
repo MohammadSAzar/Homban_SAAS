@@ -890,7 +890,6 @@ class BuyerListView(ReadOnlyPermissionMixin, ListView):
                 queryset_filtered = [obj for obj in queryset_filtered if
                                      obj.budget_announced and obj.budget_announced <= form.cleaned_data['max_budget']]
 
-
             return queryset_filtered
         return queryset_default
 
@@ -1119,7 +1118,7 @@ class TaskBossURListView(ReadOnlyPermissionMixin, ListView):
     model = models.Task
     template_name = 'dashboard/tasks/task_bs_ur_list.html'
     context_object_name = 'tasks'
-    paginate_by = 12
+    paginate_by = 6
     permission_model = 'Task'
 
     def get_queryset(self):
@@ -1134,7 +1133,7 @@ class TaskBossOPListView(ReadOnlyPermissionMixin, ListView):
     model = models.Task
     template_name = 'dashboard/tasks/task_bs_op_list.html'
     context_object_name = 'tasks'
-    paginate_by = 12
+    paginate_by = 6
     permission_model = 'Task'
 
     def get_queryset(self):
@@ -1149,7 +1148,7 @@ class TaskBossCLListView(ReadOnlyPermissionMixin, ListView):
     model = models.Task
     template_name = 'dashboard/tasks/task_bs_cl_list.html'
     context_object_name = 'tasks'
-    paginate_by = 12
+    paginate_by = 6
     permission_model = 'Task'
 
     def get_queryset(self):
@@ -1164,7 +1163,7 @@ class TaskFPListView(ReadOnlyPermissionMixin, ListView):
     model = models.Task
     template_name = 'dashboard/tasks/task_fp_list.html'
     context_object_name = 'tasks'
-    paginate_by = 12
+    paginate_by = 6
     permission_model = 'Task'
 
     def get_queryset(self):
@@ -1183,7 +1182,7 @@ class TaskCPListView(ReadOnlyPermissionMixin, ListView):
     model = models.Task
     template_name = 'dashboard/tasks/task_cp_list.html'
     context_object_name = 'tasks'
-    paginate_by = 12
+    paginate_by = 6
     permission_model = 'Task'
 
     def get_queryset(self):
@@ -1202,7 +1201,7 @@ class TaskBTListView(ReadOnlyPermissionMixin, ListView):
     model = models.Task
     template_name = 'dashboard/tasks/task_bt_list.html'
     context_object_name = 'tasks'
-    paginate_by = 12
+    paginate_by = 6
     permission_model = 'Task'
 
     def get_queryset(self):
@@ -1326,6 +1325,7 @@ class TaskResultView(PermissionRequiredMixin, UpdateView):
         elif task_type == 'bt':
             return reverse('task_bt_list')
         return reverse('dashboard')
+
 
 
 

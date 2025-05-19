@@ -567,9 +567,131 @@ class SubDistrictCreateForm(forms.ModelForm):
             field.required = True
 
 
+# -------------------------------- Services ---------------------------------
+visit_required_fields = ['type', 'date', 'time']
+session_required_fields = ['visit', 'type', 'date', 'time']
+trade_required_fields = ['session', 'type', 'date', 'time', 'owner', 'owner_national_code', 'customer_national_code']
+
+
+class VisitCreateForm(forms.ModelForm):
+    class Meta:
+        model = models.Visit
+        fields = ['sale_file', 'rent_file', 'customer', 'type', 'date', 'time', 'description']
+
+    def __init__(self, *args, **kwargs):
+        super(VisitCreateForm, self).__init__(*args, **kwargs)
+        self.fields['date'] = forms.ChoiceField(
+            choices=models.next_week_shamsi(),
+            required=True,
+            label=self.fields['date'].label,
+        )
+        for field in session_required_fields:
+            self.fields[field].required = True
+
+
+class VisitResultForm(forms.ModelForm):
+    class Meta:
+        model = models.Visit
+        fields = ['result', 'status']
+
+    def clean(self):
+        cleaned_data = super().clean()
+        status = cleaned_data.get('status')
+        result = cleaned_data.get('result')
+
+        if result != '':
+            if status != 'dne':
+                self.add_error('status', "برای ثبت نتیجه، وضعیت را به 'انجام شده' تغییر دهید.")
+
+        return cleaned_data
+
+
+class VisitCancelForm(forms.ModelForm):
+    class Meta:
+        model = models.Visit
+        fields = ['result', 'status']
+
+    def clean(self):
+        cleaned_data = super().clean()
+        status = cleaned_data.get('status')
+        result = cleaned_data.get('result')
+
+        if result != '':
+            if status != 'can':
+                self.add_error('status', "برای لغو بازدید، وضعیت را به 'لغو شده' تغییر دهید.")
+
+        return cleaned_data
+
+
+class SessionCreateForm(forms.ModelForm):
+    class Meta:
+        model = models.Session
+        fields = ['visit', 'type', 'date', 'time', 'description']
+
+    def __init__(self, *args, **kwargs):
+        super(SessionCreateForm, self).__init__(*args, **kwargs)
+        self.fields['date'] = forms.ChoiceField(
+            choices=models.next_week_shamsi(),
+            required=True,
+            label=self.fields['date'].label,
+        )
+        for field in session_required_fields:
+            self.fields[field].required = True
+
+
+class SessionResultForm(forms.ModelForm):
+    class Meta:
+        model = models.Session
+        fields = ['result', 'status']
+
+    def clean(self):
+        cleaned_data = super().clean()
+        status = cleaned_data.get('status')
+        result = cleaned_data.get('result')
+
+        if result != '':
+            if status != 'dne':
+                self.add_error('status', "برای ثبت نتیجه، وضعیت را به 'انجام شده' تغییر دهید.")
+
+        return cleaned_data
+
+
+class SessionCancelForm(forms.ModelForm):
+    class Meta:
+        model = models.Session
+        fields = ['result', 'status']
+
+    def clean(self):
+        cleaned_data = super().clean()
+        status = cleaned_data.get('status')
+        result = cleaned_data.get('result')
+
+        if result != '':
+            if status != 'can':
+                self.add_error('status', "برای لغو نشست، وضعیت را به 'لغو شده' تغییر دهید.")
+
+        return cleaned_data
+
+
+class TradeCreateForm(forms.ModelForm):
+    class Meta:
+        model = models.Trade
+        fields = ['session', 'type', 'date', 'description', 'price', 'deposit', 'rent', 'owner', 'owner_national_code',
+                  'buyer', 'renter', 'customer_national_code', 'followup_code']
+
+    def __init__(self, *args, **kwargs):
+        super(TradeCreateForm, self).__init__(*args, **kwargs)
+        self.fields['date'] = forms.ChoiceField(
+            choices=models.last_month_shamsi(),
+            required=True,
+            label=self.fields['date'].label,
+        )
+        for field in trade_required_fields:
+            self.fields[field].required = True
+
+
 # ---------------------------------- Tasks ----------------------------------
 task_required_fields = ['title', 'type', 'agent', 'deadline', 'description']
-task_result_required_fields = ['result', 'status']
 
 
 class TaskCreateForm(forms.ModelForm):
@@ -620,6 +742,7 @@ class TaskAdminForm(forms.ModelForm):
             required=False,
             label=self.fields['deadline'].label,
         )
+
 
 
 

@@ -60,7 +60,7 @@
                         <!-- Result Link -->
                         {% if task.agent.title == request.user.title and task.status == 'UR' %}
                             <div class="nk-fmg-actions" style="margin-top: 3em;">
-                                <a href="{% url 'task_result' task.pk task.slug %}" class="btn btn-primary" style="line-height: 30px;">تغییر نتیجه</a>
+                                <a href="{% url 'task_result' task.pk task.code %}" class="btn btn-primary" style="line-height: 30px;">تغییر نتیجه</a>
                             </div>
                         {% endif %}
                     <!-- end: Result -->    

@@ -314,8 +314,9 @@
                                             {% endif %}
 
                                             <!-- button -->
-                                            <div class="form-group" style="width: 100%;!important;">
-                                                <button type="submit" onclick="submitFormAndRefresh()" class="btn btn-lg btn-primary">اعمال فیلتر</button>
+                                            <div class="form-group">
+                                                <button type="submit" onclick="submitFormAndRefresh()" class="btn btn-primary justify-center" style="width: 100%;!important;">اعمال فیلتر</button>
+                                                <a href="{% url 'rent_file_list' %}" class="btn btn-danger justify-center" style="width: 100%;!important; margin-top: 10px;">حذف فیلترها</a>
                                             </div>
                                         </form>
                                         <!-- end: Form -->
@@ -503,53 +504,55 @@
 
                                 <!-- Loop -->
                                 {% for file in rent_files %}
-                                    <div class="nk-file-item nk-file">
-                                        <div class="nk-file-info">
-                                            <div class="nk-file-title">
-
-                                                <!-- Code / Sub-district -->
-                                                <div class="nk-file-name">
-                                                    <div class="nk-file-name-text" style="margin-bottom: 0.5em; height: 3em;!important; -webkit-line-clamp: 2;!important;">
-                                                        <span style="font-size: 0.8em;">کد: {{ file.code }} / <span style="color: green; font-size: 1.1em;">{{ file.sub_district }}</span></span>
+                                    {% if file.status == 'acc' %}
+                                        <div class="nk-file-item nk-file">
+                                            <div class="nk-file-info">
+                                                <div class="nk-file-title">
+    
+                                                    <!-- Code / Sub-district -->
+                                                    <div class="nk-file-name">
+                                                        <div class="nk-file-name-text" style="margin-bottom: 0.5em; height: 3em;!important; -webkit-line-clamp: 2;!important;">
+                                                            <span style="font-size: 0.8em;">کد: {{ file.code }} / <span style="color: green; font-size: 1.1em;">{{ file.sub_district }}</span></span>
+                                                        </div>
                                                     </div>
-                                                </div>
-
-                                                <!-- Cover -->
-                                                <a href="{{ file.get_absolute_url }}" class="nk-file-link">
-                                                    <div class="nk-file-icon">
-                                                        <figure class="product-image--holder" style="height: 12.3em;!important; -webkit-line-clamp: 12.3;!important;">
-                                                            {% if file.image1 %}
-                                                                <img src="{{ file.image1.url }}" alt="File Cover" style="height: 12.3em;!important; -webkit-line-clamp: 12.3;!important;">
-                                                            {% else %}
-                                                                <img src="{% static 'dashboard/images/blank_file.jpg' %}" alt="File Cover" style="height: 12.3em;!important; -webkit-line-clamp: 12.3;!important;">
-                                                            {% endif %}
-                                                        </figure>
+    
+                                                    <!-- Cover -->
+                                                    <a href="{{ file.get_absolute_url }}" class="nk-file-link">
+                                                        <div class="nk-file-icon">
+                                                            <figure class="product-image--holder" style="height: 12.3em;!important; -webkit-line-clamp: 12.3;!important;">
+                                                                {% if file.image1 %}
+                                                                    <img src="{{ file.image1.url }}" alt="File Cover" style="height: 12.3em;!important; -webkit-line-clamp: 12.3;!important;">
+                                                                {% else %}
+                                                                    <img src="{% static 'dashboard/images/blank_file.jpg' %}" alt="File Cover" style="height: 12.3em;!important; -webkit-line-clamp: 12.3;!important;">
+                                                                {% endif %}
+                                                            </figure>
+                                                        </div>
+                                                    </a>
+    
+                                                    <!-- Title -->
+                                                    <div class="nk-file-name">
+                                                        <div class="nk-file-name-text" style="height: 4em;!important; -webkit-line-clamp: 2;!important;">
+                                                            <span class="title" style="font-size: 0.9em;">{{ file.title|linebreaksbr|farsi_number }}</span>
+                                                        </div>
                                                     </div>
-                                                </a>
-
-                                                <!-- Title -->
-                                                <div class="nk-file-name">
-                                                    <div class="nk-file-name-text" style="height: 4em;!important; -webkit-line-clamp: 2;!important;">
-                                                        <span class="title" style="font-size: 0.9em;">{{ file.title|linebreaksbr|farsi_number }}</span>
+    
+                                                    <!-- Deposit -->
+                                                    <div class="nk-file-name">
+                                                        <span class="title" style="font-size: 0.8em; color: green;">رهن: {{ file.deposit_announced|intcomma:False|farsi_number }} تومان</span>
                                                     </div>
+                                                
+                                                    <!-- Rent -->
+                                                    <div class="nk-file-name">
+                                                        <span class="title" style="font-size: 0.8em; color: green;">اجاره: {{ file.rent_announced|intcomma:False|farsi_number }} تومان</span>
+                                                    </div>
+    
+                                                    <!-- More -->
+                                                    <a href="{{ file.get_absolute_url }}" class="btn btn-primary" style="margin-top: 1em;"><em class="icon ni ni-eye"></em><span>مشاهده</span></a>
+    
                                                 </div>
-
-                                                <!-- Deposit -->
-                                                <div class="nk-file-name">
-                                                    <span class="title" style="font-size: 0.8em; color: green;">رهن: {{ file.deposit_announced|intcomma:False|farsi_number }} تومان</span>
-                                                </div>
-                                            
-                                                <!-- Rent -->
-                                                <div class="nk-file-name">
-                                                    <span class="title" style="font-size: 0.8em; color: green;">اجاره: {{ file.rent_announced|intcomma:False|farsi_number }} تومان</span>
-                                                </div>
-
-                                                <!-- More -->
-                                                <a href="{{ file.get_absolute_url }}" class="btn btn-primary" style="margin-top: 1em;"><em class="icon ni ni-eye"></em><span>مشاهده</span></a>
-
                                             </div>
                                         </div>
-                                    </div>
+                                    {% endif %}
                                 {% endfor %}
 
                             </div>

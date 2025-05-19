@@ -56,8 +56,8 @@
                                     <div style="font-size: 0.9em;">کد فایل: {{ rent_file.code }}</div>
 
                                     <div style="font-size: 0.9em; margin-top: 1em;">
-                                        <a href="{% url 'rent_file_update' rent_file.slug rent_file.unique_url_id %}" class="btn btn-primary">بروزرسانی</a>
-                                        <a href="{% url 'rent_file_delete' rent_file.slug rent_file.unique_url_id %}" class="btn btn-danger">پاک کردن</a>
+                                        <a href="{% url 'rent_file_update' rent_file.pk rent_file.unique_url_id %}" class="btn btn-primary">بروزرسانی</a>
+                                        <a href="{% url 'rent_file_delete' rent_file.pk rent_file.unique_url_id %}" class="btn btn-danger">پاک کردن</a>
                                     </div>
                                 </div>
                             </div>
@@ -214,7 +214,7 @@
                                 <!-- Link -->
                                 <li>
                                     {% if rent_file.zip_file %}
-                                        <a href="{% url 'rent_file_gallery' rent_file.slug rent_file.unique_url_id %}"
+                                        <a href="{% url 'rent_file_gallery' rent_file.pk rent_file.unique_url_id %}"
                                            class="btn btn-primary"
                                            onclick="copyToClipboard(event, this)">
                                            کپی لینک مشاهده محتوا

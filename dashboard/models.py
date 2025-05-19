@@ -28,70 +28,25 @@ def generate_unique_code():
 
 
 # -------------------------------- TIMES ----------------------------------
-def next_seven_days_shamsi():
+def next_week_shamsi():
     days = []
-    today = date.today()
+    today = datetime.today()
     for i in range(1, 8):
         next_day = today + timedelta(days=i)
-        days.append({
-            'result_day': next_day.strftime('%A'),
-            'result_date': next_day.strftime('%Y/%m/%d')
-        })
-    for j in range(0, 7):
-        if days[j]['result_day'] == 'Monday' or days[j]['result_day'] == 'monday':
-            days[j]['result_day'] = 'دوشنبه'
-        if days[j]['result_day'] == 'Tuesday' or days[j]['result_day'] == 'tuesday':
-            days[j]['result_day'] = 'سه‌شنبه'
-        if days[j]['result_day'] == 'Wednesday' or days[j]['result_day'] == 'wednesday':
-            days[j]['result_day'] = 'چهارشنبه'
-        if days[j]['result_day'] == 'Thursday' or days[j]['result_day'] == 'thursday':
-            days[j]['result_day'] = 'پنج‌شنبه'
-        if days[j]['result_day'] == 'Friday' or days[j]['result_day'] == 'friday':
-            days[j]['result_day'] = 'جمعه'
-        if days[j]['result_day'] == 'Saturday' or days[j]['result_day'] == 'saturday':
-            days[j]['result_day'] = 'شنبه'
-        if days[j]['result_day'] == 'Sunday' or days[j]['result_day'] == 'sunday':
-            days[j]['result_day'] = 'یکشنبه'
-    final_days = []
-    for k in range(0, 7):
-        converted_day = str(days[k]['result_day'] + ' - ' + days[k]['result_date'])
-        final_days.append((
-            'result_day', converted_day,
-        ))
-    return final_days
-
-
-def last_month_shamsi():
-    days = []
-    today = date.today()
-    for i in range(1, 31):
-        previous_day = today - timedelta(days=i)
-        days.append({
-            'result_day': previous_day.strftime('%A'),
-            'result_date': previous_day.strftime('%Y/%m/%d')
-        })
-    for j in range(0, 30):
-        if days[j]['result_day'] == 'Monday' or days[j]['result_day'] == 'monday':
-            days[j]['result_day'] = 'دوشنبه'
-        if days[j]['result_day'] == 'Tuesday' or days[j]['result_day'] == 'tuesday':
-            days[j]['result_day'] = 'سه‌شنبه'
-        if days[j]['result_day'] == 'Wednesday' or days[j]['result_day'] == 'wednesday':
-            days[j]['result_day'] = 'چهارشنبه'
-        if days[j]['result_day'] == 'Thursday' or days[j]['result_day'] == 'thursday':
-            days[j]['result_day'] = 'پنج‌شنبه'
-        if days[j]['result_day'] == 'Friday' or days[j]['result_day'] == 'friday':
-            days[j]['result_day'] = 'جمعه'
-        if days[j]['result_day'] == 'Saturday' or days[j]['result_day'] == 'saturday':
-            days[j]['result_day'] = 'شنبه'
-        if days[j]['result_day'] == 'Sunday' or days[j]['result_day'] == 'sunday':
-            days[j]['result_day'] = 'یکشنبه'
-    final_days = []
-    for k in range(0, 30):
-        converted_day = str(days[k]['result_day'] + ' - ' + days[k]['result_date'])
-        final_days.append((
-            'result_day', converted_day,
-        ))
-    return final_days
+        weekday_en = next_day.strftime('%A')
+        date_str = next_day.strftime('%Y/%m/%d')
+        weekday_fa = {
+            'Monday': 'دوشنبه',
+            'Tuesday': 'سه‌شنبه',
+            'Wednesday': 'چهارشنبه',
+            'Thursday': 'پنج‌شنبه',
+            'Friday': 'جمعه',
+            'Saturday': 'شنبه',
+            'Sunday': 'یکشنبه',
+        }.get(weekday_en, weekday_en)
+        label = f"{weekday_fa} - {date_str}"
+        days.append((date_str, label))
+    return days
 
 
 def next_month_shamsi():
@@ -115,13 +70,34 @@ def next_month_shamsi():
     return days
 
 
+def last_month_shamsi():
+    days = []
+    today = datetime.today()
+    for i in range(1, 31):
+        prev_day = today - timedelta(days=i)
+        weekday_en = prev_day.strftime('%A')
+        date_str = prev_day.strftime('%Y/%m/%d')
+        weekday_fa = {
+            'Monday': 'دوشنبه',
+            'Tuesday': 'سه‌شنبه',
+            'Wednesday': 'چهارشنبه',
+            'Thursday': 'پنج‌شنبه',
+            'Friday': 'جمعه',
+            'Saturday': 'شنبه',
+            'Sunday': 'یکشنبه',
+        }.get(weekday_en, weekday_en)
+        label = f"{weekday_fa} - {date_str}"
+        days.append((date_str, label))
+    return days
+
+
 # --------------------------------- LOCs ------------------------------------
 class Province(models.Model):
     name = models.CharField(max_length=100, verbose_name=_('Province'))
 
-    @property
-    def slug(self):
-        return slugify(self.name, allow_unicode=True)
+    class Meta:
+        verbose_name = 'استان'
+        verbose_name_plural = 'استان‌ها'
 
     def __str__(self):
         return self.name
@@ -133,6 +109,10 @@ class Province(models.Model):
 class City(models.Model):
     name = models.CharField(max_length=100, verbose_name=_('City'))
     province = models.ForeignKey(Province, on_delete=models.CASCADE, related_name='cities')
+
+    class Meta:
+        verbose_name = 'شهر'
+        verbose_name_plural = 'شهرها'
 
     @property
     def slug(self):
@@ -149,6 +129,10 @@ class District(models.Model):
     name = models.CharField(max_length=100, default='', verbose_name=_('District Name'))
     city = models.ForeignKey(City, on_delete=models.CASCADE, related_name='districts')
 
+    class Meta:
+        verbose_name = 'محله (منطقه)'
+        verbose_name_plural = 'محلات (مناطق)'
+
     @property
     def slug(self):
         return slugify(self.name, allow_unicode=True)
@@ -164,6 +148,10 @@ class SubDistrict(models.Model):
     name = models.CharField(max_length=100, default='', verbose_name=_('Sub-District Name'))
     district = models.ForeignKey(District, on_delete=models.CASCADE, related_name='sub_districts')
     description = models.TextField(max_length=1000, blank=True, null=True, default='', verbose_name=_('Description'))
+
+    class Meta:
+        verbose_name = 'زیرمحله'
+        verbose_name_plural = 'زیرمحلات'
 
     @property
     def slug(self):
@@ -201,19 +189,18 @@ class CustomUserModel(AbstractUser):
 class Person(models.Model):
     name = models.CharField(max_length=100, verbose_name=_('Name'))
     phone_number = models.CharField(max_length=11, unique=True, verbose_name=_('Phone Number'))
-    slug = models.SlugField(max_length=255, null=True, blank=True, unique=True, allow_unicode=True)
     description = models.TextField(max_length=150, blank=True, null=True, verbose_name=_('Description'))
+    status = models.CharField(max_length=10, choices=choices.statuses, default='pen', verbose_name=_('Status'))
 
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.name, allow_unicode=True)
-        super(Person, self).save(*args, **kwargs)
+    class Meta:
+        verbose_name = 'شخص آگهی‌دهنده'
+        verbose_name_plural = 'اشخاص آگهی‌دهنده'
 
     def __str__(self):
         return self.name
 
     def get_absolute_url(self):
-        return reverse('person_detail', args=[self.slug])
+        return reverse('person_detail', args=[self.pk])
 
 
 class SaleFile(models.Model):
@@ -262,7 +249,6 @@ class SaleFile(models.Model):
     description = models.TextField(max_length=1000, blank=True, null=True, verbose_name=_('Description'))
     source = models.CharField(max_length=15, choices=choices.sources, null=True, blank=True, verbose_name=_('Source'))
     person = models.ForeignKey(Person, on_delete=models.SET_NULL, null=True, blank=True, related_name='sale_files', verbose_name=_('Person'))
-    slug = models.SlugField(max_length=255, null=True, blank=True, unique=True, allow_unicode=True)
     unique_url_id = models.CharField(max_length=20, null=True, unique=True, blank=True)
     code = models.CharField(max_length=6, null=True, unique=True, blank=True, verbose_name=_('Code'))
     status = models.CharField(max_length=10, choices=choices.statuses, default='pen', verbose_name=_('Status'))
@@ -330,8 +316,6 @@ class SaleFile(models.Model):
             self.unique_url_id = generate_unique_id()
         if not self.code:
             self.code = generate_unique_code()
-        if not self.slug:
-            self.slug = slugify(self.title, allow_unicode=True)
         super(SaleFile, self).save(*args, **kwargs)
 
     def __str__(self):
@@ -339,9 +323,11 @@ class SaleFile(models.Model):
 
     class Meta:
         ordering = ('-datetime_created',)
+        verbose_name = 'فایل فروش'
+        verbose_name_plural = 'فایل‌های فروش'
 
     def get_absolute_url(self):
-        return reverse('sale_file_detail', args=[self.slug, self.unique_url_id])
+        return reverse('sale_file_detail', args=[self.pk, self.unique_url_id])
 
 
 class RentFile(models.Model):
@@ -393,7 +379,6 @@ class RentFile(models.Model):
     description = models.TextField(max_length=1000, blank=True, null=True, verbose_name=_('Description'))
     source = models.CharField(max_length=15, choices=choices.sources, null=True, blank=True, verbose_name=_('Source'))
     person = models.ForeignKey(Person, on_delete=models.SET_NULL, null=True, blank=True, related_name='rent_files', verbose_name=_('Person'))
-    slug = models.SlugField(max_length=255, null=True, blank=True, unique=True, allow_unicode=True)
     unique_url_id = models.CharField(max_length=20, null=True, unique=True, blank=True)
     code = models.CharField(max_length=6, null=True, unique=True, blank=True, verbose_name=_('Code'))
     status = models.CharField(max_length=10, choices=choices.statuses, default='pen', verbose_name=_('Status'))
@@ -457,8 +442,6 @@ class RentFile(models.Model):
             self.unique_url_id = generate_unique_id()
         if not self.code:
             self.code = generate_unique_code()
-        if not self.slug:
-            self.slug = slugify(self.title, allow_unicode=True)
         super(RentFile, self).save(*args, **kwargs)
 
     def __str__(self):
@@ -466,9 +449,11 @@ class RentFile(models.Model):
 
     class Meta:
         ordering = ('-datetime_created',)
+        verbose_name = 'فایل اجاره'
+        verbose_name_plural = 'فایل‌های اجاره'
 
     def get_absolute_url(self):
-        return reverse('rent_file_detail', args=[self.slug, self.unique_url_id])
+        return reverse('rent_file_detail', args=[self.pk, self.unique_url_id])
 
 
 class Buyer(models.Model):
@@ -496,6 +481,7 @@ class Buyer(models.Model):
     phone_number = models.CharField(max_length=11, unique=True, verbose_name=_('Phone Number'))
     description = models.TextField(max_length=2000, blank=True, null=True, verbose_name=_('Description'))
     code = models.CharField(max_length=6, null=True, unique=True, blank=True, verbose_name=_('Code'))
+    status = models.CharField(max_length=10, choices=choices.statuses, default='pen', verbose_name=_('Status'))
     datetime_created = models.DateTimeField(default=timezone.now, verbose_name=_('Date and Time of Creation'))
 
     def save(self, *args, **kwargs):
@@ -508,6 +494,8 @@ class Buyer(models.Model):
 
     class Meta:
         ordering = ('-datetime_created',)
+        verbose_name = 'خریدار'
+        verbose_name_plural = 'خریداران'
 
     def get_absolute_url(self):
         return reverse('buyer_detail', args=[self.pk, self.code])
@@ -541,6 +529,7 @@ class Renter(models.Model):
     phone_number = models.CharField(max_length=11, unique=True, verbose_name=_('Phone Number'))
     description = models.TextField(max_length=2000, blank=True, null=True, verbose_name=_('Description'))
     code = models.CharField(max_length=6, null=True, unique=True, blank=True, verbose_name=_('Code'))
+    status = models.CharField(max_length=10, choices=choices.statuses, default='pen', verbose_name=_('Status'))
     datetime_created = models.DateTimeField(default=timezone.now, verbose_name=_('Date and Time of Creation'))
 
     def save(self, *args, **kwargs):
@@ -553,6 +542,8 @@ class Renter(models.Model):
 
     class Meta:
         ordering = ('-datetime_created',)
+        verbose_name = 'مستاجر'
+        verbose_name_plural = 'مستاجران'
 
     def get_absolute_url(self):
         return reverse('renter_detail', args=[self.pk, self.code])
@@ -560,14 +551,13 @@ class Renter(models.Model):
 
 # --------------------------------- SERVs ----------------------------------
 class Visit(models.Model):
-    DATES = next_seven_days_shamsi
     sale_file = models.ForeignKey(SaleFile, on_delete=models.SET_NULL, null=True, blank=True, related_name='visits', verbose_name=_('Sale File'))
     rent_file = models.ForeignKey(RentFile, on_delete=models.SET_NULL, null=True, blank=True, related_name='visits', verbose_name=_('Rent File'))
     customer = models.ForeignKey(Buyer, on_delete=models.SET_NULL, null=True, blank=True, related_name='visits', verbose_name=_('Buyer'))
     type = models.CharField(max_length=10, verbose_name=_('Type of Trade'))
     description = models.TextField(max_length=1000, blank=True, null=True, verbose_name=_('Description'))
     result = models.TextField(max_length=1000, blank=True, null=True, verbose_name=_('Result'))
-    date = models.CharField(max_length=200, choices=DATES, verbose_name=_('Date of Visit'))
+    date = models.CharField(max_length=200, verbose_name=_('Date of Visit'))
     time = models.CharField(max_length=200, choices=choices.times, verbose_name=_('Time of Visit'))
     code = models.CharField(max_length=6, null=True, unique=True, blank=True, verbose_name=_('Code'))
     status = models.CharField(max_length=10, choices=choices.serv_statuses, default='sub', verbose_name=_('Status'))
@@ -584,24 +574,25 @@ class Visit(models.Model):
 
     def __str__(self):
         if self.sale_file:
-            return f'{self.sale_file} / {self.code}'
+            return f'{self.code} / {self.sale_file}'
         if self.rent_file:
-            return f'{self.rent_file} / {self.code}'
+            return f'{self.code} / {self.rent_file}'
 
     class Meta:
         ordering = ('-datetime_created',)
+        verbose_name = 'بازدید'
+        verbose_name_plural = 'بازدیدها'
 
     def get_absolute_url(self):
-        return reverse('visit_detail', args=[self.code])
+        return reverse('visit_detail', args=[self.pk, self.code])
 
 
 class Session(models.Model):
-    DATES = next_seven_days_shamsi
     visit = models.ForeignKey(Visit, on_delete=models.SET_NULL, null=True, blank=True, related_name='sessions', verbose_name=_('Related Visit'))
     type = models.CharField(max_length=10, verbose_name=_('Type of Trade'))
     description = models.TextField(max_length=1000, blank=True, null=True, verbose_name=_('Description'))
     result = models.TextField(max_length=1000, blank=True, null=True, verbose_name=_('Result'))
-    date = models.CharField(max_length=200, choices=DATES, verbose_name=_('Date of Visit'))
+    date = models.CharField(max_length=200, verbose_name=_('Date of Visit'))
     time = models.CharField(max_length=200, choices=choices.times, verbose_name=_('Time of Visit'))
     code = models.CharField(max_length=6, null=True, unique=True, blank=True, verbose_name=_('Code'))
     status = models.CharField(max_length=10, choices=choices.serv_statuses, default='sub', verbose_name=_('Status'))
@@ -615,29 +606,31 @@ class Session(models.Model):
 
     def __str__(self):
         if self.visit.sale_file:
-            return f'{self.visit.sale_file} / {self.code}'
+            return f'{self.code} / {self.visit.sale_file}'
         if self.visit.rent_file:
-            return f'{self.visit.rent_file} / {self.code}'
+            return f'{self.code} / {self.visit.rent_file}'
 
     class Meta:
         ordering = ('-datetime_created',)
+        verbose_name = 'نشست'
+        verbose_name_plural = 'نشست‌ها'
 
     def get_absolute_url(self):
-        return reverse('session_detail', args=[self.code])
+        return reverse('session_detail', args=[self.pk, self.code])
 
 
 class Trade(models.Model):
-    DATES = last_month_shamsi
     session = models.ForeignKey(Session, on_delete=models.SET_NULL, null=True, blank=True, related_name='trades', verbose_name=_('Related Session'))
     type = models.CharField(max_length=10, verbose_name=_('Type of Trade'))
     description = models.TextField(max_length=1000, blank=True, null=True, verbose_name=_('Description'))
-    date = models.CharField(max_length=200, choices=DATES, verbose_name=_('Date of Trade'))
+    date = models.CharField(max_length=200, verbose_name=_('Date of Trade'))
     price = models.PositiveBigIntegerField(blank=True, null=True, verbose_name=_('Price'))
     deposit = models.PositiveBigIntegerField(blank=True, null=True, verbose_name=_('Deposit'))
     rent = models.PositiveBigIntegerField(blank=True, null=True, verbose_name=_('Rent'))
     owner = models.CharField(max_length=100, verbose_name=_('Owner (Seller / Lessor)'))
     owner_national_code = models.CharField(max_length=10, verbose_name=_('Owner (Seller / Lessor) National Code'))
-    customer = models.CharField(max_length=100, verbose_name=_('Customer (Buyer / Tenant)'))
+    buyer = models.ForeignKey(Buyer, blank=True, null=True, on_delete=models.SET_NULL, verbose_name=_('Customer (Buyer)'))
+    renter = models.ForeignKey(Renter, blank=True, null=True, on_delete=models.SET_NULL, verbose_name=_('Customer (Renter)'))
     customer_national_code = models.CharField(max_length=10, verbose_name=_('Customer (Buyer / Tenant) National Code'))
     code = models.CharField(max_length=6, null=True, unique=True, blank=True, verbose_name=_('Code'))
     followup_code = models.CharField(max_length=6, null=True, unique=True, blank=True, verbose_name=_('Followup Code'))
@@ -651,15 +644,17 @@ class Trade(models.Model):
 
     def __str__(self):
         if self.session.visit.sale_file:
-            return f'{self.session.visit.sale_file} / {self.code}'
+            return f'{self.code} / {self.session.visit.sale_file}'
         if self.session.visit.rent_file:
-            return f'{self.session.visit.rent_file} / {self.code}'
+            return f'{self.code} / {self.session.visit.rent_file}'
 
     class Meta:
         ordering = ('-datetime_created',)
+        verbose_name = 'معامله'
+        verbose_name_plural = 'معاملات'
 
     def get_absolute_url(self):
-        return reverse('trade_detail', args=[self.code])
+        return reverse('trade_detail', args=[self.pk, self.code])
 
 
 # --------------------------------- MNGs ---------------------------------
@@ -676,7 +671,6 @@ class Task(models.Model):
     description = models.TextField(max_length=1000, blank=True, null=True, verbose_name=_('Description'))
     result = models.TextField(max_length=1000, blank=True, null=True, verbose_name=_('Result'))
     status = models.CharField(max_length=10, choices=choices.task_statuses, default='OP',  verbose_name=_('Status'))
-    slug = models.SlugField(max_length=255, null=True, blank=True, unique=True, allow_unicode=True)
     datetime_created = models.DateTimeField(auto_now_add=True, verbose_name=_('Date and Time of Creation'))
 
     @property
@@ -686,18 +680,18 @@ class Task(models.Model):
     def save(self, *args, **kwargs):
         if not self.code:
             self.code = generate_unique_code()
-        if not self.slug:
-            self.slug = slugify(self.title, allow_unicode=True)
         super(Task, self).save(*args, **kwargs)
 
     def __str__(self):
-        return f'{self.agent.title} / {self.code}'
+        return f'{self.type} / {self.code}'
 
     class Meta:
         ordering = ('-datetime_created',)
+        verbose_name = 'وظیفه'
+        verbose_name_plural = 'وظایف'
 
     def get_absolute_url(self):
-        return reverse('task_detail', args=[self.pk, self.slug])
+        return reverse('task_detail', args=[self.pk, self.code])
 
 
 

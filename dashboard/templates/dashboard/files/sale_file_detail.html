@@ -56,8 +56,8 @@
                                     <div style="font-size: 0.9em;">کد فایل: {{ sale_file.code }}</div>
 
                                     <div style="font-size: 0.9em; margin-top: 1em;">
-                                        <a href="{% url 'sale_file_update' sale_file.slug sale_file.unique_url_id %}" class="btn btn-primary">بروزرسانی</a>
-                                        <a href="{% url 'sale_file_delete' sale_file.slug sale_file.unique_url_id %}" class="btn btn-danger">پاک کردن</a>
+                                        <a href="{% url 'sale_file_update' sale_file.pk sale_file.unique_url_id %}" class="btn btn-primary">بروزرسانی</a>
+                                        <a href="{% url 'sale_file_delete' sale_file.pk sale_file.unique_url_id %}" class="btn btn-danger">پاک کردن</a>
                                     </div>
                                 </div>
                             </div>
@@ -214,7 +214,7 @@
                                 <!-- Link -->
                                 <li>
                                     {% if sale_file.zip_file %}
-                                        <a href="{% url 'sale_file_gallery' sale_file.slug sale_file.unique_url_id %}"
+                                        <a href="{% url 'sale_file_gallery' sale_file.pk sale_file.unique_url_id %}"
                                            class="btn btn-primary"
                                            onclick="copyToClipboard(event, this)">
                                            کپی لینک مشاهده محتوا

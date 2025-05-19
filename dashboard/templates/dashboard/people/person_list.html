@@ -54,6 +54,7 @@
     </div>
     <!-- end: Upper Navbar -->
     
+
     <!-- List -->
     <div class="nk-block">
 
@@ -108,70 +109,72 @@
         <!-- Person -->
         <div class="row g-gs">
             {% for person in persons %}
-            <div class="col-sm-6 col-lg-4 col-xxl-4">
-                <div class="card h-100">
-                    <div class="card-inner">
-                        <div class="project">
-
-                            <!-- Name & Phone -->
-                            <div class="project-head">
-                                <div class="project-title">
-                                    <div class="project-info">
-                                        <h6 class="title">{{ person.name }}</h6>
-                                        <span class="sub-text" style="font-size: 0.95em; margin-top: 0.7em;">{{ person.phone_number }}</span>
+                 {% if person.status == 'acc' %}   
+                    <div class="col-sm-6 col-lg-4 col-xxl-4">
+                        <div class="card h-100">
+                            <div class="card-inner">
+                                <div class="project">
+        
+                                    <!-- Name & Phone -->
+                                    <div class="project-head">
+                                        <div class="project-title">
+                                            <div class="project-info">
+                                                <h6 class="title">{{ person.name }}</h6>
+                                                <span class="sub-text" style="font-size: 0.95em; margin-top: 0.7em;">{{ person.phone_number }}</span>
+                                            </div>
+                                        </div>
                                     </div>
+        
+                                    <!-- Description -->
+                                    <div class="project-details">
+                                        <p style="height: 8em;!important; -webkit-line-clamp: 4;!important;">{{ person.description|linebreaksbr|farsi_number }}</p>
+                                    </div>
+        
+                                    <!-- Files -->
+                                    <div  style="height: 12em;!important; -webkit-line-clamp: 4;!important;">
+                                        <h6 class="title" style="margin-bottom: 0.7em;">فایل‌های فروش/اجاره:</h6>
+                                        <!-- Sale -->
+                                        {% if person.sale_files %}
+                                            {% for sale_file in person.sale_files.all %}
+                                                <div class="project-head" style="margin-bottom: 0.5em;!important;">
+                                                    <div class="project-title">
+                                                        <div class="project-info">
+                                                            <a href="{{ sale_file.get_absolute_url }}">
+                                                                <span class="sub-text" style="font-size: 0.85em;">{{ sale_file.title|linebreaksbr|farsi_number }}</span>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            {% endfor %}
+                                        {% endif %}
+        
+                                        <!-- Rent -->
+                                        {% if person.rent_files %}
+                                            {% for rent_file in person.rent_files.all %}
+                                                <div class="project-head" style="margin-bottom: 0.5em;!important;">
+                                                    <div class="project-title">
+                                                        <div class="project-info">
+                                                            <a href="{{ rent_file.get_absolute_url }}">
+                                                                <span class="sub-text" style="font-size: 0.85em;">{{ rent_file.title|linebreaksbr|farsi_number }}</span>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+        
+                                    <!-- Edit - Delete -->
+                                    <div class="project-meta">
+                                        <a href="{% url 'person_update' person.pk %}" class="btn btn-primary" style="margin-top: 1em;"><em class="icon ni ni-edit"></em><span>تغییر</span></a>
+                                        <a href="{% url 'person_delete' person.pk %}" class="btn btn-danger" style="margin-top: 1em;"><em class="icon ni ni-delete"></em><span>حذف</span></a>
+                                    </div>
+        
                                 </div>
                             </div>
-
-                            <!-- Description -->
-                            <div class="project-details">
-                                <p style="height: 8em;!important; -webkit-line-clamp: 4;!important;">{{ person.description|linebreaksbr|farsi_number }}</p>
-                            </div>
-
-                            <!-- Files -->
-                            <div  style="height: 12em;!important; -webkit-line-clamp: 4;!important;">
-                                <h6 class="title" style="margin-bottom: 0.7em;">فایل‌های فروش/اجاره:</h6>
-                                <!-- Sale -->
-                                {% if person.sale_files %}
-                                    {% for sale_file in person.sale_files.all %}
-                                        <div class="project-head" style="margin-bottom: 0.5em;!important;">
-                                            <div class="project-title">
-                                                <div class="project-info">
-                                                    <a href="{{ sale_file.get_absolute_url }}">
-                                                        <span class="sub-text" style="font-size: 0.85em;">{{ sale_file.title|linebreaksbr|farsi_number }}</span>
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    {% endfor %}
-                                {% endif %}
-
-                                <!-- Rent -->
-                                {% if person.rent_files %}
-                                    {% for rent_file in person.rent_files.all %}
-                                        <div class="project-head" style="margin-bottom: 0.5em;!important;">
-                                            <div class="project-title">
-                                                <div class="project-info">
-                                                    <a href="{{ rent_file.get_absolute_url }}">
-                                                        <span class="sub-text" style="font-size: 0.85em;">{{ rent_file.title|linebreaksbr|farsi_number }}</span>
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    {% endfor %}
-                                {% endif %}
-                            </div>
-
-                            <!-- Edit - Delete -->
-                            <div class="project-meta">
-                                <a href="{% url 'person_update' person.pk %}" class="btn btn-primary" style="margin-top: 1em;"><em class="icon ni ni-edit"></em><span>تغییر</span></a>
-                                <a href="{% url 'person_delete' person.pk %}" class="btn btn-danger" style="margin-top: 1em;"><em class="icon ni ni-delete"></em><span>حذف</span></a>
-                            </div>
-
                         </div>
                     </div>
-                </div>
-            </div>
+                 {% endif %}   
             {% endfor %}
         </div>
         <!-- end: Person -->
