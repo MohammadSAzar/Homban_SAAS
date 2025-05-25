@@ -569,14 +569,14 @@ class SubDistrictCreateForm(forms.ModelForm):
 
 # -------------------------------- Services ---------------------------------
 visit_required_fields = ['type', 'date', 'time']
-session_required_fields = ['visit', 'type', 'date', 'time']
-trade_required_fields = ['session', 'type', 'date', 'time', 'owner', 'owner_national_code', 'customer_national_code']
+session_required_fields = ['type', 'date', 'time']
+trade_required_fields = ['session_code', 'type', 'date', 'time', 'owner']
 
 
 class VisitCreateForm(forms.ModelForm):
     class Meta:
         model = models.Visit
-        fields = ['sale_file', 'rent_file', 'customer', 'type', 'date', 'time', 'description']
+        fields = ['sale_file_code', 'rent_file_code', 'buyer_code', 'renter_code', 'type', 'date', 'time', 'description']
 
     def __init__(self, *args, **kwargs):
         super(VisitCreateForm, self).__init__(*args, **kwargs)
@@ -626,7 +626,7 @@ class VisitCancelForm(forms.ModelForm):
 class SessionCreateForm(forms.ModelForm):
     class Meta:
         model = models.Session
-        fields = ['visit', 'type', 'date', 'time', 'description']
+        fields = ['sale_file_code', 'rent_file_code', 'buyer_code', 'renter_code', 'visit_code', 'type', 'date', 'time', 'description']
 
     def __init__(self, *args, **kwargs):
         super(SessionCreateForm, self).__init__(*args, **kwargs)
@@ -676,8 +676,8 @@ class SessionCancelForm(forms.ModelForm):
 class TradeCreateForm(forms.ModelForm):
     class Meta:
         model = models.Trade
-        fields = ['session', 'type', 'date', 'description', 'price', 'deposit', 'rent', 'owner', 'owner_national_code',
-                  'buyer', 'renter', 'customer_national_code', 'followup_code']
+        fields = ['session_code', 'type', 'date', 'description', 'price', 'deposit', 'rent', 'contract_owner',
+                  'contract_buyer', 'contract_renter', 'followup_code']
 
     def __init__(self, *args, **kwargs):
         super(TradeCreateForm, self).__init__(*args, **kwargs)

@@ -101,7 +101,7 @@ class RenterAdmin(admin.ModelAdmin):
 # --------------------------------- SERV ---------------------------------
 @admin.register(models.Visit)
 class VisitAdmin(admin.ModelAdmin):
-    list_display = ('type', 'code', 'sale_file', 'rent_file', 'customer', 'status', 'datetime_created')
+    list_display = ('type', 'code', 'sale_file_code', 'rent_file_code', 'buyer_code', 'renter_code', 'status', 'datetime_created')
     ordering = ('-datetime_created',)
     list_filter = ('type', 'status',)
     readonly_fields = ('code', 'datetime_created',)
@@ -109,7 +109,7 @@ class VisitAdmin(admin.ModelAdmin):
 
 @admin.register(models.Session)
 class SessionAdmin(admin.ModelAdmin):
-    list_display = ('type', 'code', 'visit', 'status', 'datetime_created')
+    list_display = ('type', 'code', 'sale_file_code', 'rent_file_code', 'buyer_code', 'renter_code', 'visit_code', 'status', 'datetime_created')
     ordering = ('-datetime_created',)
     list_filter = ('type', 'status',)
     readonly_fields = ('code', 'datetime_created',)
@@ -117,8 +117,8 @@ class SessionAdmin(admin.ModelAdmin):
 
 @admin.register(models.Trade)
 class TradeAdmin(admin.ModelAdmin):
-    list_display = ('type', 'code', 'session', 'followup_code', 'date', 'price', 'deposit', 'rent',
-                    'owner', 'buyer', 'renter', 'datetime_created')
+    list_display = ('type', 'code', 'session_code', 'followup_code', 'date', 'price', 'deposit', 'rent',
+                    'contract_owner', 'contract_buyer', 'contract_renter', 'datetime_created')
     ordering = ('-datetime_created',)
     list_filter = ('type',)
     readonly_fields = ('code', 'datetime_created',)
