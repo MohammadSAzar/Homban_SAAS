@@ -1,0 +1,180 @@
+{% extends '_base_dashboard.html' %}
+
+{% load static %}
+{% load i18n %}
+{% load jalali_tags %}
+{% load number_converter %}
+{% load widget_tweaks %}
+{% load humanize %}
+
+
+{% block title %}{{ trade }}{% endblock %}
+
+
+{% block content %}
+
+    <div class="card">
+        <div class="card-aside-wrap">
+            <div class="card-inner card-inner-lg">
+
+                <!-- Name -->
+                <div class="nk-block-head  nk-block-head-lg">
+                    <div class="nk-block-between">
+                        <div class="nk-block-head-content">
+                            <h5 class="nk-block-title">"{{ trade }}"</h5>
+                            <div style="font-size: 0.9em; margin-top: 1em;">
+                                <a href="{% url 'trade_update' trade.pk trade.code %}" class="btn btn-primary" style="margin-left: 10px;">تغییر</a>
+                                {% if trade.followup_code_status == 'ntk' %}
+                                    <a href="{% url 'trade_code' trade.pk trade.code %}" class="btn btn-primary">ثبت کد رهگیری</a>
+                                {% endif %}
+                            </div>
+                            <div class="nk-block-des" style="margin-top: 10px;">
+                                <p>کد معامله: {{ trade.code }}</p>
+                            </div>
+                            <div class="nk-block-des">
+                                {% if trade.followup_code_status == 'tkn' %}
+                                    <p>کد رهگیری: {{ trade.followup_code }}</p>
+                                {% else %}
+                                    <p>کد رهگیری: {{ trade.get_followup_code_status_display }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- end: Title -->
+
+                <!-- Info -->
+                <div class="nk-block">
+
+                    <!-- Main -->
+                    <div class="nk-data  data-list">
+                        <!-- Title -->
+                        <div class="data-head">
+                            <h6 class="title">اطلاعات اصلی</h6>
+                        </div>
+                        <!-- type -->
+                        <div class="data-item" data-bs-toggle="modal" data-bs-target="#profile-edit">
+                            <div class="data-col">
+                                <span class="data-label">نوع معامله:</span>
+                                <span class="data-value">{{ trade.get_type_display }}</span>
+                            </div>
+                        </div>
+                        <!-- date -->
+                        <div class="data-item" data-bs-toggle="modal" data-bs-target="#profile-edit">
+                            <div class="data-col">
+                                <span class="data-label">تاریخ معامله:</span>
+                                <span class="data-value">{{ trade.date }}</span>
+                            </div>
+                        </div>
+                        <!-- session_code -->
+                        <div class="data-item" data-bs-toggle="modal" data-bs-target="#profile-edit">
+                            <div class="data-col">
+                                <span class="data-label">کد جلسه مربوطه:</span>
+                                <span class="data-value">{{ trade.session_code }}</span>
+                            </div>
+                        </div>
+                        <!-- file -->
+                        <div class="data-item" data-bs-toggle="modal" data-bs-target="#profile-edit">
+                            <div class="data-col">
+                                <span class="data-label">فایل مربوطه:</span>
+                                {% if trade.type == 'sale' %}
+                                    <a href="{{ trade.sale_file.get_absolute_url }}" style="text-decoration: none">
+                                        <span class="data-value">{{ trade.sale_file.title|farsi_number }}</span>
+                                    </a>
+                                {% else %}
+                                    <a href="{{ trade.rent_file.get_absolute_url }}" style="text-decoration: none">
+                                        <span class="data-value">{{ trade.rent_file.title|farsi_number }}</span>
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Other -->
+                    <div class="nk-data  data-list">
+                        <!-- Title -->
+                        <div class="data-head">
+                            <h6 class="title">سایر اطلاعات</h6>
+                        </div>
+                        <!-- contract_owner -->
+                        <div class="data-item" data-bs-toggle="modal" data-bs-target="#profile-edit">
+                            <div class="data-col">
+                                <span class="data-label">مالک (در قرارداد):</span>
+                                <span class="data-value">{{ trade.contract_owner}}</span>
+                            </div>
+                        </div>
+                        <!-- contract_buyer/renter -->
+                        <div class="data-item" data-bs-toggle="modal" data-bs-target="#profile-edit">
+                            <div class="data-col">
+                                {% if trade.type == 'sale' %}
+                                    <span class="data-label">خریدار (در قرارداد):</span>
+                                    <span class="data-value">{{ trade.contract_buyer}}</span>
+                                {% else %}
+                                    <span class="data-label">مستاجر (در قرارداد):</span>
+                                    <span class="data-value">{{ trade.contract_renter}}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <!-- website_buyer/renter -->
+                        <div class="data-item" data-bs-toggle="modal" data-bs-target="#profile-edit">
+                            <div class="data-col">
+                                {% if trade.type == 'sale' %}
+                                    <span class="data-label">خریدار (در سایت):</span>
+                                    <a href="{{ trade.buyer.get_absolute_url }}" style="text-decoration: none">
+                                        <span class="data-value">{{ trade.buyer.name }}</span>
+                                    </a>
+                                {% else %}
+                                    <span class="data-label">مستاجر (در سایت):</span>
+                                    <a href="{{ trade.renter.get_absolute_url }}" style="text-decoration: none">
+                                        <span class="data-value">{{ trade.renter.name }}</span>
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% if trade.type == 'sale' %}
+                            <!-- price -->
+                            <div class="data-item" data-bs-toggle="modal" data-bs-target="#profile-edit">
+                                <div class="data-col">
+                                    <span class="data-label">قیمت:</span>
+                                    <span class="data-value">{{ trade.price|intcomma:False|farsi_number }} تومان</span>
+                                </div>
+                            </div>
+                        {% else %}
+                            <!-- deposit -->
+                            <div class="data-item" data-bs-toggle="modal" data-bs-target="#profile-edit">
+                                <div class="data-col">
+                                    <span class="data-label">قیمت:</span>
+                                    <span class="data-value">{{ trade.deposit|intcomma:False|farsi_number }} تومان</span>
+                                </div>
+                            </div>
+                            <!-- rent -->
+                            <div class="data-item" data-bs-toggle="modal" data-bs-target="#profile-edit">
+                                <div class="data-col">
+                                    <span class="data-label">قیمت:</span>
+                                    <span class="data-value">{{ trade.rent|farsi_number }} تومان</span>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        <!-- description -->
+                        <div class="data-item" data-bs-toggle="modal" data-bs-target="#profile-edit">
+                            <div class="data-col">
+                                <span class="data-label">توضیحات:</span>
+                                <span class="data-value">{{ trade.description|linebreaksbr|farsi_number|safe }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- end: Info -->
+
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+
+
+
+

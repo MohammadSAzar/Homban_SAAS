@@ -158,8 +158,12 @@ times = [
 
 serv_statuses = [
     ('sub', _('Submitted')),
-    ('can', _('Canceled')),
-    ('dne', _('Done')),
+    ('end', 'خاتمه یافته'),
+]
+
+fc_statuses = [
+    ('tkn', 'گرفته شده'),
+    ('ntk', 'گرفته نشده'),
 ]
 
 types = [

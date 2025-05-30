@@ -101,7 +101,7 @@ class RenterAdmin(admin.ModelAdmin):
 # --------------------------------- SERV ---------------------------------
 @admin.register(models.Visit)
 class VisitAdmin(admin.ModelAdmin):
-    list_display = ('type', 'code', 'sale_file_code', 'rent_file_code', 'buyer_code', 'renter_code', 'status', 'datetime_created')
+    list_display = ('type', 'agent', 'code', 'sale_file_code', 'rent_file_code', 'buyer_code', 'renter_code', 'status', 'datetime_created')
     ordering = ('-datetime_created',)
     list_filter = ('type', 'status',)
     readonly_fields = ('code', 'datetime_created',)
@@ -109,7 +109,7 @@ class VisitAdmin(admin.ModelAdmin):
 
 @admin.register(models.Session)
 class SessionAdmin(admin.ModelAdmin):
-    list_display = ('type', 'code', 'sale_file_code', 'rent_file_code', 'buyer_code', 'renter_code', 'visit_code', 'status', 'datetime_created')
+    list_display = ('type', 'agent', 'code', 'sale_file_code', 'rent_file_code', 'buyer_code', 'renter_code', 'status', 'datetime_created')
     ordering = ('-datetime_created',)
     list_filter = ('type', 'status',)
     readonly_fields = ('code', 'datetime_created',)

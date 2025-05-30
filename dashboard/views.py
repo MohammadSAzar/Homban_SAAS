@@ -295,7 +295,7 @@ class SaleFileListView(ReadOnlyPermissionMixin, ListView):
     permission_model = 'SaleFile'
 
     def get_queryset(self):
-        if self.request.user.title == 'fp':
+        if self.request.user.title != 'bs':
             sub_district = self.request.user.sub_district
             queryset_default = (models.SaleFile.objects.select_related('province', 'city', 'district', 'sub_district', 'person')
                                 .filter(sub_district=sub_district))
@@ -315,7 +315,6 @@ class SaleFileListView(ReadOnlyPermissionMixin, ListView):
                     queryset_filtered = queryset_filtered.filter(elevator=form.cleaned_data['elevator'])
                 if form.cleaned_data['warehouse']:
                     queryset_filtered = queryset_filtered.filter(warehouse=form.cleaned_data['warehouse'])
-
                 queryset_filtered = list(queryset_filtered)
 
                 if form.cleaned_data['has_images'] == 'has':
@@ -326,8 +325,6 @@ class SaleFileListView(ReadOnlyPermissionMixin, ListView):
                     queryset_filtered = [obj for obj in queryset_filtered if obj.has_video]
                 if form.cleaned_data['has_video'] == 'hasnt':
                     queryset_filtered = [obj for obj in queryset_filtered if not obj.has_video]
-
-                # queryset_final = queryset_filtered
                 if form.cleaned_data['min_price']:
                     queryset_filtered = [obj for obj in queryset_filtered if
                                          obj.price_announced and obj.price_announced >= form.cleaned_data[
@@ -390,7 +387,6 @@ class SaleFileListView(ReadOnlyPermissionMixin, ListView):
                     queryset_filtered = queryset_filtered.filter(elevator=form.cleaned_data['elevator'])
                 if form.cleaned_data['warehouse']:
                     queryset_filtered = queryset_filtered.filter(warehouse=form.cleaned_data['warehouse'])
-
                 queryset_filtered = list(queryset_filtered)
 
                 if form.cleaned_data['has_images'] == 'has':
@@ -402,7 +398,6 @@ class SaleFileListView(ReadOnlyPermissionMixin, ListView):
                 if form.cleaned_data['has_video'] == 'hasnt':
                     queryset_filtered = [obj for obj in queryset_filtered if not obj.has_video]
 
-                # queryset_final = queryset_filtered
                 if form.cleaned_data['min_price']:
                     queryset_filtered = [obj for obj in queryset_filtered if
                                          obj.price_announced and obj.price_announced >= form.cleaned_data['min_price']]
@@ -533,7 +528,7 @@ class RentFileListView(ReadOnlyPermissionMixin, ListView):
     permission_model = 'RentFile'
 
     def get_queryset(self):
-        if self.request.user.title == 'fp':
+        if self.request.user.title != 'bs':
             sub_district = self.request.user.sub_district
             queryset_default = (
                 models.RentFile.objects.select_related('province', 'city', 'district', 'sub_district', 'person')
@@ -635,7 +630,6 @@ class RentFileListView(ReadOnlyPermissionMixin, ListView):
                     queryset_filtered = queryset_filtered.filter(elevator=form.cleaned_data['elevator'])
                 if form.cleaned_data['warehouse']:
                     queryset_filtered = queryset_filtered.filter(warehouse=form.cleaned_data['warehouse'])
-
                 queryset_filtered = list(queryset_filtered)
 
                 if form.cleaned_data['has_images'] == 'has':
@@ -647,7 +641,6 @@ class RentFileListView(ReadOnlyPermissionMixin, ListView):
                 if form.cleaned_data['has_video'] == 'hasnt':
                     queryset_filtered = [obj for obj in queryset_filtered if not obj.has_video]
 
-                # queryset_final = queryset_filtered
                 if form.cleaned_data['min_deposit']:
                     queryset_filtered = [obj for obj in queryset_filtered if
                                          obj.deposit_announced and obj.deposit_announced >= form.cleaned_data['min_deposit']]
@@ -682,7 +675,6 @@ class RentFileListView(ReadOnlyPermissionMixin, ListView):
                 if form.cleaned_data['max_level']:
                     queryset_filtered = [obj for obj in queryset_filtered if
                                          int(obj.level) <= int(form.cleaned_data['max_level'])]
-
                 return queryset_filtered
             return queryset_default
 
@@ -856,42 +848,79 @@ class BuyerListView(ReadOnlyPermissionMixin, ListView):
     permission_model = 'Buyer'
 
     def get_queryset(self):
-        queryset_default = models.Buyer.objects.select_related('province', 'city', 'district').prefetch_related('sub_districts')
-        form = forms.BuyerFilterForm(self.request.GET)
+        if self.request.user.title == 'bs':
+            queryset_default = models.Buyer.objects.select_related('province', 'city', 'district').prefetch_related('sub_districts')
 
-        if form.is_valid():
-            queryset_filtered = queryset_default
-            if form.cleaned_data['province']:
-                queryset_filtered = queryset_filtered.filter(province=form.cleaned_data['province'])
-            if form.cleaned_data['city']:
-                queryset_filtered = queryset_filtered.filter(city=form.cleaned_data['city'])
-            if form.cleaned_data['district']:
-                queryset_filtered = queryset_filtered.filter(district=form.cleaned_data['district'])
-            if form.cleaned_data['sub_districts']:
-                queryset_filtered = queryset_filtered.filter(sub_districts__in=form.cleaned_data['sub_districts']).distinct()
-            if form.cleaned_data['budget_status']:
-                queryset_filtered = queryset_filtered.filter(budget_status=form.cleaned_data['budget_status'])
-            if form.cleaned_data['document']:
-                queryset_filtered = queryset_filtered.filter(document=form.cleaned_data['document'])
-            if form.cleaned_data['parking']:
-                queryset_filtered = queryset_filtered.filter(parking=form.cleaned_data['parking'])
-            if form.cleaned_data['elevator']:
-                queryset_filtered = queryset_filtered.filter(elevator=form.cleaned_data['elevator'])
-            if form.cleaned_data['warehouse']:
-                queryset_filtered = queryset_filtered.filter(warehouse=form.cleaned_data['warehouse'])
+            form = forms.BuyerFilterForm(self.request.GET)
+            if form.is_valid():
+                queryset_filtered = queryset_default
+                if form.cleaned_data['province']:
+                    queryset_filtered = queryset_filtered.filter(province=form.cleaned_data['province'])
+                if form.cleaned_data['city']:
+                    queryset_filtered = queryset_filtered.filter(city=form.cleaned_data['city'])
+                if form.cleaned_data['district']:
+                    queryset_filtered = queryset_filtered.filter(district=form.cleaned_data['district'])
+                if form.cleaned_data['sub_districts']:
+                    queryset_filtered = queryset_filtered.filter(sub_districts__in=form.cleaned_data['sub_districts']).distinct()
+                if form.cleaned_data['budget_status']:
+                    queryset_filtered = queryset_filtered.filter(budget_status=form.cleaned_data['budget_status'])
+                if form.cleaned_data['document']:
+                    queryset_filtered = queryset_filtered.filter(document=form.cleaned_data['document'])
+                if form.cleaned_data['parking']:
+                    queryset_filtered = queryset_filtered.filter(parking=form.cleaned_data['parking'])
+                if form.cleaned_data['elevator']:
+                    queryset_filtered = queryset_filtered.filter(elevator=form.cleaned_data['elevator'])
+                if form.cleaned_data['warehouse']:
+                    queryset_filtered = queryset_filtered.filter(warehouse=form.cleaned_data['warehouse'])
+                queryset_filtered = list(queryset_filtered)
 
-            queryset_filtered = list(queryset_filtered)
+                if form.cleaned_data['min_budget']:
+                    queryset_filtered = [obj for obj in queryset_filtered if
+                                         obj.budget_announced and obj.budget_announced >= form.cleaned_data['min_budget']]
+                if form.cleaned_data['max_budget']:
+                    queryset_filtered = [obj for obj in queryset_filtered if
+                                         obj.budget_announced and obj.budget_announced <= form.cleaned_data['max_budget']]
 
-            # queryset_final = queryset_filtered
-            if form.cleaned_data['min_budget']:
-                queryset_filtered = [obj for obj in queryset_filtered if
-                                     obj.budget_announced and obj.budget_announced >= form.cleaned_data['min_budget']]
-            if form.cleaned_data['max_budget']:
-                queryset_filtered = [obj for obj in queryset_filtered if
-                                     obj.budget_announced and obj.budget_announced <= form.cleaned_data['max_budget']]
+                return queryset_filtered
+            return queryset_default
 
-            return queryset_filtered
-        return queryset_default
+        else:
+            queryset_default = (models.Buyer.objects.select_related('province', 'city', 'district').prefetch_related('sub_districts')
+                                .filter(sub_districts__name__contains=self.request.user.sub_district.name))
+
+            form = forms.BuyerFilterForm(self.request.GET)
+            if form.is_valid():
+                queryset_filtered = queryset_default
+                if form.cleaned_data['province']:
+                    queryset_filtered = queryset_filtered.filter(province=form.cleaned_data['province'])
+                if form.cleaned_data['city']:
+                    queryset_filtered = queryset_filtered.filter(city=form.cleaned_data['city'])
+                if form.cleaned_data['district']:
+                    queryset_filtered = queryset_filtered.filter(district=form.cleaned_data['district'])
+                if form.cleaned_data['sub_districts']:
+                    queryset_filtered = queryset_filtered.filter(sub_districts__in=form.cleaned_data['sub_districts']).distinct()
+                if form.cleaned_data['budget_status']:
+                    queryset_filtered = queryset_filtered.filter(budget_status=form.cleaned_data['budget_status'])
+                if form.cleaned_data['document']:
+                    queryset_filtered = queryset_filtered.filter(document=form.cleaned_data['document'])
+                if form.cleaned_data['parking']:
+                    queryset_filtered = queryset_filtered.filter(parking=form.cleaned_data['parking'])
+                if form.cleaned_data['elevator']:
+                    queryset_filtered = queryset_filtered.filter(elevator=form.cleaned_data['elevator'])
+                if form.cleaned_data['warehouse']:
+                    queryset_filtered = queryset_filtered.filter(warehouse=form.cleaned_data['warehouse'])
+
+                queryset_filtered = list(queryset_filtered)
+
+                if form.cleaned_data['min_budget']:
+                    queryset_filtered = [obj for obj in queryset_filtered if
+                                         obj.budget_announced and obj.budget_announced >= form.cleaned_data['min_budget']]
+                if form.cleaned_data['max_budget']:
+                    queryset_filtered = [obj for obj in queryset_filtered if
+                                         obj.budget_announced and obj.budget_announced <= form.cleaned_data['max_budget']]
+
+                return queryset_filtered
+            return queryset_default
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -985,50 +1014,99 @@ class RenterListView(ReadOnlyPermissionMixin, ListView):
     permission_model = 'Renter'
 
     def get_queryset(self):
-        queryset_default = models.Renter.objects.select_related('province', 'city', 'district').prefetch_related('sub_districts')
-        form = forms.RenterFilterForm(self.request.GET)
+        if self.request.user.title == 'bs':
+            queryset_default = models.Renter.objects.select_related('province', 'city', 'district').prefetch_related('sub_districts')
 
-        if form.is_valid():
-            queryset_filtered = queryset_default
-            if form.cleaned_data['province']:
-                queryset_filtered = queryset_filtered.filter(province=form.cleaned_data['province'])
-            if form.cleaned_data['city']:
-                queryset_filtered = queryset_filtered.filter(city=form.cleaned_data['city'])
-            if form.cleaned_data['district']:
-                queryset_filtered = queryset_filtered.filter(district=form.cleaned_data['district'])
-            if form.cleaned_data['sub_districts']:
-                queryset_filtered = queryset_filtered.filter(sub_districts__in=form.cleaned_data['sub_districts']).distinct()
-            if form.cleaned_data['budget_status']:
-                queryset_filtered = queryset_filtered.filter(budget_status=form.cleaned_data['budget_status'])
-            if form.cleaned_data['convertable']:
-                queryset_filtered = queryset_filtered.filter(convertable=form.cleaned_data['convertable'])
-            if form.cleaned_data['document']:
-                queryset_filtered = queryset_filtered.filter(document=form.cleaned_data['document'])
-            if form.cleaned_data['parking']:
-                queryset_filtered = queryset_filtered.filter(parking=form.cleaned_data['parking'])
-            if form.cleaned_data['elevator']:
-                queryset_filtered = queryset_filtered.filter(elevator=form.cleaned_data['elevator'])
-            if form.cleaned_data['warehouse']:
-                queryset_filtered = queryset_filtered.filter(warehouse=form.cleaned_data['warehouse'])
+            form = forms.RenterFilterForm(self.request.GET)
+            if form.is_valid():
+                queryset_filtered = queryset_default
+                if form.cleaned_data['province']:
+                    queryset_filtered = queryset_filtered.filter(province=form.cleaned_data['province'])
+                if form.cleaned_data['city']:
+                    queryset_filtered = queryset_filtered.filter(city=form.cleaned_data['city'])
+                if form.cleaned_data['district']:
+                    queryset_filtered = queryset_filtered.filter(district=form.cleaned_data['district'])
+                if form.cleaned_data['sub_districts']:
+                    queryset_filtered = queryset_filtered.filter(sub_districts__in=form.cleaned_data['sub_districts']).distinct()
+                if form.cleaned_data['budget_status']:
+                    queryset_filtered = queryset_filtered.filter(budget_status=form.cleaned_data['budget_status'])
+                if form.cleaned_data['convertable']:
+                    queryset_filtered = queryset_filtered.filter(convertable=form.cleaned_data['convertable'])
+                if form.cleaned_data['document']:
+                    queryset_filtered = queryset_filtered.filter(document=form.cleaned_data['document'])
+                if form.cleaned_data['parking']:
+                    queryset_filtered = queryset_filtered.filter(parking=form.cleaned_data['parking'])
+                if form.cleaned_data['elevator']:
+                    queryset_filtered = queryset_filtered.filter(elevator=form.cleaned_data['elevator'])
+                if form.cleaned_data['warehouse']:
+                    queryset_filtered = queryset_filtered.filter(warehouse=form.cleaned_data['warehouse'])
 
-            queryset_filtered = list(queryset_filtered)
+                queryset_filtered = list(queryset_filtered)
 
-            # queryset_final = queryset_filtered
-            if form.cleaned_data['min_deposit']:
-                queryset_filtered = [obj for obj in queryset_filtered if
-                                     obj.deposit_announced and obj.deposit_announced >= form.cleaned_data['min_deposit']]
-            if form.cleaned_data['max_deposit']:
-                queryset_filtered = [obj for obj in queryset_filtered if
-                                     obj.deposit_announced and obj.deposit_announced <= form.cleaned_data['max_deposit']]
-            if form.cleaned_data['min_rent']:
-                queryset_filtered = [obj for obj in queryset_filtered if
-                                     obj.rent_announced and obj.rent_announced >= form.cleaned_data['min_rent']]
-            if form.cleaned_data['max_rent']:
-                queryset_filtered = [obj for obj in queryset_filtered if
-                                     obj.rent_announced and obj.rent_announced <= form.cleaned_data['max_rent']]
+                if form.cleaned_data['min_deposit']:
+                    queryset_filtered = [obj for obj in queryset_filtered if
+                                         obj.deposit_announced and obj.deposit_announced >= form.cleaned_data['min_deposit']]
+                if form.cleaned_data['max_deposit']:
+                    queryset_filtered = [obj for obj in queryset_filtered if
+                                         obj.deposit_announced and obj.deposit_announced <= form.cleaned_data['max_deposit']]
+                if form.cleaned_data['min_rent']:
+                    queryset_filtered = [obj for obj in queryset_filtered if
+                                         obj.rent_announced and obj.rent_announced >= form.cleaned_data['min_rent']]
+                if form.cleaned_data['max_rent']:
+                    queryset_filtered = [obj for obj in queryset_filtered if
+                                         obj.rent_announced and obj.rent_announced <= form.cleaned_data['max_rent']]
 
-            return queryset_filtered
-        return queryset_default
+                return queryset_filtered
+            return queryset_default
+        else:
+            queryset_default = models.Renter.objects.select_related('province', 'city', 'district').prefetch_related(
+                'sub_districts').filter(sub_districts__name__contains=self.request.user.sub_district.name).distinct()
+            form = forms.RenterFilterForm(self.request.GET)
+
+            if form.is_valid():
+                queryset_filtered = queryset_default
+                if form.cleaned_data['province']:
+                    queryset_filtered = queryset_filtered.filter(province=form.cleaned_data['province'])
+                if form.cleaned_data['city']:
+                    queryset_filtered = queryset_filtered.filter(city=form.cleaned_data['city'])
+                if form.cleaned_data['district']:
+                    queryset_filtered = queryset_filtered.filter(district=form.cleaned_data['district'])
+                if form.cleaned_data['sub_districts']:
+                    queryset_filtered = queryset_filtered.filter(
+                        sub_districts__in=form.cleaned_data['sub_districts']).distinct()
+                if form.cleaned_data['budget_status']:
+                    queryset_filtered = queryset_filtered.filter(budget_status=form.cleaned_data['budget_status'])
+                if form.cleaned_data['convertable']:
+                    queryset_filtered = queryset_filtered.filter(convertable=form.cleaned_data['convertable'])
+                if form.cleaned_data['document']:
+                    queryset_filtered = queryset_filtered.filter(document=form.cleaned_data['document'])
+                if form.cleaned_data['parking']:
+                    queryset_filtered = queryset_filtered.filter(parking=form.cleaned_data['parking'])
+                if form.cleaned_data['elevator']:
+                    queryset_filtered = queryset_filtered.filter(elevator=form.cleaned_data['elevator'])
+                if form.cleaned_data['warehouse']:
+                    queryset_filtered = queryset_filtered.filter(warehouse=form.cleaned_data['warehouse'])
+
+                queryset_filtered = list(queryset_filtered)
+
+                # queryset_final = queryset_filtered
+                if form.cleaned_data['min_deposit']:
+                    queryset_filtered = [obj for obj in queryset_filtered if
+                                         obj.deposit_announced and obj.deposit_announced >= form.cleaned_data[
+                                             'min_deposit']]
+                if form.cleaned_data['max_deposit']:
+                    queryset_filtered = [obj for obj in queryset_filtered if
+                                         obj.deposit_announced and obj.deposit_announced <= form.cleaned_data[
+                                             'max_deposit']]
+                if form.cleaned_data['min_rent']:
+                    queryset_filtered = [obj for obj in queryset_filtered if
+                                         obj.rent_announced and obj.rent_announced >= form.cleaned_data['min_rent']]
+                if form.cleaned_data['max_rent']:
+                    queryset_filtered = [obj for obj in queryset_filtered if
+                                         obj.rent_announced and obj.rent_announced <= form.cleaned_data['max_rent']]
+
+                return queryset_filtered
+            return queryset_default
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -1326,6 +1404,391 @@ class TaskResultView(PermissionRequiredMixin, UpdateView):
             return reverse('task_bt_list')
         return reverse('dashboard')
 
+
+# --------------------------------- Services --------------------------------
+class VisitListView(ReadOnlyPermissionMixin, ListView):
+    model = models.Visit
+    template_name = 'dashboard/services/visit_list.html'
+    context_object_name = 'visits'
+    paginate_by = 12
+    permission_model = 'Visit'
+
+    def get_queryset(self):
+        if self.request.user.title == 'bs':
+            queryset = models.Visit.objects.all()
+            return queryset
+        else:
+            if not self.request.user.sub_district:
+                return models.Visit.objects.none()
+
+            user_sub_district = self.request.user.sub_district
+            sale_visits = models.Visit.objects.filter(
+                sale_file_code__isnull=False,
+                sale_file_code__in=models.SaleFile.objects.filter(
+                    sub_district=user_sub_district
+                ).values_list('code', flat=True)
+            )
+            rent_visits = models.Visit.objects.filter(
+                rent_file_code__isnull=False,
+                rent_file_code__in=models.RentFile.objects.filter(
+                    sub_district=user_sub_district
+                ).values_list('code', flat=True)
+            )
+            queryset = (sale_visits | rent_visits).distinct()
+            queryset = queryset.filter(agent=self.request.user)
+
+            return queryset
+
+
+class VisitCreateView(PermissionRequiredMixin, CreateView):
+    model = models.Visit
+    form_class = forms.VisitCreateForm
+    template_name = 'dashboard/services/visit_create.html'
+    permission_model = 'Visit'
+    permission_action = 'create'
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+    def form_valid(self, form):
+        messages.success(self.request, "بازدید جدید در سامانه ثبت شد.")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        self.object = None
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_success_url(self):
+        return reverse('visit_list')
+
+
+class VisitUpdateView(PermissionRequiredMixin, UpdateView):
+    model = models.Visit
+    form_class = forms.VisitCreateForm
+    template_name = 'dashboard/services/visit_update.html'
+    context_object_name = 'visit'
+    permission_model = 'Visit'
+    permission_action = 'update'
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
+    def form_valid(self, form):
+        messages.success(self.request, "تغییرات شما در سامانه ثبت شد.")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        self.object = None
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_success_url(self):
+        return reverse('visit_list')
+
+
+class VisitDeleteView(PermissionRequiredMixin, DeleteView):
+    model = models.Visit
+    template_name = 'dashboard/services/visit_delete.html'
+    success_url = reverse_lazy('visit_list')
+    context_object_name = 'visit'
+    permission_model = 'Visit'
+    permission_action = 'delete'
+
+    def form_valid(self, form):
+        messages.error(self.request, "بازدید مربوطه از سامانه حذف شد.")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        self.object = None
+        return self.render_to_response(self.get_context_data(form=form))
+
+
+class VisitDetailView(ReadOnlyPermissionMixin, DetailView):
+    model = models.Visit
+    context_object_name = 'visit'
+    template_name = 'dashboard/services/visit_detail.html'
+    permission_model = 'Visit'
+
+
+class VisitResultView(PermissionRequiredMixin, UpdateView):
+    model = models.Visit
+    form_class = forms.VisitResultForm
+    template_name = 'dashboard/services/visit_result.html'
+    context_object_name = 'visit'
+    permission_model = 'Visit'
+    permission_action = 'update'
+
+    def form_valid(self, form):
+        messages.success(self.request, "تغییرات شما در سامانه ثبت شد (و توسط مدیر مشاهده خواهد شد).")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        self.object = None
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_success_url(self):
+        return reverse('visit_list')
+
+
+class SessionListView(ReadOnlyPermissionMixin, ListView):
+    model = models.Session
+    template_name = 'dashboard/services/session_list.html'
+    context_object_name = 'sessions'
+    paginate_by = 12
+    permission_model = 'Session'
+
+    def get_queryset(self):
+        if self.request.user.title == 'bs':
+            queryset = models.Session.objects.all()
+            return queryset
+        else:
+            if not self.request.user.sub_district:
+                return models.Session.objects.none()
+
+            user_sub_district = self.request.user.sub_district
+            sale_sessions = models.Session.objects.filter(
+                sale_file_code__isnull=False,
+                sale_file_code__in=models.SaleFile.objects.filter(
+                    sub_district=user_sub_district
+                ).values_list('code', flat=True)
+            )
+            rent_sessions = models.Session.objects.filter(
+                rent_file_code__isnull=False,
+                rent_file_code__in=models.RentFile.objects.filter(
+                    sub_district=user_sub_district
+                ).values_list('code', flat=True)
+            )
+            queryset = (sale_sessions | rent_sessions).distinct()
+            queryset = queryset.filter(agent=self.request.user)
+
+            return queryset
+
+
+class SessionCreateView(PermissionRequiredMixin, CreateView):
+    model = models.Session
+    form_class = forms.SessionCreateForm
+    template_name = 'dashboard/services/session_create.html'
+    permission_model = 'Session'
+    permission_action = 'create'
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+    def form_valid(self, form):
+        messages.success(self.request, "نشست جدید در سامانه ثبت شد.")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        self.object = None
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_success_url(self):
+        return reverse('session_list')
+
+
+class SessionUpdateView(PermissionRequiredMixin, UpdateView):
+    model = models.Session
+    form_class = forms.SessionCreateForm
+    template_name = 'dashboard/services/session_update.html'
+    context_object_name = 'session'
+    permission_model = 'Session'
+    permission_action = 'update'
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
+    def form_valid(self, form):
+        messages.success(self.request, "تغییرات شما در سامانه ثبت شد.")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        self.object = None
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_success_url(self):
+        return reverse('session_list')
+
+
+class SessionDeleteView(PermissionRequiredMixin, DeleteView):
+    model = models.Session
+    template_name = 'dashboard/services/session_delete.html'
+    success_url = reverse_lazy('session_list')
+    context_object_name = 'session'
+    permission_model = 'Session'
+    permission_action = 'delete'
+
+    def form_valid(self, form):
+        messages.error(self.request, "نشست مربوطه از سامانه حذف شد.")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        self.object = None
+        return self.render_to_response(self.get_context_data(form=form))
+
+
+class SessionDetailView(ReadOnlyPermissionMixin, DetailView):
+    model = models.Session
+    context_object_name = 'session'
+    template_name = 'dashboard/services/session_detail.html'
+    permission_model = 'Session'
+
+
+class SessionResultView(PermissionRequiredMixin, UpdateView):
+    model = models.Session
+    form_class = forms.SessionResultForm
+    template_name = 'dashboard/services/session_result.html'
+    context_object_name = 'session'
+    permission_model = 'Session'
+    permission_action = 'update'
+
+    def form_valid(self, form):
+        messages.success(self.request, "تغییرات شما در سامانه ثبت شد (و توسط مدیر مشاهده خواهد شد).")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        self.object = None
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_success_url(self):
+        return reverse('session_list')
+
+
+class TradeListView(ReadOnlyPermissionMixin, ListView):
+    model = models.Trade
+    template_name = 'dashboard/services/trade_list.html'
+    context_object_name = 'trades'
+    paginate_by = 12
+    permission_model = 'Trade'
+
+    def get_queryset(self):
+        if self.request.user.title == 'bs':
+            queryset = models.Trade.objects.all()
+            return queryset
+        else:
+            if not self.request.user.sub_district:
+                return models.Trade.objects.none()
+
+            user_sub_district = self.request.user.sub_district
+            sale_trades = models.Trade.objects.filter(
+                sale_file_code__isnull=False,
+                sale_file_code__in=models.SaleFile.objects.filter(
+                    sub_district=user_sub_district
+                ).values_list('code', flat=True)
+            )
+            rent_trades = models.Trade.objects.filter(
+                rent_file_code__isnull=False,
+                rent_file_code__in=models.RentFile.objects.filter(
+                    sub_district=user_sub_district
+                ).values_list('code', flat=True)
+            )
+            queryset = (sale_trades | rent_trades).distinct()
+            queryset = queryset.filter(agent=self.request.user)
+
+            return queryset
+
+
+class TradeCreateView(PermissionRequiredMixin, CreateView):
+    model = models.Trade
+    form_class = forms.TradeCreateForm
+    template_name = 'dashboard/services/trade_create.html'
+    permission_model = 'Trade'
+    permission_action = 'create'
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+    def form_valid(self, form):
+        messages.success(self.request, "نشست جدید در سامانه ثبت شد.")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        self.object = None
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_success_url(self):
+        return reverse('trade_list')
+
+
+class TradeUpdateView(PermissionRequiredMixin, UpdateView):
+    model = models.Trade
+    form_class = forms.TradeCreateForm
+    template_name = 'dashboard/services/trade_update.html'
+    context_object_name = 'trade'
+    permission_model = 'Trade'
+    permission_action = 'update'
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
+    def form_valid(self, form):
+        messages.success(self.request, "تغییرات شما در سامانه ثبت شد.")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        self.object = None
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_success_url(self):
+        return reverse('trade_list')
+
+
+class TradeDetailView(ReadOnlyPermissionMixin, DetailView):
+    model = models.Trade
+    context_object_name = 'trade'
+    template_name = 'dashboard/services/trade_detail.html'
+    permission_model = 'Trade'
+
+
+class TradeCodeView(PermissionRequiredMixin, UpdateView):
+    model = models.Trade
+    form_class = forms.TradeCodeForm
+    template_name = 'dashboard/services/trade_code.html'
+    context_object_name = 'trade'
+    permission_model = 'Trade'
+    permission_action = 'update'
+
+    def form_valid(self, form):
+        messages.success(self.request, "تغییرات شما در سامانه ثبت شد (و توسط مدیر مشاهده خواهد شد).")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        self.object = None
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_success_url(self):
+        return reverse('trade_list')
 
 
 

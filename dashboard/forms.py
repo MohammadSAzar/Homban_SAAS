@@ -570,23 +570,101 @@ class SubDistrictCreateForm(forms.ModelForm):
 # -------------------------------- Services ---------------------------------
 visit_required_fields = ['type', 'date', 'time']
 session_required_fields = ['type', 'date', 'time']
-trade_required_fields = ['session_code', 'type', 'date', 'time', 'owner']
+trade_required_fields = ['session_code', 'type', 'date']
 
 
 class VisitCreateForm(forms.ModelForm):
     class Meta:
         model = models.Visit
-        fields = ['sale_file_code', 'rent_file_code', 'buyer_code', 'renter_code', 'type', 'date', 'time', 'description']
+        fields = ['type', 'agent', 'date', 'time', 'sale_file_code', 'rent_file_code', 'buyer_code', 'renter_code', 'description']
 
     def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
         super(VisitCreateForm, self).__init__(*args, **kwargs)
         self.fields['date'] = forms.ChoiceField(
             choices=models.next_week_shamsi(),
             required=True,
             label=self.fields['date'].label,
         )
-        for field in session_required_fields:
+        for field in visit_required_fields:
             self.fields[field].required = True
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        if self.user and self.user.title != 'bs':
+            instance.agent = self.user
+        if commit:
+            instance.save()
+            self.save_m2m()
+        return instance
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if self.user.title == 'bs':
+            agent = cleaned_data.get('agent')
+        else:
+            agent = self.user
+        visit_type = cleaned_data.get('type')
+        sale_file_code = cleaned_data.get('sale_file_code')
+        rent_file_code = cleaned_data.get('rent_file_code')
+        buyer_code = cleaned_data.get('buyer_code')
+        renter_code = cleaned_data.get('renter_code')
+
+        sale_file_codes = list(models.SaleFile.objects.values_list('code', flat=True))
+        rent_file_codes = list(models.RentFile.objects.values_list('code', flat=True))
+        buyer_codes = list(models.Buyer.objects.values_list('code', flat=True))
+        renter_codes = list(models.Renter.objects.values_list('code', flat=True))
+
+        if visit_type == 'sale' and rent_file_code:
+            self.add_error('rent_file_code', 'نوع معامله فروش است، امکان انتخاب فایل اجاره وجود ندارد')
+        if visit_type == 'sale' and renter_code:
+            self.add_error('renter_code', 'نوع معامله فروش است، امکان انتخاب مشتری مستاجر وجود ندارد')
+        if visit_type == 'rent' and sale_file_code:
+            self.add_error('sale_file_code', 'نوع معامله اجاره است، امکان انتخاب فایل فروش وجود ندارد')
+        if visit_type == 'rent' and buyer_code:
+            self.add_error('buyer_code', 'نوع معامله اجاره است، امکان انتخاب مشتری خریدار وجود ندارد')
+
+        if sale_file_code and sale_file_code not in sale_file_codes:
+            self.add_error('sale_file_code', 'کد فایل فروش وارد شده معتبر نیست')
+        if rent_file_code and rent_file_code not in rent_file_codes:
+            self.add_error('rent_file_code', 'کد فایل اجاره وارد شده معتبر نیست')
+        if buyer_code and buyer_code not in buyer_codes:
+            self.add_error('buyer_code', 'کد خریدار وارد شده معتبر نیست')
+        if renter_code and renter_code not in renter_codes:
+            self.add_error('renter_code', 'کد مستاجر وارد شده معتبر نیست')
+
+        if visit_type == 'sale' and sale_file_code in sale_file_codes and buyer_code in buyer_codes:
+            sale_file = models.SaleFile.objects.get(code=sale_file_code)
+            buyer = models.Buyer.objects.get(code=buyer_code)
+            if sale_file.sub_district not in buyer.sub_districts.all():
+                self.add_error('sale_file_code', 'فایل فروش و خریدار، زیرمحله مشترک ندارند')
+                self.add_error('buyer_code', 'فایل فروش و خریدار، زیرمحله مشترک ندارند')
+            if self.user.title:
+                if self.user.title == 'fp' or self.user.title == 'bt':
+                    if self.user.sub_district != sale_file.sub_district:
+                        self.add_error('sale_file_code', 'شما اجازه تنظیم بازدید برای فایل فروش مربوطه را ندارید')
+                if self.user.title == 'cp' or self.user.title == 'bt':
+                    if self.user.sub_district not in buyer.sub_districts.all():
+                        self.add_error('buyer_code', 'شما اجازه تنظیم بازدید برای خریدار مربوطه را ندارید')
+            if agent.sub_district != sale_file.sub_district:
+                self.add_error('sale_file_code', 'فایل فروش و مشاور، زیرمحله مشترک ندارند')
+                self.add_error('agent', 'فایل فروش و مشاور، زیرمحله مشترک ندارند')
+
+        if visit_type == 'rent' and rent_file_code in rent_file_codes and renter_code in renter_codes:
+            rent_file = models.RentFile.objects.get(code=rent_file_code)
+            renter = models.Renter.objects.get(code=renter_code)
+            if rent_file.sub_district not in renter.sub_districts.all():
+                self.add_error('rent_file_code', 'فایل اجاره و مستاجر، زیرمحله مشترک ندارند')
+                self.add_error('renter_code', 'فایل اجاره و مستاجر، زیرمحله مشترک ندارند')
+            if self.user.title == 'fp' or self.user.title == 'bt':
+                if self.user.sub_district != rent_file.sub_district:
+                    self.add_error('rent_file_code', 'شما اجازه تنظیم بازدید برای فایل اجاره مربوطه را ندارید')
+            if self.user.title == 'cp' or self.user.title == 'bt':
+                if self.user.sub_district not in renter.sub_districts.all():
+                    self.add_error('renter_code', 'شما اجازه تنظیم بازدید برای مستاجر مربوطه را ندارید')
+            if agent.sub_district != rent_file.sub_district:
+                self.add_error('rent_file_code', 'فایل اجاره و مشاور، زیرمحله مشترک ندارند')
+                self.add_error('agent', 'فایل اجاره و مشاور، زیرمحله مشترک ندارند')
 
 
 class VisitResultForm(forms.ModelForm):
@@ -600,25 +678,8 @@ class VisitResultForm(forms.ModelForm):
         result = cleaned_data.get('result')
 
         if result != '':
-            if status != 'dne':
-                self.add_error('status', "برای ثبت نتیجه، وضعیت را به 'انجام شده' تغییر دهید.")
-
-        return cleaned_data
-
-
-class VisitCancelForm(forms.ModelForm):
-    class Meta:
-        model = models.Visit
-        fields = ['result', 'status']
-
-    def clean(self):
-        cleaned_data = super().clean()
-        status = cleaned_data.get('status')
-        result = cleaned_data.get('result')
-
-        if result != '':
-            if status != 'can':
-                self.add_error('status', "برای لغو بازدید، وضعیت را به 'لغو شده' تغییر دهید.")
+            if status != 'end':
+                self.add_error('status', "برای ثبت نتیجه، وضعیت را به 'خاتمه یافته' تغییر دهید.")
 
         return cleaned_data
 
@@ -626,9 +687,10 @@ class VisitCancelForm(forms.ModelForm):
 class SessionCreateForm(forms.ModelForm):
     class Meta:
         model = models.Session
-        fields = ['sale_file_code', 'rent_file_code', 'buyer_code', 'renter_code', 'visit_code', 'type', 'date', 'time', 'description']
+        fields = ['type', 'agent', 'date', 'time', 'sale_file_code', 'rent_file_code', 'buyer_code', 'renter_code', 'description']
 
     def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
         super(SessionCreateForm, self).__init__(*args, **kwargs)
         self.fields['date'] = forms.ChoiceField(
             choices=models.next_week_shamsi(),
@@ -637,6 +699,83 @@ class SessionCreateForm(forms.ModelForm):
         )
         for field in session_required_fields:
             self.fields[field].required = True
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        if self.user and self.user.title != 'bs':
+            instance.agent = self.user
+        if commit:
+            instance.save()
+            self.save_m2m()
+        return instance
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if self.user.title == 'bs':
+            agent = cleaned_data.get('agent')
+        else:
+            agent = self.user
+        session_type = cleaned_data.get('type')
+        sale_file_code = cleaned_data.get('sale_file_code')
+        rent_file_code = cleaned_data.get('rent_file_code')
+        buyer_code = cleaned_data.get('buyer_code')
+        renter_code = cleaned_data.get('renter_code')
+
+        sale_file_codes = list(models.SaleFile.objects.values_list('code', flat=True))
+        rent_file_codes = list(models.RentFile.objects.values_list('code', flat=True))
+        buyer_codes = list(models.Buyer.objects.values_list('code', flat=True))
+        renter_codes = list(models.Renter.objects.values_list('code', flat=True))
+
+        if session_type == 'sale' and rent_file_code:
+            self.add_error('rent_file_code', 'نوع معامله فروش است، امکان انتخاب فایل اجاره وجود ندارد')
+        if session_type == 'sale' and renter_code:
+            self.add_error('renter_code', 'نوع معامله فروش است، امکان انتخاب مشتری مستاجر وجود ندارد')
+        if session_type == 'rent' and sale_file_code:
+            self.add_error('sale_file_code', 'نوع معامله اجاره است، امکان انتخاب فایل فروش وجود ندارد')
+        if session_type == 'rent' and buyer_code:
+            self.add_error('buyer_code', 'نوع معامله اجاره است، امکان انتخاب مشتری خریدار وجود ندارد')
+
+        if sale_file_code and sale_file_code not in sale_file_codes:
+            self.add_error('sale_file_code', 'کد فایل فروش وارد شده معتبر نیست')
+        if rent_file_code and rent_file_code not in rent_file_codes:
+            self.add_error('rent_file_code', 'کد فایل اجاره وارد شده معتبر نیست')
+        if buyer_code and buyer_code not in buyer_codes:
+            self.add_error('buyer_code', 'کد خریدار وارد شده معتبر نیست')
+        if renter_code and renter_code not in renter_codes:
+            self.add_error('renter_code', 'کد مستاجر وارد شده معتبر نیست')
+
+        if session_type == 'sale' and sale_file_code in sale_file_codes and buyer_code in buyer_codes:
+            sale_file = models.SaleFile.objects.get(code=sale_file_code)
+            buyer = models.Buyer.objects.get(code=buyer_code)
+            if sale_file.sub_district not in buyer.sub_districts.all():
+                self.add_error('sale_file_code', 'فایل فروش و خریدار، زیرمحله مشترک ندارند')
+                self.add_error('buyer_code', 'فایل فروش و خریدار، زیرمحله مشترک ندارند')
+            if self.user.title:
+                if self.user.title == 'fp' or self.user.title == 'bt':
+                    if self.user.sub_district != sale_file.sub_district:
+                        self.add_error('sale_file_code', 'شما اجازه تنظیم جلسه برای فایل فروش مربوطه را ندارید')
+                if self.user.title == 'cp' or self.user.title == 'bt':
+                    if self.user.sub_district not in buyer.sub_districts.all():
+                        self.add_error('buyer_code', 'شما اجازه تنظیم جلسه برای خریدار مربوطه را ندارید')
+            if agent.sub_district != sale_file.sub_district:
+                self.add_error('sale_file_code', 'فایل فروش و مشاور، زیرمحله مشترک ندارند')
+                self.add_error('agent', 'فایل فروش و مشاور، زیرمحله مشترک ندارند')
+
+        if session_type == 'rent' and rent_file_code in rent_file_codes and renter_code in renter_codes:
+            rent_file = models.RentFile.objects.get(code=rent_file_code)
+            renter = models.Renter.objects.get(code=renter_code)
+            if rent_file.sub_district not in renter.sub_districts.all():
+                self.add_error('rent_file_code', 'فایل اجاره و مستاجر، زیرمحله مشترک ندارند')
+                self.add_error('renter_code', 'فایل اجاره و مستاجر، زیرمحله مشترک ندارند')
+            if self.user.title == 'fp' or self.user.title == 'bt':
+                if self.user.sub_district != rent_file.sub_district:
+                    self.add_error('rent_file_code', 'شما اجازه تنظیم جلسه برای فایل اجاره مربوطه را ندارید')
+            if self.user.title == 'cp' or self.user.title == 'bt':
+                if self.user.sub_district not in renter.sub_districts.all():
+                    self.add_error('renter_code', 'شما اجازه تنظیم جلسه برای مستاجر مربوطه را ندارید')
+            if agent.sub_district != rent_file.sub_district:
+                self.add_error('rent_file_code', 'فایل اجاره و مشاور، زیرمحله مشترک ندارند')
+                self.add_error('agent', 'فایل اجاره و مشاور، زیرمحله مشترک ندارند')
 
 
 class SessionResultForm(forms.ModelForm):
@@ -650,25 +789,8 @@ class SessionResultForm(forms.ModelForm):
         result = cleaned_data.get('result')
 
         if result != '':
-            if status != 'dne':
-                self.add_error('status', "برای ثبت نتیجه، وضعیت را به 'انجام شده' تغییر دهید.")
-
-        return cleaned_data
-
-
-class SessionCancelForm(forms.ModelForm):
-    class Meta:
-        model = models.Session
-        fields = ['result', 'status']
-
-    def clean(self):
-        cleaned_data = super().clean()
-        status = cleaned_data.get('status')
-        result = cleaned_data.get('result')
-
-        if result != '':
-            if status != 'can':
-                self.add_error('status', "برای لغو نشست، وضعیت را به 'لغو شده' تغییر دهید.")
+            if status != 'end':
+                self.add_error('status', "برای ثبت نتیجه، وضعیت را به 'خاتمه یافته' تغییر دهید.")
 
         return cleaned_data
 
@@ -676,10 +798,11 @@ class SessionCancelForm(forms.ModelForm):
 class TradeCreateForm(forms.ModelForm):
     class Meta:
         model = models.Trade
-        fields = ['session_code', 'type', 'date', 'description', 'price', 'deposit', 'rent', 'contract_owner',
-                  'contract_buyer', 'contract_renter', 'followup_code']
+        fields = ['type', 'session_code', 'date', 'price', 'deposit', 'rent', 'followup_code', 'description',
+                  'contract_owner', 'contract_buyer', 'contract_renter']
 
     def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
         super(TradeCreateForm, self).__init__(*args, **kwargs)
         self.fields['date'] = forms.ChoiceField(
             choices=models.last_month_shamsi(),
@@ -688,6 +811,61 @@ class TradeCreateForm(forms.ModelForm):
         )
         for field in trade_required_fields:
             self.fields[field].required = True
+
+    def clean(self):
+        cleaned_data = super().clean()
+        trade_type = cleaned_data.get('type')
+        session_code = cleaned_data.get('session_code')
+        price = cleaned_data.get('price')
+        deposit = cleaned_data.get('deposit')
+        rent = cleaned_data.get('rent')
+        contract_renter = cleaned_data.get('contract_renter')
+        contract_buyer = cleaned_data.get('contract_buyer')
+
+        session_codes = models.Session.objects.values_list('code', flat=True)
+        session = models.Session.objects.get(code=session_code)
+        if session_code not in session_codes:
+            self.add_error('session_code', 'کد جلسه وارد شده، معتبر نیست')
+        if trade_type != session.type:
+            self.add_error('session_code', 'نوع جلسه انتخابی با نوع معامله متفاوت است')
+        if session.agent != self.user and self.user.title != 'bs':
+            self.add_error('session_code', 'شما اجازه ثبت معامله برای این جلسه را ندارید')
+
+        if trade_type == 'sale':
+            if deposit:
+                self.add_error('deposit', 'برای معامله فروش، امکان تعیین مبلغ ودیعه (رهن) وجود ندارد')
+            if rent:
+                self.add_error('rent', 'برای معامله فروش، امکان تعیین مبلغ اجاره وجود ندارد')
+            if contract_renter:
+                self.add_error('contract_renter', 'برای معامله فروش، امکان تعیین نام مستاجر وجود ندارد')
+        if trade_type == 'rent':
+            if price:
+                self.add_error('price', 'برای معامله اجاره، فقط باید ودیعه و اجاره تعیین گردد')
+            if contract_buyer:
+                self.add_error('contract_buyer', 'برای معامله اجاره، امکان تعیین نام خریدار وجود ندارد')
+
+        if price and not checkers.file_price_checker(price):
+            self.add_error('price', 'قیمت معامله باید بین 1 تا 1000 میلیارد تومان باشد')
+        if deposit and not checkers.rent_file_deposit_price_checker(deposit):
+            self.add_error('deposit', 'مبلغ ودیعه (رهن) باید بین صفر تا 100 میلیارد تومان باشد')
+        if rent and not checkers.rent_file_rent_price_checker(rent):
+            self.add_error('rent', 'مبلغ اجاره باید بین صفر تا 10 میلیارد تومان باشد')
+
+
+class TradeCodeForm(forms.ModelForm):
+    class Meta:
+        model = models.Trade
+        fields = ['followup_code']
+
+    def clean(self):
+        cleaned_data = super().clean()
+        followup_code = cleaned_data.get('followup_code')
+
+        # if followup_code != '':
+        #     if followup_code != 'end':
+        #         self.add_error('status', "برای ثبت نتیجه، وضعیت را به 'خاتمه یافته' تغییر دهید.")
+
+        return cleaned_data
 
 
 # ---------------------------------- Tasks ----------------------------------

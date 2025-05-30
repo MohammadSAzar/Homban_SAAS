@@ -1,0 +1,226 @@
+{% extends '_base_dashboard.html' %}
+
+{% load static %}
+{% load i18n %}
+{% load jalali_tags %}
+{% load number_converter %}
+{% load humanize %}
+{% load widget_tweaks %}
+
+
+{% block title %}ثبت معامله جدید{% endblock %}
+
+
+{% block content %}
+    
+    <!-- Messages2 -->
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <!-- Main -->
+    <div class="components-preview  wide-md mx-auto">
+        <div class="nk-block nk-block-lg">
+            <div class="card card-bordered card-preview">
+                <div class="card-inner" >
+                    <div class="preview-block" >
+
+                        <!-- Title -->
+                        <div class="nk-block-head nk-block-head-lg wide-sm">
+                            <div class="nk-block-head-content">
+                                <h6 class="nk-block-title page-title" style="line-height: 45px;">ثبت معامله جدید</h6>
+                            </div>
+                        </div>
+                        <!-- end: Title -->
+
+                        <!-- Form -->
+                        <form class="row gy-4" method="post" enctype="multipart/form-data" novalidate>
+                            {% csrf_token %}
+                                
+                            <!-- type -->
+                            <div class="col-lg-4 col-sm-4">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.type.id_for_label }}">نوع معامله</label>
+                                        {% render_field form.type id="type" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.type.errors %}
+                                        {% for error in form.type.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- date -->
+                            <div class="col-lg-4 col-sm-4">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.date.id_for_label }}">تاریخ معامله</label>
+                                        {% render_field form.date id="type" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.date.errors %}
+                                        {% for error in form.date.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- session_code -->
+                            <div class="col-lg-4 col-sm-4">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.session_code.id_for_label }}">کد جلسه مربوطه</label>
+                                        {% render_field form.session_code id="session_code" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.session_code.errors %}
+                                        {% for error in form.session_code.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        
+                            <!-- contract_owner -->
+                            <div class="col-lg-3 col-sm-3">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.contract_owner.id_for_label }}">نام مالک (در قرارداد)</label>
+                                        {% render_field form.contract_owner id="contract_owner" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.contract_owner.errors %}
+                                        {% for error in form.contract_owner.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <!-- contract_buyer -->
+                            <div class="col-lg-3 col-sm-3">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.contract_buyer.id_for_label }}">نام خریدار (در قرارداد)</label>
+                                        {% render_field form.contract_buyer id="contract_buyer" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.contract_buyer.errors %}
+                                        {% for error in form.contract_buyer.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- contract_renter -->
+                            <div class="col-lg-3 col-sm-3">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.contract_renter.id_for_label }}">نام مستاجر (در قرارداد)</label>
+                                        {% render_field form.contract_renter id="contract_renter" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.contract_renter.errors %}
+                                        {% for error in form.contract_renter.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- followup_code -->
+                            <div class="col-lg-3 col-sm-3">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.followup_code.id_for_label }}">کد رهگیری</label>
+                                        {% render_field form.followup_code id="followup_code" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.followup_code.errors %}
+                                        {% for error in form.followup_code.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        
+                            <!-- price -->
+                            <div class="col-lg-4 col-sm-4">
+                                    <div class="form-group">
+                                        <div class="form-control-wrap">
+                                            <label class="form-label" for="{{ form.price.id_for_label }}">قیمت فروش</label>
+                                            {% render_field form.price id="price" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                        </div>
+                                        {% if form.price.errors %}
+                                            {% for error in form.price.errors %}
+                                                <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                        
+                            <!-- deposit -->
+                            <div class="col-lg-4 col-sm-4">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.deposit.id_for_label }}">ودیعه (رهن)</label>
+                                        {% render_field form.deposit id="deposit" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.deposit.errors %}
+                                        {% for error in form.deposit.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        
+                            <!-- rent -->
+                            <div class="col-lg-4 col-sm-4">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.rent.id_for_label }}">اجاره ماهانه</label>
+                                        {% render_field form.rent id="rent" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.rent.errors %}
+                                        {% for error in form.rent.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        
+                            <!-- description -->
+                            <div class="col-lg-12 col-sm-12">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.description.id_for_label }}">توضیحات</label>
+                                        {% render_field form.description id="description" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.description.errors %}
+                                        {% for error in form.description.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        
+                            <!-- Submit -->
+                            <div class="nk-fmg-actions" style="margin-top: 3em;">
+                                <button type="submit" class="btn btn-primary" style="line-height: 30px;">ثبت اطلاعات</button>
+                            </div>
+                        </form>
+                        <!-- end: Form -->    
+                    
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+
+
+

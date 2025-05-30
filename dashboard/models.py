@@ -551,11 +551,12 @@ class Renter(models.Model):
 
 # --------------------------------- SERVs ----------------------------------
 class Visit(models.Model):
-    sale_file_code = models.CharField(max_length=6, null=True, unique=True, blank=True, verbose_name=_('Sale File Code'))
-    rent_file_code = models.CharField(max_length=6, null=True, unique=True, blank=True, verbose_name=_('Rent File Code'))
-    buyer_code = models.CharField(max_length=6, null=True, unique=True, blank=True, verbose_name=_('Buyer Code'))
-    renter_code = models.CharField(max_length=6, null=True, unique=True, blank=True, verbose_name=_('Renter Code'))
-    type = models.CharField(max_length=10, verbose_name=_('Type of Trade'))
+    agent = models.ForeignKey(CustomUserModel, on_delete=models.SET_NULL, null=True, blank=True, related_name='visits', verbose_name=_('Agent'))
+    sale_file_code = models.CharField(max_length=6, null=True, blank=True, verbose_name=_('Sale File Code'))
+    rent_file_code = models.CharField(max_length=6, null=True, blank=True, verbose_name=_('Rent File Code'))
+    buyer_code = models.CharField(max_length=6, null=True, blank=True, verbose_name=_('Buyer Code'))
+    renter_code = models.CharField(max_length=6, null=True, blank=True, verbose_name=_('Renter Code'))
+    type = models.CharField(max_length=10, choices=choices.types, blank=True, null=True, verbose_name=_('Type of Trade'))
     description = models.TextField(max_length=1000, blank=True, null=True, verbose_name=_('Description'))
     result = models.TextField(max_length=1000, blank=True, null=True, verbose_name=_('Result'))
     date = models.CharField(max_length=200, verbose_name=_('Date of Visit'))
@@ -567,38 +568,34 @@ class Visit(models.Model):
     @property
     def sale_file(self):
         if self.sale_file_code:
-            file = SaleFile.objects.filter(code=self.sale_file_code)
+            file = SaleFile.objects.get(code=self.sale_file_code)
             return file
 
     @property
     def rent_file(self):
         if self.rent_file_code:
-            file = RentFile.objects.filter(code=self.rent_file_code)
+            file = RentFile.objects.get(code=self.rent_file_code)
             return file
 
     @property
     def buyer(self):
         if self.buyer_code:
-            buyer = Buyer.objects.filter(code=self.buyer_code)
+            buyer = Buyer.objects.get(code=self.buyer_code)
             return buyer
 
     @property
     def renter(self):
         if self.renter_code:
-            renter = Renter.objects.filter(code=self.renter_code)
+            renter = Renter.objects.get(code=self.renter_code)
             return renter
 
     def save(self, *args, **kwargs):
-        if self.sale_file_code:
-            self.type = choices.types[0]
-        if self.rent_file_code:
-            self.type = choices.types[1]
         if not self.code:
             self.code = generate_unique_code()
         super(Visit, self).save(*args, **kwargs)
 
     def __str__(self):
-        return f'بازدید: {self.type} / {self.code}'
+        return f'بازدید: {self.get_type_display()} / {self.code}'
 
     class Meta:
         ordering = ('-datetime_created',)
@@ -610,12 +607,12 @@ class Visit(models.Model):
 
 
 class Session(models.Model):
-    sale_file_code = models.CharField(max_length=6, null=True, unique=True, blank=True, verbose_name=_('Sale File Code'))
-    rent_file_code = models.CharField(max_length=6, null=True, unique=True, blank=True, verbose_name=_('Rent File Code'))
-    buyer_code = models.CharField(max_length=6, null=True, unique=True, blank=True, verbose_name=_('Buyer Code'))
-    renter_code = models.CharField(max_length=6, null=True, unique=True, blank=True, verbose_name=_('Renter Code'))
-    visit_code = models.CharField(max_length=6, null=True, unique=True, blank=True, verbose_name=_('Visit Code'))
-    type = models.CharField(max_length=10, verbose_name=_('Type of Trade'))
+    agent = models.ForeignKey(CustomUserModel, on_delete=models.SET_NULL, null=True, blank=True, related_name='sessions', verbose_name=_('Agent'))
+    sale_file_code = models.CharField(max_length=6, null=True, blank=True, verbose_name=_('Sale File Code'))
+    rent_file_code = models.CharField(max_length=6, null=True, blank=True, verbose_name=_('Rent File Code'))
+    buyer_code = models.CharField(max_length=6, null=True, blank=True, verbose_name=_('Buyer Code'))
+    renter_code = models.CharField(max_length=6, null=True, blank=True, verbose_name=_('Renter Code'))
+    type = models.CharField(max_length=10, choices=choices.types, blank=True, null=True, verbose_name=_('Type of Trade'))
     description = models.TextField(max_length=1000, blank=True, null=True, verbose_name=_('Description'))
     result = models.TextField(max_length=1000, blank=True, null=True, verbose_name=_('Result'))
     date = models.CharField(max_length=200, verbose_name=_('Date of Visit'))
@@ -627,34 +624,28 @@ class Session(models.Model):
     @property
     def sale_file(self):
         if self.sale_file_code:
-            file = SaleFile.objects.filter(code=self.sale_file_code)
+            file = SaleFile.objects.get(code=self.sale_file_code)
             return file
 
     @property
     def rent_file(self):
         if self.rent_file_code:
-            file = RentFile.objects.filter(code=self.rent_file_code)
+            file = RentFile.objects.get(code=self.rent_file_code)
             return file
 
     @property
     def buyer(self):
         if self.buyer_code:
-            buyer = Buyer.objects.filter(code=self.buyer_code)
+            buyer = Buyer.objects.get(code=self.buyer_code)
             return buyer
 
     @property
     def renter(self):
         if self.renter_code:
-            renter = Renter.objects.filter(code=self.renter_code)
+            renter = Renter.objects.get(code=self.renter_code)
             return renter
 
-    @property
-    def visit(self):
-        visit = Visit.objects.filter(code=self.visit_code)
-        return visit
-
     def save(self, *args, **kwargs):
-        self.type = self.visit.type
         if not self.code:
             self.code = generate_unique_code()
         super(Session, self).save(*args, **kwargs)
@@ -673,17 +664,19 @@ class Session(models.Model):
 
 class Trade(models.Model):
     session_code = models.CharField(max_length=6, null=True, unique=True, blank=True, verbose_name=_('Session Code'))
-    type = models.CharField(max_length=10, verbose_name=_('Type of Trade'))
+    session = models.ForeignKey(Session, on_delete=models.SET_NULL, null=True, blank=True, related_name='trades', verbose_name=_('Session'))
+    type = models.CharField(max_length=10, choices=choices.types, blank=True, null=True, verbose_name=_('Type of Trade'))
     description = models.TextField(max_length=1000, blank=True, null=True, verbose_name=_('Description'))
     date = models.CharField(max_length=200, verbose_name=_('Date of Trade'))
     price = models.PositiveBigIntegerField(blank=True, null=True, verbose_name=_('Price'))
     deposit = models.PositiveBigIntegerField(blank=True, null=True, verbose_name=_('Deposit'))
     rent = models.PositiveBigIntegerField(blank=True, null=True, verbose_name=_('Rent'))
-    contract_owner = models.CharField(max_length=100, blank=True, null=True, verbose_name=_('Contract Owner (Seller / Lessor)'))
-    contract_buyer = models.CharField(max_length=10, blank=True, null=True, verbose_name=_('Contract Customer (Buyer)'))
-    contract_renter = models.CharField(max_length=10, blank=True, null=True, verbose_name=_('Contract Customer (Renter)'))
+    contract_owner = models.CharField(max_length=200, blank=True, null=True, verbose_name=_('Contract Owner (Seller / Lessor)'))
+    contract_buyer = models.CharField(max_length=200, blank=True, null=True, verbose_name=_('Contract Customer (Buyer)'))
+    contract_renter = models.CharField(max_length=200, blank=True, null=True, verbose_name=_('Contract Customer (Renter)'))
     code = models.CharField(max_length=6, null=True, unique=True, blank=True, verbose_name=_('Code'))
-    followup_code = models.CharField(max_length=6, null=True, unique=True, blank=True, verbose_name=_('Followup Code'))
+    followup_code = models.CharField(max_length=20, null=True, unique=True, blank=True, verbose_name=_('Followup Code'))
+    followup_code_status = models.CharField(max_length=10, choices=choices.fc_statuses, default='ntk', verbose_name=_('Followup Code Status'))
     datetime_created = models.DateTimeField(auto_now_add=True, verbose_name=_('Date and Time of Creation'))
 
     @property
@@ -710,30 +703,21 @@ class Trade(models.Model):
             renter = self.session.renter
             return renter
 
-    @property
-    def owner(self):
-        if self.type == 'sale':
-            if self.session.sale_file.source == 'PN':
-                owner = self.session.sale_file.source
-                return owner
-        if self.type == 'rent':
-            if self.session.rent_file.source == 'PN':
-                owner = self.session.rent_file.source
-                return owner
-
-    @property
-    def session(self):
-        session = Session.objects.filter(code=self.session_code)
-        return session
-
     def save(self, *args, **kwargs):
-        self.type = self.session.type
+        self.session = Session.objects.get(code=self.session_code)
+        if self.followup_code:
+            self.followup_code_status = choices.fc_statuses[0][0]
+        else:
+            self.followup_code_status = choices.fc_statuses[1][0]
         if not self.code:
             self.code = generate_unique_code()
         super(Trade, self).save(*args, **kwargs)
 
     def __str__(self):
-        return f'معامله: {self.type} / {self.code}'
+        if self.type == 'sale':
+            return f'معامله: {self.type} / {self.code} / {self.sale_file}'
+        else:
+            return f'معامله: {self.type} / {self.code} / {self.rent_file}'
 
     class Meta:
         ordering = ('-datetime_created',)
