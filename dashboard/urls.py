@@ -81,6 +81,9 @@ urlpatterns = [
     re_path(r'trade/code/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/', views.TradeCodeView.as_view(), name='trade_code'),
     re_path(r'trade/detail/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/', views.TradeDetailView.as_view(), name='trade_detail'),
     re_path(r'trade/create/', views.TradeCreateView.as_view(), name='trade_create'),
+    # boss
+    path('tasks/boss/', views.TaskBossListView.as_view(), name='boss_task_list'),
+    re_path(r'tasks/boss/approve/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/', views.TaskBossApproveView.as_view(), name='boss_task_approve'),
 ]
 
 

@@ -54,7 +54,8 @@ class SubDistrictAdmin(admin.ModelAdmin):
 # --------------------------------- FILE ----------------------------------
 @admin.register(models.Person)
 class PersonAdmin(admin.ModelAdmin):
-    list_display = ('name', 'phone_number')
+    list_display = ('name', 'phone_number', 'datetime_created')
+    ordering = ('-datetime_created',)
 
 
 @admin.register(models.SaleFile)
@@ -101,7 +102,7 @@ class RenterAdmin(admin.ModelAdmin):
 # --------------------------------- SERV ---------------------------------
 @admin.register(models.Visit)
 class VisitAdmin(admin.ModelAdmin):
-    list_display = ('type', 'agent', 'code', 'sale_file_code', 'rent_file_code', 'buyer_code', 'renter_code', 'status', 'datetime_created')
+    list_display = ('type', 'agent', 'code', 'sale_file', 'rent_file', 'buyer', 'renter', 'status', 'datetime_created')
     ordering = ('-datetime_created',)
     list_filter = ('type', 'status',)
     readonly_fields = ('code', 'datetime_created',)
@@ -109,7 +110,7 @@ class VisitAdmin(admin.ModelAdmin):
 
 @admin.register(models.Session)
 class SessionAdmin(admin.ModelAdmin):
-    list_display = ('type', 'agent', 'code', 'sale_file_code', 'rent_file_code', 'buyer_code', 'renter_code', 'status', 'datetime_created')
+    list_display = ('type', 'agent', 'code', 'sale_file', 'rent_file', 'buyer', 'renter', 'status', 'datetime_created')
     ordering = ('-datetime_created',)
     list_filter = ('type', 'status',)
     readonly_fields = ('code', 'datetime_created',)
@@ -133,6 +134,16 @@ class TaskAdmin(admin.ModelAdmin):
     list_filter = ['type', 'status', 'deadline']
     search_fields = ['title', 'agent__username', 'code']
     readonly_fields = ('code', 'datetime_created',)
+
+
+@admin.register(models.TaskBoss)
+class TaskBossAdmin(admin.ModelAdmin):
+    list_display = ('type', 'code', 'condition', 'new_sale_file', 'new_rent_file', 'new_buyer', 'new_renter',
+                    'new_person', 'ur_task', 'datetime_created')
+    ordering = ('-datetime_created',)
+    list_filter = ['type', 'condition']
+    readonly_fields = ('code', 'datetime_created',)
+
 
 
 

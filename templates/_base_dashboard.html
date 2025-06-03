@@ -144,13 +144,16 @@
                                                 </li>
                                                 {% if request.user.title == 'bs' %}
                                                     <li class="nk-menu-item">
+                                                        <a href="{% url 'boss_task_list' %}" class="nk-menu-link"><span class="nk-menu-text">وظایف مدیر</span></a>
+                                                    </li>
+                                                    <li class="nk-menu-item">
                                                         <a href="{% url 'task_bs_ur_list' %}" class="nk-menu-link"><span class="nk-menu-text">وظایف تحویل داده شده</span></a>
                                                     </li>
                                                     <li class="nk-menu-item">
                                                         <a href="{% url 'task_bs_op_list' %}" class="nk-menu-link"><span class="nk-menu-text">وظایف تحویل باز</span></a>
                                                     </li>
                                                     <li class="nk-menu-item">
-                                                        <a href="{% url 'task_bs_cl_list' %}" class="nk-menu-link"><span class="nk-menu-text">وظایف تحویل بسته شده</span></a>
+                                                        <a href="{% url 'task_bs_cl_list' %}" class="nk-menu-link"><span class="nk-menu-text">وظایف بسته</span></a>
                                                     </li>
                                                 {% endif %}
                                                 <li class="nk-menu-item">

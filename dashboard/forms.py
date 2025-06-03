@@ -922,5 +922,300 @@ class TaskAdminForm(forms.ModelForm):
         )
 
 
+# -------------------------------- BossTasks --------------------------------
+class TaskBossStatusForm(forms.ModelForm):
+    class Meta:
+        model = models.TaskBoss
+        fields = ['condition']
+
+
+class SaleFileStatusForm(forms.ModelForm):
+    class Meta:
+        model = models.SaleFile
+        fields = ['status']
+
+
+class RentFileStatusForm(forms.ModelForm):
+    class Meta:
+        model = models.RentFile
+        fields = ['status']
+
+
+class BuyerStatusForm(forms.ModelForm):
+    class Meta:
+        model = models.Buyer
+        fields = ['status']
+
+
+class RenterStatusForm(forms.ModelForm):
+    class Meta:
+        model = models.Renter
+        fields = ['status']
+
+
+class PersonStatusForm(forms.ModelForm):
+    class Meta:
+        model = models.Person
+        fields = ['status']
+
+
+class TaskStatusForm(forms.ModelForm):
+    class Meta:
+        model = models.Task
+        fields = ['status']
+
+
+class CombinedTaskStatusForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        self.boss_instance = kwargs.pop('boss_instance', None)
+        self.task_instance = kwargs.pop('task_instance', None)
+        super().__init__(*args, **kwargs)
+
+        data = args[0] if args else None
+        self.boss_form = TaskBossStatusForm(data=data, instance=self.boss_instance)
+        self.task_form = TaskStatusForm(data=data, instance=self.task_instance)
+
+    def is_valid(self):
+        valid = self.task_form.is_valid() and self.boss_form.is_valid()
+        return valid and self._cross_form_validation()
+
+    def _cross_form_validation(self):
+        condition = self.boss_form.cleaned_data.get('condition')
+        status = self.task_form.cleaned_data.get('status')
+
+        if status == 'OP' and condition == 'op':
+            self.boss_form.add_error('condition', 'برای وضعیت "باز"، این فیلد باید "بسته" باشد')
+            self.task_form.add_error('status', 'برای وظیفه مدیریتی "باز"، این فیلد باید "تحویل داده شده" باشد')
+            return False
+        if status == 'UR' and condition == 'cl':
+            self.boss_form.add_error('condition', 'برای وضعیت "تحویل داده شده"،این فیلد باید "باز" باشد')
+            self.task_form.add_error('status', 'برای وظیفه مدیریتی "بسته"، این فیلد باید "باز" یا "بسته" باشد')
+            return False
+        if status == 'UR' and condition == 'op':
+            self.boss_form.add_error('condition', 'هیچ تغییری در فرم ایجاد نشده است')
+            self.task_form.add_error('status', 'هیچ تغییری در فرم ایجاد نشده است')
+            return False
+        if status == 'CL' and condition == 'op':
+            self.boss_form.add_error('condition', 'برای وضعیت "بسته"، این فیلد باید "بسته" باشد')
+            self.task_form.add_error('status', 'برای وظیفه مدیریتی "باز"، این فیلد باید "تحویل داده شده" باشد')
+            return False
+
+        return True
+
+    def save(self):
+        self.boss_form.save()
+        self.task_form.save()
+
+
+class CombinedSaleFileStatusForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        self.boss_instance = kwargs.pop('boss_instance', None)
+        self.sale_file_instance = kwargs.pop('sale_file_instance', None)
+        super().__init__(*args, **kwargs)
+
+        data = args[0] if args else None
+        self.boss_form = TaskBossStatusForm(data=data, instance=self.boss_instance)
+        self.sale_file_form = SaleFileStatusForm(data=data, instance=self.sale_file_instance)
+
+    def is_valid(self):
+        valid = self.sale_file_form.is_valid() and self.boss_form.is_valid()
+        return valid and self._cross_form_validation()
+
+    def _cross_form_validation(self):
+        status = self.sale_file_form.cleaned_data.get('status')
+        condition = self.boss_form.cleaned_data.get('condition')
+
+        if status == 'acc' and condition == 'op':
+            self.boss_form.add_error('condition', 'برای وضعیت "پذیرفته شده"، این فیلد باید "بسته" باشد')
+            self.sale_file_form.add_error('status', 'برای وظیفه مدیریتی "باز"، این فیلد باید "در انتظار" باشد')
+            return False
+        if status == 'can' and condition == 'op':
+            self.boss_form.add_error('condition', 'برای وضعیت "رد شده"،این فیلد باید "بسته" باشد')
+            self.sale_file_form.add_error('status', 'برای وظیفه مدیریتی "باز"، این فیلد باید "در انتظار" باشد')
+            return False
+        if status == 'pen' and condition == 'cl':
+            self.boss_form.add_error('condition', 'برای وضعیت "در انتظار"،این فیلد باید "باز" باشد')
+            self.sale_file_form.add_error('status', 'برای وظیفه مدیریتی "بسته"، این فیلد باید "رد شده" یا "پذیرفته ‌شده" باشد')
+            return False
+        if status == 'pen' and condition == 'op':
+            self.boss_form.add_error('condition', 'هیچ تغییری در فرم ایجاد نشده است')
+            self.sale_file_form.add_error('status', 'هیچ تغییری در فرم ایجاد نشده است')
+            return False
+
+        return True
+
+    def save(self):
+        self.boss_form.save()
+        self.sale_file_form.save()
+
+
+class CombinedRentFileStatusForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        self.boss_instance = kwargs.pop('boss_instance', None)
+        self.rent_file_instance = kwargs.pop('rent_file_instance', None)
+        super().__init__(*args, **kwargs)
+
+        data = args[0] if args else None
+        self.boss_form = TaskBossStatusForm(data=data, instance=self.boss_instance)
+        self.rent_file_form = RentFileStatusForm(data=data, instance=self.rent_file_instance)
+
+    def is_valid(self):
+        valid = self.rent_file_form.is_valid() and self.boss_form.is_valid()
+        return valid and self._cross_form_validation()
+
+    def _cross_form_validation(self):
+        status = self.rent_file_form.cleaned_data.get('status')
+        condition = self.boss_form.cleaned_data.get('condition')
+
+        if status == 'acc' and condition == 'op':
+            self.boss_form.add_error('condition', 'برای وضعیت "پذیرفته شده"، این فیلد باید "بسته" باشد')
+            self.rent_file_form.add_error('status', 'برای وظیفه مدیریتی "باز"، این فیلد باید "در انتظار" باشد')
+            return False
+        if status == 'can' and condition == 'op':
+            self.boss_form.add_error('condition', 'برای وضعیت "رد شده"،این فیلد باید "بسته" باشد')
+            self.rent_file_form.add_error('status', 'برای وظیفه مدیریتی "باز"، این فیلد باید "در انتظار" باشد')
+            return False
+        if status == 'pen' and condition == 'cl':
+            self.boss_form.add_error('condition', 'برای وضعیت "در انتظار"،این فیلد باید "باز" باشد')
+            self.rent_file_form.add_error('status', 'برای وظیفه مدیریتی "بسته"، این فیلد باید "رد شده" یا "پذیرفته ‌شده" باشد')
+            return False
+        if status == 'pen' and condition == 'op':
+            self.boss_form.add_error('condition', 'هیچ تغییری در فرم ایجاد نشده است')
+            self.rent_file_form.add_error('status', 'هیچ تغییری در فرم ایجاد نشده است')
+            return False
+
+        return True
+
+    def save(self):
+        self.boss_form.save()
+        self.rent_file_form.save()
+
+
+class CombinedBuyerStatusForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        self.boss_instance = kwargs.pop('boss_instance', None)
+        self.buyer_instance = kwargs.pop('buyer_instance', None)
+        super().__init__(*args, **kwargs)
+
+        data = args[0] if args else None
+        self.boss_form = TaskBossStatusForm(data=data, instance=self.boss_instance)
+        self.buyer_form = BuyerStatusForm(data=data, instance=self.buyer_instance)
+
+    def is_valid(self):
+        valid = self.buyer_form.is_valid() and self.boss_form.is_valid()
+        return valid and self._cross_form_validation()
+
+    def _cross_form_validation(self):
+        status = self.buyer_form.cleaned_data.get('status')
+        condition = self.boss_form.cleaned_data.get('condition')
+
+        if status == 'acc' and condition == 'op':
+            self.boss_form.add_error('condition', 'برای وضعیت "پذیرفته شده"، این فیلد باید "بسته" باشد')
+            self.buyer_form.add_error('status', 'برای وظیفه مدیریتی "باز"، این فیلد باید "در انتظار" باشد')
+            return False
+        if status == 'can' and condition == 'op':
+            self.boss_form.add_error('condition', 'برای وضعیت "رد شده"،این فیلد باید "بسته" باشد')
+            self.buyer_form.add_error('status', 'برای وظیفه مدیریتی "باز"، این فیلد باید "در انتظار" باشد')
+            return False
+        if status == 'pen' and condition == 'cl':
+            self.boss_form.add_error('condition', 'برای وضعیت "در انتظار"،این فیلد باید "باز" باشد')
+            self.buyer_form.add_error('status', 'برای وظیفه مدیریتی "بسته"، این فیلد باید "رد شده" یا "پذیرفته ‌شده" باشد')
+            return False
+        if status == 'pen' and condition == 'op':
+            self.boss_form.add_error('condition', 'هیچ تغییری در فرم ایجاد نشده است')
+            self.buyer_form.add_error('status', 'هیچ تغییری در فرم ایجاد نشده است')
+            return False
+
+        return True
+
+    def save(self):
+        self.boss_form.save()
+        self.buyer_form.save()
+
+
+class CombinedRenterStatusForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        self.boss_instance = kwargs.pop('boss_instance', None)
+        self.renter_instance = kwargs.pop('renter_instance', None)
+        super().__init__(*args, **kwargs)
+
+        data = args[0] if args else None
+        self.boss_form = TaskBossStatusForm(data=data, instance=self.boss_instance)
+        self.renter_form = RenterStatusForm(data=data, instance=self.renter_instance)
+
+    def is_valid(self):
+        valid = self.renter_form.is_valid() and self.boss_form.is_valid()
+        return valid and self._cross_form_validation()
+
+    def _cross_form_validation(self):
+        status = self.renter_form.cleaned_data.get('status')
+        condition = self.boss_form.cleaned_data.get('condition')
+
+        if status == 'acc' and condition == 'op':
+            self.boss_form.add_error('condition', 'برای وضعیت "پذیرفته شده"، این فیلد باید "بسته" باشد')
+            self.renter_form.add_error('status', 'برای وظیفه مدیریتی "باز"، این فیلد باید "در انتظار" باشد')
+            return False
+        if status == 'can' and condition == 'op':
+            self.boss_form.add_error('condition', 'برای وضعیت "رد شده"،این فیلد باید "بسته" باشد')
+            self.renter_form.add_error('status', 'برای وظیفه مدیریتی "باز"، این فیلد باید "در انتظار" باشد')
+            return False
+        if status == 'pen' and condition == 'cl':
+            self.boss_form.add_error('condition', 'برای وضعیت "در انتظار"،این فیلد باید "باز" باشد')
+            self.renter_form.add_error('status', 'برای وظیفه مدیریتی "بسته"، این فیلد باید "رد شده" یا "پذیرفته ‌شده" باشد')
+            return False
+        if status == 'pen' and condition == 'op':
+            self.boss_form.add_error('condition', 'هیچ تغییری در فرم ایجاد نشده است')
+            self.renter_form.add_error('status', 'هیچ تغییری در فرم ایجاد نشده است')
+            return False
+
+        return True
+
+    def save(self):
+        self.boss_form.save()
+        self.renter_form.save()
+
+
+class CombinedPersonStatusForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        self.boss_instance = kwargs.pop('boss_instance', None)
+        self.person_instance = kwargs.pop('person_instance', None)
+        super().__init__(*args, **kwargs)
+
+        data = args[0] if args else None
+        self.boss_form = TaskBossStatusForm(data=data, instance=self.boss_instance)
+        self.person_form = PersonStatusForm(data=data, instance=self.person_instance)
+
+    def is_valid(self):
+        valid = self.person_form.is_valid() and self.boss_form.is_valid()
+        return valid and self._cross_form_validation()
+
+    def _cross_form_validation(self):
+        status = self.person_form.cleaned_data.get('status')
+        condition = self.boss_form.cleaned_data.get('condition')
+
+        if status == 'acc' and condition == 'op':
+            self.boss_form.add_error('condition', 'برای وضعیت "پذیرفته شده"، این فیلد باید "بسته" باشد')
+            self.person_form.add_error('status', 'برای وظیفه مدیریتی "باز"، این فیلد باید "در انتظار" باشد')
+            return False
+        if status == 'can' and condition == 'op':
+            self.boss_form.add_error('condition', 'برای وضعیت "رد شده"،این فیلد باید "بسته" باشد')
+            self.person_form.add_error('status', 'برای وظیفه مدیریتی "باز"، این فیلد باید "در انتظار" باشد')
+            return False
+        if status == 'pen' and condition == 'cl':
+            self.boss_form.add_error('condition', 'برای وضعیت "در انتظار"،این فیلد باید "باز" باشد')
+            self.person_form.add_error('status', 'برای وظیفه مدیریتی "بسته"، این فیلد باید "رد شده" یا "پذیرفته ‌شده" باشد')
+            return False
+        if status == 'pen' and condition == 'op':
+            self.boss_form.add_error('condition', 'هیچ تغییری در فرم ایجاد نشده است')
+            self.person_form.add_error('status', 'هیچ تغییری در فرم ایجاد نشده است')
+            return False
+
+        return True
+
+    def save(self):
+        self.boss_form.save()
+        self.person_form.save()
+
+
 
 

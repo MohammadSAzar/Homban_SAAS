@@ -1,0 +1,211 @@
+{% extends '_base_dashboard.html' %}
+
+{% load static %}
+{% load i18n %}
+{% load jalali_tags %}
+{% load number_converter %}
+{% load humanize %}
+{% load widget_tweaks %}
+
+
+{% block title %}تایید وظیفه "{{ boss_task.code }}"{% endblock %}
+
+
+{% block content %}
+    
+    <!-- Messages2 -->
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <!-- Main -->
+    <div class="components-preview wide-md mx-auto">
+        <div class="nk-block nk-block-lg">
+            <div class="card card-bordered card-preview">
+                <div class="card-inner" >
+                    <div class="preview-block" >
+
+                        <!-- Title -->
+                        <div class="nk-block-head nk-block-head-lg wide-sm">
+                            <div class="nk-block-head-content">
+                                {% if boss_task.type == 'sf' %}
+                                    <h6 class="title" style="margin-bottom: 0.7em;">تایید فایل فروش جدید: "
+                                        <a href="{{ boss_task.new_sale_file.get_absolute_url }}" style="text-decoration: none; color: black;">{{ boss_task.new_sale_file.title|farsi_number }}"</a>
+                                    </h6>
+                                {% elif boss_task.type == 'rf' %}
+                                    <h6 class="title" style="margin-bottom: 0.7em;">تایید فایل اجاره جدید: "
+                                        <a href="{{ boss_task.new_rent_file.get_absolute_url }}" style="text-decoration: none; color: black;">{{ boss_task.new_rent_file.title|farsi_number }}"</a>
+                                    </h6>
+                                {% elif boss_task.type == 'by' %}
+                                    <h6 class="title" style="margin-bottom: 0.7em;">تایید خریدار جدید: "
+                                        <a href="{{ boss_task.new_buyer.get_absolute_url }}" style="text-decoration: none; color: black;">{{ boss_task.new_buyer.name }}"</a>
+                                    </h6>
+                                {% elif boss_task.type == 'rt' %}
+                                    <h6 class="title" style="margin-bottom: 0.7em;">تایید مستاجر جدید: "
+                                        <a href="{{ boss_task.new_renter.get_absolute_url }}" style="text-decoration: none; color: black;">{{ boss_task.new_renter.name }}"</a>
+                                    </h6>
+                                {% elif boss_task.type == 'ps' %}
+                                    <h6 class="title" style="margin-bottom: 0.7em;">تایید آگهی‌دهنده جدید: "
+                                        <a style="text-decoration: none; color: black;">{{ boss_task.new_person.name }}"</a>
+                                    </h6>
+                                {% elif boss_task.type == 'ts' %}
+                                    <h6 class="title" style="margin-bottom: 0.7em;">بررسی وظیفه تحویل داده شده:"{{ boss_task.ur_task.title }}"</h6>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <!-- end: Title -->
+
+                        <!-- Form -->
+                        <form class="row gy-4" method="post"  enctype="multipart/form-data" novalidate>
+                            {% csrf_token %}
+
+                            <!-- Status >>> SaleFile -->
+                            {% if boss_task.type == 'sf' %}
+                                <div class="col-lg-5 col-sm-5">
+                                    <div class="form-group">
+                                        <div class="form-control-wrap">
+                                            <label class="form-label" for="{{ form.sale_file_form.status.id_for_label }}">وضعیت</label>
+                                            {% render_field form.sale_file_form.status id="status" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                        </div>
+                                        {% if form.sale_file_form.status.errors %}
+                                            {% for error in form.sale_file_form.status.errors %}
+                                                <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endif %}
+
+                            <!-- Status >>> RentFile -->
+                            {% if boss_task.type == 'rf' %}
+                                <div class="col-lg-5 col-sm-5">
+                                    <div class="form-group">
+                                        <div class="form-control-wrap">
+                                            <label class="form-label" for="{{ form.rent_file_form.status.id_for_label }}">وضعیت</label>
+                                            {% render_field form.rent_file_form.status id="status" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                        </div>
+                                        {% if form.rent_file_form.status.errors %}
+                                            {% for error in form.rent_file_form.status.errors %}
+                                                <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endif %}
+
+                            <!-- Status >>> Buyer -->
+                            {% if boss_task.type == 'by' %}
+                                <div class="col-lg-5 col-sm-5">
+                                    <div class="form-group">
+                                        <div class="form-control-wrap">
+                                            <label class="form-label" for="{{ form.buyer_form.status.id_for_label }}">وضعیت</label>
+                                            {% render_field form.buyer_form.status id="status" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                        </div>
+                                        {% if form.buyer_form.status.errors %}
+                                            {% for error in form.buyer_form.status.errors %}
+                                                <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endif %}
+
+                            <!-- Status >>> Renter -->
+                            {% if boss_task.type == 'rt' %}
+                                <div class="col-lg-5 col-sm-5">
+                                    <div class="form-group">
+                                        <div class="form-control-wrap">
+                                            <label class="form-label" for="{{ form.renter_form.status.id_for_label }}">وضعیت</label>
+                                            {% render_field form.renter_form.status id="status" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                        </div>
+                                        {% if form.renter_form.status.errors %}
+                                            {% for error in form.renter_form.status.errors %}
+                                                <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endif %}
+
+                            <!-- Status >>> Person -->
+                            {% if boss_task.type == 'ps' %}
+                                <div class="col-lg-5 col-sm-5">
+                                    <div class="form-group">
+                                        <div class="form-control-wrap">
+                                            <label class="form-label" for="{{ form.person_form.status.id_for_label }}">وضعیت</label>
+                                            {% render_field form.person_form.status id="status" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                        </div>
+                                        {% if form.person_form.status.errors %}
+                                            {% for error in form.person_form.status.errors %}
+                                                <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endif %}
+
+                            <!-- Status >>> Task -->
+                            {% if boss_task.type == 'ts' %}
+                                <!-- result -->
+                                <div class="col-lg-12 col-sm-12">
+                                    <div class="form-group">
+                                        <div class="form-control-wrap">
+                                            <label class="form-label">نتیجه وظیفه</label>
+                                            <div id="result" type="text" class="form-control form-control-xl form-control-outlined form__input--textarea">{{ task.result }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- status -->
+                                <div class="col-lg-5 col-sm-5">
+                                    <div class="form-group">
+                                        <div class="form-control-wrap">
+                                            <label class="form-label" for="{{ form.task_form.status.id_for_label }}">وضعیت</label>
+                                            {% render_field form.task_form.status id="status" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                        </div>
+                                        {% if form.task_form.status.errors %}
+                                            {% for error in form.task_form.status.errors %}
+                                                <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endif %}
+                            <!-- end: Task -->
+
+                             <!-- Condition -->
+                            <div class="col-lg-7 col-sm-7">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.boss_form.condition.id_for_label }}">نتیجه وضعیت مدیریتی</label>
+                                        {% render_field form.boss_form.condition id="condition" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.boss_form.condition.errors %}
+                                        {% for error in form.boss_form.condition.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+
+                            <!-- Submit -->
+                            <div class="nk-fmg-actions" style="margin-top: 3em;">
+                                <button type="submit" class="btn btn-primary" style="line-height: 30px;">ارسال</button>
+                            </div>
+                        </form>
+                        <!-- end: Form -->    
+                    
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+
+

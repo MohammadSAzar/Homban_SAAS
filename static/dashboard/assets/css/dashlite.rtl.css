@@ -2533,7 +2533,7 @@ div.dataTables_wrapper div.dataTables_filter input:disabled {
 .dual-listbox .dual-listbox__search::file-selector-button,
 div.dataTables_wrapper div.dataTables_filter input::file-selector-button {
   padding: 0.4375rem 1rem;
-  margin: -0.4375rem -1rem;
+  /*margin: -0.4375rem -1rem;*/
   margin-inline-end: 1rem;
   color: #3c4d62;
   background-color: #ebeef2;

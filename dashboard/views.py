@@ -1,11 +1,12 @@
-from django.shortcuts import render
+from django.views import View
+from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic import DetailView, CreateView, ListView, UpdateView, DeleteView, TemplateView
+from django.db.models import Prefetch
 from django.contrib import messages
-from django.contrib.auth import get_user_model
 
 
-from . import models, forms, choices
+from . import models, forms
 from .permissions import PermissionRequiredMixin, ReadOnlyPermissionMixin
 
 
@@ -25,11 +26,34 @@ class LocationListView(ReadOnlyPermissionMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        provinces = models.Province.objects.prefetch_related(
+            Prefetch(
+                'cities',
+                queryset=models.City.objects.prefetch_related(
+                    Prefetch(
+                        'districts',
+                        queryset=models.District.objects.prefetch_related(
+                            'sub_districts'
+                        ).select_related('city')
+                    )
+                ).select_related('province')
+            )
+        )
 
-        context['provinces'] = models.Province.objects.all()
-        context['cities'] = models.City.objects.all()
-        context['districts'] = models.District.objects.all()
-        context['sub_districts'] = models.SubDistrict.objects.all()
+        cities = []
+        districts = []
+        sub_districts = []
+        for province in provinces:
+            for city in province.cities.all():
+                cities.append(city)
+                for district in city.districts.all():
+                    districts.append(district)
+                    sub_districts.extend(district.sub_districts.all())
+
+        context['provinces'] = provinces
+        context['cities'] = cities
+        context['districts'] = districts
+        context['sub_districts'] = sub_districts
 
         return context
 
@@ -775,6 +799,10 @@ class PersonListView(ReadOnlyPermissionMixin, ListView):
     paginate_by = 6
     permission_model = 'Person'
 
+    def get_queryset(self):
+        queryset = models.Person.objects.prefetch_related('sale_files', 'rent_files').filter(status='acc').all()
+        return queryset
+
 
 class PersonCreateView(PermissionRequiredMixin, CreateView):
     model = models.Person
@@ -1201,7 +1229,8 @@ class TaskBossURListView(ReadOnlyPermissionMixin, ListView):
 
     def get_queryset(self):
         if self.request.user.title == 'bs':
-            queryset = models.Task.objects.select_related('agent', 'sale_file', 'rent_file', 'agent__sub_district').filter(status='UR')
+            queryset = models.Task.objects.select_related('agent', 'sale_file', 'rent_file', 'buyer', 'renter',
+                                                          'agent__sub_district').filter(status='UR')
             return queryset
         else:
             return models.Task.objects.none()
@@ -1216,7 +1245,8 @@ class TaskBossOPListView(ReadOnlyPermissionMixin, ListView):
 
     def get_queryset(self):
         if self.request.user.title == 'bs':
-            queryset = models.Task.objects.select_related('agent', 'sale_file', 'rent_file', 'agent__sub_district').filter(status='OP')
+            queryset = models.Task.objects.select_related('agent', 'sale_file', 'rent_file', 'buyer', 'renter',
+                                                          'agent__sub_district').filter(status='OP')
             return queryset
         else:
             return models.Task.objects.none()
@@ -1231,7 +1261,8 @@ class TaskBossCLListView(ReadOnlyPermissionMixin, ListView):
 
     def get_queryset(self):
         if self.request.user.title == 'bs':
-            queryset = models.Task.objects.select_related('agent', 'sale_file', 'rent_file', 'agent__sub_district').filter(status='CL')
+            queryset = models.Task.objects.select_related('agent', 'sale_file', 'rent_file', 'buyer', 'renter',
+                                                          'agent__sub_district').filter(status='CL')
             return queryset
         else:
             return models.Task.objects.none()
@@ -1246,11 +1277,13 @@ class TaskFPListView(ReadOnlyPermissionMixin, ListView):
 
     def get_queryset(self):
         if self.request.user.title == 'bs':
-            queryset = models.Task.objects.select_related('agent', 'sale_file', 'rent_file', 'agent__sub_district')
+            queryset = models.Task.objects.select_related('agent', 'sale_file', 'rent_file', 'buyer', 'renter',
+                                                          'agent__sub_district')
             return queryset
         elif self.request.user.title == 'fp':
             agent = self.request.user
-            queryset = models.Task.objects.select_related('agent', 'sale_file', 'rent_file', 'agent__sub_district').filter(agent=agent)
+            queryset = models.Task.objects.select_related('agent', 'sale_file', 'rent_file', 'buyer', 'renter',
+                                                          'agent__sub_district').filter(agent=agent)
             return queryset
         else:
             return models.Task.objects.none()
@@ -1265,11 +1298,13 @@ class TaskCPListView(ReadOnlyPermissionMixin, ListView):
 
     def get_queryset(self):
         if self.request.user.title == 'bs':
-            queryset = models.Task.objects.select_related('agent', 'sale_file', 'rent_file', 'agent__sub_district')
+            queryset = models.Task.objects.select_related('agent', 'sale_file', 'rent_file', 'buyer', 'renter',
+                                                          'agent__sub_district')
             return queryset
         elif self.request.user.title == 'cp':
             agent = self.request.user
-            queryset = models.Task.objects.select_related('agent', 'sale_file', 'rent_file', 'agent__sub_district').filter(agent=agent)
+            queryset = models.Task.objects.select_related('agent', 'sale_file', 'rent_file', 'buyer', 'renter',
+                                                          'agent__sub_district').filter(agent=agent)
             return queryset
         else:
             return models.Task.objects.none()
@@ -1284,11 +1319,13 @@ class TaskBTListView(ReadOnlyPermissionMixin, ListView):
 
     def get_queryset(self):
         if self.request.user.title == 'bs':
-            queryset = models.Task.objects.select_related('agent', 'sale_file', 'rent_file', 'agent__sub_district')
+            queryset = models.Task.objects.select_related('agent', 'sale_file', 'rent_file', 'buyer', 'renter',
+                                                          'agent__sub_district')
             return queryset
         elif self.request.user.title == 'bt':
             agent = self.request.user
-            queryset = models.Task.objects.select_related('agent', 'sale_file', 'rent_file', 'agent__sub_district').filter(agent=agent)
+            queryset = models.Task.objects.select_related('agent', 'sale_file', 'rent_file', 'buyer', 'renter',
+                                                          'agent__sub_district').filter(agent=agent)
             return queryset
         else:
             return models.Task.objects.none()
@@ -1299,6 +1336,19 @@ class TaskDetailView(ReadOnlyPermissionMixin, DetailView):
     context_object_name = 'task'
     template_name = 'dashboard/tasks/task_detail.html'
     permission_model = 'Task'
+
+    def get_queryset(self):
+        return models.Task.objects.select_related(
+            'agent',
+            'agent__sub_district',
+            'agent__sub_district__district',
+            'agent__sub_district__district__city',
+            'agent__sub_district__district__city__province',
+            'sale_file',
+            'rent_file',
+            'buyer',
+            'renter',
+        )
 
 
 class TaskCreateView(PermissionRequiredMixin, CreateView):
@@ -1405,6 +1455,143 @@ class TaskResultView(PermissionRequiredMixin, UpdateView):
         return reverse('dashboard')
 
 
+# -------------------------------- BossTasks -------------------------------
+class TaskBossListView(ListView):
+    model = models.TaskBoss
+    template_name = 'dashboard/boss/boss_task_list.html'
+    context_object_name = 'boss_tasks'
+    paginate_by = 12
+
+    def get_queryset(self):
+        queryset = models.TaskBoss.objects.select_related('new_sale_file', 'new_rent_file', 'new_buyer', 'new_renter',
+                                                          'new_person', 'ur_task').filter(condition='op').all()
+        return queryset
+
+
+class TaskBossApproveView(View):
+    template_name = 'dashboard/boss/boss_task_approve.html'
+
+    def get(self, request, pk, code):
+        boss_task = get_object_or_404(models.TaskBoss, pk=pk, code=code)
+        if boss_task.type == 'sf':
+            sale_file = boss_task.new_sale_file
+            form = forms.CombinedSaleFileStatusForm(sale_file_instance=sale_file, boss_instance=boss_task)
+            return render(request, 'dashboard/boss/boss_task_approve.html', {
+                'form': form,
+                'boss_task': boss_task,
+                'sale_file': sale_file,
+            })
+        if boss_task.type == 'rf':
+            rent_file = boss_task.new_rent_file
+            form = forms.CombinedRentFileStatusForm(rent_file_instance=rent_file, boss_instance=boss_task)
+            return render(request, 'dashboard/boss/boss_task_approve.html', {
+                'form': form,
+                'boss_task': boss_task,
+                'rent_file': rent_file,
+            })
+        if boss_task.type == 'by':
+            buyer = boss_task.new_buyer
+            form = forms.CombinedBuyerStatusForm(buyer_instance=buyer, boss_instance=boss_task)
+            return render(request, 'dashboard/boss/boss_task_approve.html', {
+                'form': form,
+                'boss_task': boss_task,
+                'buyer': buyer,
+            })
+        if boss_task.type == 'rt':
+            renter = boss_task.new_renter
+            form = forms.CombinedRenterStatusForm(renter_instance=renter, boss_instance=boss_task)
+            return render(request, 'dashboard/boss/boss_task_approve.html', {
+                'form': form,
+                'boss_task': boss_task,
+                'renter': renter,
+            })
+        if boss_task.type == 'ps':
+            person = boss_task.new_person
+            form = forms.CombinedPersonStatusForm(person_instance=person, boss_instance=boss_task)
+            return render(request, 'dashboard/boss/boss_task_approve.html', {
+                'form': form,
+                'boss_task': boss_task,
+                'person': person,
+            })
+        if boss_task.type == 'ts':
+            task = boss_task.ur_task
+            form = forms.CombinedTaskStatusForm(task_instance=task, boss_instance=boss_task)
+            return render(request, 'dashboard/boss/boss_task_approve.html', {
+                'form': form,
+                'boss_task': boss_task,
+                'task': task,
+            })
+
+    def post(self, request, pk, code):
+        boss_task = get_object_or_404(models.TaskBoss, pk=pk, code=code)
+        if boss_task.type == 'sf':
+            sale_file = boss_task.new_sale_file
+            form = forms.CombinedSaleFileStatusForm(request.POST, sale_file_instance=sale_file, boss_instance=boss_task)
+            if form.is_valid():
+                form.save()
+                return redirect('boss_task_list')
+            return render(request, 'dashboard/boss/boss_task_approve.html', {
+                'form': form,
+                'boss_task': boss_task,
+                'sale_file': sale_file,
+            })
+        if boss_task.type == 'rf':
+            rent_file = boss_task.new_rent_file
+            form = forms.CombinedRentFileStatusForm(request.POST, rent_file_instance=rent_file, boss_instance=boss_task)
+            if form.is_valid():
+                form.save()
+                return redirect('boss_task_list')
+            return render(request, 'dashboard/boss/boss_task_approve.html', {
+                'form': form,
+                'boss_task': boss_task,
+                'rent_file': rent_file,
+            })
+        if boss_task.type == 'by':
+            buyer = boss_task.new_buyer
+            form = forms.CombinedBuyerStatusForm(request.POST, buyer_instance=buyer, boss_instance=boss_task)
+            if form.is_valid():
+                form.save()
+                return redirect('boss_task_list')
+            return render(request, 'dashboard/boss/boss_task_approve.html', {
+                'form': form,
+                'boss_task': boss_task,
+                'buyer': buyer,
+            })
+        if boss_task.type == 'rt':
+            renter = boss_task.new_renter
+            form = forms.CombinedRenterStatusForm(request.POST, renter_instance=renter, boss_instance=boss_task)
+            if form.is_valid():
+                form.save()
+                return redirect('boss_task_list')
+            return render(request, 'dashboard/boss/boss_task_approve.html', {
+                'form': form,
+                'boss_task': boss_task,
+                'renter': renter,
+            })
+        if boss_task.type == 'ps':
+            person = boss_task.new_person
+            form = forms.CombinedPersonStatusForm(request.POST, person_instance=person, boss_instance=boss_task)
+            if form.is_valid():
+                form.save()
+                return redirect('boss_task_list')
+            return render(request, 'dashboard/boss/boss_task_approve.html', {
+                'form': form,
+                'boss_task': boss_task,
+                'person': person,
+            })
+        if boss_task.type == 'ts':
+            task = boss_task.ur_task
+            form = forms.CombinedTaskStatusForm(request.POST, task_instance=task, boss_instance=boss_task)
+            if form.is_valid():
+                form.save()
+                return redirect('boss_task_list')
+            return render(request, 'dashboard/boss/boss_task_approve.html', {
+                'form': form,
+                'boss_task': boss_task,
+                'task': task,
+            })
+
+
 # --------------------------------- Services --------------------------------
 class VisitListView(ReadOnlyPermissionMixin, ListView):
     model = models.Visit
@@ -1415,7 +1602,7 @@ class VisitListView(ReadOnlyPermissionMixin, ListView):
 
     def get_queryset(self):
         if self.request.user.title == 'bs':
-            queryset = models.Visit.objects.all()
+            queryset = models.Visit.objects.select_related('agent', 'agent__sub_district').all()
             return queryset
         else:
             if not self.request.user.sub_district:
@@ -1479,6 +1666,19 @@ class VisitUpdateView(PermissionRequiredMixin, UpdateView):
     permission_model = 'Visit'
     permission_action = 'update'
 
+    def get_queryset(self):
+        return models.Visit.objects.select_related(
+            'agent',
+            'agent__sub_district',
+            'agent__sub_district__district',
+            'agent__sub_district__district__city',
+            'agent__sub_district__district__city__province',
+            'sale_file',
+            'rent_file',
+            'buyer',
+            'renter',
+        )
+
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs['user'] = self.request.user
@@ -1519,6 +1719,19 @@ class VisitDetailView(ReadOnlyPermissionMixin, DetailView):
     template_name = 'dashboard/services/visit_detail.html'
     permission_model = 'Visit'
 
+    def get_queryset(self):
+        return models.Visit.objects.select_related(
+            'agent',
+            'agent__sub_district',
+            'agent__sub_district__district',
+            'agent__sub_district__district__city',
+            'agent__sub_district__district__city__province',
+            'sale_file',
+            'rent_file',
+            'buyer',
+            'renter',
+        )
+
 
 class VisitResultView(PermissionRequiredMixin, UpdateView):
     model = models.Visit
@@ -1549,7 +1762,7 @@ class SessionListView(ReadOnlyPermissionMixin, ListView):
 
     def get_queryset(self):
         if self.request.user.title == 'bs':
-            queryset = models.Session.objects.all()
+            queryset = models.Session.objects.select_related('agent', 'agent__sub_district').all()
             return queryset
         else:
             if not self.request.user.sub_district:
@@ -1653,6 +1866,19 @@ class SessionDetailView(ReadOnlyPermissionMixin, DetailView):
     template_name = 'dashboard/services/session_detail.html'
     permission_model = 'Session'
 
+    def get_queryset(self):
+        return models.Session.objects.select_related(
+            'agent',
+            'agent__sub_district',
+            'agent__sub_district__district',
+            'agent__sub_district__district__city',
+            'agent__sub_district__district__city__province',
+            'sale_file',
+            'rent_file',
+            'buyer',
+            'renter',
+        )
+
 
 class SessionResultView(PermissionRequiredMixin, UpdateView):
     model = models.Session
@@ -1683,7 +1909,9 @@ class TradeListView(ReadOnlyPermissionMixin, ListView):
 
     def get_queryset(self):
         if self.request.user.title == 'bs':
-            queryset = models.Trade.objects.all()
+            queryset = models.Trade.objects.select_related('session', 'session__agent', 'session__agent__sub_district',
+                                                           'session__sale_file', 'session__rent_file', 'session__buyer',
+                                                           'session__renter').all()
             return queryset
         else:
             if not self.request.user.sub_district:
