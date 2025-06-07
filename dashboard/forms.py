@@ -340,10 +340,13 @@ class PersonCreateForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
+        name = cleaned_data.get('name')
         phone_number = cleaned_data.get('phone_number')
 
         if phone_number and not checkers.phone_checker(phone_number):
             self.add_error('phone_number', 'شماره تلفن همراه وارد شده صحیح نیست')
+        if name and not checkers.name_checker(name):
+            self.add_error('name', 'فرمت نام صحیح نیست')
 
         return cleaned_data
 
@@ -379,6 +382,7 @@ class BuyerCreateForm(forms.ModelForm):
         budget_max = cleaned_data.get('budget_max')
         area_max = cleaned_data.get('area_max')
         area_min = cleaned_data.get('area_min')
+        name = cleaned_data.get('name')
 
         if phone_number and not checkers.phone_checker(phone_number):
             self.add_error('phone_number', 'شماره تلفن همراه وارد شده صحیح نیست')
@@ -390,6 +394,8 @@ class BuyerCreateForm(forms.ModelForm):
             self.add_error('area_max', 'متراژ درخواستی خریدار باید بین 20 تا 10000 متر باشد.')
         if area_min and not checkers.area_checker(area_min):
             self.add_error('area_min', 'متراژ درخواستی خریدار باید بین 20 تا 10000 متر باشد.')
+        if name and not checkers.name_checker(name):
+            self.add_error('name', 'فرمت نام صحیح نیست')
 
         return cleaned_data
 
@@ -460,6 +466,7 @@ class RenterCreateForm(forms.ModelForm):
         rent_max = cleaned_data.get('rent_max')
         area_max = cleaned_data.get('area_max')
         area_min = cleaned_data.get('area_min')
+        name = cleaned_data.get('name')
 
         if phone_number and not checkers.phone_checker(phone_number):
             self.add_error('phone_number', 'شماره تلفن همراه وارد شده صحیح نیست')
@@ -475,6 +482,8 @@ class RenterCreateForm(forms.ModelForm):
             self.add_error('area_max', 'متراژ درخواستی خریدار باید بین 20 تا 10000 متر باشد.')
         if area_min and not checkers.area_checker(area_min):
             self.add_error('area_min', 'متراژ درخواستی خریدار باید بین 20 تا 10000 متر باشد.')
+        if name and not checkers.name_checker(name):
+            self.add_error('name', 'فرمت نام صحیح نیست')
 
         return cleaned_data
 
@@ -570,7 +579,7 @@ class SubDistrictCreateForm(forms.ModelForm):
 # -------------------------------- Services ---------------------------------
 visit_required_fields = ['type', 'date', 'time']
 session_required_fields = ['type', 'date', 'time']
-trade_required_fields = ['session_code', 'type', 'date']
+trade_required_fields = ['session_code', 'type', 'date', 'contract_owner']
 
 
 class VisitCreateForm(forms.ModelForm):
@@ -602,6 +611,8 @@ class VisitCreateForm(forms.ModelForm):
         cleaned_data = super().clean()
         if self.user.title == 'bs':
             agent = cleaned_data.get('agent')
+            if agent is None:
+                self.add_error('agent', 'انتخاب مشاور برای نشست الزامی است')
         else:
             agent = self.user
         visit_type = cleaned_data.get('type')
@@ -614,6 +625,15 @@ class VisitCreateForm(forms.ModelForm):
         rent_file_codes = list(models.RentFile.objects.values_list('code', flat=True))
         buyer_codes = list(models.Buyer.objects.values_list('code', flat=True))
         renter_codes = list(models.Renter.objects.values_list('code', flat=True))
+
+        if visit_type == 'sale' and not sale_file_code:
+            self.add_error('sale_file_code', 'انتخاب فایل فروش الزامی است')
+        if visit_type == 'sale' and not buyer_code:
+            self.add_error('buyer_code', 'انتخاب مشتری (خریدار) الزامی است')
+        if visit_type == 'rent' and not rent_file_code:
+            self.add_error('rent_file_code', 'انتخاب فایل اجاره الزامی است')
+        if visit_type == 'rent' and not renter_code:
+            self.add_error('renter_code', 'انتخاب مشتری (مستاجر) الزامی است')
 
         if visit_type == 'sale' and rent_file_code:
             self.add_error('rent_file_code', 'نوع معامله فروش است، امکان انتخاب فایل اجاره وجود ندارد')
@@ -713,6 +733,8 @@ class SessionCreateForm(forms.ModelForm):
         cleaned_data = super().clean()
         if self.user.title == 'bs':
             agent = cleaned_data.get('agent')
+            if agent is None:
+                self.add_error('agent', 'انتخاب مشاور برای نشست الزامی است')
         else:
             agent = self.user
         session_type = cleaned_data.get('type')
@@ -725,6 +747,15 @@ class SessionCreateForm(forms.ModelForm):
         rent_file_codes = list(models.RentFile.objects.values_list('code', flat=True))
         buyer_codes = list(models.Buyer.objects.values_list('code', flat=True))
         renter_codes = list(models.Renter.objects.values_list('code', flat=True))
+
+        if session_type == 'sale' and not sale_file_code:
+            self.add_error('sale_file_code', 'انتخاب فایل فروش الزامی است')
+        if session_type == 'sale' and not buyer_code:
+            self.add_error('buyer_code', 'انتخاب مشتری (خریدار) الزامی است')
+        if session_type == 'rent' and not rent_file_code:
+            self.add_error('rent_file_code', 'انتخاب فایل اجاره الزامی است')
+        if session_type == 'rent' and not renter_code:
+            self.add_error('renter_code', 'انتخاب مشتری (مستاجر) الزامی است')
 
         if session_type == 'sale' and rent_file_code:
             self.add_error('rent_file_code', 'نوع معامله فروش است، امکان انتخاب فایل اجاره وجود ندارد')
@@ -819,17 +850,22 @@ class TradeCreateForm(forms.ModelForm):
         price = cleaned_data.get('price')
         deposit = cleaned_data.get('deposit')
         rent = cleaned_data.get('rent')
+        contract_owner = cleaned_data.get('contract_owner')
         contract_renter = cleaned_data.get('contract_renter')
         contract_buyer = cleaned_data.get('contract_buyer')
 
+        if contract_owner and not checkers.name_checker(contract_owner):
+            self.add_error('contract_owner', 'فرمت نام صحیح نیست')
+
         session_codes = models.Session.objects.values_list('code', flat=True)
-        session = models.Session.objects.get(code=session_code)
-        if session_code not in session_codes:
+        if session_code in session_codes:
+            session = models.Session.objects.get(code=session_code)
+            if session.agent != self.user and self.user.title != 'bs':
+                self.add_error('session_code', 'شما اجازه ثبت معامله برای این جلسه را ندارید')
+            if trade_type != session.type:
+                self.add_error('session_code', 'نوع جلسه انتخابی با نوع معامله متفاوت است')
+        if session_code and session_code not in session_codes:
             self.add_error('session_code', 'کد جلسه وارد شده، معتبر نیست')
-        if trade_type != session.type:
-            self.add_error('session_code', 'نوع جلسه انتخابی با نوع معامله متفاوت است')
-        if session.agent != self.user and self.user.title != 'bs':
-            self.add_error('session_code', 'شما اجازه ثبت معامله برای این جلسه را ندارید')
 
         if trade_type == 'sale':
             if deposit:
@@ -838,11 +874,19 @@ class TradeCreateForm(forms.ModelForm):
                 self.add_error('rent', 'برای معامله فروش، امکان تعیین مبلغ اجاره وجود ندارد')
             if contract_renter:
                 self.add_error('contract_renter', 'برای معامله فروش، امکان تعیین نام مستاجر وجود ندارد')
+            if not contract_buyer:
+                self.add_error('contract_buyer', 'تعیین نام خریدار (طبق قرارداد) الزامی است')
+            if contract_buyer and not checkers.name_checker(contract_buyer):
+                self.add_error('contract_buyer', 'فرمت نام صحیح نیست')
         if trade_type == 'rent':
             if price:
                 self.add_error('price', 'برای معامله اجاره، فقط باید ودیعه و اجاره تعیین گردد')
             if contract_buyer:
                 self.add_error('contract_buyer', 'برای معامله اجاره، امکان تعیین نام خریدار وجود ندارد')
+            if not contract_renter:
+                self.add_error('contract_renter', 'تعیین نام مستاجر (طبق قرارداد) الزامی است')
+            if contract_renter and not checkers.name_checker(contract_renter):
+                self.add_error('contract_renter', 'فرمت نام صحیح نیست')
 
         if price and not checkers.file_price_checker(price):
             self.add_error('price', 'قیمت معامله باید بین 1 تا 1000 میلیارد تومان باشد')

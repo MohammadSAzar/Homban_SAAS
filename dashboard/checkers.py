@@ -1,3 +1,6 @@
+import re
+
+
 min_file_price = 1000000000  # TOOMAN
 max_file_price = 1000000000000  # TOOMAN
 min_area = 20  # m2
@@ -63,5 +66,10 @@ def national_code_checker(code):
 
     except ValueError:
         return False
+
+
+def name_checker(name):
+    pattern = r'^[آ-ی\s]+$'
+    return re.match(pattern, name) is not None
 
 
