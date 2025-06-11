@@ -37,15 +37,35 @@
                         </div>
                         <!-- end: Title -->
 
-                        <!-- Results -->
-                        <div class="col-lg-12 col-sm-12">
-                            <div class="form-group">
-                                <div class="form-control-wrap">
-                                    <label class="form-label">نتیجه:</label>
-                                    <span>{{ visit.result|linebreaksbr|farsi_number }}</span>
+                        <!-- Results - Notes - Comment -->
+                        {% if visit.status == 'dne' %}
+                            <div class="col-lg-12 col-sm-12">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label">نتیجه:</label>
+                                        <span>{{ visit.result|linebreaksbr|farsi_number }}</span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        {% elif visit.status == 'can' %}
+                            <div class="col-lg-12 col-sm-12">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label">توضیحات مدیر:</label>
+                                        <span>{{ visit.boss_notes|linebreaksbr|farsi_number }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        {% elif visit.status == 'end' %}
+                            <div class="col-lg-12 col-sm-12">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label">توضیحات نهایی مدیر:</label>
+                                        <span>{{ visit.boss_final_comment|linebreaksbr|farsi_number }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
                         
                         <!-- status -->
                         <div class="col-lg-12 col-sm-12">
@@ -58,7 +78,7 @@
                         </div>
                         
                         <!-- Result Link -->
-                        {% if visit.agent.title == request.user.title and visit.status == 'end' %}
+                        {% if visit.agent.title == request.user.title and visit.status == 'dne' %}
                             <div class="nk-fmg-actions" style="margin-top: 3em;">
                                 <a href="{% url 'visit_result' visit.pk visit.code %}" class="btn btn-primary" style="line-height: 30px;">تغییر نتیجه</a>
                             </div>

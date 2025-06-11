@@ -27,7 +27,7 @@
         <div class="nk-block nk-block-lg">
             <div class="card card-bordered card-preview">
                 <div class="card-inner" >
-                    <div class="preview-block" >
+                    <div class="preview-block">
 
                         <!-- Title -->
                         <div class="nk-block-head nk-block-head-lg wide-sm">
@@ -52,6 +52,38 @@
                                     <h6 class="title" style="margin-bottom: 0.7em;">تایید آگهی‌دهنده جدید: "
                                         <a style="text-decoration: none; color: black;">{{ boss_task.new_person.name }}"</a>
                                     </h6>
+                                {% elif boss_task.type == 'vs' %}
+                                    <h6 class="title" style="margin-bottom: 0.7em;">تایید بازدید جدید: "
+                                        {% if boss_task.new_visit.type == 'sale' %}
+                                            <a href="{{ boss_task.new_visit.sale_file.get_absolute_url }}" style="text-decoration: none; color: black;">{{ boss_task.new_visit.sale_file.title }}"</a>
+                                        {% elif boss_task.new_visit.type == 'rent' %}
+                                            <a href="{{ boss_task.new_visit.RENT_file.get_absolute_url }}" style="text-decoration: none; color: black;">{{ boss_task.new_visit.rent_file.title }}"</a>
+                                        {% endif %}
+                                    </h6>
+                                {% elif boss_task.type == 'ss' %}
+                                    <h6 class="title" style="margin-bottom: 0.7em;">تایید نشست جدید: "
+                                        {% if boss_task.new_session.type == 'sale' %}
+                                            <a href="{{ boss_task.new_session.sale_file.get_absolute_url }}" style="text-decoration: none; color: black;">{{ boss_task.new_session.sale_file.title }}"</a>
+                                        {% elif boss_task.new_session.type == 'rent' %}
+                                            <a href="{{ boss_task.new_session.rent_file.get_absolute_url }}" style="text-decoration: none; color: black;">{{ boss_task.new_session.rent_file.title }}"</a>
+                                        {% endif %}
+                                    </h6>
+                                {% elif boss_task.type == 'rv' %}
+                                    <h6 class="title" style="margin-bottom: 0.7em;">تایید نتیجه بازدید: "
+                                        {% if boss_task.result_visit.type == 'sale' %}
+                                            <a href="{{ boss_task.result_visit.sale_file.get_absolute_url }}" style="text-decoration: none; color: black;">{{ boss_task.result_visit.sale_file.title }}"</a>
+                                        {% elif boss_task.result_visit.type == 'rent' %}
+                                            <a href="{{ boss_task.result_visit.rent_file.get_absolute_url }}" style="text-decoration: none; color: black;">{{ boss_task.result_visit.rent_file.title }}"</a>
+                                        {% endif %}
+                                    </h6>
+                                {% elif boss_task.type == 'rs' %}
+                                    <h6 class="title" style="margin-bottom: 0.7em;">تایید نتیجه نشست: "
+                                        {% if boss_task.result_session.type == 'sale' %}
+                                            <a href="{{ boss_task.result_session.sale_file.get_absolute_url }}" style="text-decoration: none; color: black;">{{ boss_task.result_session.sale_file.title }}"</a>
+                                        {% elif boss_task.result_session.type == 'rent' %}
+                                            <a href="{{ boss_task.result_session.rent_file.get_absolute_url }}" style="text-decoration: none; color: black;">{{ boss_task.result_session.rent_file.title }}"</a>
+                                        {% endif %}
+                                    </h6>
                                 {% elif boss_task.type == 'ts' %}
                                     <h6 class="title" style="margin-bottom: 0.7em;">بررسی وظیفه تحویل داده شده:"{{ boss_task.ur_task.title }}"</h6>
                                 {% endif %}
@@ -60,7 +92,7 @@
                         <!-- end: Title -->
 
                         <!-- Form -->
-                        <form class="row gy-4" method="post"  enctype="multipart/form-data" novalidate>
+                        <form class="row gy-4" method="post" enctype="multipart/form-data" novalidate>
                             {% csrf_token %}
 
                             <!-- Status >>> SaleFile -->
@@ -176,7 +208,139 @@
                             {% endif %}
                             <!-- end: Task -->
 
-                             <!-- Condition -->
+                            <!-- Status >>> Visit -->
+                            {% if boss_task.type == 'vs' %}
+                                <!-- notes -->
+                                <div class="col-lg-12 col-sm-12">
+                                    <div class="form-group">
+                                        <div class="form-control-wrap">
+                                            <label class="form-label" for="{{ form.visit_form.boss_notes.id_for_label }}">توضیحات مدیر</label>
+                                            {% render_field form.visit_form.boss_notes id="condition" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                        </div>
+                                        {% if form.visit_form.boss_notes.errors %}
+                                            {% for error in form.visit_form.boss_notes.errors %}
+                                                <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <!-- status -->
+                                <div class="col-lg-5 col-sm-5">
+                                    <div class="form-group">
+                                        <div class="form-control-wrap">
+                                            <label class="form-label" for="{{ form.visit_form.status.id_for_label }}">وضعیت</label>
+                                            {% render_field form.visit_form.status id="status" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                        </div>
+                                        {% if form.visit_form.status.errors %}
+                                            {% for error in form.visit_form.status.errors %}
+                                                <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endif %}
+                            <!-- end: Visit -->
+
+                            <!-- Status >>> Session -->
+                            {% if boss_task.type == 'ss' %}
+                                <!-- notes -->
+                                <div class="col-lg-12 col-sm-12">
+                                    <div class="form-group">
+                                        <div class="form-control-wrap">
+                                            <label class="form-label" for="{{ form.session_form.boss_notes.id_for_label }}">توضیحات مدیر</label>
+                                            {% render_field form.session_form.boss_notes id="condition" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                        </div>
+                                        {% if form.session_form.boss_notes.errors %}
+                                            {% for error in form.session_form.boss_notes.errors %}
+                                                <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <!-- status -->
+                                <div class="col-lg-5 col-sm-5">
+                                    <div class="form-group">
+                                        <div class="form-control-wrap">
+                                            <label class="form-label" for="{{ form.session_form.status.id_for_label }}">وضعیت</label>
+                                            {% render_field form.session_form.status id="status" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                        </div>
+                                        {% if form.session_form.status.errors %}
+                                            {% for error in form.session_form.status.errors %}
+                                                <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endif %}
+                            <!-- end: Session -->
+                        
+                            <!-- Status >>> RVisit -->
+                            {% if boss_task.type == 'rv' %}
+                                <!-- comment -->
+                                <div class="col-lg-12 col-sm-12">
+                                    <div class="form-group">
+                                        <div class="form-control-wrap">
+                                            <label class="form-label" for="{{ form.result_visit_form.boss_final_comment.id_for_label }}">توضیح نهایی مدیر</label>
+                                            {% render_field form.result_visit_form.boss_final_comment id="condition" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                        </div>
+                                        {% if form.result_visit_form.boss_final_comment.errors %}
+                                            {% for error in form.result_visit_form.boss_final_comment.errors %}
+                                                <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <!-- status -->
+                                <div class="col-lg-5 col-sm-5">
+                                    <div class="form-group">
+                                        <div class="form-control-wrap">
+                                            <label class="form-label" for="{{ form.result_visit_form.status.id_for_label }}">وضعیت</label>
+                                            {% render_field form.result_visit_form.status id="status" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                        </div>
+                                        {% if form.result_visit_form.status.errors %}
+                                            {% for error in form.result_visit_form.status.errors %}
+                                                <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endif %}
+                            <!-- end: RVisit -->
+                        
+                            <!-- Status >>> RSession -->
+                            {% if boss_task.type == 'rs' %}
+                                <!-- comment -->
+                                <div class="col-lg-12 col-sm-12">
+                                    <div class="form-group">
+                                        <div class="form-control-wrap">
+                                            <label class="form-label" for="{{ form.result_session_form.boss_final_comment.id_for_label }}">توضیح نهایی مدیر</label>
+                                            {% render_field form.result_session_form.boss_final_comment id="condition" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                        </div>
+                                        {% if form.result_session_form.boss_final_comment.errors %}
+                                            {% for error in form.result_session_form.boss_final_comment.errors %}
+                                                <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <!-- status -->
+                                <div class="col-lg-5 col-sm-5">
+                                    <div class="form-group">
+                                        <div class="form-control-wrap">
+                                            <label class="form-label" for="{{ form.result_session_form.status.id_for_label }}">وضعیت</label>
+                                            {% render_field form.result_session_form.status id="status" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                        </div>
+                                        {% if form.result_session_form.status.errors %}
+                                            {% for error in form.result_session_form.status.errors %}
+                                                <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endif %}
+                            <!-- end: RSession -->
+
+                            <!-- Condition -->
                             <div class="col-lg-7 col-sm-7">
                                 <div class="form-group">
                                     <div class="form-control-wrap">
@@ -190,13 +354,17 @@
                                     {% endif %}
                                 </div>
                             </div>
-
+                            <!-- end: Condition -->
 
                             <!-- Submit -->
                             <div class="nk-fmg-actions" style="margin-top: 3em;">
                                 <button type="submit" class="btn btn-primary" style="line-height: 30px;">ارسال</button>
                             </div>
                         </form>
+                    
+                        {% for error in form.errors %}
+                            {{ error }}
+                        {% endfor %}
                         <!-- end: Form -->    
                     
                     </div>
@@ -206,6 +374,5 @@
     </div>
 
 {% endblock %}
-
 
 

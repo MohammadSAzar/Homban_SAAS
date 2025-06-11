@@ -1463,8 +1463,8 @@ class TaskBossListView(ListView):
     paginate_by = 12
 
     def get_queryset(self):
-        queryset = models.TaskBoss.objects.select_related('new_sale_file', 'new_rent_file', 'new_buyer', 'new_renter',
-                                                          'new_person', 'ur_task').filter(condition='op').all()
+        queryset = models.TaskBoss.objects.select_related('new_sale_file', 'new_rent_file', 'new_buyer', 'new_renter', 'new_person',
+                                                          'new_visit', 'new_session', 'ur_task').filter(condition='op').all()
         return queryset
 
 
@@ -1513,6 +1513,38 @@ class TaskBossApproveView(View):
                 'boss_task': boss_task,
                 'person': person,
             })
+        if boss_task.type == 'vs':
+            visit = boss_task.new_visit
+            form = forms.CombinedVisitStatusForm(visit_instance=visit, boss_instance=boss_task)
+            return render(request, 'dashboard/boss/boss_task_approve.html', {
+                'form': form,
+                'boss_task': boss_task,
+                'visit': visit,
+            })
+        if boss_task.type == 'ss':
+            session = boss_task.new_session
+            form = forms.CombinedSessionStatusForm(session_instance=session, boss_instance=boss_task)
+            return render(request, 'dashboard/boss/boss_task_approve.html', {
+                'form': form,
+                'boss_task': boss_task,
+                'session': session,
+            })
+        if boss_task.type == 'rv':
+            result_visit = boss_task.result_visit
+            form = forms.CombinedVisitResultForm(result_visit_instance=result_visit, boss_instance=boss_task)
+            return render(request, 'dashboard/boss/boss_task_approve.html', {
+                'form': form,
+                'boss_task': boss_task,
+                'result_visit': result_visit,
+            })
+        if boss_task.type == 'rs':
+            result_session = boss_task.result_session
+            form = forms.CombinedSessionResultForm(result_session_instance=result_session, boss_instance=boss_task)
+            return render(request, 'dashboard/boss/boss_task_approve.html', {
+                'form': form,
+                'boss_task': boss_task,
+                'result_session': result_session,
+            })
         if boss_task.type == 'ts':
             task = boss_task.ur_task
             form = forms.CombinedTaskStatusForm(task_instance=task, boss_instance=boss_task)
@@ -1529,6 +1561,7 @@ class TaskBossApproveView(View):
             form = forms.CombinedSaleFileStatusForm(request.POST, sale_file_instance=sale_file, boss_instance=boss_task)
             if form.is_valid():
                 form.save()
+                messages.success(self.request, "تغییرات در سامانه ثبت شد.")
                 return redirect('boss_task_list')
             return render(request, 'dashboard/boss/boss_task_approve.html', {
                 'form': form,
@@ -1540,6 +1573,7 @@ class TaskBossApproveView(View):
             form = forms.CombinedRentFileStatusForm(request.POST, rent_file_instance=rent_file, boss_instance=boss_task)
             if form.is_valid():
                 form.save()
+                messages.success(self.request, "تغییرات در سامانه ثبت شد.")
                 return redirect('boss_task_list')
             return render(request, 'dashboard/boss/boss_task_approve.html', {
                 'form': form,
@@ -1551,6 +1585,7 @@ class TaskBossApproveView(View):
             form = forms.CombinedBuyerStatusForm(request.POST, buyer_instance=buyer, boss_instance=boss_task)
             if form.is_valid():
                 form.save()
+                messages.success(self.request, "تغییرات در سامانه ثبت شد.")
                 return redirect('boss_task_list')
             return render(request, 'dashboard/boss/boss_task_approve.html', {
                 'form': form,
@@ -1562,6 +1597,7 @@ class TaskBossApproveView(View):
             form = forms.CombinedRenterStatusForm(request.POST, renter_instance=renter, boss_instance=boss_task)
             if form.is_valid():
                 form.save()
+                messages.success(self.request, "تغییرات در سامانه ثبت شد.")
                 return redirect('boss_task_list')
             return render(request, 'dashboard/boss/boss_task_approve.html', {
                 'form': form,
@@ -1573,17 +1609,67 @@ class TaskBossApproveView(View):
             form = forms.CombinedPersonStatusForm(request.POST, person_instance=person, boss_instance=boss_task)
             if form.is_valid():
                 form.save()
+                messages.success(self.request, "تغییرات در سامانه ثبت شد.")
                 return redirect('boss_task_list')
             return render(request, 'dashboard/boss/boss_task_approve.html', {
                 'form': form,
                 'boss_task': boss_task,
                 'person': person,
             })
+        if boss_task.type == 'vs':
+            visit = boss_task.new_visit
+            form = forms.CombinedVisitStatusForm(request.POST, visit_instance=visit, boss_instance=boss_task)
+            if form.is_valid():
+                form.save()
+                messages.success(self.request, "تغییرات در سامانه ثبت شد.")
+                return redirect('boss_task_list')
+            return render(request, 'dashboard/boss/boss_task_approve.html', {
+                'form': form,
+                'boss_task': boss_task,
+                'visit': visit,
+            })
+        if boss_task.type == 'ss':
+            session = boss_task.new_session
+            form = forms.CombinedSessionStatusForm(request.POST, session_instance=session, boss_instance=boss_task)
+            if form.is_valid():
+                form.save()
+                messages.success(self.request, "تغییرات در سامانه ثبت شد.")
+                return redirect('boss_task_list')
+            return render(request, 'dashboard/boss/boss_task_approve.html', {
+                'form': form,
+                'boss_task': boss_task,
+                'session': session,
+            })
+        if boss_task.type == 'rv':
+            result_visit = boss_task.result_visit
+            form = forms.CombinedVisitResultForm(request.POST, result_visit_instance=result_visit, boss_instance=boss_task)
+            if form.is_valid():
+                form.save()
+                messages.success(self.request, "تغییرات در سامانه ثبت شد.")
+                return redirect('boss_task_list')
+            return render(request, 'dashboard/boss/boss_task_approve.html', {
+                'form': form,
+                'boss_task': boss_task,
+                'result_visit': result_visit,
+            })
+        if boss_task.type == 'rs':
+            result_session = boss_task.result_session
+            form = forms.CombinedSessionResultForm(request.POST, result_session_instance=result_session, boss_instance=boss_task)
+            if form.is_valid():
+                form.save()
+                messages.success(self.request, "تغییرات در سامانه ثبت شد.")
+                return redirect('boss_task_list')
+            return render(request, 'dashboard/boss/boss_task_approve.html', {
+                'form': form,
+                'boss_task': boss_task,
+                'result_session': result_session,
+            })
         if boss_task.type == 'ts':
             task = boss_task.ur_task
             form = forms.CombinedTaskStatusForm(request.POST, task_instance=task, boss_instance=boss_task)
             if form.is_valid():
                 form.save()
+                messages.success(self.request, "تغییرات در سامانه ثبت شد.")
                 return redirect('boss_task_list')
             return render(request, 'dashboard/boss/boss_task_approve.html', {
                 'form': form,

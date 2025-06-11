@@ -138,8 +138,7 @@ class TaskAdmin(admin.ModelAdmin):
 
 @admin.register(models.TaskBoss)
 class TaskBossAdmin(admin.ModelAdmin):
-    list_display = ('type', 'code', 'condition', 'new_sale_file', 'new_rent_file', 'new_buyer', 'new_renter',
-                    'new_person', 'ur_task', 'datetime_created')
+    list_display = ('type', 'code', 'condition', 'datetime_created')
     ordering = ('-datetime_created',)
     list_filter = ['type', 'condition']
     readonly_fields = ('code', 'datetime_created',)

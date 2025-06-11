@@ -98,183 +98,108 @@
         <div class="row  g-gs">
             {% for visit in visits %}
                 <div class="col-sm-6 col-lg-6 col-xxl-6">
+                    <div class="card h-100">
+                        <div class="card-inner">
+                            <div class="project">
 
-                    {% if visit.status == 'end' %}
-                        <div class="card  h-100" style="background-color: #C8E6C9">
-                            <div class="card-inner">
-                                <div class="project">
-
-                                    <!-- Up -->
-                                    <div class="project-head" style="margin-bottom: 3em;">
-                                        <div class="project-title">
-                                            <div class="project-info">
-                                                <h6 class="title" style="margin-bottom: 0.85em;">بازدید در تاریخ: "{{ visit.date }}"</h6>
-                                                <div style="margin-bottom: 0.6em;">
-                                                    <span style="font-size: 0.9em;">کد بازدید: {{ visit.code }}</span>
-                                                </div>
-                                                <div style="margin-bottom: 0.6em;">
-                                                    <span style="font-size: 0.9em;">نوع معامله: "{{ visit.get_type_display }}"</span>
-                                                </div>
-                                                <div style="margin-bottom: 0.6em;">
-                                                    <span style="font-size: 0.9em;">وضعیت: "{{ visit.get_status_display }}"</span>
-                                                </div>
-                                                <div style="margin-bottom: 0.6em;">
-                                                    <span style="font-size: 0.9em;">مشاور: "{{ visit.agent }}"</span>
-                                                </div>
-                                                <div>
-                                                    <span style="font-size: 0.9em;">زیرمحله: "{{ visit.agent.sub_district }}"</span>
-                                                </div>
+                                <!-- Up -->
+                                <div class="project-head" style="margin-bottom: 3em;">
+                                    <div class="project-title">
+                                        <div class="project-info">
+                                            <h6 class="title" style="margin-bottom: 0.85em;">بازدید در تاریخ: "{{ visit.date }}"</h6>
+                                            <div style="margin-bottom: 0.6em;">
+                                                <span style="font-size: 0.9em;">کد بازدید: {{ visit.code }}</span>
                                             </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- File -->
-                                    <div class="project-head">
-                                        <div class="project-title">
-                                            <div class="project-info" style="height: 6em;!important; -webkit-line-clamp: 3;!important;">
-                                                <h6 class="title" style="margin-bottom: 0.7em;">فایل مربوطه:</h6>
-                                                {% if visit.type == 'sale' %}
-                                                    <a href="{{ visit.sale_file.get_absolute_url }}">
-                                                        <span class="sub-text" style="font-size: 0.85em;">{{ visit.sale_file.title|farsi_number }} | {{ visit.sale_file.code }}</span>
-                                                    </a>
-                                                {% elif visit.type == 'rent' %}
-                                                    <a href="{{ visit.rent_file.get_absolute_url }}">
-                                                        <span class="sub-text" style="font-size: 0.85em;">{{ visit.rent_file.title|farsi_number }} | {{ visit.rent_file.code }}</span>
-                                                    </a>
+                                            <div style="margin-bottom: 0.6em;">
+                                                <span style="font-size: 0.9em;">نوع معامله: "{{ visit.get_type_display }}"</span>
+                                            </div>
+                                            <div style="margin-bottom: 0.6em;">
+                                                {% if visit.status == 'sub' %}
+                                                    <span style="font-size: 0.9em; color: #FBC02D">وضعیت: "{{ visit.get_status_display }}"</span>
+                                                {% elif visit.status == 'acc' %}
+                                                    <span style="font-size: 0.9em; color: #1E88E5">وضعیت: "{{ visit.get_status_display }}"</span>
+                                                {% elif visit.status == 'can' %}
+                                                    <span style="font-size: 0.9em; color: #F44336">وضعیت: "{{ visit.get_status_display }}"</span>
+                                                {% elif visit.status == 'dne' %}
+                                                    <span style="font-size: 0.9em; color: #00A65C">وضعیت: "{{ visit.get_status_display }}"</span>
+                                                {% elif visit.status == 'end' %}
+                                                    <span style="font-size: 0.9em; color: #512DA8">وضعیت: "{{ visit.get_status_display }}"</span>
                                                 {% endif %}
                                             </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Customer -->
-                                    <div class="project-head">
-                                        <div class="project-title">
-                                            <div class="project-info" style="height: 6em;!important; -webkit-line-clamp: 3;!important;">
-                                                <h6 class="title" style="margin-bottom: 0.7em;">مشتری (خریدار/مستاجر) مربوطه:</h6>
-                                                {% if visit.type == 'sale' %}
-                                                    <a href="{{ visit.buyer.get_absolute_url }}">
-                                                        <span class="sub-text" style="font-size: 0.85em;">{{ visit.buyer.name }} | {{ visit.buyer.code }}</span>
-                                                    </a>
-                                                {% elif visit.type == 'rent' %}
-                                                    <a href="{{ visit.renter.get_absolute_url }}">
-                                                        <span class="sub-text" style="font-size: 0.85em;">{{ visit.renter.name }} | {{ visit.renter.code }}</span>
-                                                    </a>
-                                                {% endif %}
+                                            <div style="margin-bottom: 0.6em;">
+                                                <span style="font-size: 0.9em;">مشاور: "{{ visit.agent }}"</span>
+                                            </div>
+                                            <div>
+                                                <span style="font-size: 0.9em;">زیرمحله: "{{ visit.agent.sub_district }}"</span>
                                             </div>
                                         </div>
                                     </div>
-
-                                    <!-- Description -->
-                                    <div class="project-details">
-                                        <h6 class="title" style="margin-bottom: 0.7em;">توضیحات</h6>
-                                        <p style="height: 8em;!important; -webkit-line-clamp: 4;!important;">{{ visit.description|farsi_number|linebreaksbr }}</p>
-                                    </div>
-
-                                    <!-- Edit - Delete -->
-                                    {% if request.user.title == 'bs' or request.user.sub_district == visit.sale_file.sub_district or request.user.sub_district == visit.rent_file.sub_district %}
-                                        <div class="project-meta">
-                                            <a href="{% url 'visit_update' visit.pk visit.code %}" class="btn btn-primary justify-center" style="margin-top: 1em;"><em class="icon ni ni-edit"></em><span>تغییر</span></a>
-                                            <a href="{% url 'visit_delete' visit.pk visit.code %}" class="btn btn-danger justify-center" style="margin-top: 1em;"><em class="icon ni ni-delete"></em><span>حذف</span></a>
-                                        </div>
-                                    {% endif %}
-
-                                    <!-- Result -->
-                                    <div class="project-meta">
-                                        <a href="{% url 'visit_detail' visit.pk visit.code %}" class="btn btn-primary justify-center" style="margin-top: 1em; width: 100%"><em class="icon ni ni-edit-alt-fill"></em>مشاهده نتیجه</a>
-                                    </div>
-
                                 </div>
-                            </div>
-                        </div>
-                    {% elif visit.status == 'sub' %}
-                        <div class="card  h-100" style="background-color: #FFCDD2">
-                            <div class="card-inner">
-                                <div class="project">
 
-                                    <!-- Up -->
-                                    <div class="project-head" style="margin-bottom: 3em;">
-                                        <div class="project-title">
-                                            <div class="project-info">
-                                                <h6 class="title" style="margin-bottom: 0.85em;">بازدید در تاریخ: "{{ visit.date }}"</h6>
-                                                <div style="margin-bottom: 0.6em;">
-                                                    <span style="font-size: 0.9em;">کد بازدید: {{ visit.code }}</span>
-                                                </div>
-                                                <div style="margin-bottom: 0.6em;">
-                                                    <span style="font-size: 0.9em;">نوع معامله: "{{ visit.get_type_display }}"</span>
-                                                </div>
-                                                <div style="margin-bottom: 0.6em;">
-                                                    <span style="font-size: 0.9em;">وضعیت: "{{ visit.get_status_display }}"</span>
-                                                </div>
-                                                <div style="margin-bottom: 0.6em;">
-                                                    <span style="font-size: 0.9em;">مشاور: "{{ visit.agent }}"</span>
-                                                </div>
-                                                <div>
-                                                    <span style="font-size: 0.9em;">زیرمحله: "{{ visit.agent.sub_district }}"</span>
-                                                </div>
-                                            </div>
+                                <!-- File -->
+                                <div class="project-head">
+                                    <div class="project-title">
+                                        <div class="project-info" style="height: 6em;!important; -webkit-line-clamp: 3;!important;">
+                                            <h6 class="title" style="margin-bottom: 0.7em;">فایل مربوطه:</h6>
+                                            {% if visit.type == 'sale' %}
+                                                <a href="{{ visit.sale_file.get_absolute_url }}">
+                                                    <span class="sub-text" style="font-size: 0.85em;">{{ visit.sale_file.title|farsi_number }} | {{ visit.sale_file.code }}</span>
+                                                </a>
+                                            {% elif visit.type == 'rent' %}
+                                                <a href="{{ visit.rent_file.get_absolute_url }}">
+                                                    <span class="sub-text" style="font-size: 0.85em;">{{ visit.rent_file.title|farsi_number }} | {{ visit.rent_file.code }}</span>
+                                                </a>
+                                            {% endif %}
                                         </div>
                                     </div>
+                                </div>
 
-                                    <!-- File -->
-                                    <div class="project-head">
-                                        <div class="project-title">
-                                            <div class="project-info" style="height: 6em;!important; -webkit-line-clamp: 3;!important;">
-                                                <h6 class="title" style="margin-bottom: 0.7em;">فایل مربوطه:</h6>
-                                                {% if visit.type == 'sale' %}
-                                                    <a href="{{ visit.sale_file.get_absolute_url }}">
-                                                        <span class="sub-text" style="font-size: 0.85em;">{{ visit.sale_file.title|farsi_number }} | {{ visit.sale_file.code }}</span>
-                                                    </a>
-                                                {% elif visit.type == 'rent' %}
-                                                    <a href="{{ visit.rent_file.get_absolute_url }}">
-                                                        <span class="sub-text" style="font-size: 0.85em;">{{ visit.rent_file.title|farsi_number }} | {{ visit.rent_file.code }}</span>
-                                                    </a>
-                                                {% endif %}
-                                            </div>
+                                <!-- Customer -->
+                                <div class="project-head">
+                                    <div class="project-title">
+                                        <div class="project-info" style="height: 6em;!important; -webkit-line-clamp: 3;!important;">
+                                            <h6 class="title" style="margin-bottom: 0.7em;">مشتری (خریدار/مستاجر) مربوطه:</h6>
+                                            {% if visit.type == 'sale' %}
+                                                <a href="{{ visit.buyer.get_absolute_url }}">
+                                                    <span class="sub-text" style="font-size: 0.85em;">{{ visit.buyer.name }} | {{ visit.buyer.code }}</span>
+                                                </a>
+                                            {% elif visit.type == 'rent' %}
+                                                <a href="{{ visit.renter.get_absolute_url }}">
+                                                    <span class="sub-text" style="font-size: 0.85em;">{{ visit.renter.name }} | {{ visit.renter.code }}</span>
+                                                </a>
+                                            {% endif %}
                                         </div>
                                     </div>
+                                </div>
 
-                                    <!-- Customer -->
-                                    <div class="project-head">
-                                        <div class="project-title">
-                                            <div class="project-info" style="height: 6em;!important; -webkit-line-clamp: 3;!important;">
-                                                <h6 class="title" style="margin-bottom: 0.7em;">مشتری (خریدار/مستاجر) مربوطه:</h6>
-                                                {% if visit.type == 'sale' %}
-                                                    <a href="{{ visit.buyer.get_absolute_url }}">
-                                                        <span class="sub-text" style="font-size: 0.85em;">{{ visit.buyer.name }} | {{ visit.buyer.code }}</span>
-                                                    </a>
-                                                {% elif visit.type == 'rent' %}
-                                                    <a href="{{ visit.renter.get_absolute_url }}">
-                                                        <span class="sub-text" style="font-size: 0.85em;">{{ visit.renter.name }} | {{ visit.renter.code }}</span>
-                                                    </a>
-                                                {% endif %}
-                                            </div>
-                                        </div>
-                                    </div>
+                                <!-- Description -->
+                                <div class="project-details">
+                                    <h6 class="title" style="margin-bottom: 0.7em;">توضیحات</h6>
+                                    <p style="height: 8em;!important; -webkit-line-clamp: 4;!important;">{{ visit.description|farsi_number|linebreaksbr }}</p>
+                                </div>
 
-                                    <!-- Description -->
-                                    <div class="project-details">
-                                        <h6 class="title" style="margin-bottom: 0.7em;">توضیحات</h6>
-                                        <p style="height: 8em;!important; -webkit-line-clamp: 4;!important;">{{ visit.description|farsi_number|linebreaksbr }}</p>
-                                    </div>
-
-                                    <!-- Edit - Delete -->
-                                    {% if request.user.title == 'bs' or request.user.sub_district == visit.sale_file.sub_district or request.user.sub_district == visit.rent_file.sub_district %}
-                                        <div class="project-meta">
-                                            <a href="{% url 'visit_update' visit.pk visit.code %}" class="btn btn-primary justify-center" style="margin-top: 1em;"><em class="icon ni ni-edit"></em><span>تغییر</span></a>
-                                            <a href="{% url 'visit_delete' visit.pk visit.code %}" class="btn btn-danger justify-center" style="margin-top: 1em;"><em class="icon ni ni-delete"></em><span>حذف</span></a>
-                                        </div>
-                                    {% endif %}
-
-                                    <!-- Result -->
+                                <!-- Edit - Delete -->
+                                {% if request.user.title == 'bs' or request.user.sub_district == visit.sale_file.sub_district or request.user.sub_district == visit.rent_file.sub_district %}
                                     <div class="project-meta">
+                                        <a href="{% url 'visit_update' visit.pk visit.code %}" class="btn btn-primary justify-center" style="margin-top: 1em;"><em class="icon ni ni-edit"></em><span>تغییر</span></a>
+                                        <a href="{% url 'visit_delete' visit.pk visit.code %}" class="btn btn-danger justify-center" style="margin-top: 1em;"><em class="icon ni ni-delete"></em><span>حذف</span></a>
+                                    </div>
+                                {% endif %}
+
+                                <!-- Result -->
+                                <div class="project-meta">
+                                    {% if visit.status == 'sub' %}
+                                        <a class="btn btn-gray justify-center" style="margin-top: 1em; width: 100%" readonly><em class="icon ni ni-edit-alt-fill"></em>عدم دسترسی به نتیجه</a>
+                                    {% elif visit.status == 'acc' %}
                                         <a href="{% url 'visit_result' visit.pk visit.code %}" class="btn btn-primary justify-center" style="margin-top: 1em; width: 100%"><em class="icon ni ni-edit-alt-fill"></em>ثبت نتیجه</a>
-                                    </div>
-
+                                    {% elif visit.status == 'dne' or visit.status == 'end' or visit.status == 'can' %}
+                                        <a href="{% url 'visit_detail' visit.pk visit.code %}" class="btn btn-primary justify-center" style="margin-top: 1em; width: 100%"><em class="icon ni ni-edit-alt-fill"></em>مشاهده نتیجه</a>
+                                    {% endif %}
                                 </div>
+
                             </div>
                         </div>
-                    {% endif %}
-
+                    </div>
                 </div>
             {% endfor %}
         </div>

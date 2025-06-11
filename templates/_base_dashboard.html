@@ -139,9 +139,9 @@
                                                 <span class="nk-menu-text">{% trans 'Team' %}</span>
                                             </a>
                                             <ul class="nk-menu-sub">
-                                                <li class="nk-menu-item">
-                                                    <a href="#" class="nk-menu-link"><span class="nk-menu-text">{% trans 'Agents' %}</span></a>
-                                                </li>
+{#                                                <li class="nk-menu-item">#}
+{#                                                    <a href="{% url 'dashboard' %}" class="nk-menu-link"><span class="nk-menu-text">{% trans 'Agents' %}</span></a>#}
+{#                                                </li>#}
                                                 {% if request.user.title == 'bs' %}
                                                     <li class="nk-menu-item">
                                                         <a href="{% url 'boss_task_list' %}" class="nk-menu-link"><span class="nk-menu-text">وظایف مدیر</span></a>
@@ -155,10 +155,10 @@
                                                     <li class="nk-menu-item">
                                                         <a href="{% url 'task_bs_cl_list' %}" class="nk-menu-link"><span class="nk-menu-text">وظایف بسته</span></a>
                                                     </li>
+                                                    <li class="nk-menu-item">
+                                                        <a href="{% url 'task_create' %}" class="nk-menu-link"><span class="nk-menu-text">{% trans 'Create New Task' %}</span></a>
+                                                    </li>
                                                 {% endif %}
-                                                <li class="nk-menu-item">
-                                                    <a href="{% url 'task_create' %}" class="nk-menu-link"><span class="nk-menu-text">{% trans 'Create New Task' %}</span></a>
-                                                </li>
                                                 <li class="nk-menu-item">
                                                     <a href="{% url 'task_fp_list' %}" class="nk-menu-link"><span class="nk-menu-text">{% trans 'FP Tasks' %}</span></a>
                                                 </li>
@@ -274,6 +274,5 @@
     </body>
 
 </html>
-
 
 

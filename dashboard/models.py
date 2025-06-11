@@ -600,16 +600,18 @@ class Visit(models.Model):
     rent_file_code = models.CharField(max_length=6, null=True, blank=True, verbose_name=_('Rent File Code'))
     rent_file = models.ForeignKey(RentFile, on_delete=models.SET_NULL, null=True, blank=True, related_name='visits',
                                   verbose_name=_('Visit Rent File'))
-    buyer_code = models.CharField(max_length=6, null=True, blank=True, verbose_name=_('Buyer Code'))
+    buyer_code = models.CharField(max_length=10, null=True, blank=True, verbose_name=_('Buyer Code'))
     buyer = models.ForeignKey(Buyer, on_delete=models.SET_NULL, null=True, blank=True, related_name='visits',
                               verbose_name=_('Visit Buyer'))
-    renter_code = models.CharField(max_length=6, null=True, blank=True, verbose_name=_('Renter Code'))
+    renter_code = models.CharField(max_length=10, null=True, blank=True, verbose_name=_('Renter Code'))
     renter = models.ForeignKey(Renter, on_delete=models.SET_NULL, null=True, blank=True, related_name='visits',
                                verbose_name=_('Visit Renter'))
     type = models.CharField(max_length=10, choices=choices.types, blank=True, null=True,
                             verbose_name=_('Type of Trade'))
     description = models.TextField(max_length=1000, blank=True, null=True, verbose_name=_('Description'))
+    boss_notes = models.TextField(max_length=1000, blank=True, null=True, verbose_name=_('Boss Notes'))
     result = models.TextField(max_length=1000, blank=True, null=True, verbose_name=_('Result'))
+    boss_final_comment = models.TextField(max_length=1000, blank=True, null=True, verbose_name=_('Boss Final Comment'))
     date = models.CharField(max_length=200, verbose_name=_('Date of Visit'))
     time = models.CharField(max_length=200, choices=choices.times, verbose_name=_('Time of Visit'))
     code = models.CharField(max_length=10, null=True, unique=True, blank=True, verbose_name=_('Code'))
@@ -627,7 +629,16 @@ class Visit(models.Model):
             self.renter = Renter.objects.get(code=self.renter_code)
         if not self.code:
             self.code = generate_unique_code_longer()
+        is_new = self.pk is None
+        previous_status = None
+        if not is_new:
+            previous = Visit.objects.filter(pk=self.pk).first()
+            if previous:
+                previous_status = previous.status
         super(Visit, self).save(*args, **kwargs)
+        if self.status == 'dne' and previous_status != 'dne':
+            if not TaskBoss.objects.filter(result_visit=self).exists():
+                TaskBoss.objects.create(result_visit=self, type='rv')
 
     def __str__(self):
         return f'بازدید: {self.get_type_display()} / {self.code}'
@@ -650,16 +661,18 @@ class Session(models.Model):
     rent_file_code = models.CharField(max_length=6, null=True, blank=True, verbose_name=_('Rent File Code'))
     rent_file = models.ForeignKey(RentFile, on_delete=models.SET_NULL, null=True, blank=True, related_name='sessions',
                                   verbose_name=_('Visit Rent File'))
-    buyer_code = models.CharField(max_length=6, null=True, blank=True, verbose_name=_('Buyer Code'))
+    buyer_code = models.CharField(max_length=10, null=True, blank=True, verbose_name=_('Buyer Code'))
     buyer = models.ForeignKey(Buyer, on_delete=models.SET_NULL, null=True, blank=True, related_name='sessions',
                               verbose_name=_('Visit Buyer'))
-    renter_code = models.CharField(max_length=6, null=True, blank=True, verbose_name=_('Renter Code'))
+    renter_code = models.CharField(max_length=10, null=True, blank=True, verbose_name=_('Renter Code'))
     renter = models.ForeignKey(Renter, on_delete=models.SET_NULL, null=True, blank=True, related_name='sessions',
                                verbose_name=_('Visit Renter'))
     type = models.CharField(max_length=10, choices=choices.types, blank=True, null=True,
                             verbose_name=_('Type of Trade'))
     description = models.TextField(max_length=1000, blank=True, null=True, verbose_name=_('Description'))
+    boss_notes = models.TextField(max_length=1000, blank=True, null=True, verbose_name=_('Boss Notes'))
     result = models.TextField(max_length=1000, blank=True, null=True, verbose_name=_('Result'))
+    boss_final_comment = models.TextField(max_length=1000, blank=True, null=True, verbose_name=_('Boss Final Comment'))
     date = models.CharField(max_length=200, verbose_name=_('Date of Visit'))
     time = models.CharField(max_length=200, choices=choices.times, verbose_name=_('Time of Visit'))
     code = models.CharField(max_length=10, null=True, unique=True, blank=True, verbose_name=_('Code'))
@@ -677,7 +690,16 @@ class Session(models.Model):
             self.renter = Renter.objects.get(code=self.renter_code)
         if not self.code:
             self.code = generate_unique_code_longer()
+        is_new = self.pk is None
+        previous_status = None
+        if not is_new:
+            previous = Session.objects.filter(pk=self.pk).first()
+            if previous:
+                previous_status = previous.status
         super(Session, self).save(*args, **kwargs)
+        if self.status == 'dne' and previous_status != 'dne':
+            if not TaskBoss.objects.filter(result_session=self).exists():
+                TaskBoss.objects.create(result_session=self, type='rs')
 
     def __str__(self):
         return f'نشست: {self.type} / {self.code}'
@@ -826,6 +848,14 @@ class TaskBoss(models.Model):
                                    related_name='new_renter', verbose_name='مستاجر جدید')
     new_person = models.ForeignKey(Person, on_delete=models.CASCADE, blank=True, null=True,
                                    related_name='new_persons', verbose_name='آگهی‌دهنده جدید')
+    new_visit = models.ForeignKey(Visit, on_delete=models.CASCADE, blank=True, null=True,
+                                  related_name='new_visits', verbose_name='بازدید جدید')
+    new_session = models.ForeignKey(Session, on_delete=models.CASCADE, blank=True, null=True,
+                                    related_name='new_sessions', verbose_name='نشست جدید')
+    result_visit = models.ForeignKey(Visit, on_delete=models.CASCADE, blank=True, null=True,
+                                     related_name='result_visits', verbose_name='نتیجه بازدید')
+    result_session = models.ForeignKey(Session, on_delete=models.CASCADE, blank=True, null=True,
+                                       related_name='result_sessions', verbose_name='نتیجه نشست')
     ur_task = models.ForeignKey(Task, on_delete=models.CASCADE, blank=True, null=True,
                                 related_name='ur_tasks', verbose_name='وظیفه تحویل داده شده')
     type = models.CharField(max_length=10, choices=choices.boss_task_types, blank=True, null=True, verbose_name='نوع')

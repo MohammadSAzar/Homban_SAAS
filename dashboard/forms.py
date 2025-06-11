@@ -612,7 +612,7 @@ class VisitCreateForm(forms.ModelForm):
         if self.user.title == 'bs':
             agent = cleaned_data.get('agent')
             if agent is None:
-                self.add_error('agent', 'انتخاب مشاور برای نشست الزامی است')
+                self.add_error('agent', 'انتخاب مشاور برای بازدید الزامی است')
         else:
             agent = self.user
         visit_type = cleaned_data.get('type')
@@ -666,7 +666,7 @@ class VisitCreateForm(forms.ModelForm):
                 if self.user.title == 'cp' or self.user.title == 'bt':
                     if self.user.sub_district not in buyer.sub_districts.all():
                         self.add_error('buyer_code', 'شما اجازه تنظیم بازدید برای خریدار مربوطه را ندارید')
-            if agent.sub_district != sale_file.sub_district:
+            if agent and agent.sub_district != sale_file.sub_district:
                 self.add_error('sale_file_code', 'فایل فروش و مشاور، زیرمحله مشترک ندارند')
                 self.add_error('agent', 'فایل فروش و مشاور، زیرمحله مشترک ندارند')
 
@@ -682,7 +682,7 @@ class VisitCreateForm(forms.ModelForm):
             if self.user.title == 'cp' or self.user.title == 'bt':
                 if self.user.sub_district not in renter.sub_districts.all():
                     self.add_error('renter_code', 'شما اجازه تنظیم بازدید برای مستاجر مربوطه را ندارید')
-            if agent.sub_district != rent_file.sub_district:
+            if agent and agent.sub_district != rent_file.sub_district:
                 self.add_error('rent_file_code', 'فایل اجاره و مشاور، زیرمحله مشترک ندارند')
                 self.add_error('agent', 'فایل اجاره و مشاور، زیرمحله مشترک ندارند')
 
@@ -694,12 +694,13 @@ class VisitResultForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
-        status = cleaned_data.get('status')
         result = cleaned_data.get('result')
+        status = cleaned_data.get('status')
 
-        if result != '':
-            if status != 'end':
-                self.add_error('status', "برای ثبت نتیجه، وضعیت را به 'خاتمه یافته' تغییر دهید.")
+        if result == '':
+            self.add_error('result', "در صورت انجام بازدید، ثبت نتیجه آن الزامی است.")
+        if status != 'dne':
+            self.add_error('status', "برای ثبت نتیجه، تعیین وضعیتی به جز 'انجام شده' مجاز نیست")
 
         return cleaned_data
 
@@ -788,7 +789,7 @@ class SessionCreateForm(forms.ModelForm):
                 if self.user.title == 'cp' or self.user.title == 'bt':
                     if self.user.sub_district not in buyer.sub_districts.all():
                         self.add_error('buyer_code', 'شما اجازه تنظیم جلسه برای خریدار مربوطه را ندارید')
-            if agent.sub_district != sale_file.sub_district:
+            if agent and agent.sub_district != sale_file.sub_district:
                 self.add_error('sale_file_code', 'فایل فروش و مشاور، زیرمحله مشترک ندارند')
                 self.add_error('agent', 'فایل فروش و مشاور، زیرمحله مشترک ندارند')
 
@@ -804,7 +805,7 @@ class SessionCreateForm(forms.ModelForm):
             if self.user.title == 'cp' or self.user.title == 'bt':
                 if self.user.sub_district not in renter.sub_districts.all():
                     self.add_error('renter_code', 'شما اجازه تنظیم جلسه برای مستاجر مربوطه را ندارید')
-            if agent.sub_district != rent_file.sub_district:
+            if agent and agent.sub_district != rent_file.sub_district:
                 self.add_error('rent_file_code', 'فایل اجاره و مشاور، زیرمحله مشترک ندارند')
                 self.add_error('agent', 'فایل اجاره و مشاور، زیرمحله مشترک ندارند')
 
@@ -816,12 +817,13 @@ class SessionResultForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
-        status = cleaned_data.get('status')
         result = cleaned_data.get('result')
+        status = cleaned_data.get('status')
 
-        if result != '':
-            if status != 'end':
-                self.add_error('status', "برای ثبت نتیجه، وضعیت را به 'خاتمه یافته' تغییر دهید.")
+        if result == '':
+            self.add_error('result', "در صورت انجام نشست، ثبت نتیجه آن الزامی است.")
+        if status != 'dne':
+            self.add_error('status', "برای ثبت نتیجه، تعیین وضعیتی به جز 'انجام شده' مجاز نیست")
 
         return cleaned_data
 
@@ -972,6 +974,11 @@ class TaskBossStatusForm(forms.ModelForm):
         model = models.TaskBoss
         fields = ['condition']
 
+    def clean(self):
+        condition = self.cleaned_data.get('condition')
+        if not condition:
+            self.add_error('condition', 'این فیلد لازم است')
+
 
 class SaleFileStatusForm(forms.ModelForm):
     class Meta:
@@ -1001,6 +1008,30 @@ class PersonStatusForm(forms.ModelForm):
     class Meta:
         model = models.Person
         fields = ['status']
+
+
+class VisitStatusForm(forms.ModelForm):
+    class Meta:
+        model = models.Visit
+        fields = ['status', 'boss_notes']
+
+
+class SessionStatusForm(forms.ModelForm):
+    class Meta:
+        model = models.Session
+        fields = ['status', 'boss_notes']
+
+
+class VisitResultBossForm(forms.ModelForm):
+    class Meta:
+        model = models.Visit
+        fields = ['status', 'boss_final_comment']
+
+
+class SessionResultBossForm(forms.ModelForm):
+    class Meta:
+        model = models.Session
+        fields = ['status', 'boss_final_comment']
 
 
 class TaskStatusForm(forms.ModelForm):
@@ -1260,6 +1291,164 @@ class CombinedPersonStatusForm(forms.Form):
         self.boss_form.save()
         self.person_form.save()
 
+
+class CombinedVisitStatusForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        self.boss_instance = kwargs.pop('boss_instance', None)
+        self.visit_instance = kwargs.pop('visit_instance', None)
+        super().__init__(*args, **kwargs)
+
+        data = args[0] if args else None
+        self.boss_form = TaskBossStatusForm(data=data, instance=self.boss_instance)
+        self.visit_form = VisitStatusForm(data=data, instance=self.visit_instance)
+
+    def is_valid(self):
+        valid = self.visit_form.is_valid() and self.boss_form.is_valid()
+        return valid and self._cross_form_validation()
+
+    def _cross_form_validation(self):
+        status = self.visit_form.cleaned_data.get('status')
+        condition = self.boss_form.cleaned_data.get('condition')
+
+        if status == 'sub' and condition == 'op':
+            self.visit_form.add_error('status', 'هیچ تغییری اعمال نشده است')
+            self.boss_form.add_error('condition', 'هیچ تغییری اعمال نشده است')
+            return False
+        if status == 'sub' and condition == 'cl':
+            self.visit_form.add_error('status', 'برای بستن وظیفه مدیریتی، این فیلد باید "تایید شده" یا "رد شده" باشد')
+            return False
+        if status == 'acc' and condition == 'op':
+            self.boss_form.add_error('condition', 'برای وضعیت "تایید شده"، این فیلد باید "بسته" باشد')
+            return False
+        if status == 'can' and condition == 'op':
+            self.boss_form.add_error('condition', 'برای وضعیت "رد شده"، این فیلد باید "بسته" باشد')
+            return False
+        if status == 'dne' or status == 'end':
+            self.visit_form.add_error('status', 'انتخاب "انجام شده" و "تایید نتیجه" برای این فیلد، فعلا مجاز نیست')
+            return False
+        if not condition:
+            self.boss_form.add_error('condition', 'تعیین این فیلد الزامی است')
+            return False
+        if not status:
+            self.visit_form.add_error('status', 'تعیین این فیلد الزامی است')
+            return False
+
+        return True
+
+    def save(self):
+        self.boss_form.save()
+        self.visit_form.save()
+
+
+class CombinedSessionStatusForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        self.boss_instance = kwargs.pop('boss_instance', None)
+        self.session_instance = kwargs.pop('session_instance', None)
+        super().__init__(*args, **kwargs)
+
+        data = args[0] if args else None
+        self.boss_form = TaskBossStatusForm(data=data, instance=self.boss_instance)
+        self.session_form = SessionStatusForm(data=data, instance=self.session_instance)
+
+    def is_valid(self):
+        valid = self.session_form.is_valid() and self.boss_form.is_valid()
+        return valid and self._cross_form_validation()
+
+    def _cross_form_validation(self):
+        status = self.session_form.cleaned_data.get('status')
+        condition = self.boss_form.cleaned_data.get('condition')
+
+        if status == 'sub' and condition == 'op':
+            self.session_form.add_error('status', 'هیچ تغییری اعمال نشده است')
+            self.boss_form.add_error('condition', 'هیچ تغییری اعمال نشده است')
+            return False
+        if status == 'sub' and condition == 'cl':
+            self.session_form.add_error('status', 'برای بستن وظیفه مدیریتی، این فیلد باید "تایید شده" یا "رد شده" باشد')
+            return False
+        if status == 'acc' and condition == 'op':
+            self.boss_form.add_error('condition', 'برای وضعیت "تایید شده"، این فیلد باید "بسته" باشد')
+            return False
+        if status == 'can' and condition == 'op':
+            self.boss_form.add_error('condition', 'برای وضعیت "رد شده"، این فیلد باید "بسته" باشد')
+            return False
+        if status == 'dne' or status == 'end':
+            self.session_form.add_error('status', 'انتخاب "انجام شده" و "تایید نتیجه" برای این فیلد، فعلا مجاز نیست')
+            return False
+        if not condition:
+            self.boss_form.add_error('condition', 'تعیین این فیلد الزامی است')
+            return False
+        if not status:
+            self.session_form.add_error('status', 'تعیین این فیلد الزامی است')
+            return False
+        return True
+
+    def save(self):
+        self.boss_form.save()
+        self.session_form.save()
+
+
+class CombinedVisitResultForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        self.boss_instance = kwargs.pop('boss_instance', None)
+        self.result_visit_instance = kwargs.pop('result_visit_instance', None)
+        super().__init__(*args, **kwargs)
+
+        data = args[0] if args else None
+        self.boss_form = TaskBossStatusForm(data=data, instance=self.boss_instance)
+        self.result_visit_form = VisitResultBossForm(data=data, instance=self.result_visit_instance)
+
+    def is_valid(self):
+        valid = self.result_visit_form.is_valid() and self.boss_form.is_valid()
+        return valid and self._cross_form_validation()
+
+    def _cross_form_validation(self):
+        status = self.result_visit_form.cleaned_data.get('status')
+        condition = self.boss_form.cleaned_data.get('condition')
+
+        if status != 'end':
+            self.result_visit_form.add_error('status', "برای بازدید انجام شده، این فیلد فقط می‌تواند 'تایید نتیجه' باشد")
+            return False
+        if condition != 'cl':
+            self.boss_form.add_error('condition', "برای تایید نتیجه، این فیلد باید 'بسته' باشد")
+            return False
+
+        return True
+
+    def save(self):
+        self.boss_form.save()
+        self.result_visit_form.save()
+
+
+class CombinedSessionResultForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        self.boss_instance = kwargs.pop('boss_instance', None)
+        self.result_session_instance = kwargs.pop('result_session_instance', None)
+        super().__init__(*args, **kwargs)
+
+        data = args[0] if args else None
+        self.boss_form = TaskBossStatusForm(data=data, instance=self.boss_instance)
+        self.result_session_form = SessionResultBossForm(data=data, instance=self.result_session_instance)
+
+    def is_valid(self):
+        valid = self.result_session_form.is_valid() and self.boss_form.is_valid()
+        return valid and self._cross_form_validation()
+
+    def _cross_form_validation(self):
+        status = self.result_session_form.cleaned_data.get('status')
+        condition = self.boss_form.cleaned_data.get('condition')
+
+        if status != 'end':
+            self.result_session_form.add_error('status', "برای نشست انجام شده، این فیلد فقط می‌تواند 'تایید نتیجه' باشد")
+            return False
+        if condition != 'cl':
+            self.boss_form.add_error('condition', "برای تایید نتیجه، این فیلد باید 'بسته' باشد")
+            return False
+
+        return True
+
+    def save(self):
+        self.boss_form.save()
+        self.result_session_form.save()
 
 
 

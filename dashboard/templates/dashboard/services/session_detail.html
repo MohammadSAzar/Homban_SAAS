@@ -37,15 +37,35 @@
                         </div>
                         <!-- end: Title -->
 
-                        <!-- Results -->
-                        <div class="col-lg-12 col-sm-12">
-                            <div class="form-group">
-                                <div class="form-control-wrap">
-                                    <label class="form-label">نتیجه:</label>
-                                    <span>{{ session.result|linebreaksbr|farsi_number }}</span>
+                        <!-- Results - Notes - Comment -->
+                        {% if session.status == 'dne' %}
+                            <div class="col-lg-12 col-sm-12">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label">نتیجه:</label>
+                                        <span>{{ session.result|linebreaksbr|farsi_number }}</span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        {% elif session.status == 'can' %}
+                            <div class="col-lg-12 col-sm-12">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label">توضیحات مدیر:</label>
+                                        <span>{{ session.boss_notes|linebreaksbr|farsi_number }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        {% elif session.status == 'end' %}
+                            <div class="col-lg-12 col-sm-12">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label">توضیحات نهایی مدیر:</label>
+                                        <span>{{ session.boss_final_comment|linebreaksbr|farsi_number }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
                         
                         <!-- status -->
                         <div class="col-lg-12 col-sm-12">
@@ -58,7 +78,7 @@
                         </div>
                         
                         <!-- Result Link -->
-                        {% if session.agent.title == request.user.title and session.status == 'end' %}
+                        {% if session.agent.title == request.user.title and session.status == 'dne' %}
                             <div class="nk-fmg-actions" style="margin-top: 3em;">
                                 <a href="{% url 'session_result' session.pk session.code %}" class="btn btn-primary" style="line-height: 30px;">تغییر نتیجه</a>
                             </div>
