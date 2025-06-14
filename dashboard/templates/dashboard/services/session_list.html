@@ -177,24 +177,24 @@
                                     <p style="height: 8em;!important; -webkit-line-clamp: 4;!important;">{{ session.description|farsi_number|linebreaksbr }}</p>
                                 </div>
             
-                                <!-- Edit - Delete -->
+                                <!-- Links -->
                                 {% if request.user.title == 'bs' or request.user.sub_district == session.sale_file.sub_district or request.user.sub_district == session.rent_file.sub_district %}
-                                    <div class="project-meta">
-                                        <a href="{% url 'session_update' session.pk session.code %}" class="btn btn-primary justify-center" style="margin-top: 1em;"><em class="icon ni ni-edit"></em><span>تغییر</span></a>
-                                        <a href="{% url 'session_delete' session.pk session.code %}" class="btn btn-danger justify-center" style="margin-top: 1em;"><em class="icon ni ni-delete"></em><span>حذف</span></a>
-                                    </div>
-                                {% endif %}
-            
-                                <!-- Result -->
-                                <div class="project-meta">
                                     {% if session.status == 'sub' %}
-                                        <a class="btn btn-gray justify-center" style="margin-top: 1em; width: 100%" readonly><em class="icon ni ni-edit-alt-fill"></em>عدم دسترسی به نتیجه</a>
+                                        <div class="project-meta">
+                                            <a href="{% url 'session_update' session.pk session.code %}" class="btn btn-primary justify-center" style="margin-top: 1em;"><em class="icon ni ni-edit"></em><span>تغییر</span></a>
+                                            <a href="{% url 'session_delete' session.pk session.code %}" class="btn btn-danger justify-center" style="margin-top: 1em;"><em class="icon ni ni-delete"></em><span>حذف</span></a>
+                                        </div>
                                     {% elif session.status == 'acc' %}
-                                        <a href="{% url 'session_result' session.pk session.code %}" class="btn btn-primary justify-center" style="margin-top: 1em; width: 100%"><em class="icon ni ni-edit-alt-fill"></em>ثبت نتیجه</a>
-                                    {% elif session.status == 'dne' or session.status == 'end' or session.status == 'can' %}
-                                        <a href="{% url 'session_detail' session.pk session.code %}" class="btn btn-primary justify-center" style="margin-top: 1em; width: 100%"><em class="icon ni ni-edit-alt-fill"></em>مشاهده نتیجه</a>
+                                        <div class="project-meta">
+                                            <a href="{% url 'session_detail' session.pk session.code %}" class="btn btn-primary justify-center" style="margin-top: 1em;"><em class="icon ni ni-edit"></em><span>مشاهده</span></a>
+                                            <a href="{% url 'session_result' session.pk session.code %}" class="btn btn-primary justify-center" style="margin-top: 1em;"><em class="icon ni ni-delete"></em><span>ثبت نتیجه</span></a>
+                                        </div>
+                                    {% elif session.status == 'can' or session.status == 'dne' or session.status == 'end' %}
+                                        <div class="project-meta">
+                                            <a href="{% url 'session_detail' session.pk session.code %}" class="btn btn-primary justify-center" style="margin-top: 1em; width: 100%"><em class="icon ni ni-edit-alt-fill"></em>مشاهده</a>
+                                        </div>
                                     {% endif %}
-                                </div>
+                                {% endif %}
 
                             </div>
                         </div>

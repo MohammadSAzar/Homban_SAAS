@@ -702,7 +702,7 @@ class Session(models.Model):
                 TaskBoss.objects.create(result_session=self, type='rs')
 
     def __str__(self):
-        return f'نشست: {self.type} / {self.code}'
+        return f'نشست: {self.get_type_display()} / {self.code}'
 
     class Meta:
         ordering = ('-datetime_created',)
@@ -738,25 +738,25 @@ class Trade(models.Model):
 
     @property
     def sale_file(self):
-        if self.type == 'sale':
+        if self.type == 'sale' and self.session:
             file = self.session.sale_file
             return file
 
     @property
     def rent_file(self):
-        if self.type == 'rent':
+        if self.type == 'rent' and self.session:
             file = self.session.rent_file
             return file
 
     @property
     def buyer(self):
-        if self.type == 'sale':
+        if self.type == 'sale' and self.session:
             buyer = self.session.buyer
             return buyer
 
     @property
     def renter(self):
-        if self.type == 'rent':
+        if self.type == 'rent' and self.session:
             renter = self.session.renter
             return renter
 
@@ -772,10 +772,13 @@ class Trade(models.Model):
         super(Trade, self).save(*args, **kwargs)
 
     def __str__(self):
-        if self.type == 'sale':
-            return f'معامله: {self.type} / {self.code} / {self.session.sale_file}'
+        if self.session:
+            if self.type == 'sale':
+                return f'معامله: {self.get_type_display()} / {self.code} / {self.session.sale_file}'
+            else:
+                return f'معامله: {self.get_type_display()} / {self.code} / {self.session.rent_file}'
         else:
-            return f'معامله: {self.type} / {self.code} / {self.session.rent_file}'
+            return f'معامله: {self.get_type_display()} / {self.code}'
 
     class Meta:
         ordering = ('-datetime_created',)
@@ -826,7 +829,7 @@ class Task(models.Model):
                 TaskBoss.objects.create(ur_task=self, type='ts')
 
     def __str__(self):
-        return f'{self.type} / {self.code}'
+        return f'{self.get_type_display()} / {self.code}'
 
     class Meta:
         ordering = ('-datetime_created',)
@@ -870,7 +873,7 @@ class TaskBoss(models.Model):
         super(TaskBoss, self).save(*args, **kwargs)
 
     def __str__(self):
-        return f'{self.type} / {self.code}'
+        return f'{self.get_type_display()} / {self.code}'
 
     class Meta:
         ordering = ('-datetime_created',)

@@ -2005,19 +2005,19 @@ class TradeListView(ReadOnlyPermissionMixin, ListView):
 
             user_sub_district = self.request.user.sub_district
             sale_trades = models.Trade.objects.filter(
-                sale_file_code__isnull=False,
-                sale_file_code__in=models.SaleFile.objects.filter(
+                session__sale_file_code__isnull=False,
+                session__sale_file_code__in=models.SaleFile.objects.filter(
                     sub_district=user_sub_district
                 ).values_list('code', flat=True)
             )
             rent_trades = models.Trade.objects.filter(
-                rent_file_code__isnull=False,
-                rent_file_code__in=models.RentFile.objects.filter(
+                session__rent_file_code__isnull=False,
+                session__rent_file_code__in=models.RentFile.objects.filter(
                     sub_district=user_sub_district
                 ).values_list('code', flat=True)
             )
             queryset = (sale_trades | rent_trades).distinct()
-            queryset = queryset.filter(agent=self.request.user)
+            queryset = queryset.filter(session__agent=self.request.user)
 
             return queryset
 
