@@ -196,7 +196,7 @@ class Person(models.Model):
     phone_number = models.CharField(max_length=11, unique=True, verbose_name=_('Phone Number'))
     description = models.TextField(max_length=150, blank=True, null=True, verbose_name=_('Description'))
     status = models.CharField(max_length=10, choices=choices.statuses, default='pen', verbose_name=_('Status'))
-    datetime_created = models.DateTimeField(auto_now_add=True)
+    datetime_created = models.DateTimeField(auto_now_add=True, null=True)
 
     class Meta:
         ordering = ('-datetime_created',)

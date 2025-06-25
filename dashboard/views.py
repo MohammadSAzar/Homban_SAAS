@@ -1775,7 +1775,6 @@ class VisitUpdateView(PermissionRequiredMixin, UpdateView):
         return super().form_valid(form)
 
     def form_invalid(self, form):
-        self.object = None
         return self.render_to_response(self.get_context_data(form=form))
 
     def get_success_url(self):
@@ -1795,7 +1794,6 @@ class VisitDeleteView(PermissionRequiredMixin, DeleteView):
         return super().form_valid(form)
 
     def form_invalid(self, form):
-        self.object = None
         return self.render_to_response(self.get_context_data(form=form))
 
 
@@ -1832,7 +1830,6 @@ class VisitResultView(PermissionRequiredMixin, UpdateView):
         return super().form_valid(form)
 
     def form_invalid(self, form):
-        self.object = None
         return self.render_to_response(self.get_context_data(form=form))
 
     def get_success_url(self):
@@ -1897,7 +1894,6 @@ class SessionCreateView(PermissionRequiredMixin, CreateView):
         return super().form_valid(form)
 
     def form_invalid(self, form):
-        self.object = None
         return self.render_to_response(self.get_context_data(form=form))
 
     def get_success_url(self):
@@ -1922,7 +1918,6 @@ class SessionUpdateView(PermissionRequiredMixin, UpdateView):
         return super().form_valid(form)
 
     def form_invalid(self, form):
-        self.object = None
         return self.render_to_response(self.get_context_data(form=form))
 
     def get_success_url(self):
@@ -1942,7 +1937,6 @@ class SessionDeleteView(PermissionRequiredMixin, DeleteView):
         return super().form_valid(form)
 
     def form_invalid(self, form):
-        self.object = None
         return self.render_to_response(self.get_context_data(form=form))
 
 
@@ -1979,7 +1973,6 @@ class SessionResultView(PermissionRequiredMixin, UpdateView):
         return super().form_valid(form)
 
     def form_invalid(self, form):
-        self.object = None
         return self.render_to_response(self.get_context_data(form=form))
 
     def get_success_url(self):
@@ -2046,7 +2039,6 @@ class TradeCreateView(PermissionRequiredMixin, CreateView):
         return super().form_valid(form)
 
     def form_invalid(self, form):
-        self.object = None
         return self.render_to_response(self.get_context_data(form=form))
 
     def get_success_url(self):
@@ -2071,7 +2063,6 @@ class TradeUpdateView(PermissionRequiredMixin, UpdateView):
         return super().form_valid(form)
 
     def form_invalid(self, form):
-        self.object = None
         return self.render_to_response(self.get_context_data(form=form))
 
     def get_success_url(self):
@@ -2098,7 +2089,6 @@ class TradeCodeView(PermissionRequiredMixin, UpdateView):
         return super().form_valid(form)
 
     def form_invalid(self, form):
-        self.object = None
         return self.render_to_response(self.get_context_data(form=form))
 
     def get_success_url(self):
