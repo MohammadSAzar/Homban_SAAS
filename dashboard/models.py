@@ -4,7 +4,6 @@ import zipfile
 import random
 import string
 from jdatetime import date, timedelta, datetime
-# from datetime import datetime, timedelta
 
 from django.conf import settings
 from django.db import models
@@ -796,14 +795,18 @@ class Task(models.Model):
     type = models.CharField(max_length=10, choices=choices.task_types, verbose_name=_('Type of Task'))
     agent = models.ForeignKey(CustomUserModel, on_delete=models.SET_NULL, null=True, blank=True, related_name='tasks',
                               verbose_name=_('Agent'))
+    sale_file_code = models.CharField(max_length=6, null=True, blank=True, verbose_name=_('Sale File Code'))
     sale_file = models.ForeignKey(SaleFile, on_delete=models.SET_NULL, null=True, blank=True, related_name='tasks',
-                                  verbose_name=_('Sale File'))
+                                  verbose_name=_('Task Sale File'))
+    rent_file_code = models.CharField(max_length=6, null=True, blank=True, verbose_name=_('Rent File Code'))
     rent_file = models.ForeignKey(RentFile, on_delete=models.SET_NULL, null=True, blank=True, related_name='tasks',
-                                  verbose_name=_('Rent File'))
+                                  verbose_name=_('Task Rent File'))
+    buyer_code = models.CharField(max_length=10, null=True, blank=True, verbose_name=_('Buyer Code'))
     buyer = models.ForeignKey(Buyer, on_delete=models.SET_NULL, null=True, blank=True, related_name='tasks',
-                              verbose_name=_('Buyer'))
+                              verbose_name=_('Task Buyer'))
+    renter_code = models.CharField(max_length=10, null=True, blank=True, verbose_name=_('Renter Code'))
     renter = models.ForeignKey(Renter, on_delete=models.SET_NULL, null=True, blank=True, related_name='tasks',
-                               verbose_name=_('Renter'))
+                               verbose_name=_('Task Renter'))
     code = models.CharField(max_length=10, null=True, unique=True, blank=True)
     description = models.TextField(max_length=1000, blank=True, null=True, verbose_name=_('Description'))
     result = models.TextField(max_length=1000, blank=True, null=True, verbose_name=_('Result'))
@@ -815,6 +818,14 @@ class Task(models.Model):
         return self.agent.sub_district
 
     def save(self, *args, **kwargs):
+        if not self.sale_file and self.sale_file_code:
+            self.sale_file = SaleFile.objects.get(code=self.sale_file_code)
+        if not self.rent_file and self.rent_file_code:
+            self.rent_file = RentFile.objects.get(code=self.rent_file_code)
+        if not self.buyer and self.buyer_code:
+            self.buyer = Buyer.objects.get(code=self.buyer_code)
+        if not self.renter and self.renter_code:
+            self.renter = Renter.objects.get(code=self.renter_code)
         if not self.code:
             self.code = generate_unique_code_longer()
         is_new = self.pk is None
@@ -882,7 +893,6 @@ class TaskBoss(models.Model):
 
     def get_absolute_url(self):
         return reverse('boss_task_approve', args=[self.pk, self.code])
-
 
 
 

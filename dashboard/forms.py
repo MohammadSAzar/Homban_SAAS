@@ -921,7 +921,7 @@ task_required_fields = ['title', 'type', 'agent', 'deadline', 'description']
 class TaskCreateForm(forms.ModelForm):
     class Meta:
         model = models.Task
-        fields = ['title', 'type', 'agent', 'deadline', 'sale_file', 'rent_file', 'buyer', 'renter', 'description']
+        fields = ['title', 'type', 'agent', 'deadline', 'sale_file_code', 'rent_file_code','buyer_code', 'renter_code', 'description']
 
     def __init__(self, *args, **kwargs):
         super(TaskCreateForm, self).__init__(*args, **kwargs)
@@ -932,6 +932,54 @@ class TaskCreateForm(forms.ModelForm):
         )
         for field in task_required_fields:
             self.fields[field].required = True
+
+    def clean(self):
+        cleaned_data = super().clean()
+        task_type = cleaned_data.get('type')
+        agent = cleaned_data.get('agent')
+        sale_file_code = cleaned_data.get('sale_file_code')
+        rent_file_code = cleaned_data.get('rent_file_code')
+        buyer_code = cleaned_data.get('buyer_code')
+        renter_code = cleaned_data.get('renter_code')
+
+        sale_file_codes = list(models.SaleFile.objects.values_list('code', flat=True))
+        rent_file_codes = list(models.RentFile.objects.values_list('code', flat=True))
+        buyer_codes = list(models.Buyer.objects.values_list('code', flat=True))
+        renter_codes = list(models.Renter.objects.values_list('code', flat=True))
+
+        if sale_file_code and sale_file_code not in sale_file_codes:
+            self.add_error('sale_file_code', 'کد فایل فروش وارد شده معتبر نیست')
+        if rent_file_code and rent_file_code not in rent_file_codes:
+            self.add_error('rent_file_code', 'کد فایل اجاره وارد شده معتبر نیست')
+        if buyer_code and buyer_code not in buyer_codes:
+            self.add_error('buyer_code', 'کد خریدار وارد شده معتبر نیست')
+        if renter_code and renter_code not in renter_codes:
+            self.add_error('renter_code', 'کد مستاجر وارد شده معتبر نیست')
+
+        if sale_file_code and sale_file_code in sale_file_codes:
+            sale_file = models.SaleFile.objects.get(code=sale_file_code)
+            if sale_file.sub_district != agent.sub_district:
+                self.add_error('sale_file_code', 'فایل فروش و مشاور مربوطه، زیرمحله مشترک ندارند')
+        if rent_file_code and rent_file_code in rent_file_codes:
+            rent_file = models.RentFile.objects.get(code=rent_file_code)
+            if rent_file.sub_district != agent.sub_district:
+                self.add_error('rent_file_code', 'فایل اجاره و مشاور مربوطه، زیرمحله مشترک ندارند')
+        if buyer_code and buyer_code in buyer_codes:
+            buyer = models.Buyer.objects.get(code=buyer_code)
+            if agent.sub_district not in buyer.sub_districts.all():
+                self.add_error('buyer_code', 'خریدار و مشاور مربوطه، زیرمحله مشترک ندارند')
+        if renter_code and renter_code in renter_codes:
+            renter = models.Renter.objects.get(code=renter_code)
+            if agent.sub_district not in renter.sub_districts.all():
+                self.add_error('renter_code', 'مستاجر و مشاور مربوطه، زیرمحله مشترک ندارند')
+
+        if agent.title == 'bs':
+            self.add_error('agent', 'امکان تعریف وظیفه برای مدیر وجود ندارد')
+        if agent.title != task_type and agent.title != 'bs':
+            self.add_error('agent', 'مشاور انتخابی با "نوع وظیفه" همخوانی ندارد')
+            self.add_error('type', 'نوع وظیفه با "مشاور انتخابی" همخوانی ندارد')
+
+        return cleaned_data
 
 
 class TaskResultForm(forms.ModelForm):
