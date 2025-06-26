@@ -220,7 +220,11 @@
                                             <!-- Name -->
                                             <a href="#" class="dropdown-toggle" data-bs-toggle="dropdown">
                                                 <div class="user-toggle">
-                                                    <div class="user-name dropdown-indicator" style="font-size: 1em; padding-top: 0.5em;">{{ user.get_title_display }} / {{ user.sub_district }}</div>
+                                                    {% if user.name_family %}
+                                                        <div class="user-name dropdown-indicator" style="font-size: 1em; padding-top: 0.5em;">{{ user.name_family }} / {{ user.sub_district }}</div>
+                                                    {% else %}
+                                                        <div class="user-name dropdown-indicator" style="font-size: 1em; padding-top: 0.5em;">{{ user.get_title_display }} / {{ user.sub_district }}</div>
+                                                    {% endif %}
                                                 </div>
                                             </a>
 
@@ -274,5 +278,6 @@
     </body>
 
 </html>
+
 
 

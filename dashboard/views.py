@@ -16,7 +16,11 @@ def home_view(request):
 
 
 def dashboard_view(request):
-    return render(request, 'dashboard/dashboard.html')
+    user = request.user
+    context = {
+        'user': user,
+    }
+    return render(request, 'dashboard/dashboard.html', context)
 
 
 # --------------------------------- Locations --------------------------------

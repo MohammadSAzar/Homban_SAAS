@@ -176,6 +176,7 @@ class CustomUserModel(AbstractUser):
         ('bt', _('Dual Person')),
     ]
     title = models.CharField(max_length=10, choices=TITLE_CHOICES, blank=True, null=True, verbose_name=_('Title'))
+    name_family = models.CharField(max_length=300, blank=True, null=True, verbose_name='نام و نام خانوادگی')
     sub_district = models.ForeignKey(SubDistrict, on_delete=models.SET_NULL, null=True, blank=True,
                                      related_name='agents', verbose_name=_('Sub-District'))
     email = models.EmailField(unique=False, blank=True, null=True)
@@ -893,6 +894,5 @@ class TaskBoss(models.Model):
 
     def get_absolute_url(self):
         return reverse('boss_task_approve', args=[self.pk, self.code])
-
 
 

@@ -2,13 +2,17 @@
 
 {% load static %}
 {% load i18n %}
+{% load jalali_tags %}
+{% load number_converter %}
 {% load widget_tweaks %}
+{% load humanize %}
 
 
 {% block title %}{% trans 'Dashboard' %}{% endblock %}
 
 
 {% block content %}
+
     <!-- Message -->
     <div id="successModal"  class="modal">
         <div class="modal-content">
@@ -28,6 +32,62 @@
             });
         });
     </script>
+
+    <!-- Info -->
+    <div class="card">
+        <div class="card-aside-wrap">
+            <div class="card-inner card-inner-lg">
+
+                <!-- Main -->
+                <div class="nk-block-head nk-block-head-lg">
+                    <div class="nk-block-between">
+                        <div class="nk-block-head-content">
+                            <h5 class="nk-block-title">مشاور: {{ user.name_family|farsi_number }}</h5>
+                            <div class="nk-block-des" style="margin-top: 20px;">
+                                <h6 style="color: #00a65c">نقش: {{ user.get_title_display|farsi_number }}</h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Location -->
+                {% if user.title != 'bs' %}
+                    <div class="nk-block" style="margin-top: 1.5em;">
+                        <div class="nk-data  data-list">
+                            <!-- Ribbon -->
+                            <div class="data-head">
+                                <h6 class="title">اطلاعات موقعیت فعالیت</h6>
+                            </div>
+                            <!-- PCD -->
+                            <div class="data-item" data-bs-toggle="modal" data-bs-target="#profile-edit">
+                                <div class="data-col">
+                                    <span class="data-label">لوکیشن فعالیت:</span>
+                                    <span class="data-value">{{ user.sub_district.district.city.province }} | {{ user.sub_district.district.city }} | {{ user.sub_district.district }}</span>
+                                </div>
+                            </div>
+                            <!-- Subhi -->
+                            <div class="data-item" data-bs-toggle="modal" data-bs-target="#profile-edit">
+                                <div class="data-col">
+                                    <span class="data-label">زیرمحله مشاور:</span>
+                                    <span class="data-value" style="color: #00a65c">{{ user.sub_district.name }}</span>
+                                </div>
+                            </div>
+                            <!-- Description -->
+                            <div class="data-item" data-bs-toggle="modal" data-bs-target="#profile-edit">
+                                <div class="data-col">
+                                    <span class="data-label">توضیحات زیرمحله:</span>
+                                    <span class="data-value">{{ user.sub_district.description|linebreaksbr|farsi_number|safe }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+
 {% endblock %}
+
 
 
