@@ -48,7 +48,7 @@
     <!-- end: Upper Navbar -->
     
 
-    <!-- List -->
+    <!-- Main -->
     <div class="nk-block">
 
         <!-- Upper + Mobile -->
@@ -90,435 +90,484 @@
         <!-- end: Upper + Mobile -->
 
         <!-- Tasks -->
-        <div class="row g-gs" >
-            {% for task in tasks %}
-                {% if task.type == 'bt' %}
-                    <div class="col-sm-6 col-lg-6 col-xxl-6">
-
-                        {% if task.status == 'CL' %}
-                            <div class="card h-100" style="background-color: #C8E6C9">
-                                <div class="card-inner">
-                                    <div class="project">
-
-                                        <!-- Up -->
-                                        <div class="project-head">
-                                            <div class="project-title">
-                                                <div class="project-info">
-                                                    <h6 class="title">{{ task.title }} | {{ task.code }}</h6>
-                                                    <span class="sub-text" style="font-size: 0.95em; margin-top: 0.7em;">{{ task.agent }} | {{ task.agent.sub_district }}</span>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Description -->
-                                        <div class="project-details">
-                                            <p style="height: 8em;!important; -webkit-line-clamp: 4;!important;">{{ task.description|linebreaksbr|farsi_number }}</p>
-                                        </div>
-
-                                        <!-- Middle1 -->
-                                        <div  style="height: 8em;!important; -webkit-line-clamp: 4;!important;">
-                                            <h6 class="title" style="margin-bottom: 0.7em;">فایل فروش/اجاره مربوطه:</h6>
-                                            <!-- Sale -->
-                                            {% if task.sale_file %}
-                                                <div class="project-head" style="margin-bottom: 0.5em;!important;">
-                                                    <div class="project-title">
-                                                        <div class="project-info">
-                                                            <a href="{{ task.sale_file.get_absolute_url }}">
-                                                                <span class="sub-text" style="font-size: 0.85em;">فروش: {{ task.sale_file.title|linebreaksbr|farsi_number }}</span>
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            {% else %}
-                                                <div class="project-head" style="margin-bottom: 0.5em;!important;">
-                                                    <div class="project-title">
-                                                        <div class="project-info">
-                                                            <span class="sub-text" style="font-size: 0.85em;">فروش: ----</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            {% endif %}
-
-                                            <!-- Rent -->
-                                            {% if task.rent_file %}
-                                                <div class="project-head" style="margin-bottom: 0.5em;!important;">
-                                                    <div class="project-title">
-                                                        <div class="project-info">
-                                                            <a href="{{ task.rent_file.get_absolute_url }}">
-                                                                <span class="sub-text" style="font-size: 0.85em;">اجاره: {{ task.rent_file.title|linebreaksbr|farsi_number }}</span>
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            {% else %}
-                                                <div class="project-head" style="margin-bottom: 0.5em;!important;">
-                                                    <div class="project-title">
-                                                        <div class="project-info">
-                                                            <span class="sub-text" style="font-size: 0.85em;">اجاره: ----</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            {% endif %}
-                                        </div>
-
-                                        <!-- Middle2 -->
-                                        <div  style="height: 8em;!important; -webkit-line-clamp: 4;!important;">
-                                            <h6 class="title" style="margin-bottom: 0.7em;">مشتری (خریدار/موجر) مربوطه:</h6>
-                                            <!-- Buyer -->
-                                            {% if task.buyer %}
-                                                <div class="project-head" style="margin-bottom: 0.5em;!important;">
-                                                    <div class="project-title">
-                                                        <div class="project-info">
-                                                            <a href="{{ task.buyer.get_absolute_url }}">
-                                                                <span class="sub-text" style="font-size: 0.85em;">خریدار: {{ task.buyer.name }}</span>
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            {% else %}
-                                                <div class="project-head" style="margin-bottom: 0.5em;!important;">
-                                                    <div class="project-title">
-                                                        <div class="project-info">
-                                                            <span class="sub-text" style="font-size: 0.85em;">خریدار: ----</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            {% endif %}
-
-                                            <!-- Renter -->
-                                            {% if task.renter %}
-                                                <div class="project-head" style="margin-bottom: 0.5em;!important;">
-                                                    <div class="project-title">
-                                                        <div class="project-info">
-                                                            <a href="{{ task.renter.get_absolute_url }}">
-                                                                <span class="sub-text" style="font-size: 0.85em;">موجر: {{ task.renter.name }}</span>
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            {% else %}
-                                                <div class="project-head" style="margin-bottom: 0.5em;!important;">
-                                                    <div class="project-title">
-                                                        <div class="project-info">
-                                                            <span class="sub-text" style="font-size: 0.85em;">موجر: ----</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            {% endif %}
-                                        </div>
-
-                                        <!-- Bottom -->
-                                        <div class="project-head">
-                                            <div class="project-title">
-                                                <div class="project-info">
-                                                    <span class="sub-text" style="font-size: 0.95em; margin-top: 0.7em;">ددلاین: {{ task.deadline }}</span>
-                                                    <span class="sub-text" style="font-size: 0.95em; margin-top: 0.7em;">وضعیت: {{ task.get_status_display }}</span>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Edit - Delete -->
-                                        {% if request.user.title == 'bs' %}
-                                            <div class="project-meta">
-                                                    <a href="{% url 'task_update' task.pk task.code %}" class="btn btn-primary justify-center" style="margin-top: 1em;"><em class="icon ni ni-edit"></em><span>تغییر</span></a>
-                                                <a href="{% url 'task_delete' task.pk task.code %}" class="btn btn-danger justify-center" style="margin-top: 1em;"><em class="icon ni ni-delete"></em><span>حذف</span></a>
-                                            </div>
-                                        {% endif %}
-
-                                        <!-- Result -->
-                                        <div class="project-meta">
-                                            <a href="{% url 'task_detail' task.pk task.code %}" class="btn btn-primary justify-center" style="margin-top: 1em; width: 100%"><em class="icon ni ni-edit-alt-fill"></em>مشاهده نتیجه</a>
-                                        </div>
-
-                                    </div>
-                                </div>
+        <div class="row  g-gs">
+        
+            <!-- ّFilter -->
+            <div class="col-lg-2">
+                <div class="card h-100">
+                    <div class="card-inner">
+    
+                        <!-- Form -->
+                        <form id="filter-form" method="get" action="{% url 'task_bt_list' %}" enctype="multipart/form-data">
+                            {% csrf_token %}
+                        
+                            <!-- status -->
+                            <div class="form-group">
+                                <label class="form-label" for="{{ filter_form.status.id_for_label }}">وضعیت وظیفه</label>
+                                {% render_field filter_form.status type="text" id="status" class="form-control" %}
                             </div>
-                        {% elif task.status == 'UR' %}
-                            <div class="card h-100" style="background-color: #BBDEFB">
-                                <div class="card-inner">
-                                    <div class="project">
-
-                                        <!-- Up -->
-                                        <div class="project-head">
-                                            <div class="project-title">
-                                                <div class="project-info">
-                                                    <h6 class="title">{{ task.title }} | {{ task.code }}</h6>
-                                                    <span class="sub-text" style="font-size: 0.95em; margin-top: 0.7em;">{{ task.agent }} | {{ task.agent.sub_district }}</span>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Description -->
-                                        <div class="project-details">
-                                            <p style="height: 8em;!important; -webkit-line-clamp: 4;!important;">{{ task.description|linebreaksbr|farsi_number }}</p>
-                                        </div>
-
-                                        <!-- Middle1 -->
-                                        <div  style="height: 8em;!important; -webkit-line-clamp: 4;!important;">
-                                            <h6 class="title" style="margin-bottom: 0.7em;">فایل فروش/اجاره مربوطه:</h6>
-                                            <!-- Sale -->
-                                            {% if task.sale_file %}
-                                                <div class="project-head" style="margin-bottom: 0.5em;!important;">
-                                                    <div class="project-title">
-                                                        <div class="project-info">
-                                                            <a href="{{ task.sale_file.get_absolute_url }}">
-                                                                <span class="sub-text" style="font-size: 0.85em;">فروش: {{ task.sale_file.title|linebreaksbr|farsi_number }}</span>
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            {% else %}
-                                                <div class="project-head" style="margin-bottom: 0.5em;!important;">
-                                                    <div class="project-title">
-                                                        <div class="project-info">
-                                                            <span class="sub-text" style="font-size: 0.85em;">فروش: ----</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            {% endif %}
-
-                                            <!-- Rent -->
-                                            {% if task.rent_file %}
-                                                <div class="project-head" style="margin-bottom: 0.5em;!important;">
-                                                    <div class="project-title">
-                                                        <div class="project-info">
-                                                            <a href="{{ task.rent_file.get_absolute_url }}">
-                                                                <span class="sub-text" style="font-size: 0.85em;">اجاره: {{ task.rent_file.title|linebreaksbr|farsi_number }}</span>
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            {% else %}
-                                                <div class="project-head" style="margin-bottom: 0.5em;!important;">
-                                                    <div class="project-title">
-                                                        <div class="project-info">
-                                                            <span class="sub-text" style="font-size: 0.85em;">اجاره: ----</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            {% endif %}
-                                        </div>
-
-                                        <!-- Middle2 -->
-                                        <div  style="height: 8em;!important; -webkit-line-clamp: 4;!important;">
-                                            <h6 class="title" style="margin-bottom: 0.7em;">مشتری (خریدار/موجر) مربوطه:</h6>
-                                            <!-- Buyer -->
-                                            {% if task.buyer %}
-                                                <div class="project-head" style="margin-bottom: 0.5em;!important;">
-                                                    <div class="project-title">
-                                                        <div class="project-info">
-                                                            <a href="{{ task.buyer.get_absolute_url }}">
-                                                                <span class="sub-text" style="font-size: 0.85em;">خریدار: {{ task.buyer.name }}</span>
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            {% else %}
-                                                <div class="project-head" style="margin-bottom: 0.5em;!important;">
-                                                    <div class="project-title">
-                                                        <div class="project-info">
-                                                            <span class="sub-text" style="font-size: 0.85em;">خریدار: ----</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            {% endif %}
-
-                                            <!-- Renter -->
-                                            {% if task.renter %}
-                                                <div class="project-head" style="margin-bottom: 0.5em;!important;">
-                                                    <div class="project-title">
-                                                        <div class="project-info">
-                                                            <a href="{{ task.renter.get_absolute_url }}">
-                                                                <span class="sub-text" style="font-size: 0.85em;">موجر: {{ task.renter.name }}</span>
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            {% else %}
-                                                <div class="project-head" style="margin-bottom: 0.5em;!important;">
-                                                    <div class="project-title">
-                                                        <div class="project-info">
-                                                            <span class="sub-text" style="font-size: 0.85em;">موجر: ----</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            {% endif %}
-                                        </div>
-
-                                        <!-- Bottom -->
-                                        <div class="project-head">
-                                            <div class="project-title">
-                                                <div class="project-info">
-                                                    <span class="sub-text" style="font-size: 0.95em; margin-top: 0.7em;">ددلاین: {{ task.deadline }}</span>
-                                                    <span class="sub-text" style="font-size: 0.95em; margin-top: 0.7em;">وضعیت: {{ task.get_status_display }}</span>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Edit - Delete -->
-                                        {% if request.user.title == 'bs' %}
-                                            <div class="project-meta">
-                                                <a href="{% url 'task_update' task.pk task.code %}" class="btn btn-primary justify-center" style="margin-top: 1em;"><em class="icon ni ni-edit"></em><span>تغییر</span></a>
-                                                <a href="{% url 'task_delete' task.pk task.code %}" class="btn btn-danger justify-center" style="margin-top: 1em;"><em class="icon ni ni-delete"></em><span>حذف</span></a>
-                                            </div>
-                                        {% endif %}
-
-                                        <!-- Result -->
-                                        <div class="project-meta">
-                                            <a href="{% url 'task_detail' task.pk task.code %}" class="btn btn-primary justify-center" style="margin-top: 1em; width: 100%"><em class="icon ni ni-edit-alt-fill"></em>مشاهده نتیجه</a>
-                                        </div>
-
-                                    </div>
-                                </div>
+                            {% if filter_form.status.errors %}
+                                {% for error in filter_form.status.errors %}
+                                    <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                {% endfor %}
+                            {% endif %}
+    
+                            <!-- button -->
+                            <div class="form-group" style="width: 100%;!important;">
+                                <button type="submit" onclick="submitFormAndRefresh()" class="btn btn-primary justify-center" style="width: 100%;!important;">اعمال فیلتر</button>
+                                <a href="{% url 'task_bt_list' %}" class="btn btn-danger justify-center" style="width: 100%;!important; margin-top: 10px;">حذف فیلتر</a>
                             </div>
-                        {% elif task.status == 'OP' %}
-                            <div class="card h-100" style="background-color: #FFCDD2">
-                                <div class="card-inner">
-                                    <div class="project">
-
-                                        <!-- Up -->
-                                        <div class="project-head">
-                                            <div class="project-title">
-                                                <div class="project-info">
-                                                    <h6 class="title">{{ task.title }} | {{ task.code }}</h6>
-                                                    <span class="sub-text" style="font-size: 0.95em; margin-top: 0.7em;">{{ task.agent }} | {{ task.agent.sub_district }}</span>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Description -->
-                                        <div class="project-details">
-                                            <p style="height: 8em;!important; -webkit-line-clamp: 4;!important;">{{ task.description|linebreaksbr|farsi_number }}</p>
-                                        </div>
-
-                                        <!-- Middle1 -->
-                                        <div  style="height: 8em;!important; -webkit-line-clamp: 4;!important;">
-                                            <h6 class="title" style="margin-bottom: 0.7em;">فایل فروش/اجاره مربوطه:</h6>
-                                            <!-- Sale -->
-                                            {% if task.sale_file %}
-                                                <div class="project-head" style="margin-bottom: 0.5em;!important;">
-                                                    <div class="project-title">
-                                                        <div class="project-info">
-                                                            <a href="{{ task.sale_file.get_absolute_url }}">
-                                                                <span class="sub-text" style="font-size: 0.85em;">فروش: {{ task.sale_file.title|linebreaksbr|farsi_number }}</span>
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            {% else %}
-                                                <div class="project-head" style="margin-bottom: 0.5em;!important;">
-                                                    <div class="project-title">
-                                                        <div class="project-info">
-                                                            <span class="sub-text" style="font-size: 0.85em;">فروش: ----</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            {% endif %}
-
-                                            <!-- Rent -->
-                                            {% if task.rent_file %}
-                                                <div class="project-head" style="margin-bottom: 0.5em;!important;">
-                                                    <div class="project-title">
-                                                        <div class="project-info">
-                                                            <a href="{{ task.rent_file.get_absolute_url }}">
-                                                                <span class="sub-text" style="font-size: 0.85em;">اجاره: {{ task.rent_file.title|linebreaksbr|farsi_number }}</span>
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            {% else %}
-                                                <div class="project-head" style="margin-bottom: 0.5em;!important;">
-                                                    <div class="project-title">
-                                                        <div class="project-info">
-                                                            <span class="sub-text" style="font-size: 0.85em;">اجاره: ----</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            {% endif %}
-                                        </div>
-
-                                        <!-- Middle2 -->
-                                        <div  style="height: 8em;!important; -webkit-line-clamp: 4;!important;">
-                                            <h6 class="title" style="margin-bottom: 0.7em;">مشتری (خریدار/موجر) مربوطه:</h6>
-                                            <!-- Buyer -->
-                                            {% if task.buyer %}
-                                                <div class="project-head" style="margin-bottom: 0.5em;!important;">
-                                                    <div class="project-title">
-                                                        <div class="project-info">
-                                                            <a href="{{ task.buyer.get_absolute_url }}">
-                                                                <span class="sub-text" style="font-size: 0.85em;">خریدار: {{ task.buyer.name }}</span>
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            {% else %}
-                                                <div class="project-head" style="margin-bottom: 0.5em;!important;">
-                                                    <div class="project-title">
-                                                        <div class="project-info">
-                                                            <span class="sub-text" style="font-size: 0.85em;">خریدار: ----</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            {% endif %}
-
-                                            <!-- Renter -->
-                                            {% if task.renter %}
-                                                <div class="project-head" style="margin-bottom: 0.5em;!important;">
-                                                    <div class="project-title">
-                                                        <div class="project-info">
-                                                            <a href="{{ task.renter.get_absolute_url }}">
-                                                                <span class="sub-text" style="font-size: 0.85em;">موجر: {{ task.renter.name }}</span>
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            {% else %}
-                                                <div class="project-head" style="margin-bottom: 0.5em;!important;">
-                                                    <div class="project-title">
-                                                        <div class="project-info">
-                                                            <span class="sub-text" style="font-size: 0.85em;">موجر: ----</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            {% endif %}
-                                        </div>
-
-                                        <!-- Bottom -->
-                                        <div class="project-head">
-                                            <div class="project-title">
-                                                <div class="project-info">
-                                                    <span class="sub-text" style="font-size: 0.95em; margin-top: 0.7em;">ددلاین: {{ task.deadline }}</span>
-                                                    <span class="sub-text" style="font-size: 0.95em; margin-top: 0.7em;">وضعیت: {{ task.get_status_display }}</span>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Edit - Delete -->
-                                        {% if request.user.title == 'bs' %}
-                                            <div class="project-meta">
-                                                <a href="{% url 'task_update' task.pk task.code %}" class="btn btn-primary justify-center" style="margin-top: 1em;"><em class="icon ni ni-edit"></em><span>تغییر</span></a>
-                                                <a href="{% url 'task_delete' task.pk task.code %}" class="btn btn-danger justify-center" style="margin-top: 1em;"><em class="icon ni ni-delete"></em><span>حذف</span></a>
-                                            </div>
-                                        {% endif %}
-
-                                        <!-- Result -->
-                                        <div class="project-meta">
-                                            <a href="{% url 'task_result' task.pk task.code %}" class="btn btn-primary justify-center" style="margin-top: 1em; width: 100%"><em class="icon ni ni-edit-alt-fill"></em>ثبت نتیجه</a>
-                                        </div>
-
-                                    </div>
-                                </div>
-                            </div>
-                        {% endif %}
-
+                        
+                        </form>
+                        <!-- end: Form -->
+    
+                        <!-- JS -->
+                        <script>
+                            function submitFormAndRefresh() {
+                                document.getElementById('filter-form').submit();
+                                location.reload();
+                            }
+                        </script>
+                        <!-- end: JS -->
+    
                     </div>
-                {% endif %}
-            {% endfor %}
+                </div>
+            </div>
+            <!-- end: Filter -->
+        
+            <!-- List -->
+            <div class="col-lg-10">
+                {% for task in tasks %}
+                    {% if task.type == 'bt' %}
+                        <div class="col-sm-6 col-lg-6 col-xxl-6">
+    
+                            {% if task.status == 'CL' %}
+                                <div class="card h-100" style="background-color: #C8E6C9">
+                                    <div class="card-inner">
+                                        <div class="project">
+    
+                                            <!-- Up -->
+                                            <div class="project-head">
+                                                <div class="project-title">
+                                                    <div class="project-info">
+                                                        <h6 class="title">{{ task.title }} | {{ task.code }}</h6>
+                                                        <span class="sub-text" style="font-size: 0.95em; margin-top: 0.7em;">{{ task.agent }} | {{ task.agent.sub_district }}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+    
+                                            <!-- Description -->
+                                            <div class="project-details">
+                                                <p style="height: 8em;!important; -webkit-line-clamp: 4;!important;">{{ task.description|linebreaksbr|farsi_number }}</p>
+                                            </div>
+    
+                                            <!-- Middle1 -->
+                                            <div  style="height: 8em;!important; -webkit-line-clamp: 4;!important;">
+                                                <h6 class="title" style="margin-bottom: 0.7em;">فایل فروش/اجاره مربوطه:</h6>
+                                                <!-- Sale -->
+                                                {% if task.sale_file %}
+                                                    <div class="project-head" style="margin-bottom: 0.5em;!important;">
+                                                        <div class="project-title">
+                                                            <div class="project-info">
+                                                                <a href="{{ task.sale_file.get_absolute_url }}">
+                                                                    <span class="sub-text" style="font-size: 0.85em;">فروش: {{ task.sale_file.title|linebreaksbr|farsi_number }}</span>
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {% else %}
+                                                    <div class="project-head" style="margin-bottom: 0.5em;!important;">
+                                                        <div class="project-title">
+                                                            <div class="project-info">
+                                                                <span class="sub-text" style="font-size: 0.85em;">فروش: ----</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {% endif %}
+    
+                                                <!-- Rent -->
+                                                {% if task.rent_file %}
+                                                    <div class="project-head" style="margin-bottom: 0.5em;!important;">
+                                                        <div class="project-title">
+                                                            <div class="project-info">
+                                                                <a href="{{ task.rent_file.get_absolute_url }}">
+                                                                    <span class="sub-text" style="font-size: 0.85em;">اجاره: {{ task.rent_file.title|linebreaksbr|farsi_number }}</span>
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {% else %}
+                                                    <div class="project-head" style="margin-bottom: 0.5em;!important;">
+                                                        <div class="project-title">
+                                                            <div class="project-info">
+                                                                <span class="sub-text" style="font-size: 0.85em;">اجاره: ----</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+    
+                                            <!-- Middle2 -->
+                                            <div  style="height: 8em;!important; -webkit-line-clamp: 4;!important;">
+                                                <h6 class="title" style="margin-bottom: 0.7em;">مشتری (خریدار/موجر) مربوطه:</h6>
+                                                <!-- Buyer -->
+                                                {% if task.buyer %}
+                                                    <div class="project-head" style="margin-bottom: 0.5em;!important;">
+                                                        <div class="project-title">
+                                                            <div class="project-info">
+                                                                <a href="{{ task.buyer.get_absolute_url }}">
+                                                                    <span class="sub-text" style="font-size: 0.85em;">خریدار: {{ task.buyer.name }}</span>
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {% else %}
+                                                    <div class="project-head" style="margin-bottom: 0.5em;!important;">
+                                                        <div class="project-title">
+                                                            <div class="project-info">
+                                                                <span class="sub-text" style="font-size: 0.85em;">خریدار: ----</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {% endif %}
+    
+                                                <!-- Renter -->
+                                                {% if task.renter %}
+                                                    <div class="project-head" style="margin-bottom: 0.5em;!important;">
+                                                        <div class="project-title">
+                                                            <div class="project-info">
+                                                                <a href="{{ task.renter.get_absolute_url }}">
+                                                                    <span class="sub-text" style="font-size: 0.85em;">موجر: {{ task.renter.name }}</span>
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {% else %}
+                                                    <div class="project-head" style="margin-bottom: 0.5em;!important;">
+                                                        <div class="project-title">
+                                                            <div class="project-info">
+                                                                <span class="sub-text" style="font-size: 0.85em;">موجر: ----</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+    
+                                            <!-- Bottom -->
+                                            <div class="project-head">
+                                                <div class="project-title">
+                                                    <div class="project-info">
+                                                        <span class="sub-text" style="font-size: 0.95em; margin-top: 0.7em;">ددلاین: {{ task.deadline }}</span>
+                                                        <span class="sub-text" style="font-size: 0.95em; margin-top: 0.7em;">وضعیت: {{ task.get_status_display }}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+    
+                                            <!-- Edit - Delete -->
+                                            {% if request.user.title == 'bs' %}
+                                                <div class="project-meta">
+                                                        <a href="{% url 'task_update' task.pk task.code %}" class="btn btn-primary justify-center" style="margin-top: 1em;"><em class="icon ni ni-edit"></em><span>تغییر</span></a>
+                                                    <a href="{% url 'task_delete' task.pk task.code %}" class="btn btn-danger justify-center" style="margin-top: 1em;"><em class="icon ni ni-delete"></em><span>حذف</span></a>
+                                                </div>
+                                            {% endif %}
+    
+                                            <!-- Result -->
+                                            <div class="project-meta">
+                                                <a href="{% url 'task_detail' task.pk task.code %}" class="btn btn-primary justify-center" style="margin-top: 1em; width: 100%"><em class="icon ni ni-edit-alt-fill"></em>مشاهده نتیجه</a>
+                                            </div>
+    
+                                        </div>
+                                    </div>
+                                </div>
+                            {% elif task.status == 'UR' %}
+                                <div class="card h-100" style="background-color: #BBDEFB">
+                                    <div class="card-inner">
+                                        <div class="project">
+    
+                                            <!-- Up -->
+                                            <div class="project-head">
+                                                <div class="project-title">
+                                                    <div class="project-info">
+                                                        <h6 class="title">{{ task.title }} | {{ task.code }}</h6>
+                                                        <span class="sub-text" style="font-size: 0.95em; margin-top: 0.7em;">{{ task.agent }} | {{ task.agent.sub_district }}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+    
+                                            <!-- Description -->
+                                            <div class="project-details">
+                                                <p style="height: 8em;!important; -webkit-line-clamp: 4;!important;">{{ task.description|linebreaksbr|farsi_number }}</p>
+                                            </div>
+    
+                                            <!-- Middle1 -->
+                                            <div  style="height: 8em;!important; -webkit-line-clamp: 4;!important;">
+                                                <h6 class="title" style="margin-bottom: 0.7em;">فایل فروش/اجاره مربوطه:</h6>
+                                                <!-- Sale -->
+                                                {% if task.sale_file %}
+                                                    <div class="project-head" style="margin-bottom: 0.5em;!important;">
+                                                        <div class="project-title">
+                                                            <div class="project-info">
+                                                                <a href="{{ task.sale_file.get_absolute_url }}">
+                                                                    <span class="sub-text" style="font-size: 0.85em;">فروش: {{ task.sale_file.title|linebreaksbr|farsi_number }}</span>
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {% else %}
+                                                    <div class="project-head" style="margin-bottom: 0.5em;!important;">
+                                                        <div class="project-title">
+                                                            <div class="project-info">
+                                                                <span class="sub-text" style="font-size: 0.85em;">فروش: ----</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {% endif %}
+    
+                                                <!-- Rent -->
+                                                {% if task.rent_file %}
+                                                    <div class="project-head" style="margin-bottom: 0.5em;!important;">
+                                                        <div class="project-title">
+                                                            <div class="project-info">
+                                                                <a href="{{ task.rent_file.get_absolute_url }}">
+                                                                    <span class="sub-text" style="font-size: 0.85em;">اجاره: {{ task.rent_file.title|linebreaksbr|farsi_number }}</span>
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {% else %}
+                                                    <div class="project-head" style="margin-bottom: 0.5em;!important;">
+                                                        <div class="project-title">
+                                                            <div class="project-info">
+                                                                <span class="sub-text" style="font-size: 0.85em;">اجاره: ----</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+    
+                                            <!-- Middle2 -->
+                                            <div  style="height: 8em;!important; -webkit-line-clamp: 4;!important;">
+                                                <h6 class="title" style="margin-bottom: 0.7em;">مشتری (خریدار/موجر) مربوطه:</h6>
+                                                <!-- Buyer -->
+                                                {% if task.buyer %}
+                                                    <div class="project-head" style="margin-bottom: 0.5em;!important;">
+                                                        <div class="project-title">
+                                                            <div class="project-info">
+                                                                <a href="{{ task.buyer.get_absolute_url }}">
+                                                                    <span class="sub-text" style="font-size: 0.85em;">خریدار: {{ task.buyer.name }}</span>
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {% else %}
+                                                    <div class="project-head" style="margin-bottom: 0.5em;!important;">
+                                                        <div class="project-title">
+                                                            <div class="project-info">
+                                                                <span class="sub-text" style="font-size: 0.85em;">خریدار: ----</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {% endif %}
+    
+                                                <!-- Renter -->
+                                                {% if task.renter %}
+                                                    <div class="project-head" style="margin-bottom: 0.5em;!important;">
+                                                        <div class="project-title">
+                                                            <div class="project-info">
+                                                                <a href="{{ task.renter.get_absolute_url }}">
+                                                                    <span class="sub-text" style="font-size: 0.85em;">موجر: {{ task.renter.name }}</span>
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {% else %}
+                                                    <div class="project-head" style="margin-bottom: 0.5em;!important;">
+                                                        <div class="project-title">
+                                                            <div class="project-info">
+                                                                <span class="sub-text" style="font-size: 0.85em;">موجر: ----</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+    
+                                            <!-- Bottom -->
+                                            <div class="project-head">
+                                                <div class="project-title">
+                                                    <div class="project-info">
+                                                        <span class="sub-text" style="font-size: 0.95em; margin-top: 0.7em;">ددلاین: {{ task.deadline }}</span>
+                                                        <span class="sub-text" style="font-size: 0.95em; margin-top: 0.7em;">وضعیت: {{ task.get_status_display }}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+    
+                                            <!-- Edit - Delete -->
+                                            {% if request.user.title == 'bs' %}
+                                                <div class="project-meta">
+                                                    <a href="{% url 'task_update' task.pk task.code %}" class="btn btn-primary justify-center" style="margin-top: 1em;"><em class="icon ni ni-edit"></em><span>تغییر</span></a>
+                                                    <a href="{% url 'task_delete' task.pk task.code %}" class="btn btn-danger justify-center" style="margin-top: 1em;"><em class="icon ni ni-delete"></em><span>حذف</span></a>
+                                                </div>
+                                            {% endif %}
+    
+                                            <!-- Result -->
+                                            <div class="project-meta">
+                                                <a href="{% url 'task_detail' task.pk task.code %}" class="btn btn-primary justify-center" style="margin-top: 1em; width: 100%"><em class="icon ni ni-edit-alt-fill"></em>مشاهده نتیجه</a>
+                                            </div>
+    
+                                        </div>
+                                    </div>
+                                </div>
+                            {% elif task.status == 'OP' %}
+                                <div class="card h-100" style="background-color: #FFCDD2">
+                                    <div class="card-inner">
+                                        <div class="project">
+    
+                                            <!-- Up -->
+                                            <div class="project-head">
+                                                <div class="project-title">
+                                                    <div class="project-info">
+                                                        <h6 class="title">{{ task.title }} | {{ task.code }}</h6>
+                                                        <span class="sub-text" style="font-size: 0.95em; margin-top: 0.7em;">{{ task.agent }} | {{ task.agent.sub_district }}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+    
+                                            <!-- Description -->
+                                            <div class="project-details">
+                                                <p style="height: 8em;!important; -webkit-line-clamp: 4;!important;">{{ task.description|linebreaksbr|farsi_number }}</p>
+                                            </div>
+    
+                                            <!-- Middle1 -->
+                                            <div  style="height: 8em;!important; -webkit-line-clamp: 4;!important;">
+                                                <h6 class="title" style="margin-bottom: 0.7em;">فایل فروش/اجاره مربوطه:</h6>
+                                                <!-- Sale -->
+                                                {% if task.sale_file %}
+                                                    <div class="project-head" style="margin-bottom: 0.5em;!important;">
+                                                        <div class="project-title">
+                                                            <div class="project-info">
+                                                                <a href="{{ task.sale_file.get_absolute_url }}">
+                                                                    <span class="sub-text" style="font-size: 0.85em;">فروش: {{ task.sale_file.title|linebreaksbr|farsi_number }}</span>
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {% else %}
+                                                    <div class="project-head" style="margin-bottom: 0.5em;!important;">
+                                                        <div class="project-title">
+                                                            <div class="project-info">
+                                                                <span class="sub-text" style="font-size: 0.85em;">فروش: ----</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {% endif %}
+    
+                                                <!-- Rent -->
+                                                {% if task.rent_file %}
+                                                    <div class="project-head" style="margin-bottom: 0.5em;!important;">
+                                                        <div class="project-title">
+                                                            <div class="project-info">
+                                                                <a href="{{ task.rent_file.get_absolute_url }}">
+                                                                    <span class="sub-text" style="font-size: 0.85em;">اجاره: {{ task.rent_file.title|linebreaksbr|farsi_number }}</span>
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {% else %}
+                                                    <div class="project-head" style="margin-bottom: 0.5em;!important;">
+                                                        <div class="project-title">
+                                                            <div class="project-info">
+                                                                <span class="sub-text" style="font-size: 0.85em;">اجاره: ----</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+    
+                                            <!-- Middle2 -->
+                                            <div  style="height: 8em;!important; -webkit-line-clamp: 4;!important;">
+                                                <h6 class="title" style="margin-bottom: 0.7em;">مشتری (خریدار/موجر) مربوطه:</h6>
+                                                <!-- Buyer -->
+                                                {% if task.buyer %}
+                                                    <div class="project-head" style="margin-bottom: 0.5em;!important;">
+                                                        <div class="project-title">
+                                                            <div class="project-info">
+                                                                <a href="{{ task.buyer.get_absolute_url }}">
+                                                                    <span class="sub-text" style="font-size: 0.85em;">خریدار: {{ task.buyer.name }}</span>
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {% else %}
+                                                    <div class="project-head" style="margin-bottom: 0.5em;!important;">
+                                                        <div class="project-title">
+                                                            <div class="project-info">
+                                                                <span class="sub-text" style="font-size: 0.85em;">خریدار: ----</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {% endif %}
+    
+                                                <!-- Renter -->
+                                                {% if task.renter %}
+                                                    <div class="project-head" style="margin-bottom: 0.5em;!important;">
+                                                        <div class="project-title">
+                                                            <div class="project-info">
+                                                                <a href="{{ task.renter.get_absolute_url }}">
+                                                                    <span class="sub-text" style="font-size: 0.85em;">موجر: {{ task.renter.name }}</span>
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {% else %}
+                                                    <div class="project-head" style="margin-bottom: 0.5em;!important;">
+                                                        <div class="project-title">
+                                                            <div class="project-info">
+                                                                <span class="sub-text" style="font-size: 0.85em;">موجر: ----</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+    
+                                            <!-- Bottom -->
+                                            <div class="project-head">
+                                                <div class="project-title">
+                                                    <div class="project-info">
+                                                        <span class="sub-text" style="font-size: 0.95em; margin-top: 0.7em;">ددلاین: {{ task.deadline }}</span>
+                                                        <span class="sub-text" style="font-size: 0.95em; margin-top: 0.7em;">وضعیت: {{ task.get_status_display }}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+    
+                                            <!-- Edit - Delete -->
+                                            {% if request.user.title == 'bs' %}
+                                                <div class="project-meta">
+                                                    <a href="{% url 'task_update' task.pk task.code %}" class="btn btn-primary justify-center" style="margin-top: 1em;"><em class="icon ni ni-edit"></em><span>تغییر</span></a>
+                                                    <a href="{% url 'task_delete' task.pk task.code %}" class="btn btn-danger justify-center" style="margin-top: 1em;"><em class="icon ni ni-delete"></em><span>حذف</span></a>
+                                                </div>
+                                            {% endif %}
+    
+                                            <!-- Result -->
+                                            <div class="project-meta">
+                                                <a href="{% url 'task_result' task.pk task.code %}" class="btn btn-primary justify-center" style="margin-top: 1em; width: 100%"><em class="icon ni ni-edit-alt-fill"></em>ثبت نتیجه</a>
+                                            </div>
+    
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+    
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            <!-- end: List -->
+        
         </div>
         <!-- end: Tasks -->
     
     </div>
-    <!-- end: List -->
+    <!-- end: Main -->
     
     <!-- Pagination -->
     <div class="nk-block-head nk-block-head-lg" style="margin-top: 1.5em;">
@@ -563,7 +612,6 @@
     <!-- end: Pagination -->
 
 {% endblock %}
-
 
 
 

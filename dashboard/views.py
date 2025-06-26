@@ -5,7 +5,6 @@ from django.views.generic import DetailView, CreateView, ListView, UpdateView, D
 from django.db.models import Prefetch
 from django.contrib import messages
 
-
 from . import models, forms
 from .permissions import PermissionRequiredMixin, ReadOnlyPermissionMixin
 
@@ -325,8 +324,9 @@ class SaleFileListView(ReadOnlyPermissionMixin, ListView):
     def get_queryset(self):
         if self.request.user.title != 'bs':
             sub_district = self.request.user.sub_district
-            queryset_default = (models.SaleFile.objects.select_related('province', 'city', 'district', 'sub_district', 'person')
-                                .filter(sub_district=sub_district))
+            queryset_default = (
+                models.SaleFile.objects.select_related('province', 'city', 'district', 'sub_district', 'person')
+                .filter(sub_district=sub_district))
             form = forms.SaleFileAgentFilterForm(self.request.GET)
 
             if form.is_valid():
@@ -390,7 +390,8 @@ class SaleFileListView(ReadOnlyPermissionMixin, ListView):
             return queryset_default
 
         else:
-            queryset_default = models.SaleFile.objects.select_related('province', 'city', 'district', 'sub_district', 'person')
+            queryset_default = models.SaleFile.objects.select_related('province', 'city', 'district', 'sub_district',
+                                                                      'person')
             form = forms.SaleFileFilterForm(self.request.GET)
 
             if form.is_valid():
@@ -469,7 +470,8 @@ class SaleFileListView(ReadOnlyPermissionMixin, ListView):
             if self.request.GET.get('city'):
                 form.fields['district'].queryset = models.District.objects.filter(city_id=self.request.GET.get('city'))
             if self.request.GET.get('district'):
-                form.fields['sub_district'].queryset = models.SubDistrict.objects.filter(district_id=self.request.GET.get('district'))
+                form.fields['sub_district'].queryset = models.SubDistrict.objects.filter(
+                    district_id=self.request.GET.get('district'))
         context['filter_form'] = form
         return context
 
@@ -631,7 +633,8 @@ class RentFileListView(ReadOnlyPermissionMixin, ListView):
                 return queryset_filtered
             return queryset_default
         else:
-            queryset_default = models.RentFile.objects.select_related('province', 'city', 'district', 'sub_district', 'person')
+            queryset_default = models.RentFile.objects.select_related('province', 'city', 'district', 'sub_district',
+                                                                      'person')
             form = forms.RentFileFilterForm(self.request.GET)
 
             if form.is_valid():
@@ -671,10 +674,12 @@ class RentFileListView(ReadOnlyPermissionMixin, ListView):
 
                 if form.cleaned_data['min_deposit']:
                     queryset_filtered = [obj for obj in queryset_filtered if
-                                         obj.deposit_announced and obj.deposit_announced >= form.cleaned_data['min_deposit']]
+                                         obj.deposit_announced and obj.deposit_announced >= form.cleaned_data[
+                                             'min_deposit']]
                 if form.cleaned_data['max_deposit']:
                     queryset_filtered = [obj for obj in queryset_filtered if
-                                         obj.deposit_announced and obj.deposit_announced <= form.cleaned_data['max_deposit']]
+                                         obj.deposit_announced and obj.deposit_announced <= form.cleaned_data[
+                                             'max_deposit']]
                 if form.cleaned_data['min_rent']:
                     queryset_filtered = [obj for obj in queryset_filtered if
                                          obj.rent_announced and obj.rent_announced >= form.cleaned_data['min_rent']]
@@ -717,7 +722,8 @@ class RentFileListView(ReadOnlyPermissionMixin, ListView):
             if self.request.GET.get('city'):
                 form.fields['district'].queryset = models.District.objects.filter(city_id=self.request.GET.get('city'))
             if self.request.GET.get('district'):
-                form.fields['sub_district'].queryset = models.SubDistrict.objects.filter(district_id=self.request.GET.get('district'))
+                form.fields['sub_district'].queryset = models.SubDistrict.objects.filter(
+                    district_id=self.request.GET.get('district'))
         context['filter_form'] = form
         return context
 
@@ -881,7 +887,8 @@ class BuyerListView(ReadOnlyPermissionMixin, ListView):
 
     def get_queryset(self):
         if self.request.user.title == 'bs':
-            queryset_default = models.Buyer.objects.select_related('province', 'city', 'district').prefetch_related('sub_districts')
+            queryset_default = models.Buyer.objects.select_related('province', 'city', 'district').prefetch_related(
+                'sub_districts')
 
             form = forms.BuyerFilterForm(self.request.GET)
             if form.is_valid():
@@ -893,7 +900,8 @@ class BuyerListView(ReadOnlyPermissionMixin, ListView):
                 if form.cleaned_data['district']:
                     queryset_filtered = queryset_filtered.filter(district=form.cleaned_data['district'])
                 if form.cleaned_data['sub_districts']:
-                    queryset_filtered = queryset_filtered.filter(sub_districts__in=form.cleaned_data['sub_districts']).distinct()
+                    queryset_filtered = queryset_filtered.filter(
+                        sub_districts__in=form.cleaned_data['sub_districts']).distinct()
                 if form.cleaned_data['budget_status']:
                     queryset_filtered = queryset_filtered.filter(budget_status=form.cleaned_data['budget_status'])
                 if form.cleaned_data['document']:
@@ -908,17 +916,20 @@ class BuyerListView(ReadOnlyPermissionMixin, ListView):
 
                 if form.cleaned_data['min_budget']:
                     queryset_filtered = [obj for obj in queryset_filtered if
-                                         obj.budget_announced and obj.budget_announced >= form.cleaned_data['min_budget']]
+                                         obj.budget_announced and obj.budget_announced >= form.cleaned_data[
+                                             'min_budget']]
                 if form.cleaned_data['max_budget']:
                     queryset_filtered = [obj for obj in queryset_filtered if
-                                         obj.budget_announced and obj.budget_announced <= form.cleaned_data['max_budget']]
+                                         obj.budget_announced and obj.budget_announced <= form.cleaned_data[
+                                             'max_budget']]
 
                 return queryset_filtered
             return queryset_default
 
         else:
-            queryset_default = (models.Buyer.objects.select_related('province', 'city', 'district').prefetch_related('sub_districts')
-                                .filter(sub_districts__name__contains=self.request.user.sub_district.name))
+            queryset_default = (
+                models.Buyer.objects.select_related('province', 'city', 'district').prefetch_related('sub_districts')
+                .filter(sub_districts__name__contains=self.request.user.sub_district.name))
 
             form = forms.BuyerFilterForm(self.request.GET)
             if form.is_valid():
@@ -930,7 +941,8 @@ class BuyerListView(ReadOnlyPermissionMixin, ListView):
                 if form.cleaned_data['district']:
                     queryset_filtered = queryset_filtered.filter(district=form.cleaned_data['district'])
                 if form.cleaned_data['sub_districts']:
-                    queryset_filtered = queryset_filtered.filter(sub_districts__in=form.cleaned_data['sub_districts']).distinct()
+                    queryset_filtered = queryset_filtered.filter(
+                        sub_districts__in=form.cleaned_data['sub_districts']).distinct()
                 if form.cleaned_data['budget_status']:
                     queryset_filtered = queryset_filtered.filter(budget_status=form.cleaned_data['budget_status'])
                 if form.cleaned_data['document']:
@@ -946,10 +958,12 @@ class BuyerListView(ReadOnlyPermissionMixin, ListView):
 
                 if form.cleaned_data['min_budget']:
                     queryset_filtered = [obj for obj in queryset_filtered if
-                                         obj.budget_announced and obj.budget_announced >= form.cleaned_data['min_budget']]
+                                         obj.budget_announced and obj.budget_announced >= form.cleaned_data[
+                                             'min_budget']]
                 if form.cleaned_data['max_budget']:
                     queryset_filtered = [obj for obj in queryset_filtered if
-                                         obj.budget_announced and obj.budget_announced <= form.cleaned_data['max_budget']]
+                                         obj.budget_announced and obj.budget_announced <= form.cleaned_data[
+                                             'max_budget']]
 
                 return queryset_filtered
             return queryset_default
@@ -1047,7 +1061,8 @@ class RenterListView(ReadOnlyPermissionMixin, ListView):
 
     def get_queryset(self):
         if self.request.user.title == 'bs':
-            queryset_default = models.Renter.objects.select_related('province', 'city', 'district').prefetch_related('sub_districts')
+            queryset_default = models.Renter.objects.select_related('province', 'city', 'district').prefetch_related(
+                'sub_districts')
 
             form = forms.RenterFilterForm(self.request.GET)
             if form.is_valid():
@@ -1059,7 +1074,8 @@ class RenterListView(ReadOnlyPermissionMixin, ListView):
                 if form.cleaned_data['district']:
                     queryset_filtered = queryset_filtered.filter(district=form.cleaned_data['district'])
                 if form.cleaned_data['sub_districts']:
-                    queryset_filtered = queryset_filtered.filter(sub_districts__in=form.cleaned_data['sub_districts']).distinct()
+                    queryset_filtered = queryset_filtered.filter(
+                        sub_districts__in=form.cleaned_data['sub_districts']).distinct()
                 if form.cleaned_data['budget_status']:
                     queryset_filtered = queryset_filtered.filter(budget_status=form.cleaned_data['budget_status'])
                 if form.cleaned_data['convertable']:
@@ -1077,10 +1093,12 @@ class RenterListView(ReadOnlyPermissionMixin, ListView):
 
                 if form.cleaned_data['min_deposit']:
                     queryset_filtered = [obj for obj in queryset_filtered if
-                                         obj.deposit_announced and obj.deposit_announced >= form.cleaned_data['min_deposit']]
+                                         obj.deposit_announced and obj.deposit_announced >= form.cleaned_data[
+                                             'min_deposit']]
                 if form.cleaned_data['max_deposit']:
                     queryset_filtered = [obj for obj in queryset_filtered if
-                                         obj.deposit_announced and obj.deposit_announced <= form.cleaned_data['max_deposit']]
+                                         obj.deposit_announced and obj.deposit_announced <= form.cleaned_data[
+                                             'max_deposit']]
                 if form.cleaned_data['min_rent']:
                     queryset_filtered = [obj for obj in queryset_filtered if
                                          obj.rent_announced and obj.rent_announced >= form.cleaned_data['min_rent']]
@@ -1283,14 +1301,36 @@ class TaskFPListView(ReadOnlyPermissionMixin, ListView):
         if self.request.user.title == 'bs':
             queryset = models.Task.objects.select_related('agent', 'sale_file', 'rent_file', 'buyer', 'renter',
                                                           'agent__sub_district')
+            form = forms.TaskFilterForm(self.request.GET)
+            if form.is_valid():
+                queryset_filtered = queryset
+                if form.cleaned_data['status']:
+                    queryset_filtered = queryset_filtered.filter(status=form.cleaned_data['status'])
+                queryset_filtered = list(queryset_filtered)
+                return queryset_filtered
             return queryset
+
         elif self.request.user.title == 'fp':
             agent = self.request.user
             queryset = models.Task.objects.select_related('agent', 'sale_file', 'rent_file', 'buyer', 'renter',
                                                           'agent__sub_district').filter(agent=agent)
+            form = forms.TaskFilterForm(self.request.GET)
+            if form.is_valid():
+                queryset_filtered = queryset
+                if form.cleaned_data['status']:
+                    queryset_filtered = queryset_filtered.filter(status=form.cleaned_data['status'])
+                queryset_filtered = list(queryset_filtered)
+                return queryset_filtered
             return queryset
         else:
             return models.Task.objects.none()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        form = forms.TaskFilterForm(self.request.GET)
+
+        context['filter_form'] = form
+        return context
 
 
 class TaskCPListView(ReadOnlyPermissionMixin, ListView):
@@ -1304,14 +1344,36 @@ class TaskCPListView(ReadOnlyPermissionMixin, ListView):
         if self.request.user.title == 'bs':
             queryset = models.Task.objects.select_related('agent', 'sale_file', 'rent_file', 'buyer', 'renter',
                                                           'agent__sub_district')
+            form = forms.TaskFilterForm(self.request.GET)
+            if form.is_valid():
+                queryset_filtered = queryset
+                if form.cleaned_data['status']:
+                    queryset_filtered = queryset_filtered.filter(status=form.cleaned_data['status'])
+                queryset_filtered = list(queryset_filtered)
+                return queryset_filtered
             return queryset
+
         elif self.request.user.title == 'cp':
             agent = self.request.user
             queryset = models.Task.objects.select_related('agent', 'sale_file', 'rent_file', 'buyer', 'renter',
                                                           'agent__sub_district').filter(agent=agent)
+            form = forms.TaskFilterForm(self.request.GET)
+            if form.is_valid():
+                queryset_filtered = queryset
+                if form.cleaned_data['status']:
+                    queryset_filtered = queryset_filtered.filter(status=form.cleaned_data['status'])
+                queryset_filtered = list(queryset_filtered)
+                return queryset_filtered
             return queryset
         else:
             return models.Task.objects.none()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        form = forms.TaskFilterForm(self.request.GET)
+
+        context['filter_form'] = form
+        return context
 
 
 class TaskBTListView(ReadOnlyPermissionMixin, ListView):
@@ -1325,14 +1387,36 @@ class TaskBTListView(ReadOnlyPermissionMixin, ListView):
         if self.request.user.title == 'bs':
             queryset = models.Task.objects.select_related('agent', 'sale_file', 'rent_file', 'buyer', 'renter',
                                                           'agent__sub_district')
+            form = forms.TaskFilterForm(self.request.GET)
+            if form.is_valid():
+                queryset_filtered = queryset
+                if form.cleaned_data['status']:
+                    queryset_filtered = queryset_filtered.filter(status=form.cleaned_data['status'])
+                queryset_filtered = list(queryset_filtered)
+                return queryset_filtered
             return queryset
+
         elif self.request.user.title == 'bt':
             agent = self.request.user
             queryset = models.Task.objects.select_related('agent', 'sale_file', 'rent_file', 'buyer', 'renter',
                                                           'agent__sub_district').filter(agent=agent)
+            form = forms.TaskFilterForm(self.request.GET)
+            if form.is_valid():
+                queryset_filtered = queryset
+                if form.cleaned_data['status']:
+                    queryset_filtered = queryset_filtered.filter(status=form.cleaned_data['status'])
+                queryset_filtered = list(queryset_filtered)
+                return queryset_filtered
             return queryset
         else:
             return models.Task.objects.none()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        form = forms.TaskFilterForm(self.request.GET)
+
+        context['filter_form'] = form
+        return context
 
 
 class TaskDetailView(ReadOnlyPermissionMixin, DetailView):
@@ -1467,9 +1551,24 @@ class TaskBossListView(ListView):
     paginate_by = 12
 
     def get_queryset(self):
-        queryset = models.TaskBoss.objects.select_related('new_sale_file', 'new_rent_file', 'new_buyer', 'new_renter', 'new_person',
-                                                          'new_visit', 'new_session', 'ur_task').filter(condition='op').all()
+        queryset = (models.TaskBoss.objects.select_related('new_sale_file', 'new_rent_file', 'new_buyer', 'new_renter',
+                                                           'new_person', 'new_visit', 'new_session', 'ur_task')
+                    .filter(condition='op').all())
+        form = forms.TaskBossFilterForm(self.request.GET)
+        if form.is_valid():
+            queryset_filtered = queryset
+            if form.cleaned_data['type']:
+                queryset_filtered = queryset_filtered.filter(type=form.cleaned_data['type'])
+            queryset_filtered = list(queryset_filtered)
+            return queryset_filtered
         return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        form = forms.TaskBossFilterForm(self.request.GET)
+
+        context['filter_form'] = form
+        return context
 
 
 class TaskBossApproveView(View):
@@ -1646,7 +1745,8 @@ class TaskBossApproveView(View):
             })
         if boss_task.type == 'rv':
             result_visit = boss_task.result_visit
-            form = forms.CombinedVisitResultForm(request.POST, result_visit_instance=result_visit, boss_instance=boss_task)
+            form = forms.CombinedVisitResultForm(request.POST, result_visit_instance=result_visit,
+                                                 boss_instance=boss_task)
             if form.is_valid():
                 form.save()
                 messages.success(self.request, "تغییرات در سامانه ثبت شد.")
@@ -1658,7 +1758,8 @@ class TaskBossApproveView(View):
             })
         if boss_task.type == 'rs':
             result_session = boss_task.result_session
-            form = forms.CombinedSessionResultForm(request.POST, result_session_instance=result_session, boss_instance=boss_task)
+            form = forms.CombinedSessionResultForm(request.POST, result_session_instance=result_session,
+                                                   boss_instance=boss_task)
             if form.is_valid():
                 form.save()
                 messages.success(self.request, "تغییرات در سامانه ثبت شد.")

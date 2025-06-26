@@ -1016,7 +1016,15 @@ class TaskAdminForm(forms.ModelForm):
         )
 
 
+class TaskFilterForm(forms.Form):
+    status = forms.ChoiceField(choices=[('', '---------')] + choices.task_statuses, required=False, label='وضعیت وظیفه')
+
+
 # -------------------------------- BossTasks --------------------------------
+class TaskBossFilterForm(forms.Form):
+    type = forms.ChoiceField(choices=[('', '---------')] + choices.boss_task_types, required=False, label='وضعیت وظیفه')
+
+
 class TaskBossStatusForm(forms.ModelForm):
     class Meta:
         model = models.TaskBoss
@@ -1497,6 +1505,7 @@ class CombinedSessionResultForm(forms.Form):
     def save(self):
         self.boss_form.save()
         self.result_session_form.save()
+
 
 
 
