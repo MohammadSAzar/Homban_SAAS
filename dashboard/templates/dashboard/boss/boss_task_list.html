@@ -47,7 +47,7 @@
         <!-- end: Title -->
 
         <!-- Boss_Tasks -->
-        <div class="row  g-gs">
+        <div class="row g-gs">
         
             <!-- ّFilter -->
             <div class="col-lg-2">
@@ -71,8 +71,8 @@
     
                             <!-- button -->
                             <div class="form-group" style="width: 100%;!important;">
-                                <button type="submit" onclick="submitFormAndRefresh()" class="btn btn-primary justify-center" style="width: 100%;!important;">اعمال فیلتر</button>
-                                <a href="{% url 'boss_task_list' %}" class="btn btn-danger justify-center" style="width: 100%;!important; margin-top: 10px;">حذف فیلتر</a>
+                                <button type="submit" onclick="submitFormAndRefresh()" class="btn btn-primary justify-center" style="width: 100%;!important;">اعمال</button>
+                                <a href="{% url 'boss_task_list' %}" class="btn btn-danger justify-center" style="width: 100%;!important; margin-top: 10px;">حذف</a>
                             </div>
                         
                         </form>
@@ -94,92 +94,94 @@
         
             <!-- List -->
             <div class="col-lg-10">
-                {% for boss_task in boss_tasks %}
-                    <div class="col-sm-6 col-lg-6 col-xxl-6">
-                        <div class="card h-100">
-                            <div class="card-inner">
-                                <div class="project">
-    
-                                    <!-- Up -->
-                                    <div class="project-head"  style="margin-bottom: 1.7em;">
-                                        <div class="project-title">
-                                            <div class="project-info">
-                                                <h6 class="title" style="margin-bottom: 0.85em;">کد: {{ boss_task.code }}</h6>
-                                                <div style="margin-bottom: 0.6em;">
-                                                    <span style="font-size: 0.9em;">نوع: {{ boss_task.get_type_display }}</span>
+                <div class="row g-gs">
+                    {% for boss_task in boss_tasks %}
+                        <div class="col-sm-6 col-lg-6 col-xxl-6">
+                            <div class="card h-100">
+                                <div class="card-inner">
+                                    <div class="project">
+        
+                                        <!-- Up -->
+                                        <div class="project-head"  style="margin-bottom: 1.7em;">
+                                            <div class="project-title">
+                                                <div class="project-info">
+                                                    <h6 class="title" style="margin-bottom: 0.85em;">کد: {{ boss_task.code }}</h6>
+                                                    <div style="margin-bottom: 0.6em;">
+                                                        <span style="font-size: 0.9em;">نوع: {{ boss_task.get_type_display }}</span>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-    
-                                    <!-- Detail -->
-                                    <div class=" project-head">
-                                        <div class="project-title">
-                                            <div class="project-info" style="height: 4em;!important; -webkit-line-clamp: 2;!important;">
-                                                {% if boss_task.type == 'sf' %}
-                                                    <h6 class="title" style="margin-bottom: 0.7em;">تایید فایل فروش جدید: </h6>
-                                                    <span class="sub-text" style="font-size: 0.85em;">{{ boss_task.new_sale_file.title|farsi_number }}</span>
-                                                {% elif boss_task.type == 'rf' %}
-                                                    <h6 class="title" style="margin-bottom: 0.7em;">تایید فایل اجاره جدید: </h6>
-                                                    <span class="sub-text" style="font-size: 0.85em;">{{ boss_task.new_rent_file.title|farsi_number }}</span>
-                                                {% elif boss_task.type == 'by' %}
-                                                    <h6 class="title" style="margin-bottom: 0.7em;">تایید خریدار جدید: </h6>
-                                                    <span class="sub-text" style="font-size: 0.85em;">{{ boss_task.new_buyer.name }}</span>
-                                                {% elif boss_task.type == 'rt' %}
-                                                    <h6 class="title" style="margin-bottom: 0.7em;">تایید مستاجر جدید: </h6>
-                                                    <span class="sub-text" style="font-size: 0.85em;">{{ boss_task.new_renter.name }}</span>
-                                                {% elif boss_task.type == 'ps' %}
-                                                    <h6 class="title" style="margin-bottom: 0.7em;">تایید آگهی‌دهنده جدید: </h6>
-                                                    <span class="sub-text" style="font-size: 0.85em;">{{ boss_task.new_person.name }}</span>
-                                                {% elif boss_task.type == 'vs' %}
-                                                    <h6 class="title" style="margin-bottom: 0.7em;">تایید بازدید جدید: </h6>
-                                                    {% if boss_task.new_visit.type == 'sale' %}
-                                                        <span class="sub-text" style="font-size: 0.85em;">{{ boss_task.new_visit.sale_file.title }}</span>
-                                                    {% elif boss_task.new_visit.type == 'rent' %}
-                                                        <span class="sub-text" style="font-size: 0.85em;">{{ boss_task.new_visit.rent_file.title }}</span>
+        
+                                        <!-- Detail -->
+                                        <div class=" project-head">
+                                            <div class="project-title">
+                                                <div class="project-info" style="height: 4em;!important; -webkit-line-clamp: 2;!important;">
+                                                    {% if boss_task.type == 'sf' %}
+                                                        <h6 class="title" style="margin-bottom: 0.7em;">تایید فایل فروش جدید: </h6>
+                                                        <span class="sub-text" style="font-size: 0.85em;">{{ boss_task.new_sale_file.title|farsi_number }}</span>
+                                                    {% elif boss_task.type == 'rf' %}
+                                                        <h6 class="title" style="margin-bottom: 0.7em;">تایید فایل اجاره جدید: </h6>
+                                                        <span class="sub-text" style="font-size: 0.85em;">{{ boss_task.new_rent_file.title|farsi_number }}</span>
+                                                    {% elif boss_task.type == 'by' %}
+                                                        <h6 class="title" style="margin-bottom: 0.7em;">تایید خریدار جدید: </h6>
+                                                        <span class="sub-text" style="font-size: 0.85em;">{{ boss_task.new_buyer.name }}</span>
+                                                    {% elif boss_task.type == 'rt' %}
+                                                        <h6 class="title" style="margin-bottom: 0.7em;">تایید مستاجر جدید: </h6>
+                                                        <span class="sub-text" style="font-size: 0.85em;">{{ boss_task.new_renter.name }}</span>
+                                                    {% elif boss_task.type == 'ps' %}
+                                                        <h6 class="title" style="margin-bottom: 0.7em;">تایید آگهی‌دهنده جدید: </h6>
+                                                        <span class="sub-text" style="font-size: 0.85em;">{{ boss_task.new_person.name }}</span>
+                                                    {% elif boss_task.type == 'vs' %}
+                                                        <h6 class="title" style="margin-bottom: 0.7em;">تایید بازدید جدید: </h6>
+                                                        {% if boss_task.new_visit.type == 'sale' %}
+                                                            <span class="sub-text" style="font-size: 0.85em;">{{ boss_task.new_visit.sale_file.title }}</span>
+                                                        {% elif boss_task.new_visit.type == 'rent' %}
+                                                            <span class="sub-text" style="font-size: 0.85em;">{{ boss_task.new_visit.rent_file.title }}</span>
+                                                        {% endif %}
+                                                    {% elif boss_task.type == 'ss' %}
+                                                        <h6 class="title" style="margin-bottom: 0.7em;">تایید نشست جدید: </h6>
+                                                        {% if boss_task.new_session.type == 'sale' %}
+                                                            <span class="sub-text" style="font-size: 0.85em;">{{ boss_task.new_session.sale_file.title }}</span>
+                                                        {% elif boss_task.new_session.type == 'rent' %}
+                                                            <span class="sub-text" style="font-size: 0.85em;">{{ boss_task.new_session.rent_file.title }}</span>
+                                                        {% endif %}
+                                                    {% elif boss_task.type == 'rv' %}
+                                                        <h6 class="title" style="margin-bottom: 0.7em;">نتیجه بازدید: </h6>
+                                                        {% if boss_task.result_visit.type == 'sale' %}
+                                                            <span class="sub-text" style="font-size: 0.85em;">{{ boss_task.result_visit.sale_file.title }}</span>
+                                                        {% elif boss_task.result_visit.type == 'rent' %}
+                                                            <span class="sub-text" style="font-size: 0.85em;">{{ boss_task.result_visit.rent_file.title }}</span>
+                                                        {% endif %}
+                                                    {% elif boss_task.type == 'rs' %}
+                                                        <h6 class="title" style="margin-bottom: 0.7em;">نتیجه نشست: </h6>
+                                                        {% if boss_task.result_session.type == 'sale' %}
+                                                            <span class="sub-text" style="font-size: 0.85em;">{{ boss_task.result_session.sale_file.title }}</span>
+                                                        {% elif boss_task.result_session.type == 'rent' %}
+                                                            <span class="sub-text" style="font-size: 0.85em;">{{ boss_task.result_session.rent_file.title }}</span>
+                                                        {% endif %}
+                                                    {% elif boss_task.type == 'ts' %}
+                                                        <h6 class="title" style="margin-bottom: 0.7em;">بررسی وظیفه تحویل داده شده:</h6>
+                                                        <span class="sub-text" style="font-size: 0.85em;">{{ boss_task.ur_task.title|farsi_number }}</span>
                                                     {% endif %}
-                                                {% elif boss_task.type == 'ss' %}
-                                                    <h6 class="title" style="margin-bottom: 0.7em;">تایید نشست جدید: </h6>
-                                                    {% if boss_task.new_session.type == 'sale' %}
-                                                        <span class="sub-text" style="font-size: 0.85em;">{{ boss_task.new_session.sale_file.title }}</span>
-                                                    {% elif boss_task.new_session.type == 'rent' %}
-                                                        <span class="sub-text" style="font-size: 0.85em;">{{ boss_task.new_session.rent_file.title }}</span>
-                                                    {% endif %}
-                                                {% elif boss_task.type == 'rv' %}
-                                                    <h6 class="title" style="margin-bottom: 0.7em;">نتیجه بازدید: </h6>
-                                                    {% if boss_task.result_visit.type == 'sale' %}
-                                                        <span class="sub-text" style="font-size: 0.85em;">{{ boss_task.result_visit.sale_file.title }}</span>
-                                                    {% elif boss_task.result_visit.type == 'rent' %}
-                                                        <span class="sub-text" style="font-size: 0.85em;">{{ boss_task.result_visit.rent_file.title }}</span>
-                                                    {% endif %}
-                                                {% elif boss_task.type == 'rs' %}
-                                                    <h6 class="title" style="margin-bottom: 0.7em;">نتیجه نشست: </h6>
-                                                    {% if boss_task.result_session.type == 'sale' %}
-                                                        <span class="sub-text" style="font-size: 0.85em;">{{ boss_task.result_session.sale_file.title }}</span>
-                                                    {% elif boss_task.result_session.type == 'rent' %}
-                                                        <span class="sub-text" style="font-size: 0.85em;">{{ boss_task.result_session.rent_file.title }}</span>
-                                                    {% endif %}
-                                                {% elif boss_task.type == 'ts' %}
-                                                    <h6 class="title" style="margin-bottom: 0.7em;">بررسی وظیفه تحویل داده شده:</h6>
-                                                    <span class="sub-text" style="font-size: 0.85em;">{{ boss_task.ur_task.title|farsi_number }}</span>
-                                                {% endif %}
+                                                </div>
                                             </div>
                                         </div>
+        
+                                        <!-- Approve - Delete -->
+                                        {% if request.user.title == 'bs' or request.user.sub_district == visit.sale_file.sub_district or request.user.sub_district == visit.rent_file.sub_district %}
+                                            <div class="project-meta">
+                                                <a href="{% url 'boss_task_approve' boss_task.pk boss_task.code %}" class="btn btn-primary justify-center" style="margin-top: 1em;"><em class="icon ni ni-edit"></em><span>تایید</span></a>
+                                                <a href="#" class="btn btn-danger justify-center" style="margin-top: 1em;"><em class="icon ni ni-delete"></em><span>حذف</span></a>
+                                            </div>
+                                        {% endif %}
+        
                                     </div>
-    
-                                    <!-- Approve - Delete -->
-                                    {% if request.user.title == 'bs' or request.user.sub_district == visit.sale_file.sub_district or request.user.sub_district == visit.rent_file.sub_district %}
-                                        <div class="project-meta">
-                                            <a href="{% url 'boss_task_approve' boss_task.pk boss_task.code %}" class="btn btn-primary justify-center" style="margin-top: 1em;"><em class="icon ni ni-edit"></em><span>تایید</span></a>
-                                            <a href="#" class="btn btn-danger justify-center" style="margin-top: 1em;"><em class="icon ni ni-delete"></em><span>حذف</span></a>
-                                        </div>
-                                    {% endif %}
-    
                                 </div>
                             </div>
                         </div>
-                    </div>
-                {% endfor %}
+                    {% endfor %}
+                </div>
             </div>
             <!-- end: List -->
 
@@ -190,7 +192,7 @@
     <!-- end: Main -->
     
     <!-- Pagination -->
-    <div class="nk-block-head  nk-block-head-lg" style="margin-top: 1.5em;">
+    <div class="nk-block-head nk-block-head-lg" style="margin-top: 1.5em;">
         <div class="nk-block-between" style="justify-items: center; justify-content: center; text-align: center">
             <div class="nk-block-head-content">
                 <div class="my-profile-pagination" style="margin-top: 1em;">
@@ -232,6 +234,7 @@
     <!-- end: Pagination -->
 
 {% endblock %}
+
 
 
 

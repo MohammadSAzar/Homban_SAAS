@@ -1794,6 +1794,15 @@ class VisitListView(ReadOnlyPermissionMixin, ListView):
     def get_queryset(self):
         if self.request.user.title == 'bs':
             queryset = models.Visit.objects.select_related('agent', 'agent__sub_district').all()
+            form = forms.ServiceFilterForm(self.request.GET)
+            if form.is_valid():
+                queryset_filtered = queryset
+                if form.cleaned_data['type']:
+                    queryset_filtered = queryset_filtered.filter(type=form.cleaned_data['type'])
+                if form.cleaned_data['status']:
+                    queryset_filtered = queryset_filtered.filter(status=form.cleaned_data['status'])
+                queryset_filtered = list(queryset_filtered)
+                return queryset_filtered
             return queryset
         else:
             if not self.request.user.sub_district:
@@ -1814,8 +1823,24 @@ class VisitListView(ReadOnlyPermissionMixin, ListView):
             )
             queryset = (sale_visits | rent_visits).distinct()
             queryset = queryset.filter(agent=self.request.user)
+            form = forms.ServiceFilterForm(self.request.GET)
+            if form.is_valid():
+                queryset_filtered = queryset
+                if form.cleaned_data['type']:
+                    queryset_filtered = queryset_filtered.filter(type=form.cleaned_data['type'])
+                if form.cleaned_data['status']:
+                    queryset_filtered = queryset_filtered.filter(status=form.cleaned_data['status'])
+                queryset_filtered = list(queryset_filtered)
+                return queryset_filtered
 
             return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        form = forms.ServiceFilterForm(self.request.GET)
+
+        context['filter_form'] = form
+        return context
 
 
 class VisitCreateView(PermissionRequiredMixin, CreateView):
@@ -1951,28 +1976,53 @@ class SessionListView(ReadOnlyPermissionMixin, ListView):
     def get_queryset(self):
         if self.request.user.title == 'bs':
             queryset = models.Session.objects.select_related('agent', 'agent__sub_district').all()
+            form = forms.ServiceFilterForm(self.request.GET)
+            if form.is_valid():
+                queryset_filtered = queryset
+                if form.cleaned_data['type']:
+                    queryset_filtered = queryset_filtered.filter(type=form.cleaned_data['type'])
+                if form.cleaned_data['status']:
+                    queryset_filtered = queryset_filtered.filter(status=form.cleaned_data['status'])
+                queryset_filtered = list(queryset_filtered)
+                return queryset_filtered
             return queryset
         else:
             if not self.request.user.sub_district:
-                return models.Session.objects.none()
+                return models.Visit.objects.none()
 
             user_sub_district = self.request.user.sub_district
-            sale_sessions = models.Session.objects.filter(
+            sale_visits = models.Session.objects.filter(
                 sale_file_code__isnull=False,
                 sale_file_code__in=models.SaleFile.objects.filter(
                     sub_district=user_sub_district
                 ).values_list('code', flat=True)
             )
-            rent_sessions = models.Session.objects.filter(
+            rent_visits = models.Visit.objects.filter(
                 rent_file_code__isnull=False,
                 rent_file_code__in=models.RentFile.objects.filter(
                     sub_district=user_sub_district
                 ).values_list('code', flat=True)
             )
-            queryset = (sale_sessions | rent_sessions).distinct()
+            queryset = (sale_visits | rent_visits).distinct()
             queryset = queryset.filter(agent=self.request.user)
+            form = forms.ServiceFilterForm(self.request.GET)
+            if form.is_valid():
+                queryset_filtered = queryset
+                if form.cleaned_data['type']:
+                    queryset_filtered = queryset_filtered.filter(type=form.cleaned_data['type'])
+                if form.cleaned_data['status']:
+                    queryset_filtered = queryset_filtered.filter(status=form.cleaned_data['status'])
+                queryset_filtered = list(queryset_filtered)
+                return queryset_filtered
 
             return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        form = forms.ServiceFilterForm(self.request.GET)
+
+        context['filter_form'] = form
+        return context
 
 
 class SessionCreateView(PermissionRequiredMixin, CreateView):
@@ -2096,6 +2146,15 @@ class TradeListView(ReadOnlyPermissionMixin, ListView):
             queryset = models.Trade.objects.select_related('session', 'session__agent', 'session__agent__sub_district',
                                                            'session__sale_file', 'session__rent_file', 'session__buyer',
                                                            'session__renter').all()
+            form = forms.TradeFilterForm(self.request.GET)
+            if form.is_valid():
+                queryset_filtered = queryset
+                if form.cleaned_data['type']:
+                    queryset_filtered = queryset_filtered.filter(type=form.cleaned_data['type'])
+                if form.cleaned_data['followup_code_status']:
+                    queryset_filtered = queryset_filtered.filter(followup_code_status=form.cleaned_data['followup_code_status'])
+                queryset_filtered = list(queryset_filtered)
+                return queryset_filtered
             return queryset
         else:
             if not self.request.user.sub_district:
@@ -2116,8 +2175,25 @@ class TradeListView(ReadOnlyPermissionMixin, ListView):
             )
             queryset = (sale_trades | rent_trades).distinct()
             queryset = queryset.filter(session__agent=self.request.user)
+            form = forms.TradeFilterForm(self.request.GET)
+            if form.is_valid():
+                queryset_filtered = queryset
+                if form.cleaned_data['type']:
+                    queryset_filtered = queryset_filtered.filter(type=form.cleaned_data['type'])
+                if form.cleaned_data['followup_code_status']:
+                    queryset_filtered = queryset_filtered.filter(
+                        followup_code_status=form.cleaned_data['followup_code_status'])
+                queryset_filtered = list(queryset_filtered)
+                return queryset_filtered
 
             return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        form = forms.TradeFilterForm(self.request.GET)
+
+        context['filter_form'] = form
+        return context
 
 
 class TradeCreateView(PermissionRequiredMixin, CreateView):
@@ -2198,6 +2274,5 @@ class TradeCodeView(PermissionRequiredMixin, UpdateView):
 
     def get_success_url(self):
         return reverse('trade_list')
-
 
 

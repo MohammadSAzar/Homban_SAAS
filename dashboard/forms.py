@@ -828,6 +828,11 @@ class SessionResultForm(forms.ModelForm):
         return cleaned_data
 
 
+class ServiceFilterForm(forms.Form):
+    type = forms.ChoiceField(choices=[('', '---------')] + choices.types, required=False, label='نوع')
+    status = forms.ChoiceField(choices=[('', '---------')] + choices.serv_statuses, required=False, label='وضعیت')
+
+
 class TradeCreateForm(forms.ModelForm):
     class Meta:
         model = models.Trade
@@ -912,6 +917,11 @@ class TradeCodeForm(forms.ModelForm):
         #         self.add_error('status', "برای ثبت نتیجه، وضعیت را به 'خاتمه یافته' تغییر دهید.")
 
         return cleaned_data
+
+
+class TradeFilterForm(forms.Form):
+    type = forms.ChoiceField(choices=[('', '---------')] + choices.types, required=False, label='نوع')
+    followup_code_status = forms.ChoiceField(choices=[('', '---------')] + choices.fc_statuses, required=False, label='کد رهگیری')
 
 
 # ---------------------------------- Tasks ----------------------------------

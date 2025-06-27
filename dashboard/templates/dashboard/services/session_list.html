@@ -54,7 +54,7 @@
     </div>
     <!-- end: Upper Navbar -->
 
-    <!-- List -->
+    <!-- Main -->
     <div class="nk-block">
 
         <!-- Upper + Mobile -->
@@ -94,118 +94,180 @@
         <!-- end: Upper + Mobile -->
 
         <!-- Sessions -->
-        <div class="row  g-gs">
-            {% for session in sessions %}
-                <div class="col-sm-6 col-lg-6 col-xxl-6">
-                    <div class="card h-100">
-                        <div class="card-inner">
-                            <div class="project">
-                
-                                <!-- Up -->
-                                <div class="project-head" style="margin-bottom: 3em;">
-                                    <div class="project-title">
-                                        <div class="project-info">
-                                            <h6 class="title" style="margin-bottom: 0.85em;">نشست در تاریخ: "{{ session.date }}"</h6>
-                                            <div style="margin-bottom: 0.6em;">
-                                                <span style="font-size: 0.9em;">کد نشست: {{ session.code }}</span>
-                                            </div>
-                                            <div style="margin-bottom: 0.6em;">
-                                                <span style="font-size: 0.9em;">نوع معامله: "{{ session.get_type_display }}"</span>
-                                            </div>
-                                            <div style="margin-bottom: 0.6em;">
-                                                {% if session.status == 'sub' %}
-                                                    <span style="font-size: 0.9em; color: #FBC02D">وضعیت: "{{ session.get_status_display }}"</span>
-                                                {% elif session.status == 'acc' %}
-                                                    <span style="font-size: 0.9em; color: #1E88E5">وضعیت: "{{ session.get_status_display }}"</span>
-                                                {% elif session.status == 'can' %}
-                                                    <span style="font-size: 0.9em; color: #F44336">وضعیت: "{{ session.get_status_display }}"</span>
-                                                {% elif session.status == 'dne' %}
-                                                    <span style="font-size: 0.9em; color: #00A65C">وضعیت: "{{ session.get_status_display }}"</span>
-                                                {% elif session.status == 'end' %}
-                                                    <span style="font-size: 0.9em; color: #512DA8">وضعیت: "{{ session.get_status_display }}"</span>
-                                                {% endif %}
-                                            </div>
-                                            <div style="margin-bottom: 0.6em;">
-                                                <span style="font-size: 0.9em;">مشاور: "{{ session.agent }}"</span>
-                                            </div>
-                                            <div>
-                                                <span style="font-size: 0.9em;">زیرمحله: "{{ session.agent.sub_district }}"</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-            
-                                <!-- File -->
-                                <div class="project-head">
-                                    <div class="project-title">
-                                        <div class="project-info" style="height: 6em;!important; -webkit-line-clamp: 3;!important;">
-                                            <h6 class="title" style="margin-bottom: 0.7em;">فایل مربوطه:</h6>
-                                            {% if session.type == 'sale' %}
-                                                <a href="{{ session.sale_file.get_absolute_url }}">
-                                                    <span class="sub-text" style="font-size: 0.85em;">{{ session.sale_file.title|farsi_number }} | {{ session.sale_file.code }}</span>
-                                                </a>
-                                            {% elif session.type == 'rent' %}
-                                                <a href="{{ session.rent_file.get_absolute_url }}">
-                                                    <span class="sub-text" style="font-size: 0.85em;">{{ session.rent_file.title|farsi_number }} | {{ session.rent_file.code }}</span>
-                                                </a>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                </div>
-            
-                                <!-- Customer -->
-                                <div class="project-head">
-                                    <div class="project-title">
-                                        <div class="project-info" style="height: 6em;!important; -webkit-line-clamp: 3;!important;">
-                                            <h6 class="title" style="margin-bottom: 0.7em;">مشتری (خریدار/مستاجر) مربوطه:</h6>
-                                            {% if session.type == 'sale' %}
-                                                <a href="{{ session.buyer.get_absolute_url }}">
-                                                    <span class="sub-text" style="font-size: 0.85em;">{{ session.buyer.name }} | {{ session.buyer.code }}</span>
-                                                </a>
-                                            {% elif session.type == 'rent' %}
-                                                <a href="{{ session.renter.get_absolute_url }}">
-                                                    <span class="sub-text" style="font-size: 0.85em;">{{ session.renter.name }} | {{ session.renter.code }}</span>
-                                                </a>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                </div>
-            
-                                <!-- Description -->
-                                <div class="project-details">
-                                    <h6 class="title" style="margin-bottom: 0.7em;">توضیحات</h6>
-                                    <p style="height: 8em;!important; -webkit-line-clamp: 4;!important;">{{ session.description|farsi_number|linebreaksbr }}</p>
-                                </div>
-            
-                                <!-- Links -->
-                                {% if request.user.title == 'bs' or request.user.sub_district == session.sale_file.sub_district or request.user.sub_district == session.rent_file.sub_district %}
-                                    {% if session.status == 'sub' %}
-                                        <div class="project-meta">
-                                            <a href="{% url 'session_update' session.pk session.code %}" class="btn btn-primary justify-center" style="margin-top: 1em;"><em class="icon ni ni-edit"></em><span>تغییر</span></a>
-                                            <a href="{% url 'session_delete' session.pk session.code %}" class="btn btn-danger justify-center" style="margin-top: 1em;"><em class="icon ni ni-delete"></em><span>حذف</span></a>
-                                        </div>
-                                    {% elif session.status == 'acc' %}
-                                        <div class="project-meta">
-                                            <a href="{% url 'session_detail' session.pk session.code %}" class="btn btn-primary justify-center" style="margin-top: 1em;"><em class="icon ni ni-edit"></em><span>مشاهده</span></a>
-                                            <a href="{% url 'session_result' session.pk session.code %}" class="btn btn-primary justify-center" style="margin-top: 1em;"><em class="icon ni ni-delete"></em><span>ثبت نتیجه</span></a>
-                                        </div>
-                                    {% elif session.status == 'can' or session.status == 'dne' or session.status == 'end' %}
-                                        <div class="project-meta">
-                                            <a href="{% url 'session_detail' session.pk session.code %}" class="btn btn-primary justify-center" style="margin-top: 1em; width: 100%"><em class="icon ni ni-edit-alt-fill"></em>مشاهده</a>
-                                        </div>
-                                    {% endif %}
-                                {% endif %}
+        <div class="row g-gs">
+        
+            <!-- ّFilter -->
+            <div class="col-lg-2">
+                <div class="card h-100">
+                    <div class="card-inner">
 
+                        <!-- Form -->
+                        <form id="filter-form" method="get" action="{% url 'session_list' %}" enctype="multipart/form-data">
+                            {% csrf_token %}
+                        
+                            <!-- type -->
+                            <div class="form-group">
+                                <label class="form-label" for="{{ filter_form.type.id_for_label }}">نوع نشست</label>
+                                {% render_field filter_form.type type="text" id="type" class="form-control" %}
                             </div>
-                        </div>
+                            {% if filter_form.type.errors %}
+                                {% for error in filter_form.type.errors %}
+                                    <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                {% endfor %}
+                            {% endif %}
+                        
+                            <!-- status -->
+                            <div class="form-group">
+                                <label class="form-label" for="{{ filter_form.status.id_for_label }}">وضعیت نشست</label>
+                                {% render_field filter_form.status type="text" id="status" class="form-control" %}
+                            </div>
+                            {% if filter_form.status.errors %}
+                                {% for error in filter_form.status.errors %}
+                                    <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                {% endfor %}
+                            {% endif %}
+
+                            <!-- button -->
+                            <div class="form-group" style="width: 100%;!important;">
+                                <button type="submit" onclick="submitFormAndRefresh()" class="btn btn-primary justify-center" style="width: 100%;!important;">اعمال</button>
+                                <a href="{% url 'session_list' %}" class="btn btn-danger justify-center" style="width: 100%;!important; margin-top: 10px;">حذف</a>
+                            </div>
+                        
+                        </form>
+                        <!-- end: Form -->
+
+                        <!-- JS -->
+                        <script>
+                            function submitFormAndRefresh() {
+                                document.getElementById('filter-form').submit();
+                                location.reload();
+                            }
+                        </script>
+                        <!-- end: JS -->
+
                     </div>
                 </div>
-            {% endfor %}
+            </div>
+            <!-- end: Filter -->
+        
+            <!-- List -->
+            <div class="col-lg-10">
+                <div class="row g-gs">
+                    {% for session in sessions %}
+                        <div class="col-sm-6 col-lg-6 col-xxl-6">
+                            <div class="card h-100">
+                                <div class="card-inner">
+                                    <div class="project">
+                        
+                                        <!-- Up -->
+                                        <div class="project-head" style="margin-bottom: 3em;">
+                                            <div class="project-title">
+                                                <div class="project-info">
+                                                    <h6 class="title" style="margin-bottom: 0.85em;">نشست در تاریخ: "{{ session.date }}"</h6>
+                                                    <div style="margin-bottom: 0.6em;">
+                                                        <span style="font-size: 0.9em;">کد نشست: {{ session.code }}</span>
+                                                    </div>
+                                                    <div style="margin-bottom: 0.6em;">
+                                                        <span style="font-size: 0.9em;">نوع معامله: "{{ session.get_type_display }}"</span>
+                                                    </div>
+                                                    <div style="margin-bottom: 0.6em;">
+                                                        {% if session.status == 'sub' %}
+                                                            <span style="font-size: 0.9em; color: #FBC02D">وضعیت: "{{ session.get_status_display }}"</span>
+                                                        {% elif session.status == 'acc' %}
+                                                            <span style="font-size: 0.9em; color: #1E88E5">وضعیت: "{{ session.get_status_display }}"</span>
+                                                        {% elif session.status == 'can' %}
+                                                            <span style="font-size: 0.9em; color: #F44336">وضعیت: "{{ session.get_status_display }}"</span>
+                                                        {% elif session.status == 'dne' %}
+                                                            <span style="font-size: 0.9em; color: #00A65C">وضعیت: "{{ session.get_status_display }}"</span>
+                                                        {% elif session.status == 'end' %}
+                                                            <span style="font-size: 0.9em; color: #512DA8">وضعیت: "{{ session.get_status_display }}"</span>
+                                                        {% endif %}
+                                                    </div>
+                                                    <div style="margin-bottom: 0.6em;">
+                                                        <span style="font-size: 0.9em;">مشاور: "{{ session.agent }}"</span>
+                                                    </div>
+                                                    <div>
+                                                        <span style="font-size: 0.9em;">زیرمحله: "{{ session.agent.sub_district }}"</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                    
+                                        <!-- File -->
+                                        <div class="project-head">
+                                            <div class="project-title">
+                                                <div class="project-info" style="height: 6em;!important; -webkit-line-clamp: 3;!important;">
+                                                    <h6 class="title" style="margin-bottom: 0.7em;">فایل مربوطه:</h6>
+                                                    {% if session.type == 'sale' %}
+                                                        <a href="{{ session.sale_file.get_absolute_url }}">
+                                                            <span class="sub-text" style="font-size: 0.85em;">{{ session.sale_file.title|farsi_number }} | {{ session.sale_file.code }}</span>
+                                                        </a>
+                                                    {% elif session.type == 'rent' %}
+                                                        <a href="{{ session.rent_file.get_absolute_url }}">
+                                                            <span class="sub-text" style="font-size: 0.85em;">{{ session.rent_file.title|farsi_number }} | {{ session.rent_file.code }}</span>
+                                                        </a>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                    
+                                        <!-- Customer -->
+                                        <div class="project-head">
+                                            <div class="project-title">
+                                                <div class="project-info" style="height: 6em;!important; -webkit-line-clamp: 3;!important;">
+                                                    <h6 class="title" style="margin-bottom: 0.7em;">مشتری (خریدار/مستاجر) مربوطه:</h6>
+                                                    {% if session.type == 'sale' %}
+                                                        <a href="{{ session.buyer.get_absolute_url }}">
+                                                            <span class="sub-text" style="font-size: 0.85em;">{{ session.buyer.name }} | {{ session.buyer.code }}</span>
+                                                        </a>
+                                                    {% elif session.type == 'rent' %}
+                                                        <a href="{{ session.renter.get_absolute_url }}">
+                                                            <span class="sub-text" style="font-size: 0.85em;">{{ session.renter.name }} | {{ session.renter.code }}</span>
+                                                        </a>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                    
+                                        <!-- Description -->
+                                        <div class="project-details">
+                                            <h6 class="title" style="margin-bottom: 0.7em;">توضیحات</h6>
+                                            <p style="height: 8em;!important; -webkit-line-clamp: 4;!important;">{{ session.description|farsi_number|linebreaksbr }}</p>
+                                        </div>
+                    
+                                        <!-- Links -->
+                                        {% if request.user.title == 'bs' or request.user.sub_district == session.sale_file.sub_district or request.user.sub_district == session.rent_file.sub_district %}
+                                            {% if session.status == 'sub' %}
+                                                <div class="project-meta">
+                                                    <a href="{% url 'session_update' session.pk session.code %}" class="btn btn-primary justify-center" style="margin-top: 1em;"><em class="icon ni ni-edit"></em><span>تغییر</span></a>
+                                                    <a href="{% url 'session_delete' session.pk session.code %}" class="btn btn-danger justify-center" style="margin-top: 1em;"><em class="icon ni ni-delete"></em><span>حذف</span></a>
+                                                </div>
+                                            {% elif session.status == 'acc' %}
+                                                <div class="project-meta">
+                                                    <a href="{% url 'session_detail' session.pk session.code %}" class="btn btn-primary justify-center" style="margin-top: 1em;"><em class="icon ni ni-edit"></em><span>مشاهده</span></a>
+                                                    <a href="{% url 'session_result' session.pk session.code %}" class="btn btn-primary justify-center" style="margin-top: 1em;"><em class="icon ni ni-delete"></em><span>ثبت نتیجه</span></a>
+                                                </div>
+                                            {% elif session.status == 'can' or session.status == 'dne' or session.status == 'end' %}
+                                                <div class="project-meta">
+                                                    <a href="{% url 'session_detail' session.pk session.code %}" class="btn btn-primary justify-center" style="margin-top: 1em; width: 100%"><em class="icon ni ni-edit-alt-fill"></em>مشاهده</a>
+                                                </div>
+                                            {% endif %}
+                                        {% endif %}
+        
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <!-- end: List -->
+        
         </div>
         <!-- end: Sessions -->
     
     </div>
-    <!-- end: List -->
+    <!-- end: Main -->
     
     <!-- Pagination -->
     <div class="nk-block-head nk-block-head-lg" style="margin-top: 1.5em;">
@@ -250,6 +312,7 @@
     <!-- end: Pagination -->
 
 {% endblock %}
+
 
 
 
