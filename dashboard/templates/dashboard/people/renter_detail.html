@@ -35,7 +35,7 @@
                         </div>
                     </div>
                 </div>
-                <!-- end: Title -->
+                <!-- end: Name -->
 
                 <!-- Info -->
                 <div class="nk-block">
@@ -194,11 +194,32 @@
 
                 </div>
                 <!-- end: Info -->
-
+    
+                <!-- Services -->
+                <div class=" nk-block">
+                    <div class="nk-data data-list">
+                        <div class="data-head">
+                            <h6 class="title">هماهنگی خدمات</h6>
+                        </div>
+                        <div class="data-item" data-bs-toggle="modal" data-bs-target="#profile-edit">
+                            <div style="font-size: 0.9em; margin-top: 0.4em;">
+                                <a href="{% url 'visit_create' %}?renter_code={{ renter.code }}" class="btn btn-primary" style="font-size: 0.9em;">
+                                    ایجاد بازدید
+                                </a>
+                                <a href="{% url 'session_create' %}?renter_code={{ renter.code }}" class="btn btn-primary" style="font-size: 0.9em;">
+                                    ایجاد نشست
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- end: Services -->
+            
             </div>
         </div>
     </div>
 
 {% endblock %}
+
 
 

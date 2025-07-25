@@ -286,7 +286,6 @@
 
                                 // Check if we have a pre-selected sale file
                                 const isSalePreSelected = {{ pre_selected_sale_file|yesno:"true,false" }};
-
                                 if (isSalePreSelected) {
                                     // Lock the type field to 'sale' only
                                     lockTypeToSale();
@@ -303,9 +302,8 @@
                                 }
 
                                 // ########################################
-                                // Check if we have a pre-selected sale file
+                                // Check if we have a pre-selected rent file
                                 const isRentPreSelected = {{ pre_selected_rent_file|yesno:"true,false" }};
-
                                 if (isRentPreSelected) {
                                     // Lock the type field to 'sale' only
                                     lockTypeToRent();
@@ -321,6 +319,44 @@
                                     }
                                 }
                                 // ########################################
+                                
+                                // BYBYBYBYBYBYBYBYBYBYBYBYBYBYBYBYBYBYBYBY
+                                // Check if we have a pre-selected buyer
+                                const isBuyerPreSelected = {{ pre_selected_buyer|yesno:"true,false" }};
+                                if (isBuyerPreSelected) {
+                                    // Lock the type field to 'sale' only
+                                    lockTypeToSale();
+
+                                    // Prevent any changes to locked fields
+                                    preventBuyerFieldChanges();
+                                } else {
+                                    // Normal behavior - toggle fields based on type selection
+                                    if (typeField) {
+                                        typeField.addEventListener('change', toggleFieldsBasedOnType);
+                                        // Initial toggle
+                                        toggleFieldsBasedOnType();
+                                    }
+                                }
+                                // BYBYBYBYBYBYBYBYBYBYBYBYBYBYBYBYBYBYBYBY
+                                
+                                // RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR
+                                // Check if we have a pre-selected buyer
+                                const isRenterPreSelected = {{ pre_selected_renter|yesno:"true,false" }};
+                                if (isRenterPreSelected) {
+                                    // Lock the type field to 'sale' only
+                                    lockTypeToRent();
+
+                                    // Prevent any changes to locked fields
+                                    preventRenterFieldChanges();
+                                } else {
+                                    // Normal behavior - toggle fields based on type selection
+                                    if (typeField) {
+                                        typeField.addEventListener('change', toggleFieldsBasedOnType);
+                                        // Initial toggle
+                                        toggleFieldsBasedOnType();
+                                    }
+                                }
+                                // RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR
 
                                 function lockTypeToSale() {
                                     if (typeField) {
@@ -344,7 +380,6 @@
                                     }
                                 }
 
-                                // ########################################
                                 function lockTypeToRent() {
                                     if (typeField) {
                                         // Find all options and disable rent option
@@ -366,7 +401,6 @@
                                         });
                                     }
                                 }
-                                // ########################################
 
                                 function preventSaleFieldChanges() {
                                     // Prevent changes to sale_file_code
@@ -406,7 +440,6 @@
                                     });
                                 }
 
-                                // ########################################
                                 function preventRentFieldChanges() {
                                     // Prevent changes to sale_file_code
                                     if (rentFileCodeField) {
@@ -444,7 +477,87 @@
                                         }
                                     });
                                 }
-                                // ########################################
+                                
+                                
+                                // BYBYBYBYBYBYBYBYBYBYBYBYBYBYBYBYBYBYBYBY
+                                function preventBuyerFieldChanges() {
+                                    // Prevent changes to buyer_code
+                                    if (buyerCodeField) {
+                                        buyerCodeField.addEventListener('input', function(e) {
+                                            const originalValue = e.target.defaultValue;
+                                            if (e.target.value !== originalValue) {
+                                                e.target.value = originalValue;
+                                                showNotification('کد خریدار قابل تغییر نیست', 'warning');
+                                            }
+                                        });
+
+                                        // Prevent copy/paste/cut
+                                        ['cut', 'copy', 'paste'].forEach(event => {
+                                            saleFileCodeField.addEventListener(event, function(e) {
+                                                if (event === 'paste' || event === 'cut') {
+                                                    e.preventDefault();
+                                                    showNotification('این فیلد قابل تغییر نیست', 'warning');
+                                                }
+                                            });
+                                        });
+                                    }
+
+                                    // Prevent input in rent fields
+                                    [rentFileCodeField, renterCodeField].forEach(field => {
+                                        if (field) {
+                                            field.addEventListener('input', function(e) {
+                                                e.target.value = '';
+                                                showNotification('این فیلد در حالت فروش غیرفعال است', 'info');
+                                            });
+
+                                            field.addEventListener('focus', function(e) {
+                                                showNotification('این فیلد برای خریداران غیرفعال است', 'info');
+                                                e.target.blur();
+                                            });
+                                        }
+                                    });
+                                }
+                                // BYBYBYBYBYBYBYBYBYBYBYBYBYBYBYBYBYBYBYBY
+                                
+                                // RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR
+                                function preventRenterFieldChanges() {
+                                    // Prevent changes to buyer_code
+                                    if (renterCodeField) {
+                                        renterCodeField.addEventListener('input', function(e) {
+                                            const originalValue = e.target.defaultValue;
+                                            if (e.target.value !== originalValue) {
+                                                e.target.value = originalValue;
+                                                showNotification('کد مستاجر قابل تغییر نیست', 'warning');
+                                            }
+                                        });
+
+                                        // Prevent copy/paste/cut
+                                        ['cut', 'copy', 'paste'].forEach(event => {
+                                            saleFileCodeField.addEventListener(event, function(e) {
+                                                if (event === 'paste' || event === 'cut') {
+                                                    e.preventDefault();
+                                                    showNotification('این فیلد قابل تغییر نیست', 'warning');
+                                                }
+                                            });
+                                        });
+                                    }
+
+                                    // Prevent input in sale fields
+                                    [saleFileCodeField, buyerCodeField].forEach(field => {
+                                        if (field) {
+                                            field.addEventListener('input', function(e) {
+                                                e.target.value = '';
+                                                showNotification('این فیلد در حالت اجاره غیرفعال است', 'info');
+                                            });
+
+                                            field.addEventListener('focus', function(e) {
+                                                showNotification('این فیلد برای مستاجران غیرفعال است', 'info');
+                                                e.target.blur();
+                                            });
+                                        }
+                                    });
+                                }
+                                // RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR
 
                                 function toggleFieldsBasedOnType() {
                                     const selectedType = typeField.value;
@@ -517,17 +630,31 @@
                                 }
                             });
 
-                            // Function to create session for sale file (called from detail page button)
-                            function createSessionForSaleFile(saleFileCode) {
-                                if (confirm('آیا می‌خواهید برای این فایل فروش، نشست جدید ایجاد کنید؟')) {
-                                    window.location.href = "{% url 'session_create' %}?sale_file_code=" + saleFileCode;
+                            // Function to create visit for sale file
+                            function createVisitForSaleFile(saleFileCode) {
+                                if (confirm('آیا می‌خواهید برای این فایل فروش، بازدید جدید ایجاد کنید؟')) {
+                                    window.location.href = "{% url 'visit_create' %}?sale_file_code=" + saleFileCode;
                                 }
                             }
 
-                            // Function to create session for rent file (called from detail page button)
-                            function createSessionForRentFile(rentFileCode) {
-                                if (confirm('آیا می‌خواهید برای این فایل اجاره، نشست جدید ایجاد کنید؟')) {
-                                    window.location.href = "{% url 'session_create' %}?rent_file_code=" + rentFileCode;
+                            // Function to create visit for rent file
+                            function createVisitForRentFile(rentFileCode) {
+                                if (confirm('آیا می‌خواهید برای این فایل اجاره، بازدید جدید ایجاد کنید؟')) {
+                                    window.location.href = "{% url 'visit_create' %}?rent_file_code=" + rentFileCode;
+                                }
+                            }
+
+                            // Function to create visit for buyer
+                            function createVisitForBuyer(buyerCode) {
+                                if (confirm('آیا می‌خواهید برای این فایل خریدار، بازدید جدید ایجاد کنید؟')) {
+                                    window.location.href = "{% url 'visit_create' %}?buyer_code=" + buyerCode;
+                                }
+                            }
+                            
+                            // Function to create visit for renter
+                            function createVisitForRenter(renterCode) {
+                                if (confirm('آیا می‌خواهید برای این فایل خریدار، بازدید جدید ایجاد کنید؟')) {
+                                    window.location.href = "{% url 'visit_create' %}?renter_code=" + renterCode;
                                 }
                             }
 

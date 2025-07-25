@@ -1869,6 +1869,12 @@ class VisitCreateView(PermissionRequiredMixin, CreateView):
         rent_file_code = self.request.GET.get('rent_file_code')
         if rent_file_code:
             kwargs['rent_file_code'] = rent_file_code
+        buyer_code = self.request.GET.get('buyer_code')
+        if buyer_code:
+            kwargs['buyer_code'] = buyer_code
+        renter_code = self.request.GET.get('renter_code')
+        if renter_code:
+            kwargs['renter_code'] = renter_code
         return kwargs
 
     def get_context_data(self, **kwargs):
@@ -1888,6 +1894,22 @@ class VisitCreateView(PermissionRequiredMixin, CreateView):
                 context['rent_file'] = rent_file
                 context['pre_selected_rent_file'] = True
             except models.RentFile.DoesNotExist:
+                pass
+        buyer_code = self.request.GET.get('buyer_code')
+        if buyer_code:
+            try:
+                buyer = models.Buyer.objects.get(code=buyer_code)
+                context['buyer'] = buyer
+                context['pre_selected_buyer'] = True
+            except models.Buyer.DoesNotExist:
+                pass
+        renter_code = self.request.GET.get('renter_code')
+        if renter_code:
+            try:
+                renter = models.Renter.objects.get(code=renter_code)
+                context['renter'] = renter
+                context['pre_selected_renter'] = True
+            except models.Renter.DoesNotExist:
                 pass
         return context
 
@@ -2077,6 +2099,12 @@ class SessionCreateView(PermissionRequiredMixin, CreateView):
         rent_file_code = self.request.GET.get('rent_file_code')
         if rent_file_code:
             kwargs['rent_file_code'] = rent_file_code
+        buyer_code = self.request.GET.get('buyer_code')
+        if buyer_code:
+            kwargs['buyer_code'] = buyer_code
+        renter_code = self.request.GET.get('renter_code')
+        if renter_code:
+            kwargs['renter_code'] = renter_code
         return kwargs
 
     def get_context_data(self, **kwargs):
@@ -2096,6 +2124,22 @@ class SessionCreateView(PermissionRequiredMixin, CreateView):
                 context['rent_file'] = rent_file
                 context['pre_selected_rent_file'] = True
             except models.RentFile.DoesNotExist:
+                pass
+        buyer_code = self.request.GET.get('buyer_code')
+        if buyer_code:
+            try:
+                buyer = models.Buyer.objects.get(code=buyer_code)
+                context['buyer'] = buyer
+                context['pre_selected_buyer'] = True
+            except models.Buyer.DoesNotExist:
+                pass
+        renter_code = self.request.GET.get('renter_code')
+        if renter_code:
+            try:
+                renter = models.Renter.objects.get(code=renter_code)
+                context['renter'] = renter
+                context['pre_selected_renter'] = True
+            except models.Renter.DoesNotExist:
                 pass
         return context
 
@@ -2337,5 +2381,6 @@ class TradeCodeView(PermissionRequiredMixin, UpdateView):
 
     def get_success_url(self):
         return reverse('trade_list')
+
 
 

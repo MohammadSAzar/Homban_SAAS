@@ -600,6 +600,8 @@ class VisitCreateForm(forms.ModelForm):
         self.user = kwargs.pop('user', None)
         sale_file_code = kwargs.pop('sale_file_code', None)
         rent_file_code = kwargs.pop('rent_file_code', None)
+        buyer_code = kwargs.pop('buyer_code', None)
+        renter_code = kwargs.pop('renter_code', None)
         super(VisitCreateForm, self).__init__(*args, **kwargs)
 
         self.fields['date'] = forms.ChoiceField(
@@ -658,6 +660,56 @@ class VisitCreateForm(forms.ModelForm):
                 'data-locked': 'rent',
                 'class': 'form-control form-control-xl form-control-outlined'
             })
+        if buyer_code:
+            self.fields['buyer_code'].initial = buyer_code
+            self.fields['type'].initial = 'sale'
+            self.fields['buyer_code'].widget.attrs.update({
+                'readonly': True,
+                'class': 'form-control form-control-xl form-control-outlined bg-light',
+                'data-locked': 'true',
+                'title': 'این کد از خریدار انتخاب شده پر شده و قابل تغییر نیست'
+            })
+            self.fields['renter_code'].widget.attrs.update({
+                'readonly': True,
+                'disabled': True,
+                'class': 'form-control form-control-xl form-control-outlined bg-secondary text-muted',
+                'placeholder': 'غیرفعال - خریدار انتخاب شده'
+            })
+            self.fields['rent_file_code'].widget.attrs.update({
+                'readonly': True,
+                'disabled': True,
+                'class': 'form-control form-control-xl form-control-outlined bg-secondary text-muted',
+                'placeholder': 'غیرفعال - خریدار انتخاب شده'
+            })
+            self.fields['type'].widget.attrs.update({
+                'data-locked': 'sale',
+                'class': 'form-control form-control-xl form-control-outlined'
+            })
+        if renter_code:
+            self.fields['renter_code'].initial = renter_code
+            self.fields['type'].initial = 'rent'
+            self.fields['renter_code'].widget.attrs.update({
+                'readonly': True,
+                'class': 'form-control form-control-xl form-control-outlined bg-light',
+                'data-locked': 'true',
+                'title': 'این کد از مستاجر انتخاب شده پر شده و قابل تغییر نیست'
+            })
+            self.fields['buyer_code'].widget.attrs.update({
+                'readonly': True,
+                'disabled': True,
+                'class': 'form-control form-control-xl form-control-outlined bg-secondary text-muted',
+                'placeholder': 'غیرفعال - مستاجر انتخاب شده'
+            })
+            self.fields['sale_file_code'].widget.attrs.update({
+                'readonly': True,
+                'disabled': True,
+                'class': 'form-control form-control-xl form-control-outlined bg-secondary text-muted',
+                'placeholder': 'غیرفعال - مستاجر انتخاب شده'
+            })
+            self.fields['type'].widget.attrs.update({
+                'data-locked': 'rent',
+                'class': 'form-control form-control-xl form-control-outlined'
+            })
         for field in visit_required_fields:
             self.fields[field].required = True
 
@@ -685,6 +737,8 @@ class VisitCreateForm(forms.ModelForm):
         renter_code = cleaned_data.get('renter_code')
         is_sale_file_locked = self.fields['sale_file_code'].widget.attrs.get('data-locked') == 'true'
         is_rent_file_locked = self.fields['rent_file_code'].widget.attrs.get('data-locked') == 'true'
+        is_buyer_locked = self.fields['buyer_code'].widget.attrs.get('data-locked') == 'true'
+        is_renter_locked = self.fields['renter_code'].widget.attrs.get('data-locked') == 'true'
 
         if is_sale_file_locked:
             if visit_type != 'sale':
@@ -699,6 +753,20 @@ class VisitCreateForm(forms.ModelForm):
             if rent_file_code:
                 cleaned_data['sale_file_code'] = ''
             if renter_code:
+                cleaned_data['buyer_code'] = ''
+        if is_buyer_locked:
+            if visit_type != 'sale':
+                self.add_error('type', 'نوع معامله باید "فروش" باشد - خریدار از قبل انتخاب شده است')
+            if rent_file_code:
+                cleaned_data['rent_file_code'] = ''
+            if renter_code:
+                cleaned_data['renter_code'] = ''
+        if is_renter_locked:
+            if visit_type != 'rent':
+                self.add_error('type', 'نوع معامله باید "اجاره" باشد - مستاجر از قبل انتخاب شده است')
+            if sale_file_code:
+                cleaned_data['sale_file_code'] = ''
+            if buyer_code:
                 cleaned_data['buyer_code'] = ''
 
         sale_file_codes = list(models.SaleFile.objects.values_list('code', flat=True))
@@ -794,6 +862,8 @@ class SessionCreateForm(forms.ModelForm):
         self.user = kwargs.pop('user', None)
         sale_file_code = kwargs.pop('sale_file_code', None)
         rent_file_code = kwargs.pop('rent_file_code', None)
+        buyer_code = kwargs.pop('buyer_code', None)
+        renter_code = kwargs.pop('renter_code', None)
         super(SessionCreateForm, self).__init__(*args, **kwargs)
 
         self.fields['date'] = forms.ChoiceField(
@@ -852,6 +922,56 @@ class SessionCreateForm(forms.ModelForm):
                 'data-locked': 'rent',
                 'class': 'form-control form-control-xl form-control-outlined'
             })
+        if buyer_code:
+            self.fields['buyer_code'].initial = buyer_code
+            self.fields['type'].initial = 'sale'
+            self.fields['buyer_code'].widget.attrs.update({
+                'readonly': True,
+                'class': 'form-control form-control-xl form-control-outlined bg-light',
+                'data-locked': 'true',
+                'title': 'این کد از خریدار انتخاب شده پر شده و قابل تغییر نیست'
+            })
+            self.fields['renter_code'].widget.attrs.update({
+                'readonly': True,
+                'disabled': True,
+                'class': 'form-control form-control-xl form-control-outlined bg-secondary text-muted',
+                'placeholder': 'غیرفعال - خریدار انتخاب شده'
+            })
+            self.fields['rent_file_code'].widget.attrs.update({
+                'readonly': True,
+                'disabled': True,
+                'class': 'form-control form-control-xl form-control-outlined bg-secondary text-muted',
+                'placeholder': 'غیرفعال - خریدار انتخاب شده'
+            })
+            self.fields['type'].widget.attrs.update({
+                'data-locked': 'sale',
+                'class': 'form-control form-control-xl form-control-outlined'
+            })
+        if renter_code:
+            self.fields['renter_code'].initial = renter_code
+            self.fields['type'].initial = 'rent'
+            self.fields['renter_code'].widget.attrs.update({
+                'readonly': True,
+                'class': 'form-control form-control-xl form-control-outlined bg-light',
+                'data-locked': 'true',
+                'title': 'این کد از مستاجر انتخاب شده پر شده و قابل تغییر نیست'
+            })
+            self.fields['buyer_code'].widget.attrs.update({
+                'readonly': True,
+                'disabled': True,
+                'class': 'form-control form-control-xl form-control-outlined bg-secondary text-muted',
+                'placeholder': 'غیرفعال - مستاجر انتخاب شده'
+            })
+            self.fields['sale_file_code'].widget.attrs.update({
+                'readonly': True,
+                'disabled': True,
+                'class': 'form-control form-control-xl form-control-outlined bg-secondary text-muted',
+                'placeholder': 'غیرفعال - مستاجر انتخاب شده'
+            })
+            self.fields['type'].widget.attrs.update({
+                'data-locked': 'rent',
+                'class': 'form-control form-control-xl form-control-outlined'
+            })
         for field in session_required_fields:
             self.fields[field].required = True
 
@@ -879,6 +999,8 @@ class SessionCreateForm(forms.ModelForm):
         renter_code = cleaned_data.get('renter_code')
         is_sale_file_locked = self.fields['sale_file_code'].widget.attrs.get('data-locked') == 'true'
         is_rent_file_locked = self.fields['rent_file_code'].widget.attrs.get('data-locked') == 'true'
+        is_buyer_locked = self.fields['buyer_code'].widget.attrs.get('data-locked') == 'true'
+        is_renter_locked = self.fields['renter_code'].widget.attrs.get('data-locked') == 'true'
 
         if is_sale_file_locked:
             if session_type != 'sale':
@@ -893,6 +1015,20 @@ class SessionCreateForm(forms.ModelForm):
             if rent_file_code:
                 cleaned_data['sale_file_code'] = ''
             if renter_code:
+                cleaned_data['buyer_code'] = ''
+        if is_buyer_locked:
+            if session_type != 'sale':
+                self.add_error('type', 'نوع معامله باید "فروش" باشد - خریدار از قبل انتخاب شده است')
+            if rent_file_code:
+                cleaned_data['rent_file_code'] = ''
+            if renter_code:
+                cleaned_data['renter_code'] = ''
+        if is_renter_locked:
+            if session_type != 'rent':
+                self.add_error('type', 'نوع معامله باید "اجاره" باشد - مستاجر از قبل انتخاب شده است')
+            if sale_file_code:
+                cleaned_data['sale_file_code'] = ''
+            if buyer_code:
                 cleaned_data['buyer_code'] = ''
 
         sale_file_codes = list(models.SaleFile.objects.values_list('code', flat=True))
@@ -1666,6 +1802,7 @@ class CombinedSessionResultForm(forms.Form):
     def save(self):
         self.boss_form.save()
         self.result_session_form.save()
+
 
 
 
