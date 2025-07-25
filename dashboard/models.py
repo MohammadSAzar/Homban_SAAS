@@ -34,7 +34,7 @@ def generate_unique_code_longer():
 def next_week_shamsi():
     days = []
     today = datetime.today()
-    for i in range(1, 8):
+    for i in range(0, 7):
         next_day = today + timedelta(days=i)
         weekday_en = next_day.strftime('%A')
         date_str = next_day.strftime('%Y/%m/%d')
@@ -55,7 +55,7 @@ def next_week_shamsi():
 def next_month_shamsi():
     days = []
     today = datetime.today()
-    for i in range(1, 31):
+    for i in range(0, 30):
         next_day = today + timedelta(days=i)
         weekday_en = next_day.strftime('%A')
         date_str = next_day.strftime('%Y/%m/%d')
