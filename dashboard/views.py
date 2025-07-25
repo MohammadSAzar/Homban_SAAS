@@ -318,7 +318,7 @@ class SaleFileListView(ReadOnlyPermissionMixin, ListView):
     model = models.SaleFile
     template_name = 'dashboard/files/sale_file_list.html'
     context_object_name = 'sale_files'
-    paginate_by = 4
+    paginate_by = 12
     permission_model = 'SaleFile'
 
     def get_queryset(self):
@@ -536,6 +536,11 @@ class SaleFileUpdateView(PermissionRequiredMixin, UpdateView):
         self.object = None
         return self.render_to_response(self.get_context_data(form=form))
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
 
 class SaleFileDeleteView(PermissionRequiredMixin, DeleteView):
     model = models.SaleFile
@@ -559,7 +564,7 @@ class RentFileListView(ReadOnlyPermissionMixin, ListView):
     model = models.RentFile
     template_name = 'dashboard/files/rent_file_list.html'
     context_object_name = 'rent_files'
-    paginate_by = 10
+    paginate_by = 12
     permission_model = 'RentFile'
 
     def get_queryset(self):
@@ -792,6 +797,11 @@ class RentFileUpdateView(PermissionRequiredMixin, UpdateView):
     def form_invalid(self, form):
         self.object = None
         return self.render_to_response(self.get_context_data(form=form))
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
 
 
 class RentFileDeleteView(PermissionRequiredMixin, DeleteView):

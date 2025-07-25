@@ -49,7 +49,7 @@
                         <div class="card-inner">
                             <div class="user-card user-card-s2">
                                 <div class="user-info">
-                                    <div style="height: 4em;!important; -webkit-line-clamp: 2;!important;">
+                                    <div class="justify-center"  style="height: 4em;!important; -webkit-line-clamp: 2;!important;">
                                         <h6>{{ sale_file.title|linebreaksbr|farsi_number }}</h6>
                                     </div>
                                     <div class="badge bg-light rounded-pill ucap">خرید و فروش</div>
@@ -95,7 +95,7 @@
                                 <div class="col-4">
                                     <div class="profile-stats">
                                         <span class="amount">{{ sale_file.room }}</span>
-                                        <span class="sub-text">تعداد</span>
+                                        <span class="sub-text">اتاق</span>
                                     </div>
                                 </div>
                             </div>
@@ -414,7 +414,7 @@
                                             <div class="d-flex justify-content-center">
                                                 <div style="display: flex; flex-direction: column; align-items: center;">
                                                     <h6 class="lead-text">
-                                                        <span class="text-soft ml-1">منبع آگهی:</span>
+                                                        <span class="text-soft ml-1">منبع:</span>
                                                     </h6>
                                                     <h6 class="lead-text">
                                                         {% if sale_file.source %}
@@ -437,7 +437,7 @@
                                                 <div class="d-flex justify-content-center">
                                                     <div style="display: flex; flex-direction: column; align-items: center;">
                                                         <h6 class="lead-text">
-                                                            <span class="text-soft ml-1">شخص آگهی‌دهنده:</span>
+                                                            <span class="text-soft ml-1">آگهی‌دهنده:</span>
                                                         </h6>
                                                         <h6 class="lead-text">
                                                             {% if sale_file.person %}
@@ -460,7 +460,7 @@
                                             <div class="d-flex justify-content-center">
                                                 <div style="display: flex; flex-direction: column; align-items: center;">
                                                     <h6 class="lead-text">
-                                                        <span class="text-soft ml-1">حداقل قیمت ممکن:</span>
+                                                        <span class="text-soft ml-1">حداقل قیمت:</span>
                                                     </h6>
                                                     <h6 class="lead-text">
                                                         {% if sale_file.price_min %}
@@ -504,7 +504,7 @@
                                             <div class="d-flex justify-content-center">
                                                 <div style="display: flex; flex-direction: column; align-items: center;">
                                                     <h6 class="lead-text">
-                                                        <span class="text-soft ml-1">تعداد طبقات ساختمان:</span>
+                                                        <span class="text-soft ml-1">طبقات ساختمان:</span>
                                                     </h6>
                                                     <h6 class="lead-text">
                                                         {% if sale_file.file_levels %}
@@ -526,7 +526,7 @@
                                             <div class="d-flex justify-content-center">
                                                 <div style="display: flex; flex-direction: column; align-items: center;">
                                                     <h6 class="lead-text">
-                                                        <span class="text-soft ml-1">تعداد واحد در هر طبقه:</span>
+                                                        <span class="text-soft ml-1">واحد در طبقه:</span>
                                                     </h6>
                                                     <h6 class="lead-text">
                                                         {% if sale_file.apartments_per_level %}
@@ -548,7 +548,7 @@
                                             <div class="d-flex justify-content-center">
                                                 <div style="display: flex; flex-direction: column; align-items: center;">
                                                     <h6 class="lead-text">
-                                                        <span class="text-soft ml-1">وضعیت بازسازی:</span>
+                                                        <span class="text-soft ml-1">بازسازی:</span>
                                                     </h6>
                                                     <h6 class="lead-text">
                                                         {% if sale_file.restoration %}
@@ -592,7 +592,7 @@
                                             <div class="d-flex justify-content-center">
                                                 <div style="display: flex; flex-direction: column; align-items: center;">
                                                     <h6 class="lead-text">
-                                                        <span class="text-soft ml-1">وضعیت بالکن:</span>
+                                                        <span class="text-soft ml-1">بالکن:</span>
                                                     </h6>
                                                     <h6 class="lead-text">
                                                         {% if sale_file.balcony %}
@@ -658,7 +658,7 @@
                                             <div class="d-flex justify-content-center">
                                                 <div style="display: flex; flex-direction: column; align-items: center;">
                                                     <h6 class="lead-text">
-                                                        <span class="text-soft ml-1">سیستم سرمایش:</span>
+                                                        <span class="text-soft ml-1">سرمایش:</span>
                                                     </h6>
                                                     <h6 class="lead-text">
                                                         {% if sale_file.cooling %}
@@ -680,7 +680,7 @@
                                             <div class="d-flex justify-content-center">
                                                 <div style="display: flex; flex-direction: column; align-items: center;">
                                                     <h6 class="lead-text">
-                                                        <span class="text-soft ml-1">سیستم گرمایش:</span>
+                                                        <span class="text-soft ml-1">گرمایش:</span>
                                                     </h6>
                                                     <h6 class="lead-text">
                                                         {% if sale_file.heating %}
@@ -725,11 +725,11 @@
                                                 <div class="d-flex justify-content-center">
                                                     <div style="display: flex; flex-direction: column; align-items: center;">
                                                         <h6 class="lead-text">
-                                                            <span class="text-soft ml-1">آدرس فایل:</span>
+                                                            <span class="text-soft ml-1">آدرس:</span>
                                                         </h6>
                                                         <h6 class="lead-text">
                                                             {% if sale_file.address %}
-                                                                <span class="text-soft ml-1">{{ sale_file.address|linebreaksbr|farsi_number }}</span>
+                                                                <p class="text-soft ml-1">{{ sale_file.address|linebreaksbr|farsi_number }}</p>
                                                             {% else %}
                                                                 <span class="text-soft ml-1">-------------------------------------------------</span>
                                                             {% endif %}
@@ -746,11 +746,11 @@
                                                 <div class="d-flex justify-content-center">
                                                     <div style="display: flex; flex-direction: column; align-items: center;">
                                                         <h6 class="lead-text">
-                                                            <span class="text-soft ml-1">آدرس فایل:</span>
+                                                            <span class="text-soft ml-1">آدرس:</span>
                                                         </h6>
                                                         <h6 class="lead-text">
                                                             {% if sale_file.address %}
-                                                                <span class="text-soft ml-1">{{ sale_file.address|linebreaksbr|farsi_number }}</span>
+                                                                <p class="text-soft ml-1">{{ sale_file.address|linebreaksbr|farsi_number }}</p>
                                                             {% else %}
                                                                 <span class="text-soft ml-1">-------------------------------------------------</span>
                                                             {% endif %}
@@ -769,7 +769,7 @@
                                             <div class="d-flex justify-content-center">
                                                 <div style="display: flex; flex-direction: column; align-items: center;">
                                                     <h6 class="lead-text">
-                                                        <span class="text-soft ml-1">توضیحات آگهی:</span>
+                                                        <span class="text-soft ml-1">توضیحات:</span>
                                                     </h6>
                                                     <h6 class="lead-text">
                                                         {% if sale_file.description %}

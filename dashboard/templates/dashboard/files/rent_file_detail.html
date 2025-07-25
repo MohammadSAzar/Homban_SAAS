@@ -41,7 +41,7 @@
         <div class="row g-gs">
 
             <!-- Main (Sidebar) -->
-            <div class="col-lg-4 col-xl-4  col-xxl-4">
+            <div class="col-lg-4 col-xl-4 col-xxl-4">
                 <div class="card">
                     <div class="card-inner-group" >
 
@@ -49,10 +49,10 @@
                         <div class="card-inner">
                             <div class="user-card user-card-s2">
                                 <div class="user-info">
-                                    <div style="height: 4em;!important; -webkit-line-clamp: 2;!important;">
+                                    <div class="justify-center" style="height: 4em;!important; -webkit-line-clamp: 2;!important;">
                                         <h6>{{ rent_file.title|linebreaksbr|farsi_number }}</h6>
                                     </div>
-                                    <div class="badge bg-light rounded-pill ucap">خرید و فروش</div>
+                                    <div class="badge bg-light rounded-pill ucap">رهن و اجاره</div>
                                     <div style="font-size: 0.9em;">کد فایل: {{ rent_file.code }}</div>
 
                                     <div style="font-size: 0.9em; margin-top: 1em;">
@@ -95,7 +95,7 @@
                                 <div class="col-4">
                                     <div class="profile-stats">
                                         <span class="amount">{{ rent_file.room }}</span>
-                                        <span class="sub-text">تعداد</span>
+                                        <span class="sub-text">اتاق</span>
                                     </div>
                                 </div>
                             </div>
@@ -216,7 +216,7 @@
                     <div class="card-inner">
 
                         <!-- ُShare -->
-                        <div style="margin-bottom: 1em;">
+                        <div  style="margin-bottom: 1em;">
                             <ul class="nk-block-tools g-3">
 
                                 <!-- Zip -->
@@ -268,7 +268,7 @@
                         <!-- end: Share -->
 
                         <!-- Gallery -->
-                        <div class="nk-block" style="margin-top: 2em;">
+                        <div class="nk-block"  style="margin-top: 2em;">
 
                             <!-- Title (images) -->
                             <div class="nk-block-head nk-block-head-sm">
@@ -388,7 +388,7 @@
                         <!-- end: Gallery -->
 
                         <!-- Cards -->
-                        <div class="nk-block" style="margin-top: 3em;">
+                        <div class="nk-block"  style="margin-top: 3em;">
                             <div class="row">
 
                                 <!-- Title (other) -->
@@ -407,7 +407,7 @@
                                             <div class="d-flex justify-content-center">
                                                 <div style="display: flex; flex-direction: column; align-items: center;">
                                                     <h6 class="lead-text">
-                                                        <span class="text-soft ml-1">منبع آگهی:</span>
+                                                        <span class="text-soft ml-1">منبع:</span>
                                                     </h6>
                                                     <h6 class="lead-text">
                                                         {% if rent_file.source %}
@@ -430,7 +430,7 @@
                                                 <div class="d-flex justify-content-center">
                                                     <div style="display: flex; flex-direction: column; align-items: center;">
                                                         <h6 class="lead-text">
-                                                            <span class="text-soft ml-1">شخص آگهی‌دهنده:</span>
+                                                            <span class="text-soft ml-1">آگهی‌دهنده:</span>
                                                         </h6>
                                                         <h6 class="lead-text">
                                                             {% if rent_file.person %}
@@ -453,7 +453,7 @@
                                             <div class="d-flex justify-content-center">
                                                 <div style="display: flex; flex-direction: column; align-items: center;">
                                                     <h6 class="lead-text">
-                                                        <span class="text-soft ml-1">حداقل رهن ممکن:</span>
+                                                        <span class="text-soft ml-1">حداقل رهن:</span>
                                                     </h6>
                                                     <h6 class="lead-text">
                                                         {% if rent_file.deposit_min %}
@@ -475,7 +475,7 @@
                                             <div class="d-flex justify-content-center">
                                                 <div style="display: flex; flex-direction: column; align-items: center;">
                                                     <h6 class="lead-text">
-                                                        <span class="text-soft ml-1">حداقل اجاره ممکن:</span>
+                                                        <span class="text-soft ml-1">حداقل اجاره:</span>
                                                     </h6>
                                                     <h6 class="lead-text">
                                                         {% if rent_file.rent_min %}
@@ -497,7 +497,7 @@
                                             <div class="d-flex justify-content-center">
                                                 <div style="display: flex; flex-direction: column; align-items: center;">
                                                     <h6 class="lead-text">
-                                                        <span class="text-soft ml-1">جهت ملک:</span>
+                                                        <span class="text-soft ml-1">قابل تبدیل:</span>
                                                     </h6>
                                                     <h6 class="lead-text">
                                                         {% if rent_file.convertable %}
@@ -541,7 +541,7 @@
                                             <div class="d-flex justify-content-center">
                                                 <div style="display: flex; flex-direction: column; align-items: center;">
                                                     <h6 class="lead-text">
-                                                        <span class="text-soft ml-1">تعداد طبقات ساختمان:</span>
+                                                        <span class="text-soft ml-1">طبقات ساختمان:</span>
                                                     </h6>
                                                     <h6 class="lead-text">
                                                         {% if rent_file.file_levels %}
@@ -556,14 +556,14 @@
                                     </div>
                                 </div>
 
-                                 <!-- Aparts -->
+                                <!-- Aparts -->
                                 <div class="col-xl-12 col-xxl-3" style="margin-top: 13px; box-shadow: rgba(99, 99, 99, 0.35) 0px 2px 8px 0px;">
                                     <div class="card">
                                         <div class="card-inner">
                                             <div class="d-flex justify-content-center">
                                                 <div style="display: flex; flex-direction: column; align-items: center;">
                                                     <h6 class="lead-text">
-                                                        <span class="text-soft ml-1">تعداد واحد در هر طبقه:</span>
+                                                        <span class="text-soft ml-1">واحد در طبقه:</span>
                                                     </h6>
                                                     <h6 class="lead-text">
                                                         {% if rent_file.apartments_per_level %}
@@ -585,7 +585,7 @@
                                             <div class="d-flex justify-content-center">
                                                 <div style="display: flex; flex-direction: column; align-items: center;">
                                                     <h6 class="lead-text">
-                                                        <span class="text-soft ml-1">وضعیت بازسازی:</span>
+                                                        <span class="text-soft ml-1">بازسازی:</span>
                                                     </h6>
                                                     <h6 class="lead-text">
                                                         {% if rent_file.restoration %}
@@ -629,7 +629,7 @@
                                             <div class="d-flex justify-content-center">
                                                 <div style="display: flex; flex-direction: column; align-items: center;">
                                                     <h6 class="lead-text">
-                                                        <span class="text-soft ml-1">وضعیت بالکن:</span>
+                                                        <span class="text-soft ml-1">بالکن:</span>
                                                     </h6>
                                                     <h6 class="lead-text">
                                                         {% if rent_file.balcony %}
@@ -644,7 +644,7 @@
                                     </div>
                                 </div>
 
-                                 <!-- Floor -->
+                                <!-- Floor -->
                                 <div class="col-xl-12 col-xxl-3" style="margin-top: 13px; box-shadow: rgba(99, 99, 99, 0.35) 0px 2px 8px 0px;">
                                     <div class="card">
                                         <div class="card-inner">
@@ -695,7 +695,7 @@
                                             <div class="d-flex justify-content-center">
                                                 <div style="display: flex; flex-direction: column; align-items: center;">
                                                     <h6 class="lead-text">
-                                                        <span class="text-soft ml-1">سیستم سرمایش:</span>
+                                                        <span class="text-soft ml-1">سرمایش:</span>
                                                     </h6>
                                                     <h6 class="lead-text">
                                                         {% if rent_file.cooling %}
@@ -717,7 +717,7 @@
                                             <div class="d-flex justify-content-center">
                                                 <div style="display: flex; flex-direction: column; align-items: center;">
                                                     <h6 class="lead-text">
-                                                        <span class="text-soft ml-1">سیستم گرمایش:</span>
+                                                        <span class="text-soft ml-1">گرمایش:</span>
                                                     </h6>
                                                     <h6 class="lead-text">
                                                         {% if rent_file.heating %}
@@ -755,49 +755,26 @@
                                 </div>
 
                                 <!-- Address -->
-                                {% if rent_file.source == 'PN' %}
-                                    <div class="col-xl-12 col-xxl-6" style="margin-top: 13px; box-shadow: rgba(99, 99, 99, 0.35) 0px 2px 8px 0px;">
-                                        <div class="card">
-                                            <div class="card-inner">
-                                                <div class="d-flex justify-content-center">
-                                                    <div style="display: flex; flex-direction: column; align-items: center;">
-                                                        <h6 class="lead-text">
-                                                            <span class="text-soft ml-1">آدرس فایل:</span>
-                                                        </h6>
-                                                        <h6 class="lead-text">
-                                                            {% if rent_file.address %}
-                                                                <span class="text-soft ml-1">{{ rent_file.address|linebreaksbr|farsi_number }}</span>
-                                                            {% else %}
-                                                                <span class="text-soft ml-1">-------------------------------------------------</span>
-                                                            {% endif %}
-                                                        </h6>
-                                                    </div>
+                                <div class="col-xl-12 col-xxl-12" style="margin-top: 13px; box-shadow: rgba(99, 99, 99, 0.35) 0px 2px 8px 0px;">
+                                    <div class="card">
+                                        <div class="card-inner">
+                                            <div class="d-flex justify-content-center">
+                                                <div style="display: flex; flex-direction: column; align-items: center;">
+                                                    <h6 class="lead-text">
+                                                        <span class="text-soft ml-1">آدرس:</span>
+                                                    </h6>
+                                                    <h6 class="lead-text">
+                                                        {% if rent_file.address %}
+                                                            <p class="text-soft ml-1">{{ rent_file.address|linebreaksbr|farsi_number }}</p>
+                                                        {% else %}
+                                                            <span class="text-soft ml-1">-------------------------------------------------</span>
+                                                        {% endif %}
+                                                    </h6>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                {% else %}
-                                    <div class="col-xl-12 col-xxl-9" style="margin-top: 13px; box-shadow: rgba(99, 99, 99, 0.35) 0px 2px 8px 0px;">
-                                        <div class="card">
-                                            <div class="card-inner">
-                                                <div class="d-flex justify-content-center">
-                                                    <div style="display: flex; flex-direction: column; align-items: center;">
-                                                        <h6 class="lead-text">
-                                                            <span class="text-soft ml-1">آدرس فایل:</span>
-                                                        </h6>
-                                                        <h6 class="lead-text">
-                                                            {% if rent_file.address %}
-                                                                <span class="text-soft ml-1">{{ rent_file.address|linebreaksbr|farsi_number }}</span>
-                                                            {% else %}
-                                                                <span class="text-soft ml-1">-------------------------------------------------</span>
-                                                            {% endif %}
-                                                        </h6>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                {% endif %}
+                                </div>
 
                                 <!-- Description -->
                                 <div class="col-xl-12 col-xxl-12" style="margin-top: 13px; box-shadow: rgba(99, 99, 99, 0.35) 0px 2px 8px 0px;">
@@ -806,7 +783,7 @@
                                             <div class="d-flex justify-content-center">
                                                 <div style="display: flex; flex-direction: column; align-items: center;">
                                                     <h6 class="lead-text">
-                                                        <span class="text-soft ml-1">توضیحات آگهی:</span>
+                                                        <span class="text-soft ml-1">توضیحات:</span>
                                                     </h6>
                                                     <h6 class="lead-text">
                                                         {% if rent_file.description %}
@@ -834,5 +811,6 @@
     </div>
 
 {% endblock %}
+
 
 
