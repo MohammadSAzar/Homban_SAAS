@@ -1863,7 +1863,33 @@ class VisitCreateView(PermissionRequiredMixin, CreateView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs['user'] = self.request.user
+        sale_file_code = self.request.GET.get('sale_file_code')
+        if sale_file_code:
+            kwargs['sale_file_code'] = sale_file_code
+        rent_file_code = self.request.GET.get('rent_file_code')
+        if rent_file_code:
+            kwargs['rent_file_code'] = rent_file_code
         return kwargs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        sale_file_code = self.request.GET.get('sale_file_code')
+        if sale_file_code:
+            try:
+                sale_file = models.SaleFile.objects.get(code=sale_file_code)
+                context['sale_file'] = sale_file
+                context['pre_selected_sale_file'] = True
+            except models.SaleFile.DoesNotExist:
+                pass
+        rent_file_code = self.request.GET.get('rent_file_code')
+        if rent_file_code:
+            try:
+                rent_file = models.RentFile.objects.get(code=rent_file_code)
+                context['rent_file'] = rent_file
+                context['pre_selected_rent_file'] = True
+            except models.RentFile.DoesNotExist:
+                pass
+        return context
 
     def post(self, request, *args, **kwargs):
         form = self.get_form()
@@ -1998,22 +2024,22 @@ class SessionListView(ReadOnlyPermissionMixin, ListView):
             return queryset
         else:
             if not self.request.user.sub_district:
-                return models.Visit.objects.none()
+                return models.Session.objects.none()
 
             user_sub_district = self.request.user.sub_district
-            sale_visits = models.Session.objects.filter(
+            sale_sessions = models.Session.objects.filter(
                 sale_file_code__isnull=False,
                 sale_file_code__in=models.SaleFile.objects.filter(
                     sub_district=user_sub_district
                 ).values_list('code', flat=True)
             )
-            rent_visits = models.Visit.objects.filter(
+            rent_sessions = models.Session.objects.filter(
                 rent_file_code__isnull=False,
                 rent_file_code__in=models.RentFile.objects.filter(
                     sub_district=user_sub_district
                 ).values_list('code', flat=True)
             )
-            queryset = (sale_visits | rent_visits).distinct()
+            queryset = (sale_sessions | rent_sessions).distinct()
             queryset = queryset.filter(agent=self.request.user)
             form = forms.ServiceFilterForm(self.request.GET)
             if form.is_valid():
@@ -2045,7 +2071,33 @@ class SessionCreateView(PermissionRequiredMixin, CreateView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs['user'] = self.request.user
+        sale_file_code = self.request.GET.get('sale_file_code')
+        if sale_file_code:
+            kwargs['sale_file_code'] = sale_file_code
+        rent_file_code = self.request.GET.get('rent_file_code')
+        if rent_file_code:
+            kwargs['rent_file_code'] = rent_file_code
         return kwargs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        sale_file_code = self.request.GET.get('sale_file_code')
+        if sale_file_code:
+            try:
+                sale_file = models.SaleFile.objects.get(code=sale_file_code)
+                context['sale_file'] = sale_file
+                context['pre_selected_sale_file'] = True
+            except models.SaleFile.DoesNotExist:
+                pass
+        rent_file_code = self.request.GET.get('rent_file_code')
+        if rent_file_code:
+            try:
+                rent_file = models.RentFile.objects.get(code=rent_file_code)
+                context['rent_file'] = rent_file
+                context['pre_selected_rent_file'] = True
+            except models.RentFile.DoesNotExist:
+                pass
+        return context
 
     def post(self, request, *args, **kwargs):
         form = self.get_form()
@@ -2059,6 +2111,7 @@ class SessionCreateView(PermissionRequiredMixin, CreateView):
         return super().form_valid(form)
 
     def form_invalid(self, form):
+        self.object = None
         return self.render_to_response(self.get_context_data(form=form))
 
     def get_success_url(self):

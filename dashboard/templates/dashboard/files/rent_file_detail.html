@@ -158,32 +158,49 @@
                                 <!-- Parking -->
                                 <div class="col-4">
                                     <div class="profile-stats">
-                                        {% if rent_file.parking == 'has' %}
-                                            <span class="sub-text" style="color: green; font-size: 1em; border-bottom: green 1px solid">پارکینگ</span>
+                                        {% if sale_file.parking == 'has' %}
+                                            <span class="sub-text" style="color: green; font-size: 0.8em; border-bottom: green 1px solid">پارکینگ</span>
                                         {% else %}
-                                            <span class="sub-text" style="color: red; font-size: 1em; border-bottom: red 1px solid">پارکینگ</span>
+                                            <span class="sub-text" style="color: red; font-size: 0.8em; border-bottom: red 1px solid">پارکینگ</span>
                                         {% endif %}
                                     </div>
                                 </div>
                                 <!-- Elevator -->
                                 <div class="col-4">
                                     <div class="profile-stats">
-                                        {% if rent_file.elevator == 'has' %}
-                                            <span class="sub-text" style="color: green; font-size: 1em; border-bottom: green 1px solid">آسانسور</span>
+                                        {% if sale_file.elevator == 'has' %}
+                                            <span class="sub-text" style="color: green; font-size: 0.8em; border-bottom: green 1px solid">آسانسور</span>
                                         {% else %}
-                                            <span class="sub-text" style="color: red; font-size: 1em; border-bottom: red 1px solid">آسانسور</span>
+                                            <span class="sub-text" style="color: red; font-size: 0.8em; border-bottom: red 1px solid">آسانسور</span>
                                         {% endif %}
                                     </div>
                                 </div>
                                 <!-- Warehouse -->
                                 <div class="col-4">
                                     <div class="profile-stats">
-                                        {% if rent_file.warehouse == 'has' %}
-                                            <span class="sub-text" style="color: green; font-size: 1em; border-bottom: green 1px solid">انباری</span>
+                                        {% if sale_file.warehouse == 'has' %}
+                                            <span class="sub-text" style="color: green; font-size: 0.8em; border-bottom: green 1px solid">انباری</span>
                                         {% else %}
-                                            <span class="sub-text" style="color: red; font-size: 1em; border-bottom: red 1px solid">انباری</span>
+                                            <span class="sub-text" style="color: red; font-size: 0.8em; border-bottom: red 1px solid">انباری</span>
                                         {% endif %}
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Services Buttons -->
+                        <div class="card-inner">
+                            <div class="row text-center">
+                                <div style="margin-top: 1em;">
+                                    <a href="{% url 'visit_create' %}?rent_file_code={{ rent_file.code }}" class="btn btn-primary" style="font-size: 0.75em; margin-top: 0.4em;">
+                                        ایجاد بازدید
+                                    </a>
+                                    <a href="{% url 'session_create' %}?rent_file_code={{ rent_file.code }}" class="btn btn-primary" style="font-size: 0.75em; margin-top: 0.4em;">
+                                        ایجاد نشست
+                                    </a>
+{#                                    <a href="{% url 'visit_create' %}?rent_file_code={{ rent_file.code }}" class="btn btn-primary" style="font-size: 0.75em; margin-top: 0.4em;">#}
+{#                                        ایجاد بازدید#}
+{#                                    </a>#}
                                 </div>
                             </div>
                         </div>
@@ -817,8 +834,5 @@
     </div>
 
 {% endblock %}
-
-
-
 
 

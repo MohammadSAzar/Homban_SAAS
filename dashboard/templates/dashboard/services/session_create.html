@@ -40,15 +40,20 @@
                         <!-- Form -->
                         <form class="row gy-4" method="post" enctype="multipart/form-data" novalidate>
                             {% csrf_token %}
-                        
+
                             {% if request.user.title == 'bs' %}
-                                
+
                                 <!-- type -->
                                 <div class="col-lg-3 col-sm-3">
                                     <div class="form-group">
                                         <div class="form-control-wrap">
                                             <label class="form-label" for="{{ form.type.id_for_label }}">نوع معامله</label>
                                             {% render_field form.type id="type" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                            {% if pre_selected_sale_file %}
+                                                <small class="form-text text-info">
+                                                    <i class="fas fa-lock"></i>
+                                                </small>
+                                            {% endif %}
                                         </div>
                                         {% if form.type.errors %}
                                             {% for error in form.type.errors %}
@@ -57,7 +62,7 @@
                                         {% endif %}
                                     </div>
                                 </div>
-    
+
                                 <!-- agent -->
                                 <div class="col-lg-3 col-sm-3">
                                     <div class="form-group">
@@ -72,13 +77,13 @@
                                         {% endif %}
                                     </div>
                                 </div>
-    
+
                                 <!-- date -->
                                 <div class="col-lg-3 col-sm-3">
                                     <div class="form-group">
                                         <div class="form-control-wrap">
                                             <label class="form-label" for="{{ form.date.id_for_label }}">تاریخ نشست</label>
-                                            {% render_field form.date id="type" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                            {% render_field form.date id="date" type="text" class="form-control form-control-xl form-control-outlined" %}
                                         </div>
                                         {% if form.date.errors %}
                                             {% for error in form.date.errors %}
@@ -87,13 +92,13 @@
                                         {% endif %}
                                     </div>
                                 </div>
-    
+
                                 <!-- time -->
                                 <div class="col-lg-3 col-sm-3">
                                     <div class="form-group">
                                         <div class="form-control-wrap">
                                             <label class="form-label" for="{{ form.time.id_for_label }}">زمان نشست</label>
-                                            {% render_field form.time id="type" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                            {% render_field form.time id="time" type="text" class="form-control form-control-xl form-control-outlined" %}
                                         </div>
                                         {% if form.time.errors %}
                                             {% for error in form.time.errors %}
@@ -104,13 +109,18 @@
                                 </div>
 
                             {% else %}
-                                
+
                                 <!-- type -->
                                 <div class="col-lg-4 col-sm-4">
                                     <div class="form-group">
                                         <div class="form-control-wrap">
                                             <label class="form-label" for="{{ form.type.id_for_label }}">نوع معامله</label>
                                             {% render_field form.type id="type" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                            {% if pre_selected_sale_file %}
+                                                <small class="form-text text-info">
+                                                    <i class="fas fa-lock"></i>
+                                                </small>
+                                            {% endif %}
                                         </div>
                                         {% if form.type.errors %}
                                             {% for error in form.type.errors %}
@@ -119,13 +129,13 @@
                                         {% endif %}
                                     </div>
                                 </div>
-    
+
                                 <!-- date -->
                                 <div class="col-lg-4 col-sm-4">
                                     <div class="form-group">
                                         <div class="form-control-wrap">
                                             <label class="form-label" for="{{ form.date.id_for_label }}">تاریخ نشست</label>
-                                            {% render_field form.date id="type" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                            {% render_field form.date id="date" type="text" class="form-control form-control-xl form-control-outlined" %}
                                         </div>
                                         {% if form.date.errors %}
                                             {% for error in form.date.errors %}
@@ -134,13 +144,13 @@
                                         {% endif %}
                                     </div>
                                 </div>
-    
+
                                 <!-- time -->
                                 <div class="col-lg-4 col-sm-4">
                                     <div class="form-group">
                                         <div class="form-control-wrap">
                                             <label class="form-label" for="{{ form.time.id_for_label }}">زمان نشست</label>
-                                            {% render_field form.time id="type" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                            {% render_field form.time id="time" type="text" class="form-control form-control-xl form-control-outlined" %}
                                         </div>
                                         {% if form.time.errors %}
                                             {% for error in form.time.errors %}
@@ -151,13 +161,23 @@
                                 </div>
 
                             {% endif %}
-                        
+
                             <!-- sale_file_code -->
                             <div class="col-lg-3 col-sm-3">
                                 <div class="form-group">
                                     <div class="form-control-wrap">
-                                        <label class="form-label" for="{{ form.sale_file_code.id_for_label }}">کد فایل فروش</label>
+                                        <label class="form-label" for="{{ form.sale_file_code.id_for_label }}">
+                                            کد فایل فروش
+                                            {% if pre_selected_sale_file %}
+                                                <i class="fas fa-lock text-primary" title="قفل شده"></i>
+                                            {% endif %}
+                                        </label>
                                         {% render_field form.sale_file_code id="sale_file_code" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                        {% if pre_selected_sale_file %}
+                                            <small class="form-text text-muted">
+                                                <i class="fas fa-info-circle"></i>
+                                            </small>
+                                        {% endif %}
                                     </div>
                                     {% if form.sale_file_code.errors %}
                                         {% for error in form.sale_file_code.errors %}
@@ -166,13 +186,23 @@
                                     {% endif %}
                                 </div>
                             </div>
-                        
+
                             <!-- rent_file_code -->
                             <div class="col-lg-3 col-sm-3">
                                 <div class="form-group">
                                     <div class="form-control-wrap">
-                                        <label class="form-label" for="{{ form.rent_file_code.id_for_label }}">کد فایل اجاره</label>
+                                        <label class="form-label" for="{{ form.rent_file_code.id_for_label }}">
+                                            کد فایل اجاره
+                                            {% if pre_selected_sale_file %}
+                                                <i class="fas fa-ban text-muted" title="غیرفعال"></i>
+                                            {% endif %}
+                                        </label>
                                         {% render_field form.rent_file_code id="rent_file_code" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                        {% if pre_selected_sale_file %}
+                                            <small class="form-text text-muted">
+                                                <i class="fas fa-exclamation-triangle"></i>
+                                            </small>
+                                        {% endif %}
                                     </div>
                                     {% if form.rent_file_code.errors %}
                                         {% for error in form.rent_file_code.errors %}
@@ -181,7 +211,7 @@
                                     {% endif %}
                                 </div>
                             </div>
-                        
+
                             <!-- buyer_code -->
                             <div class="col-lg-3 col-sm-3">
                                 <div class="form-group">
@@ -196,13 +226,23 @@
                                     {% endif %}
                                 </div>
                             </div>
-                        
+
                             <!-- renter_code -->
                             <div class="col-lg-3 col-sm-3">
                                 <div class="form-group">
                                     <div class="form-control-wrap">
-                                        <label class="form-label" for="{{ form.renter_code.id_for_label }}">کد مستاجر</label>
+                                        <label class="form-label" for="{{ form.renter_code.id_for_label }}">
+                                            کد مستاجر
+                                            {% if pre_selected_sale_file %}
+                                                <i class="fas fa-ban text-muted" title="غیرفعال"></i>
+                                            {% endif %}
+                                        </label>
                                         {% render_field form.renter_code id="renter_code" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                        {% if pre_selected_sale_file %}
+                                            <small class="form-text text-muted">
+                                                <i class="fas fa-exclamation-triangle"></i>
+                                            </small>
+                                        {% endif %}
                                     </div>
                                     {% if form.renter_code.errors %}
                                         {% for error in form.renter_code.errors %}
@@ -211,7 +251,7 @@
                                     {% endif %}
                                 </div>
                             </div>
-                        
+
                             <!-- description -->
                             <div class="col-lg-12 col-sm-12">
                                 <div class="form-group">
@@ -226,13 +266,273 @@
                                     {% endif %}
                                 </div>
                             </div>
-                        
+
                             <!-- Submit -->
                             <div class="nk-fmg-actions" style="margin-top: 3em;">
+                                <a href="{% url 'dashboard' %}" class="btn btn-danger" style="line-height: 30px; margin-left: 10px;">انصراف</a>
                                 <button type="submit" class="btn btn-primary" style="line-height: 30px;">ثبت اطلاعات</button>
                             </div>
                         </form>
-                        <!-- end: Form -->    
+                        <!-- end: Form -->
+
+                        <!-- JS -->
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function() {
+                                const typeField = document.getElementById('type');
+                                const saleFileCodeField = document.getElementById('sale_file_code');
+                                const rentFileCodeField = document.getElementById('rent_file_code');
+                                const buyerCodeField = document.getElementById('buyer_code');
+                                const renterCodeField = document.getElementById('renter_code');
+
+                                // Check if we have a pre-selected sale file
+                                const isSalePreSelected = {{ pre_selected_sale_file|yesno:"true,false" }};
+
+                                if (isSalePreSelected) {
+                                    // Lock the type field to 'sale' only
+                                    lockTypeToSale();
+
+                                    // Prevent any changes to locked fields
+                                    preventSaleFieldChanges();
+                                } else {
+                                    // Normal behavior - toggle fields based on type selection
+                                    if (typeField) {
+                                        typeField.addEventListener('change', toggleFieldsBasedOnType);
+                                        // Initial toggle
+                                        toggleFieldsBasedOnType();
+                                    }
+                                }
+
+                                // ########################################
+                                // Check if we have a pre-selected sale file
+                                const isRentPreSelected = {{ pre_selected_rent_file|yesno:"true,false" }};
+
+                                if (isRentPreSelected) {
+                                    // Lock the type field to 'sale' only
+                                    lockTypeToRent();
+
+                                    // Prevent any changes to locked fields
+                                    preventRentFieldChanges();
+                                } else {
+                                    // Normal behavior - toggle fields based on type selection
+                                    if (typeField) {
+                                        typeField.addEventListener('change', toggleFieldsBasedOnType);
+                                        // Initial toggle
+                                        toggleFieldsBasedOnType();
+                                    }
+                                }
+                                // ########################################
+
+                                function lockTypeToSale() {
+                                    if (typeField) {
+                                        // Find all options and disable rent option
+                                        const options = typeField.querySelectorAll('option');
+                                        options.forEach(option => {
+                                            if (option.value === 'rent') {
+                                                option.disabled = true;
+                                                option.textContent += ' (غیرقابل انتخاب)';
+                                            }
+                                        });
+
+                                        // Set value to sale and disable changes
+                                        typeField.value = 'sale';
+                                        typeField.addEventListener('change', function(e) {
+                                            if (e.target.value !== 'sale') {
+                                                e.target.value = 'sale';
+                                                showNotification('نوع معامله نمی‌تواند تغییر کند - فایل فروش از قبل انتخاب شده است', 'warning');
+                                            }
+                                        });
+                                    }
+                                }
+
+                                // ########################################
+                                function lockTypeToRent() {
+                                    if (typeField) {
+                                        // Find all options and disable rent option
+                                        const options = typeField.querySelectorAll('option');
+                                        options.forEach(option => {
+                                            if (option.value === 'sale') {
+                                                option.disabled = true;
+                                                option.textContent += ' (غیرقابل انتخاب)';
+                                            }
+                                        });
+
+                                        // Set value to sale and disable changes
+                                        typeField.value = 'rent';
+                                        typeField.addEventListener('change', function(e) {
+                                            if (e.target.value !== 'rent') {
+                                                e.target.value = 'rent';
+                                                showNotification('نوع معامله نمی‌تواند تغییر کند - فایل اجاره از قبل انتخاب شده است', 'warning');
+                                            }
+                                        });
+                                    }
+                                }
+                                // ########################################
+
+                                function preventSaleFieldChanges() {
+                                    // Prevent changes to sale_file_code
+                                    if (saleFileCodeField) {
+                                        saleFileCodeField.addEventListener('input', function(e) {
+                                            const originalValue = e.target.defaultValue;
+                                            if (e.target.value !== originalValue) {
+                                                e.target.value = originalValue;
+                                                showNotification('کد فایل فروش قابل تغییر نیست', 'warning');
+                                            }
+                                        });
+
+                                        // Prevent copy/paste/cut
+                                        ['cut', 'copy', 'paste'].forEach(event => {
+                                            saleFileCodeField.addEventListener(event, function(e) {
+                                                if (event === 'paste' || event === 'cut') {
+                                                    e.preventDefault();
+                                                    showNotification('این فیلد قابل تغییر نیست', 'warning');
+                                                }
+                                            });
+                                        });
+                                    }
+
+                                    // Prevent input in rent fields
+                                    [rentFileCodeField, renterCodeField].forEach(field => {
+                                        if (field) {
+                                            field.addEventListener('input', function(e) {
+                                                e.target.value = '';
+                                                showNotification('این فیلد در حالت فروش غیرفعال است', 'info');
+                                            });
+
+                                            field.addEventListener('focus', function(e) {
+                                                showNotification('این فیلد برای فایل‌های فروش غیرفعال است', 'info');
+                                                e.target.blur();
+                                            });
+                                        }
+                                    });
+                                }
+
+                                // ########################################
+                                function preventRentFieldChanges() {
+                                    // Prevent changes to sale_file_code
+                                    if (rentFileCodeField) {
+                                        rentFileCodeField.addEventListener('input', function(e) {
+                                            const originalValue = e.target.defaultValue;
+                                            if (e.target.value !== originalValue) {
+                                                e.target.value = originalValue;
+                                                showNotification('کد فایل اجاره قابل تغییر نیست', 'warning');
+                                            }
+                                        });
+
+                                        // Prevent copy/paste/cut
+                                        ['cut', 'copy', 'paste'].forEach(event => {
+                                            rentFileCodeField.addEventListener(event, function(e) {
+                                                if (event === 'paste' || event === 'cut') {
+                                                    e.preventDefault();
+                                                    showNotification('این فیلد قابل تغییر نیست', 'warning');
+                                                }
+                                            });
+                                        });
+                                    }
+
+                                    // Prevent input in rent fields
+                                    [saleFileCodeField, buyerCodeField].forEach(field => {
+                                        if (field) {
+                                            field.addEventListener('input', function(e) {
+                                                e.target.value = '';
+                                                showNotification('این فیلد در حالت اجاره غیرفعال است', 'info');
+                                            });
+
+                                            field.addEventListener('focus', function(e) {
+                                                showNotification('این فیلد برای فایل‌های اجاره غیرفعال است', 'info');
+                                                e.target.blur();
+                                            });
+                                        }
+                                    });
+                                }
+                                // ########################################
+
+                                function toggleFieldsBasedOnType() {
+                                    const selectedType = typeField.value;
+
+                                    if (selectedType === 'sale') {
+                                        enableFields([saleFileCodeField, buyerCodeField]);
+                                        disableFields([rentFileCodeField, renterCodeField]);
+                                        clearFields([rentFileCodeField, renterCodeField]);
+
+                                    } else if (selectedType === 'rent') {
+                                        enableFields([rentFileCodeField, renterCodeField]);
+                                        disableFields([saleFileCodeField, buyerCodeField]);
+                                        clearFields([saleFileCodeField, buyerCodeField]);
+
+                                    } else {
+                                        // No type selected - disable all file-related fields
+                                        disableFields([saleFileCodeField, rentFileCodeField, buyerCodeField, renterCodeField]);
+                                    }
+                                }
+
+                                function enableFields(fields) {
+                                    fields.forEach(field => {
+                                        if (field) {
+                                            field.disabled = false;
+                                            field.classList.remove('bg-secondary', 'text-muted');
+                                            field.classList.add('form-control', 'form-control-xl', 'form-control-outlined');
+                                        }
+                                    });
+                                }
+
+                                function disableFields(fields) {
+                                    fields.forEach(field => {
+                                        if (field) {
+                                            field.disabled = true;
+                                            field.classList.add('text-muted');
+                                            {#field.classList.add('bg-secondary', 'text-muted');#}
+                                            {#field.placeholder = 'غیرفعال';#}
+                                        }
+                                    });
+                                }
+
+                                function clearFields(fields) {
+                                    fields.forEach(field => {
+                                        if (field && !field.hasAttribute('data-locked')) {
+                                            field.value = '';
+                                        }
+                                    });
+                                }
+
+                                function showNotification(message, type = 'info') {
+                                    // Create a simple notification
+                                    const notification = document.createElement('div');
+                                    notification.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+                                    notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; max-width: 300px;';
+                                    notification.innerHTML = `
+                                        ${message}
+                                        <button type="button" class="close" data-dismiss="alert">
+                                            <span>&times;</span>
+                                        </button>
+                                    `;
+
+                                    document.body.appendChild(notification);
+
+                                    // Auto remove after 3 seconds
+                                    setTimeout(() => {
+                                        if (notification.parentNode) {
+                                            notification.parentNode.removeChild(notification);
+                                        }
+                                    }, 3000);
+                                }
+                            });
+
+                            // Function to create session for sale file (called from detail page button)
+                            function createSessionForSaleFile(saleFileCode) {
+                                if (confirm('آیا می‌خواهید برای این فایل فروش، نشست جدید ایجاد کنید؟')) {
+                                    window.location.href = "{% url 'session_create' %}?sale_file_code=" + saleFileCode;
+                                }
+                            }
+
+                            // Function to create session for rent file (called from detail page button)
+                            function createSessionForRentFile(rentFileCode) {
+                                if (confirm('آیا می‌خواهید برای این فایل اجاره، نشست جدید ایجاد کنید؟')) {
+                                    window.location.href = "{% url 'session_create' %}?rent_file_code=" + rentFileCode;
+                                }
+                            }
+
+                        </script>
+                        <!-- end: JS -->
                     
                     </div>
                 </div>
@@ -241,7 +541,6 @@
     </div>
 
 {% endblock %}
-
 
 
 
