@@ -318,7 +318,7 @@ class SaleFileListView(ReadOnlyPermissionMixin, ListView):
     model = models.SaleFile
     template_name = 'dashboard/files/sale_file_list.html'
     context_object_name = 'sale_files'
-    paginate_by = 12
+    paginate_by = 4
     permission_model = 'SaleFile'
 
     def get_queryset(self):
@@ -326,7 +326,7 @@ class SaleFileListView(ReadOnlyPermissionMixin, ListView):
             sub_district = self.request.user.sub_district
             queryset_default = (
                 models.SaleFile.objects.select_related('province', 'city', 'district', 'sub_district', 'person')
-                .filter(sub_district=sub_district))
+                .filter(sub_district=sub_district)).filter(status='acc')
             form = forms.SaleFileAgentFilterForm(self.request.GET)
 
             if form.is_valid():
@@ -391,7 +391,7 @@ class SaleFileListView(ReadOnlyPermissionMixin, ListView):
 
         else:
             queryset_default = models.SaleFile.objects.select_related('province', 'city', 'district', 'sub_district',
-                                                                      'person')
+                                                                      'person').filter(status='acc')
             form = forms.SaleFileFilterForm(self.request.GET)
 
             if form.is_valid():
@@ -511,6 +511,11 @@ class SaleFileCreateView(PermissionRequiredMixin, CreateView):
         self.object = None
         return self.render_to_response(self.get_context_data(form=form))
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
     def get_success_url(self):
         return reverse('sale_file_list')
 
@@ -554,7 +559,7 @@ class RentFileListView(ReadOnlyPermissionMixin, ListView):
     model = models.RentFile
     template_name = 'dashboard/files/rent_file_list.html'
     context_object_name = 'rent_files'
-    paginate_by = 12
+    paginate_by = 10
     permission_model = 'RentFile'
 
     def get_queryset(self):
@@ -562,7 +567,7 @@ class RentFileListView(ReadOnlyPermissionMixin, ListView):
             sub_district = self.request.user.sub_district
             queryset_default = (
                 models.RentFile.objects.select_related('province', 'city', 'district', 'sub_district', 'person')
-                .filter(sub_district=sub_district))
+                .filter(sub_district=sub_district)).filter(status='acc')
             form = forms.RentFileAgentFilterForm(self.request.GET)
             if form.is_valid():
                 queryset_filtered = queryset_default
@@ -634,7 +639,7 @@ class RentFileListView(ReadOnlyPermissionMixin, ListView):
             return queryset_default
         else:
             queryset_default = models.RentFile.objects.select_related('province', 'city', 'district', 'sub_district',
-                                                                      'person')
+                                                                      'person').filter(status='acc')
             form = forms.RentFileFilterForm(self.request.GET)
 
             if form.is_valid():
@@ -762,6 +767,11 @@ class RentFileCreateView(PermissionRequiredMixin, CreateView):
     def form_invalid(self, form):
         self.object = None
         return self.render_to_response(self.get_context_data(form=form))
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
 
     def get_success_url(self):
         return reverse('rent_file_list')

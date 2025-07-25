@@ -105,11 +105,11 @@
                             <div class="col-lg-3 col-sm-3">
                                 <div class="form-group">
                                     <div class="form-control-wrap">
-                                        <label class="form-label" for="{{ form.sale_file.id_for_label }}">فایل فروش</label>
-                                        {% render_field form.sale_file id="sale_file" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                        <label class="form-label" for="{{ form.sale_file_code.id_for_label }}">کد فایل فروش</label>
+                                        {% render_field form.sale_file_code id="sale_file" type="text" class="form-control form-control-xl form-control-outlined" %}
                                     </div>
-                                    {% if form.sale_file.errors %}
-                                        {% for error in form.sale_file.errors %}
+                                    {% if form.sale_file_code.errors %}
+                                        {% for error in form.sale_file_code.errors %}
                                             <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
                                         {% endfor %}
                                     {% endif %}
@@ -120,11 +120,11 @@
                             <div class="col-lg-3 col-sm-3">
                                 <div class="form-group">
                                     <div class="form-control-wrap">
-                                        <label class="form-label" for="{{ form.rent_file.id_for_label }}">فایل اجاره</label>
-                                        {% render_field form.rent_file id="rent_file" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                        <label class="form-label" for="{{ form.rent_file_code.id_for_label }}">کد فایل اجاره</label>
+                                        {% render_field form.rent_file_code id="rent_file" type="text" class="form-control form-control-xl form-control-outlined" %}
                                     </div>
-                                    {% if form.rent_file.errors %}
-                                        {% for error in form.rent_file.errors %}
+                                    {% if form.rent_file_code.errors %}
+                                        {% for error in form.rent_file_code.errors %}
                                             <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
                                         {% endfor %}
                                     {% endif %}
@@ -135,11 +135,11 @@
                             <div class="col-lg-3 col-sm-3">
                                 <div class="form-group">
                                     <div class="form-control-wrap">
-                                        <label class="form-label" for="{{ form.buyer.id_for_label }}">مشتری (خریدار)</label>
-                                        {% render_field form.buyer id="buyer" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                        <label class="form-label" for="{{ form.buyer_code.id_for_label }}">کد مشتری (خریدار)</label>
+                                        {% render_field form.buyer_code id="buyer" type="text" class="form-control form-control-xl form-control-outlined" %}
                                     </div>
-                                    {% if form.buyer.errors %}
-                                        {% for error in form.buyer.errors %}
+                                    {% if form.buyer_code.errors %}
+                                        {% for error in form.buyer_code.errors %}
                                             <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
                                         {% endfor %}
                                     {% endif %}
@@ -150,11 +150,11 @@
                             <div class="col-lg-3 col-sm-3"Pcp>
                                 <div class="form-group">
                                     <div class="form-control-wrap">
-                                        <label class="form-label" for="{{ form.renter.id_for_label }}">مشتری (موجر)</label>
-                                        {% render_field form.renter id="renter" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                        <label class="form-label" for="{{ form.renter_code.id_for_label }}">کد مشتری (موجر)</label>
+                                        {% render_field form.renter_code id="renter" type="text" class="form-control form-control-xl form-control-outlined" %}
                                     </div>
-                                    {% if form.renter.errors %}
-                                        {% for error in form.renter.errors %}
+                                    {% if form.renter_code.errors %}
+                                        {% for error in form.renter_code.errors %}
                                             <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
                                         {% endfor %}
                                     {% endif %}

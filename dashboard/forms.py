@@ -48,6 +48,7 @@ class SaleFileCreateForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
         super(SaleFileCreateForm, self).__init__(*args, **kwargs)
         for field in sale_file_required_fields:
             self.fields[field].required = True
@@ -57,6 +58,7 @@ class SaleFileCreateForm(forms.ModelForm):
         price_announced = cleaned_data.get('price_announced')
         price_min = cleaned_data.get('price_min')
         area = cleaned_data.get('area')
+        sub_district = cleaned_data.get('sub_district')
 
         if price_announced and not checkers.file_price_checker(price_announced):
             self.add_error('price_announced', 'قیمت فایل باید بین 1 تا 1000 میلیارد تومان باشد')
@@ -64,6 +66,8 @@ class SaleFileCreateForm(forms.ModelForm):
             self.add_error('price_min', 'قیمت فایل باید بین 1 تا 1000 میلیارد تومان باشد')
         if area and not checkers.area_checker(area):
             self.add_error('area', 'متراژ فایل باید بین 20 تا 10000 متر باشد.')
+        if self.user.title != 'bs' and sub_district != self.user.sub_district:
+            self.add_error('sub_district', 'مشاور اجازه ایجاد فایل جدید در این زیرمحله را ندارد')
 
         return cleaned_data
 
@@ -182,6 +186,7 @@ class RentFileCreateForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
         super(RentFileCreateForm, self).__init__(*args, **kwargs)
         for field in rent_file_required_fields:
             self.fields[field].required = True
@@ -193,6 +198,7 @@ class RentFileCreateForm(forms.ModelForm):
         rent_announced = cleaned_data.get('rent_announced')
         rent_min = cleaned_data.get('rent_min')
         area = cleaned_data.get('area')
+        sub_district = cleaned_data.get('sub_district')
 
         if deposit_announced and not checkers.rent_file_deposit_price_checker(deposit_announced):
             self.add_error('deposit_announced', 'مبلغ رهن باید بین صفر تا 100 میلیارد تومان باشد')
@@ -204,6 +210,8 @@ class RentFileCreateForm(forms.ModelForm):
             self.add_error('rent_min', 'مبلغ اجاره باید بین صفر تا 10 میلیارد تومان باشد')
         if area and not checkers.area_checker(area):
             self.add_error('area', 'متراژ فایل باید بین 20 تا 10000 متر باشد.')
+        if self.user.title != 'bs' and sub_district != self.user.sub_district:
+            self.add_error('sub_district', 'مشاور اجازه ایجاد فایل جدید در این زیرمحله را ندارد')
 
         return cleaned_data
 
@@ -1515,7 +1523,6 @@ class CombinedSessionResultForm(forms.Form):
     def save(self):
         self.boss_form.save()
         self.result_session_form.save()
-
 
 
 
