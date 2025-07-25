@@ -94,7 +94,6 @@
             {% for task in tasks %}
                 <div class="col-sm-6 col-lg-6 col-xxl-6">
                     {% if task.status == 'UR' %}
-                        
                         <div class="card h-100">
                             <div class="card-inner">
                                 <div class="project">
@@ -111,57 +110,30 @@
 
                                     <!-- Description -->
                                     <div class="project-details">
-                                        <p style="height: 16em; white-space: pre-wrap; -webkit-line-clamp: 8;">{{ task.description|farsi_number }}</p>
+                                        <p style="height: 8em; overflow: hidden; margin-bottom: 0.5em;">
+                                            {{ task.description|truncatewords:20|farsi_number }}
+                                            <button class="btn btn-sm btn-outline-primary show-full-description"
+                                                    data-task-id="{{ task.pk }}"
+                                                    style="font-size: 0.8em;">
+                                                نمایش کامل
+                                            </button>
+                                        </p>
                                     </div>
-
-                                    <!-- Middle1 -->
-                                    <div  style="height: 8em;!important; -webkit-line-clamp: 4;!important;">
-                                        <h6 class="title" style="margin-bottom: 0.7em;">فایل فروش/اجاره مربوطه:</h6>
-                                        <!-- Sale -->
-                                        {% if task.sale_file %}
-                                            <div class="project-head" style="margin-bottom: 0.5em;!important;">
-                                                <div class="project-title">
-                                                    <div class="project-info">
-                                                        <a href="{{ task.sale_file.get_absolute_url }}">
-                                                            <span class="sub-text" style="font-size: 0.85em;">فروش: {{ task.sale_file.title|linebreaksbr|farsi_number }}</span>
-                                                        </a>
-                                                    </div>
-                                                </div>
+                                    <!-- Modal -->
+                                    <div id="descriptionModal-{{ task.pk }}" class="modal" style="margin-top: 5em; display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.7);">
+                                        <div class="modal-content" style="background-color: #fefefe; margin: 5% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 700px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
+                                            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px;">
+                                                <h5 style="margin: 0; color: #333;">توضیحات کامل</h5>
+                                                <span onclick="closeModal('{{ task.pk }}')" style="font-size: 28px; font-weight: bold; cursor: pointer; color: #aaa;">&times;</span>
                                             </div>
-                                        {% else %}
-                                            <div class="project-head" style="margin-bottom: 0.5em;!important;">
-                                                <div class="project-title">
-                                                    <div class="project-info">
-                                                        <span class="sub-text" style="font-size: 0.85em;">فروش: ----</span>
-                                                    </div>
-                                                </div>
+                                            <div style="line-height: 1.6; padding: 10px 0;">
+                                                {{ task.description|farsi_number|linebreaksbr }}
                                             </div>
-                                        {% endif %}
-
-                                        <!-- Rent -->
-                                        {% if task.rent_file %}
-                                            <div class="project-head" style="margin-bottom: 0.5em;!important;">
-                                                <div class="project-title">
-                                                    <div class="project-info">
-                                                        <a href="{{ task.rent_file.get_absolute_url }}">
-                                                            <span class="sub-text" style="font-size: 0.85em;">اجاره: {{ task.rent_file.title|linebreaksbr|farsi_number }}</span>
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        {% else %}
-                                            <div class="project-head" style="margin-bottom: 0.5em;!important;">
-                                                <div class="project-title">
-                                                    <div class="project-info">
-                                                        <span class="sub-text" style="font-size: 0.85em;">اجاره: ----</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        {% endif %}
+                                        </div>
                                     </div>
-
-                                    <!-- Middle2 -->
-                                    <div  style="height: 8em;!important; -webkit-line-clamp: 4;!important;">
+                                    
+                                    <!-- Middle -->
+                                    <div style="height: 8em;!important; -webkit-line-clamp: 4;!important;">
                                         <h6 class="title" style="margin-bottom: 0.7em;">مشتری (خریدار/موجر) مربوطه:</h6>
                                         <!-- Buyer -->
                                         {% if task.buyer %}
@@ -211,15 +183,18 @@
                                         <div class="project-title">
                                             <div class="project-info">
                                                 <span class="sub-text" style="font-size: 0.95em; margin-top: 0.7em;">ددلاین: {{ task.deadline }}</span>
+                                                <span class="sub-text" style="font-size: 0.95em; margin-top: 0.7em;">وضعیت: {{ task.get_status_display }}</span>
                                             </div>
                                         </div>
                                     </div>
 
                                     <!-- Edit - Delete -->
-                                    <div class="project-meta">
-                                        <a href="{% url 'task_update' task.pk task.code %}" class="btn btn-primary justify-center" style="margin-top: 1em;"><em class="icon ni ni-edit"></em><span>تغییر</span></a>
-                                        <a href="{% url 'task_delete' task.pk task.code %}" class="btn btn-danger justify-center" style="margin-top: 1em;"><em class="icon ni ni-delete"></em><span>حذف</span></a>
-                                    </div>
+                                    {% if request.user.title == 'bs' %}
+                                        <div class="project-meta">
+                                            <a href="{% url 'task_update' task.pk task.code %}" class="btn btn-primary justify-center" style="margin-top: 1em;"><em class="icon ni ni-edit"></em><span>تغییر</span></a>
+                                            <a href="{% url 'task_delete' task.pk task.code %}" class="btn btn-danger justify-center" style="margin-top: 1em;"><em class="icon ni ni-delete"></em><span>حذف</span></a>
+                                        </div>
+                                    {% endif %}
 
                                     <!-- Result -->
                                     <div class="project-meta">
@@ -229,13 +204,97 @@
                                 </div>
                             </div>
                         </div>
-                    
                     {% endif %}
                 </div>
             {% endfor %}
         </div>
         <!-- end: Tasks -->
     
+        <!-- JS -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Event delegation for all "show full description" buttons
+                document.addEventListener('click', function(e) {
+                    if (e.target.classList.contains('show-full-description')) {
+                        const taskId = e.target.getAttribute('data-task-id');
+                        const modal = document.getElementById('descriptionModal-' + taskId);
+                        if (modal) {
+                            modal.style.display = 'block';
+                            document.body.style.overflow = 'hidden';
+                        }
+                    }
+                    
+                    // Close modal when clicking on X or outside
+                    if (e.target.classList.contains('close-modal') || e.target.classList.contains('modal')) {
+                        const modal = e.target.closest('.modal') || e.target;
+                        if (modal) {
+                            modal.style.display = 'none';
+                            document.body.style.overflow = 'auto';
+                        }
+                    }
+                });
+                
+                // Alternative close function for buttons with onclick
+                window.closeModal = function(taskId) {
+                    const modal = document.getElementById('descriptionModal-' + taskId);
+                    if (modal) {
+                        modal.style.display = 'none';
+                        document.body.style.overflow = 'auto';
+                    }
+                };
+            });
+        </script>
+        
+        <!-- CSS -->
+        <style>
+            .modal {
+                display: none;
+                position: fixed;
+                z-index: 1000;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                overflow: auto;
+                background-color: rgba(0,0,0,0.7);
+            }
+            
+            .modal-content {
+                background-color: #fefefe;
+                margin: 5% auto;
+                padding: 20px;
+                border: 1px solid #888;
+                width: 80%;
+                max-width: 700px;
+                border-radius: 8px;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+                animation: modalopen 0.3s;
+            }
+            
+            .close-modal {
+                font-size: 28px;
+                font-weight: bold;
+                cursor: pointer;
+                color: #aaa;
+            }
+            
+            .close-modal:hover {
+                color: #000;
+            }
+            
+            @keyframes modalopen {
+                from { opacity: 0; transform: translateY(-30px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+            
+            @media (max-width: 768px) {
+                .modal-content {
+                    width: 90%;
+                    margin: 20% auto;
+                }
+            }
+        </style>
+
     </div>
     <!-- end: List -->
     
