@@ -84,8 +84,8 @@ urlpatterns = [
     # boss
     path('tasks/boss/', views.TaskBossListView.as_view(), name='boss_task_list'),
     re_path(r'tasks/boss/approve/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/', views.TaskBossApproveView.as_view(), name='boss_task_approve'),
+    re_path(r'tasks/boss/delete/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/', views.TaskBossDeleteView.as_view(), name='boss_task_delete'),
 ]
-
 
 
 

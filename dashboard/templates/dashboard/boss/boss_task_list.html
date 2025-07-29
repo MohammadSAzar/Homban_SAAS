@@ -172,7 +172,7 @@
                                         {% if request.user.title == 'bs' or request.user.sub_district == visit.sale_file.sub_district or request.user.sub_district == visit.rent_file.sub_district %}
                                             <div class="project-meta">
                                                 <a href="{% url 'boss_task_approve' boss_task.pk boss_task.code %}" class="btn btn-primary justify-center" style="margin-top: 1em;"><em class="icon ni ni-edit"></em><span>تایید</span></a>
-                                                <a href="#" class="btn btn-danger justify-center" style="margin-top: 1em;"><em class="icon ni ni-delete"></em><span>حذف</span></a>
+                                                <a href="{% url 'boss_task_delete' boss_task.pk boss_task.code %}" class="btn btn-danger justify-center" style="margin-top: 1em;"><em class="icon ni ni-delete"></em><span>حذف</span></a>
                                             </div>
                                         {% endif %}
         
@@ -234,8 +234,5 @@
     <!-- end: Pagination -->
 
 {% endblock %}
-
-
-
 
 

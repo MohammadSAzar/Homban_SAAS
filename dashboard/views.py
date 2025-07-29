@@ -1803,6 +1803,23 @@ class TaskBossApproveView(View):
             })
 
 
+class TaskBossDeleteView(PermissionRequiredMixin, DeleteView):
+    model = models.TaskBoss
+    template_name = 'dashboard/boss/boss_task_delete.html'
+    success_url = reverse_lazy('boss_task_list')
+    context_object_name = 'task'
+    permission_model = 'TaskBoss'
+    permission_action = 'delete'
+
+    def form_valid(self, form):
+        messages.error(self.request, "وظیفه مربوطه از سامانه حذف شد.")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        self.object = None
+        return self.render_to_response(self.get_context_data(form=form))
+
+
 # --------------------------------- Services --------------------------------
 class VisitListView(ReadOnlyPermissionMixin, ListView):
     model = models.Visit

@@ -16,6 +16,7 @@ ROLE_PERMISSIONS = {
         'Session': ['create', 'read', 'update', 'delete'],
         'Trade': ['create', 'read', 'update', 'delete'],
         'Task': ['create', 'read', 'update', 'delete'],
+        'TaskBoss': ['create', 'read', 'update', 'delete'],
     },
 
     'fp': {
