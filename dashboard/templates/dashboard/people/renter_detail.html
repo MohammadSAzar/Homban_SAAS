@@ -24,7 +24,7 @@
                             <h5 class="nk-block-title">مستاجر: {{ renter.name|farsi_number }}</h5>
                             <div style="font-size: 0.9em; margin-top: 1em;">
                                 <a href="{% url 'renter_update' renter.pk renter.code %}" class="btn btn-primary" style="margin-left: 10px;">بروزرسانی</a>
-                                <a href="{% url 'renter_delete' renter.pk renter.code %}" class="btn btn-danger">پاک کردن</a>
+                                <a href="{% url 'renter_delete_request' renter.pk renter.code %}" class="btn btn-danger">حذف کردن</a>
                             </div>
                             <div class="nk-block-des" style="margin-top: 10px;">
                                 <p>{{ renter.phone_number }}</p>

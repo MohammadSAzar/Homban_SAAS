@@ -197,6 +197,8 @@ class Person(models.Model):
     description = models.TextField(max_length=150, blank=True, null=True, verbose_name=_('Description'))
     status = models.CharField(max_length=10, choices=choices.statuses, default='pen', verbose_name=_('Status'))
     datetime_created = models.DateTimeField(auto_now_add=True, null=True)
+    delete_request = models.CharField(max_length=3, choices=choices.yes_or_no, blank=True, null=True, default='No',
+                                      verbose_name=_('Delete Request'))
 
     class Meta:
         ordering = ('-datetime_created',)
@@ -273,6 +275,8 @@ class SaleFile(models.Model):
     status = models.CharField(max_length=10, choices=choices.statuses, default='pen', verbose_name=_('Status'))
     datetime_created = models.DateTimeField(auto_now_add=True)
     datetime_expired = models.DateTimeField(blank=True, null=True)
+    delete_request = models.CharField(max_length=3, choices=choices.yes_or_no, blank=True, null=True, default='No',
+                                      verbose_name=_('Delete Request'))
 
     @property
     def price_per_meter(self):
@@ -415,6 +419,8 @@ class RentFile(models.Model):
     status = models.CharField(max_length=10, choices=choices.statuses, default='pen', verbose_name=_('Status'))
     datetime_created = models.DateTimeField(auto_now_add=True)
     datetime_expired = models.DateTimeField(blank=True, null=True)
+    delete_request = models.CharField(max_length=3, choices=choices.yes_or_no, blank=True, null=True, default='No',
+                                      verbose_name=_('Delete Request'))
 
     @property
     def has_images(self):
@@ -519,6 +525,8 @@ class Buyer(models.Model):
     code = models.CharField(max_length=10, null=True, unique=True, blank=True, verbose_name=_('Code'))
     status = models.CharField(max_length=10, choices=choices.statuses, default='pen', verbose_name=_('Status'))
     datetime_created = models.DateTimeField(default=timezone.now, verbose_name=_('Date and Time of Creation'))
+    delete_request = models.CharField(max_length=3, choices=choices.yes_or_no, blank=True, null=True, default='No',
+                                      verbose_name=_('Delete Request'))
 
     def save(self, *args, **kwargs):
         if not self.code:
@@ -572,6 +580,8 @@ class Renter(models.Model):
     code = models.CharField(max_length=10, null=True, unique=True, blank=True, verbose_name=_('Code'))
     status = models.CharField(max_length=10, choices=choices.statuses, default='pen', verbose_name=_('Status'))
     datetime_created = models.DateTimeField(default=timezone.now, verbose_name=_('Date and Time of Creation'))
+    delete_request = models.CharField(max_length=3, choices=choices.yes_or_no, blank=True, null=True, default='No',
+                                      verbose_name=_('Delete Request'))
 
     def save(self, *args, **kwargs):
         if not self.code:

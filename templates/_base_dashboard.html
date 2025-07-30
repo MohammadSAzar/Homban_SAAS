@@ -158,6 +158,9 @@
                                                     <li class="nk-menu-item">
                                                         <a href="{% url 'task_create' %}" class="nk-menu-link"><span class="nk-menu-text">{% trans 'Create New Task' %}</span></a>
                                                     </li>
+                                                    <li class="nk-menu-item">
+                                                        <a href="{% url 'delete_request_list' %}" class="nk-menu-link"><span class="nk-menu-text">موارد حذفی</span></a>
+                                                    </li>
                                                 {% endif %}
                                                 <li class="nk-menu-item">
                                                     <a href="{% url 'task_fp_list' %}" class="nk-menu-link"><span class="nk-menu-text">{% trans 'FP Tasks' %}</span></a>
@@ -278,6 +281,5 @@
     </body>
 
 </html>
-
 
 

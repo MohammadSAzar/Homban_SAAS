@@ -1,9 +1,11 @@
 from django.views import View
-from django.shortcuts import get_object_or_404, render, redirect
-from django.urls import reverse, reverse_lazy
 from django.views.generic import DetailView, CreateView, ListView, UpdateView, DeleteView, TemplateView
+from django.shortcuts import get_object_or_404, render, redirect
 from django.db.models import Prefetch
+from django.urls import reverse, reverse_lazy
+from django.core.exceptions import PermissionDenied
 from django.contrib import messages
+
 
 from . import models, forms
 from .permissions import PermissionRequiredMixin, ReadOnlyPermissionMixin
@@ -326,7 +328,7 @@ class SaleFileListView(ReadOnlyPermissionMixin, ListView):
             sub_district = self.request.user.sub_district
             queryset_default = (
                 models.SaleFile.objects.select_related('province', 'city', 'district', 'sub_district', 'person')
-                .filter(sub_district=sub_district)).filter(status='acc')
+                .filter(sub_district=sub_district)).filter(status='acc').exclude(delete_request='Yes')
             form = forms.SaleFileAgentFilterForm(self.request.GET)
 
             if form.is_valid():
@@ -390,8 +392,8 @@ class SaleFileListView(ReadOnlyPermissionMixin, ListView):
             return queryset_default
 
         else:
-            queryset_default = models.SaleFile.objects.select_related('province', 'city', 'district', 'sub_district',
-                                                                      'person').filter(status='acc')
+            queryset_default = (models.SaleFile.objects.select_related('province', 'city', 'district', 'sub_district', 'person')
+                                .filter(status='acc').exclude(delete_request='Yes'))
             form = forms.SaleFileFilterForm(self.request.GET)
 
             if form.is_valid():
@@ -482,6 +484,13 @@ class SaleFileDetailView(ReadOnlyPermissionMixin, DetailView):
     template_name = 'dashboard/files/sale_file_detail.html'
     permission_model = 'SaleFile'
 
+    def dispatch(self, request, *args, **kwargs):
+        sale_file = self.get_object()
+        user = request.user
+        if user.title != 'bs' and sale_file.delete_request == 'Yes':
+            raise PermissionDenied("شما اجازه مشاهده این محتوا را ندارید")
+        return super().dispatch(request, *args, **kwargs)
+
 
 class SaleFileGalleryView(DetailView):
     model = models.SaleFile
@@ -559,6 +568,44 @@ class SaleFileDeleteView(PermissionRequiredMixin, DeleteView):
         return self.render_to_response(self.get_context_data(form=form))
 
 
+class SaleFileDeleteRequestView(PermissionRequiredMixin, UpdateView):
+    model = models.SaleFile
+    form_class = forms.SaleFileDeleteRequestForm
+    template_name = 'dashboard/files/sale_file_delete_request.html'
+    context_object_name = 'sale_file'
+    permission_model = 'SaleFile'
+    permission_action = 'update'
+
+    def form_valid(self, form):
+        messages.success(self.request, "تغییرات شما در سامانه ثبت شد (این تغییرات توسط مدیر بررسی خواهد شد).")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_success_url(self):
+        return reverse_lazy('sale_file_list')
+
+
+class SaleFileRecoverView(PermissionRequiredMixin, UpdateView):
+    model = models.SaleFile
+    form_class = forms.SaleFileRecoverForm
+    template_name = 'dashboard/files/sale_file_recover.html'
+    context_object_name = 'sale_file'
+    permission_model = 'SaleFile'
+    permission_action = 'update'
+
+    def form_valid(self, form):
+        messages.success(self.request, "تغییرات شما در سامانه ثبت شد.")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_success_url(self):
+        return reverse_lazy('sale_file_list')
+
+
 # --------------------------------- Rent Files --------------------------------
 class RentFileListView(ReadOnlyPermissionMixin, ListView):
     model = models.RentFile
@@ -572,7 +619,7 @@ class RentFileListView(ReadOnlyPermissionMixin, ListView):
             sub_district = self.request.user.sub_district
             queryset_default = (
                 models.RentFile.objects.select_related('province', 'city', 'district', 'sub_district', 'person')
-                .filter(sub_district=sub_district)).filter(status='acc')
+                .filter(sub_district=sub_district)).filter(status='acc').exclude(delete_request='Yes')
             form = forms.RentFileAgentFilterForm(self.request.GET)
             if form.is_valid():
                 queryset_filtered = queryset_default
@@ -643,8 +690,8 @@ class RentFileListView(ReadOnlyPermissionMixin, ListView):
                 return queryset_filtered
             return queryset_default
         else:
-            queryset_default = models.RentFile.objects.select_related('province', 'city', 'district', 'sub_district',
-                                                                      'person').filter(status='acc')
+            queryset_default = (models.RentFile.objects.select_related('province', 'city', 'district', 'sub_district', 'person')
+                                .filter(status='acc')).exclude(delete_request='Yes')
             form = forms.RentFileFilterForm(self.request.GET)
 
             if form.is_valid():
@@ -744,6 +791,13 @@ class RentFileDetailView(ReadOnlyPermissionMixin, DetailView):
     template_name = 'dashboard/files/rent_file_detail.html'
     permission_model = 'RentFile'
 
+    def dispatch(self, request, *args, **kwargs):
+        rent_file = self.get_object()
+        user = request.user
+        if user.title != 'bs' and rent_file.delete_request == 'Yes':
+            raise PermissionDenied("شما اجازه مشاهده این محتوا را ندارید")
+        return super().dispatch(request, *args, **kwargs)
+
 
 class RentFileGalleryView(DetailView):
     model = models.RentFile
@@ -821,6 +875,44 @@ class RentFileDeleteView(PermissionRequiredMixin, DeleteView):
         return self.render_to_response(self.get_context_data(form=form))
 
 
+class RentFileDeleteRequestView(PermissionRequiredMixin, UpdateView):
+    model = models.RentFile
+    form_class = forms.RentFileDeleteRequestForm
+    template_name = 'dashboard/files/rent_file_delete_request.html'
+    context_object_name = 'rent_file'
+    permission_model = 'RentFile'
+    permission_action = 'update'
+
+    def form_valid(self, form):
+        messages.success(self.request, "تغییرات شما در سامانه ثبت شد (این تغییرات توسط مدیر بررسی خواهد شد).")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_success_url(self):
+        return reverse_lazy('rent_file_list')
+
+
+class RentFileRecoverView(PermissionRequiredMixin, UpdateView):
+    model = models.RentFile
+    form_class = forms.RentFileRecoverForm
+    template_name = 'dashboard/files/rent_file_recover.html'
+    context_object_name = 'rent_file'
+    permission_model = 'RentFile'
+    permission_action = 'update'
+
+    def form_valid(self, form):
+        messages.success(self.request, "تغییرات شما در سامانه ثبت شد.")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_success_url(self):
+        return reverse_lazy('rent_file_list')
+
+
 # --------------------------------- Persons --------------------------------
 class PersonListView(ReadOnlyPermissionMixin, ListView):
     model = models.Person
@@ -830,7 +922,8 @@ class PersonListView(ReadOnlyPermissionMixin, ListView):
     permission_model = 'Person'
 
     def get_queryset(self):
-        queryset = models.Person.objects.prefetch_related('sale_files', 'rent_files').filter(status='acc').all()
+        queryset = (models.Person.objects.prefetch_related('sale_files', 'rent_files')
+                    .filter(status='acc').exclude(delete_request='Yes'))
         return queryset
 
 
@@ -897,6 +990,44 @@ class PersonDeleteView(PermissionRequiredMixin, DeleteView):
         return self.render_to_response(self.get_context_data(form=form))
 
 
+class PersonDeleteRequestView(PermissionRequiredMixin, UpdateView):
+    model = models.Person
+    form_class = forms.PersonDeleteRequestForm
+    template_name = 'dashboard/people/person_delete_request.html'
+    context_object_name = 'person'
+    permission_model = 'Person'
+    permission_action = 'update'
+
+    def form_valid(self, form):
+        messages.success(self.request, "تغییرات شما در سامانه ثبت شد (این تغییرات توسط مدیر بررسی خواهد شد).")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_success_url(self):
+        return reverse_lazy('person_list')
+
+
+class PersonRecoverView(PermissionRequiredMixin, UpdateView):
+    model = models.Person
+    form_class = forms.PersonRecoverForm
+    template_name = 'dashboard/people/person_recover.html'
+    context_object_name = 'person'
+    permission_model = 'Person'
+    permission_action = 'update'
+
+    def form_valid(self, form):
+        messages.success(self.request, "تغییرات شما در سامانه ثبت شد.")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_success_url(self):
+        return reverse_lazy('person_list')
+
+
 # --------------------------------- Buyers --------------------------------
 class BuyerListView(ReadOnlyPermissionMixin, ListView):
     model = models.Buyer
@@ -908,7 +1039,7 @@ class BuyerListView(ReadOnlyPermissionMixin, ListView):
     def get_queryset(self):
         if self.request.user.title == 'bs':
             queryset_default = models.Buyer.objects.select_related('province', 'city', 'district').prefetch_related(
-                'sub_districts')
+                'sub_districts').exclude(delete_request='Yes')
 
             form = forms.BuyerFilterForm(self.request.GET)
             if form.is_valid():
@@ -947,9 +1078,10 @@ class BuyerListView(ReadOnlyPermissionMixin, ListView):
             return queryset_default
 
         else:
-            queryset_default = (
+            queryset_default = ((
                 models.Buyer.objects.select_related('province', 'city', 'district').prefetch_related('sub_districts')
                 .filter(sub_districts__name__contains=self.request.user.sub_district.name))
+                                .exclude(delete_request='Yes').distinct())
 
             form = forms.BuyerFilterForm(self.request.GET)
             if form.is_valid():
@@ -1006,6 +1138,13 @@ class BuyerDetailView(ReadOnlyPermissionMixin, DetailView):
     context_object_name = 'buyer'
     template_name = 'dashboard/people/buyer_detail.html'
     permission_model = 'Buyer'
+
+    def dispatch(self, request, *args, **kwargs):
+        buyer = self.get_object()
+        user = request.user
+        if user.title != 'bs' and buyer.delete_request == 'Yes':
+            raise PermissionDenied("شما اجازه مشاهده این محتوا را ندارید")
+        return super().dispatch(request, *args, **kwargs)
 
 
 class BuyerCreateView(PermissionRequiredMixin, CreateView):
@@ -1071,6 +1210,44 @@ class BuyerDeleteView(PermissionRequiredMixin, DeleteView):
         return self.render_to_response(self.get_context_data(form=form))
 
 
+class BuyerDeleteRequestView(PermissionRequiredMixin, UpdateView):
+    model = models.Buyer
+    form_class = forms.BuyerDeleteRequestForm
+    template_name = 'dashboard/people/buyer_delete_request.html'
+    context_object_name = 'buyer'
+    permission_model = 'Buyer'
+    permission_action = 'update'
+
+    def form_valid(self, form):
+        messages.success(self.request, "تغییرات شما در سامانه ثبت شد (این تغییرات توسط مدیر بررسی خواهد شد).")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_success_url(self):
+        return reverse_lazy('buyer_list')
+
+
+class BuyerRecoverView(PermissionRequiredMixin, UpdateView):
+    model = models.Buyer
+    form_class = forms.BuyerRecoverForm
+    template_name = 'dashboard/people/buyer_recover.html'
+    context_object_name = 'buyer'
+    permission_model = 'Buyer'
+    permission_action = 'update'
+
+    def form_valid(self, form):
+        messages.success(self.request, "تغییرات شما در سامانه ثبت شد.")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_success_url(self):
+        return reverse_lazy('buyer_list')
+
+
 # --------------------------------- Renters --------------------------------
 class RenterListView(ReadOnlyPermissionMixin, ListView):
     model = models.Renter
@@ -1082,7 +1259,7 @@ class RenterListView(ReadOnlyPermissionMixin, ListView):
     def get_queryset(self):
         if self.request.user.title == 'bs':
             queryset_default = models.Renter.objects.select_related('province', 'city', 'district').prefetch_related(
-                'sub_districts')
+                'sub_districts').exclude(delete_request='Yes')
 
             form = forms.RenterFilterForm(self.request.GET)
             if form.is_valid():
@@ -1129,8 +1306,9 @@ class RenterListView(ReadOnlyPermissionMixin, ListView):
                 return queryset_filtered
             return queryset_default
         else:
-            queryset_default = models.Renter.objects.select_related('province', 'city', 'district').prefetch_related(
-                'sub_districts').filter(sub_districts__name__contains=self.request.user.sub_district.name).distinct()
+            queryset_default = (models.Renter.objects.select_related('province', 'city', 'district').prefetch_related(
+                'sub_districts').filter(sub_districts__name__contains=self.request.user.sub_district.name)
+                                .exclude(delete_request='Yes').distinct())
             form = forms.RenterFilterForm(self.request.GET)
 
             if form.is_valid():
@@ -1197,6 +1375,13 @@ class RenterDetailView(ReadOnlyPermissionMixin, DetailView):
     template_name = 'dashboard/people/renter_detail.html'
     permission_model = 'Renter'
 
+    def dispatch(self, request, *args, **kwargs):
+        renter = self.get_object()
+        user = request.user
+        if user.title != 'bs' and renter.delete_request == 'Yes':
+            raise PermissionDenied("شما اجازه مشاهده این محتوا را ندارید")
+        return super().dispatch(request, *args, **kwargs)
+
 
 class RenterCreateView(PermissionRequiredMixin, CreateView):
     model = models.Renter
@@ -1259,6 +1444,44 @@ class RenterDeleteView(PermissionRequiredMixin, DeleteView):
     def form_invalid(self, form):
         self.object = None
         return self.render_to_response(self.get_context_data(form=form))
+
+
+class RenterDeleteRequestView(PermissionRequiredMixin, UpdateView):
+    model = models.Renter
+    form_class = forms.RenterDeleteRequestForm
+    template_name = 'dashboard/people/renter_delete_request.html'
+    context_object_name = 'renter'
+    permission_model = 'Renter'
+    permission_action = 'update'
+
+    def form_valid(self, form):
+        messages.success(self.request, "تغییرات شما در سامانه ثبت شد (این تغییرات توسط مدیر بررسی خواهد شد).")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_success_url(self):
+        return reverse_lazy('renter_list')
+
+
+class RenterRecoverView(PermissionRequiredMixin, UpdateView):
+    model = models.Renter
+    form_class = forms.RenterRecoverForm
+    template_name = 'dashboard/people/renter_recover.html'
+    context_object_name = 'renter'
+    permission_model = 'Renter'
+    permission_action = 'update'
+
+    def form_valid(self, form):
+        messages.success(self.request, "تغییرات شما در سامانه ثبت شد.")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_success_url(self):
+        return reverse_lazy('renter_list')
 
 
 # ---------------------------------- Tasks ---------------------------------
@@ -1818,6 +2041,28 @@ class TaskBossDeleteView(PermissionRequiredMixin, DeleteView):
     def form_invalid(self, form):
         self.object = None
         return self.render_to_response(self.get_context_data(form=form))
+
+
+def delete_request_list_view(request):
+    context = {}
+    querysets = {
+            'sale_files': models.SaleFile.objects.filter(delete_request='Yes'),
+            'rent_files': models.RentFile.objects.filter(delete_request='Yes'),
+            'buyers': models.Buyer.objects.filter(delete_request='Yes'),
+            'renters': models.Renter.objects.filter(delete_request='Yes'),
+            'persons': models.Person.objects.filter(delete_request='Yes'),
+        }
+    if querysets['sale_files'].exists():
+        context['sale_files'] = querysets['sale_files']
+    if querysets['rent_files'].exists():
+        context['rent_files'] = querysets['rent_files']
+    if querysets['buyers'].exists():
+        context['buyers'] = querysets['buyers']
+    if querysets['renters'].exists():
+        context['renters'] = querysets['renters']
+    if querysets['persons'].exists():
+        context['persons'] = querysets['persons']
+    return render(request, 'dashboard/boss/delete_item_list.html', context)
 
 
 # --------------------------------- Services --------------------------------

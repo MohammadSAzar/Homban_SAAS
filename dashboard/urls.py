@@ -12,12 +12,16 @@ urlpatterns = [
     path('sale-files/', views.SaleFileListView.as_view(), name='sale_file_list'),
     re_path(r'sale-file/update/(?P<pk>[-\w]+)/(?P<unique_url_id>[-\w]+)/', views.SaleFileUpdateView.as_view(), name='sale_file_update'),
     re_path(r'sale-file/delete/(?P<pk>[-\w]+)/(?P<unique_url_id>[-\w]+)/', views.SaleFileDeleteView.as_view(), name='sale_file_delete'),
+    re_path(r'sale-file/delete-request/(?P<pk>[-\w]+)/(?P<unique_url_id>[-\w]+)/', views.SaleFileDeleteRequestView.as_view(), name='sale_file_delete_request'),
+    re_path(r'sale-file/recover/(?P<pk>[-\w]+)/(?P<unique_url_id>[-\w]+)/', views.SaleFileRecoverView.as_view(), name='sale_file_recover'),
     re_path(r'sale-file/(?P<pk>[-\w]+)/(?P<unique_url_id>[-\w]+)/', views.SaleFileDetailView.as_view(), name='sale_file_detail'),
     re_path(r'sale-file/create/', views.SaleFileCreateView.as_view(), name='sale_file_create'),
     # rent_file
     path('rent-files/', views.RentFileListView.as_view(), name='rent_file_list'),
     re_path(r'rent-file/update/(?P<pk>[-\w]+)/(?P<unique_url_id>[-\w]+)/', views.RentFileUpdateView.as_view(), name='rent_file_update'),
     re_path(r'rent-file/delete/(?P<pk>[-\w]+)/(?P<unique_url_id>[-\w]+)/', views.RentFileDeleteView.as_view(), name='rent_file_delete'),
+    re_path(r'rent-file/delete-request/(?P<pk>[-\w]+)/(?P<unique_url_id>[-\w]+)/', views.RentFileDeleteRequestView.as_view(), name='rent_file_delete_request'),
+    re_path(r'rent-file/recover/(?P<pk>[-\w]+)/(?P<unique_url_id>[-\w]+)/', views.RentFileRecoverView.as_view(), name='rent_file_recover'),
     re_path(r'rent-file/(?P<pk>[-\w]+)/(?P<unique_url_id>[-\w]+)/', views.RentFileDetailView.as_view(), name='rent_file_detail'),
     re_path(r'rent-file/create/', views.RentFileCreateView.as_view(), name='rent_file_create'),
     # locations
@@ -38,17 +42,23 @@ urlpatterns = [
     path('persons/', views.PersonListView.as_view(), name='person_list'),
     re_path(r'person/update/(?P<pk>[-\w]+)/', views.PersonUpdateView.as_view(), name='person_update'),
     re_path(r'person/delete/(?P<pk>[-\w]+)/', views.PersonDeleteView.as_view(), name='person_delete'),
+    re_path(r'person/delete-request/(?P<pk>[-\w]+)/', views.PersonDeleteRequestView.as_view(), name='person_delete_request'),
+    re_path(r'person/recover/(?P<pk>[-\w]+)/', views.PersonRecoverView.as_view(), name='person_recover'),
     re_path(r'person/create/', views.PersonCreateView.as_view(), name='person_create'),
     # buyers
     path('buyers/', views.BuyerListView.as_view(), name='buyer_list'),
     re_path(r'buyer/update/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/', views.BuyerUpdateView.as_view(), name='buyer_update'),
     re_path(r'buyer/delete/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/', views.BuyerDeleteView.as_view(), name='buyer_delete'),
+    re_path(r'buyer/delete-request/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/', views.BuyerDeleteRequestView.as_view(), name='buyer_delete_request'),
+    re_path(r'buyer/recover/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/', views.BuyerRecoverView.as_view(), name='buyer_recover'),
     re_path(r'buyer/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/', views.BuyerDetailView.as_view(), name='buyer_detail'),
     re_path(r'buyers/create/', views.BuyerCreateView.as_view(), name='buyer_create'),
     # renters
     path('renters/', views.RenterListView.as_view(), name='renter_list'),
     re_path(r'renter/update/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/', views.RenterUpdateView.as_view(), name='renter_update'),
     re_path(r'renter/delete/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/', views.RenterDeleteView.as_view(), name='renter_delete'),
+    re_path(r'renter/delete-request/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/', views.RenterDeleteRequestView.as_view(), name='renter_delete_request'),
+    re_path(r'renter/recover/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/', views.RenterRecoverView.as_view(), name='renter_recover'),
     re_path(r'renter/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/', views.RenterDetailView.as_view(), name='renter_detail'),
     re_path(r'renters/create/', views.RenterCreateView.as_view(), name='renter_create'),
     # tasks
@@ -83,9 +93,9 @@ urlpatterns = [
     re_path(r'trade/create/', views.TradeCreateView.as_view(), name='trade_create'),
     # boss
     path('tasks/boss/', views.TaskBossListView.as_view(), name='boss_task_list'),
+    path('tasks/boss/delete-requests/', views.delete_request_list_view, name='delete_request_list'),
     re_path(r'tasks/boss/approve/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/', views.TaskBossApproveView.as_view(), name='boss_task_approve'),
     re_path(r'tasks/boss/delete/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/', views.TaskBossDeleteView.as_view(), name='boss_task_delete'),
 ]
-
 
 

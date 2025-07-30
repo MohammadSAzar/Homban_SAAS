@@ -160,6 +160,42 @@ class SaleFileAgentFilterForm(forms.Form):
         return cleaned_data
 
 
+class SaleFileDeleteRequestForm(forms.ModelForm):
+    class Meta:
+        model = models.SaleFile
+        fields = ['delete_request']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.required = True
+
+    def clean(self):
+        cleaned_data = super().clean()
+        delete_request = cleaned_data.get('delete_request')
+        if delete_request and delete_request != 'Yes':
+            self.add_error('delete_request', 'برای درخواست حذف، این فیلد را به "بله" تغییر دهید')
+        return cleaned_data
+
+
+class SaleFileRecoverForm(forms.ModelForm):
+    class Meta:
+        model = models.SaleFile
+        fields = ['delete_request']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.required = True
+
+    def clean(self):
+        cleaned_data = super().clean()
+        delete_request = cleaned_data.get('delete_request')
+        if delete_request and delete_request != 'No':
+            self.add_error('delete_request', 'برای بازیابی، این فیلد را به "خیر" تغییر دهید')
+        return cleaned_data
+
+
 # --------------------------------- Files ---------------------------------
 create_rent_file_fields = ['province', 'city', 'district', 'sub_district', 'address', 'deposit_announced', 'deposit_min',
                            'rent_announced', 'rent_min', 'convertable', 'room', 'area', 'age', 'document', 'level',
@@ -326,6 +362,42 @@ class RentFileAgentFilterForm(forms.Form):
         return cleaned_data
 
 
+class RentFileDeleteRequestForm(forms.ModelForm):
+    class Meta:
+        model = models.RentFile
+        fields = ['delete_request']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.required = True
+
+    def clean(self):
+        cleaned_data = super().clean()
+        delete_request = cleaned_data.get('delete_request')
+        if delete_request and delete_request != 'Yes':
+            self.add_error('delete_request', 'برای درخواست حذف، این فیلد را به "بله" تغییر دهید')
+        return cleaned_data
+
+
+class RentFileRecoverForm(forms.ModelForm):
+    class Meta:
+        model = models.RentFile
+        fields = ['delete_request']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.required = True
+
+    def clean(self):
+        cleaned_data = super().clean()
+        delete_request = cleaned_data.get('delete_request')
+        if delete_request and delete_request != 'No':
+            self.add_error('delete_request', 'برای بازیابی فایل، این فیلد را به "خیر" تغییر دهید')
+        return cleaned_data
+
+
 # -------------------------------- People --------------------------------
 buyer_required_fields = ['name', 'phone_number', 'description', 'province', 'city', 'district', 'sub_districts',
                          'budget_announced', 'budget_status', 'room_max', 'room_min', 'area_max', 'area_min',
@@ -356,6 +428,42 @@ class PersonCreateForm(forms.ModelForm):
         if name and not checkers.name_checker(name):
             self.add_error('name', 'فرمت نام صحیح نیست')
 
+        return cleaned_data
+
+
+class PersonDeleteRequestForm(forms.ModelForm):
+    class Meta:
+        model = models.Person
+        fields = ['delete_request']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.required = True
+
+    def clean(self):
+        cleaned_data = super().clean()
+        delete_request = cleaned_data.get('delete_request')
+        if delete_request and delete_request != 'Yes':
+            self.add_error('delete_request', 'برای درخواست حذف، این فیلد را به "بله" تغییر دهید')
+        return cleaned_data
+
+
+class PersonRecoverForm(forms.ModelForm):
+    class Meta:
+        model = models.Person
+        fields = ['delete_request']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.required = True
+
+    def clean(self):
+        cleaned_data = super().clean()
+        delete_request = cleaned_data.get('delete_request')
+        if delete_request and delete_request != 'No':
+            self.add_error('delete_request', 'برای بازیابی فرد آگهی‌دهنده، این فیلد را به "خیر" تغییر دهید')
         return cleaned_data
 
 
@@ -437,6 +545,42 @@ class BuyerFilterForm(forms.Form):
         if max_budget and not checkers.file_price_checker(max_budget):
             self.add_error('max_budget', 'بودجه مشتری باید بین 1 تا 1000 میلیارد تومان باشد')
 
+        return cleaned_data
+
+
+class BuyerDeleteRequestForm(forms.ModelForm):
+    class Meta:
+        model = models.Buyer
+        fields = ['delete_request']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.required = True
+
+    def clean(self):
+        cleaned_data = super().clean()
+        delete_request = cleaned_data.get('delete_request')
+        if delete_request and delete_request != 'Yes':
+            self.add_error('delete_request', 'برای درخواست حذف، این فیلد را به "بله" تغییر دهید')
+        return cleaned_data
+
+
+class BuyerRecoverForm(forms.ModelForm):
+    class Meta:
+        model = models.Buyer
+        fields = ['delete_request']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.required = True
+
+    def clean(self):
+        cleaned_data = super().clean()
+        delete_request = cleaned_data.get('delete_request')
+        if delete_request and delete_request != 'No':
+            self.add_error('delete_request', 'برای بازیابی خریدار، این فیلد را به "خیر" تغییر دهید')
         return cleaned_data
 
 
@@ -536,6 +680,42 @@ class RenterFilterForm(forms.Form):
         if max_rent and not checkers.rent_file_rent_price_checker(max_rent):
             self.add_error('max_rent', 'بودجه اجاره باید بین 0 تا 10 میلیارد تومان باشد')
 
+        return cleaned_data
+
+
+class RenterDeleteRequestForm(forms.ModelForm):
+    class Meta:
+        model = models.Renter
+        fields = ['delete_request']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.required = True
+
+    def clean(self):
+        cleaned_data = super().clean()
+        delete_request = cleaned_data.get('delete_request')
+        if delete_request and delete_request != 'Yes':
+            self.add_error('delete_request', 'برای درخواست حذف، این فیلد را به "بله" تغییر دهید')
+        return cleaned_data
+
+
+class RenterRecoverForm(forms.ModelForm):
+    class Meta:
+        model = models.Renter
+        fields = ['delete_request']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.required = True
+
+    def clean(self):
+        cleaned_data = super().clean()
+        delete_request = cleaned_data.get('delete_request')
+        if delete_request and delete_request != 'No':
+            self.add_error('delete_request', 'برای بازیابی مستاجر، این فیلد را به "خیر" تغییر دهید')
         return cleaned_data
 
 

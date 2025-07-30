@@ -1,0 +1,208 @@
+{% extends '_base_dashboard.html' %}
+
+{% load static %}
+{% load i18n %}
+{% load jalali_tags %}
+{% load number_converter %}
+{% load widget_tweaks %}
+{% load humanize %}
+
+
+{% block title %}موارد حذفی{% endblock %}
+
+
+{% block content %}
+
+    <!-- Message -->
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <h4 class="modal-title" style="padding: 20px 20px 10px 0;!important;">عملیات با موفقیت انجام شد (اطلاعات مربوطه توسط مدیر بررسی خواهد شد).</h4>
+            <button class="modal-my-button">بستن پیام</button>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function() {
+            var messages = "{% for message in messages %}{{ message }}{% if not forloop.last %}\\n{% endif %}{% endfor %}";
+            if (messages) {
+                $('#modal-message').text(messages);
+                $('#successModal').show();
+            }
+            $('.modal-my-button').on('click', function() {
+                $('#successModal').hide();
+            });
+        });
+    </script>
+
+    <!-- List -->
+    <div class="nk-block">
+        <div class="row g-gs">
+            <!-- Person -->
+            {% for item in persons %}
+                <div class="col-sm-6 col-lg-4 col-xxl-4">
+                    <div class="card h-100">
+                        <div class="card-inner">
+                            <div class="project">
+
+                                <div class="project-head">
+                                    <div class="project-title">
+                                        <div class="project-info">
+                                            <h6 class="title">تایید حذف آگهی‌دهنده "{{ item.name }}"</h6>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Delete -->
+                                <div class="project-meta">
+                                    <a href="{% url 'person_delete' item.pk %}" class="btn btn-danger" style="margin-top: 1em;"><em class="icon ni ni-delete"></em><span>حذف</span></a>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+            <!-- Buyer -->
+            {% for item in buyers %}
+                <div class="col-sm-6 col-lg-4 col-xxl-4">
+                    <div class="card h-100">
+                        <div class="card-inner">
+                            <div class="project">
+
+                                <div class="project-head">
+                                    <div class="project-title">
+                                        <div class="project-info">
+                                            <h6 class="title">تایید حذف خریدار "{{ item.name }}"</h6>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Delete -->
+                                <div class="project-meta">
+                                    <a href="{% url 'buyer_delete' item.pk item.code %}" class="btn btn-danger" style="margin-top: 1em;"><em class="icon ni ni-delete"></em><span>حذف</span></a>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+            <!-- Renter -->
+            {% for item in renters %}
+                <div class="col-sm-6 col-lg-4 col-xxl-4">
+                    <div class="card h-100">
+                        <div class="card-inner">
+                            <div class="project">
+
+                                <div class="project-head">
+                                    <div class="project-title">
+                                        <div class="project-info">
+                                            <h6 class="title">تایید حذف مستاجر "{{ item.name }}"</h6>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Delete -->
+                                <div class="project-meta">
+                                    <a href="{% url 'renter_delete' item.pk item.code %}" class="btn btn-danger" style="margin-top: 1em;"><em class="icon ni ni-delete"></em><span>حذف</span></a>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+            <!-- SFs -->
+            {% for item in sale_files %}
+                <div class="col-sm-6 col-lg-4 col-xxl-4">
+                    <div class="card h-100">
+                        <div class="card-inner">
+                            <div class="project">
+
+                                <div class="project-head">
+                                    <div class="project-title">
+                                        <div class="project-info">
+                                            <h6 class="title">تایید حذف فایل خرید "{{ item.title }}"</h6>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Delete -->
+                                <div class="project-meta">
+                                    <a href="{% url 'sale_file_delete' item.pk item.unique_url_id %}" class="btn btn-danger" style="margin-top: 1em;"><em class="icon ni ni-delete"></em><span>حذف</span></a>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+            <!-- RFs -->
+            {% for item in rent_files %}
+                <div class="col-sm-6 col-lg-4 col-xxl-4">
+                    <div class="card h-100">
+                        <div class="card-inner">
+                            <div class="project">
+
+                                <div class="project-head">
+                                    <div class="project-title">
+                                        <div class="project-info">
+                                            <h6 class="title">تایید حذف فایل اجاره "{{ item.title }}"</h6>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Delete -->
+                                <div class="project-meta">
+                                    <a href="{% url 'rent_file_delete' item.pk item.unique_url_id %}" class="btn btn-danger" style="margin-top: 1em;"><em class="icon ni ni-delete"></em><span>حذف</span></a>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    <!-- end: List -->
+    
+    <!-- Pagination -->
+    <div class="nk-block-head nk-block-head-lg" style="margin-top: 1.5em;">
+        <div class="nk-block-between" style="justify-items: center; justify-content: center; text-align: center">
+            <div class="nk-block-head-content">
+                <div class="my-profile-pagination" style="margin-top: 1em;">
+                    {% if page_obj.has_previous %}
+                        <a href="{% url 'person_list' %}?page=1">&laquo; ابتدا</a>
+                    {% else %}
+                        <span class="my-profile-disabled">&laquo; ابتدا</span>
+                    {% endif %}
+
+                    {% if page_obj.has_previous %}
+                        <a href="{% url 'person_list' %}?page={{ page_obj.previous_page_number }}">‹ قبلی</a>
+                    {% else %}
+                        <span class="my-profile-disabled">‹ قبلی</span>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if num == page_obj.number %}
+                            <span class="my-profile-current">{{ num }}</span>
+                        {% else %}
+                            <a href="{% url 'person_list' %}?page={{ num }}">{{ num }}</a>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                        <a href="{% url 'person_list' %}?page={{ page_obj.next_page_number }}">بعدی ›</a>
+                    {% else %}
+                        <span class="my-profile-disabled">بعدی ›</span>
+                    {% endif %}
+
+                    {% if page_obj.has_next %}
+                        <a href="{% url 'person_list' %}?page={{ page_obj.paginator.num_pages }}">انتها &raquo;</a>
+                    {% else %}
+                        <span class="my-profile-disabled">انتها &raquo;</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- end: Pagination -->
+
+{% endblock %}
+
+
+

@@ -44,7 +44,13 @@
                                 <button type="submit" class="btn btn-danger" style="line-height: 30px;">حذف فرد</button>
                             </div>
                         </form>
-                        <!-- end: Form -->    
+                        <!-- end: Form --> 
+                        
+                        <!-- Recover -->
+                        <div class="nk-fmg-actions" style="margin-top: 3em;">
+                            <a href="{% url 'person_recover' person.pk %}" class="btn btn-primary" style="line-height: 30px;">بازیابی فرد</a>
+                        </div>
+                        <!-- end: Recover -->
                     
                     </div>
                 </div>
