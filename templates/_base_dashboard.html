@@ -23,6 +23,9 @@
         <script src="{% static 'dashboard/assets/js/bundle.js' %}"></script>
         <script src="{% static 'dashboard/assets/js/scripts.js' %}"></script>
         <script src="{% static 'dashboard/assets/js/jquery-3.7.1.min.js' %}"></script>
+        <script src="{% static 'dashboard/assets/js/jdate.js' %}"></script> {# for calendar #}
+        <script src="{% static 'dashboard/assets/js/apps/calendar.js' %}"></script> {# for calendar #}
+        <script src="{% static 'dashboard/assets/js/apps/fullcalendar.js' %}"></script> {# for calendar #}
 
         <!-- Favicon -->
         <link rel="icon" type="image/png" href="{% static 'main/img/logos/ho-fav.png' %}">
@@ -139,9 +142,9 @@
                                                 <span class="nk-menu-text">{% trans 'Team' %}</span>
                                             </a>
                                             <ul class="nk-menu-sub">
-{#                                                <li class="nk-menu-item">#}
-{#                                                    <a href="{% url 'dashboard' %}" class="nk-menu-link"><span class="nk-menu-text">{% trans 'Agents' %}</span></a>#}
-{#                                                </li>#}
+                                                <li class="nk-menu-item">
+                                                    <a href="{% url 'calendar' %}" class="nk-menu-link"><span class="nk-menu-text">تقویم</span></a>
+                                                </li>
                                                 {% if request.user.title == 'bs' %}
                                                     <li class="nk-menu-item">
                                                         <a href="{% url 'boss_task_list' %}" class="nk-menu-link"><span class="nk-menu-text">وظایف مدیر</span></a>
@@ -255,7 +258,7 @@
                     <!-- end: Header -->
 
                     <!-- Content -->
-                    <div class=" nk-content">
+                    <div class="nk-content">
                         <div class="container-fluid">
                             <div class="nk-content-inner">
 

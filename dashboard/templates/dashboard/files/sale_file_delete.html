@@ -18,9 +18,13 @@
                 <div class="card-inner">
                     <div class="preview-block">
 
-                        <!-- Text -->
+                        <!-- Title -->
                         <div class="nk-block-head-content">
-                            <p class="nk-block-title" style="line-height: 45px; font-size: 1.4em;">آیا از حذف فایل {{ sale_file.title|linebreaksbr|farsi_number }} مطمئن هستید؟</p>
+                            <h5 class="nk-block-title" style="line-height: 45px; font-size: 1.4em;">آیا از حذف فایل فروش 
+                                <a href="{{ sale_file.get_absolute_url }}" style="text-decoration: none; color: #00a65c">
+                                    {{ sale_file.title|linebreaksbr|farsi_number }}
+                                </a> مطمئن هستید؟
+                            </h5>
                         </div>
                         <!-- end: Title -->
 

@@ -1,6 +1,7 @@
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django import forms
 from django.utils.translation import gettext as _
+from jdatetime import datetime as jdatetime
 
 from . import models, checkers, choices
 
@@ -1398,15 +1399,24 @@ task_required_fields = ['title', 'type', 'agent', 'deadline', 'description']
 class TaskCreateForm(forms.ModelForm):
     class Meta:
         model = models.Task
-        fields = ['title', 'type', 'agent', 'deadline', 'sale_file_code', 'rent_file_code','buyer_code', 'renter_code', 'description']
+        fields = ['title', 'type', 'agent', 'deadline', 'sale_file_code', 'rent_file_code', 'buyer_code', 'renter_code', 'description']
 
     def __init__(self, *args, **kwargs):
         super(TaskCreateForm, self).__init__(*args, **kwargs)
-        self.fields['deadline'] = forms.ChoiceField(
-            choices=models.next_month_shamsi(),
-            required=True,
-            label=self.fields['deadline'].label,
-        )
+        initial_deadline = self.initial.get('deadline') or self.data.get('deadline')
+        if 'deadline' in self.initial or 'deadline' in self.data:
+            self.fields['deadline'] = forms.CharField(
+                initial=initial_deadline,
+                required=True,
+                label='مهلت انجام',
+                widget=forms.TextInput(attrs={'readonly': 'readonly'})
+            )
+        else:
+            self.fields['deadline'] = forms.ChoiceField(
+                choices=models.next_month_shamsi(),
+                required=True,
+                label='مهلت انجام'
+            )
         for field in task_required_fields:
             self.fields[field].required = True
 
@@ -1418,6 +1428,17 @@ class TaskCreateForm(forms.ModelForm):
         rent_file_code = cleaned_data.get('rent_file_code')
         buyer_code = cleaned_data.get('buyer_code')
         renter_code = cleaned_data.get('renter_code')
+        deadline = cleaned_data.get('deadline')
+
+        if deadline:
+            try:
+                year, month, day = map(int, deadline.split('/'))
+                deadline_date = jdatetime(year, month, day)
+                today = jdatetime.now().date()
+                if deadline_date < today:
+                    self.add_error('deadline', 'ددلاین انتخابی گذشته است')
+            except (ValueError, AttributeError):
+                self.add_error('deadline', 'فرمت تاریخ نامعتبر است')
 
         sale_file_codes = list(models.SaleFile.objects.values_list('code', flat=True))
         rent_file_codes = list(models.RentFile.objects.values_list('code', flat=True))
@@ -1450,9 +1471,9 @@ class TaskCreateForm(forms.ModelForm):
             if agent.sub_district not in renter.sub_districts.all():
                 self.add_error('renter_code', 'مستاجر و مشاور مربوطه، زیرمحله مشترک ندارند')
 
-        if agent.title == 'bs':
+        if agent and agent.title == 'bs':
             self.add_error('agent', 'امکان تعریف وظیفه برای مدیر وجود ندارد')
-        if agent.title != task_type and agent.title != 'bs':
+        if agent and agent.title != task_type and agent.title != 'bs':
             self.add_error('agent', 'مشاور انتخابی با "نوع وظیفه" همخوانی ندارد')
             self.add_error('type', 'نوع وظیفه با "مشاور انتخابی" همخوانی ندارد')
 
@@ -1982,7 +2003,6 @@ class CombinedSessionResultForm(forms.Form):
     def save(self):
         self.boss_form.save()
         self.result_session_form.save()
-
 
 
 

@@ -32,7 +32,11 @@
                         <!-- Title -->
                         <div class="nk-block-head nk-block-head-lg wide-sm">
                             <div class="nk-block-head-content">
-                                <h6 class="nk-block-title page-title" style="line-height: 45px;">درخواست بازیابی مستاجر {{ renter.name }}</h6>
+                                <h5 class="nk-block-title" style="line-height: 45px;">درخواست بازیابی مستاجر 
+                                    <a href="{{ renter.get_absolute_url }}" style="text-decoration: none; color: #00a65c">
+                                        {{ renter.name }}
+                                    </a>
+                                </h5>
                             </div>
                         </div>
                         <!-- end: Title -->

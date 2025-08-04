@@ -1,3 +1,4 @@
+from django.http import JsonResponse
 from django.views import View
 from django.views.generic import DetailView, CreateView, ListView, UpdateView, DeleteView, TemplateView
 from django.shortcuts import get_object_or_404, render, redirect
@@ -1689,6 +1690,13 @@ class TaskCreateView(PermissionRequiredMixin, CreateView):
     permission_model = 'Task'
     permission_action = 'create'
 
+    def get_initial(self):
+        initial = super().get_initial()
+        deadline = self.request.GET.get('deadline')
+        if deadline:
+            initial['deadline'] = deadline
+        return initial
+
     def post(self, request, *args, **kwargs):
         form = self.get_form()
         if form.is_valid():
@@ -1784,6 +1792,14 @@ class TaskResultView(PermissionRequiredMixin, UpdateView):
         elif task_type == 'bt':
             return reverse('task_bt_list')
         return reverse('dashboard')
+
+
+def calendar_view(request):
+    user = request.user
+    context = {
+        'user': user,
+    }
+    return render(request, 'dashboard/tasks/calendar.html', context=context)
 
 
 # -------------------------------- BossTasks -------------------------------

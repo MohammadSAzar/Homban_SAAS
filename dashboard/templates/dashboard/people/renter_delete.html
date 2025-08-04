@@ -30,10 +30,12 @@
                     <div class="preview-block" >
 
                         <!-- Title -->
-                        <div class="nk-block-head  nk-block-head-lg wide-sm">
-                            <div class="nk-block-head-content">
-                                <h6 class="nk-block-title page-title" style="line-height: 45px;">حذف مستاجر {{ renter.name|farsi_number }}</h6>
-                            </div>
+                        <div class="nk-block-head-content">
+                            <h5 class="nk-block-title" style="line-height: 45px; font-size: 1.4em;">آیا از حذف مستاجر 
+                                <a href="{{ renter.get_absolute_url }}" style="text-decoration: none; color: #00a65c">
+                                    {{ renter.name }}
+                                </a> مطمئن هستید؟
+                            </h5>
                         </div>
                         <!-- end: Title -->
 

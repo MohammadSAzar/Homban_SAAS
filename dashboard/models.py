@@ -47,7 +47,7 @@ def next_week_shamsi():
             'Saturday': 'شنبه',
             'Sunday': 'یکشنبه',
         }.get(weekday_en, weekday_en)
-        label = f"{weekday_fa} - {date_str}"
+        label = f"{weekday_fa} | {date_str}"
         days.append((date_str, label))
     return days
 
@@ -68,7 +68,7 @@ def next_month_shamsi():
             'Saturday': 'شنبه',
             'Sunday': 'یکشنبه',
         }.get(weekday_en, weekday_en)
-        label = f"{weekday_fa} - {date_str}"
+        label = f"{weekday_fa} | {date_str}"
         days.append((date_str, label))
     return days
 
@@ -89,7 +89,7 @@ def last_month_shamsi():
             'Saturday': 'شنبه',
             'Sunday': 'یکشنبه',
         }.get(weekday_en, weekday_en)
-        label = f"{weekday_fa} - {date_str}"
+        label = f"{weekday_fa} | {date_str}"
         days.append((date_str, label))
     return days
 
