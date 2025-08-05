@@ -56,7 +56,16 @@
     </div>
     <!-- end: Calendar -->
     
+    <!-- JS -->
+    <script>
+        window.userData = {
+            title: "{{ request.user.title|default:''|escapejs }}"
+        };
+    </script>
+    <!-- end: JS -->
+    
     
 {% endblock %}
+
 
 

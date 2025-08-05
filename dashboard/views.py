@@ -1802,6 +1802,21 @@ def calendar_view(request):
     return render(request, 'dashboard/tasks/calendar.html', context=context)
 
 
+def dated_task_list_view(request):
+    user = request.user
+    date = request.GET.get('date')
+    tasks = models.Task.objects.filter(agent=user)
+    if date:
+        tasks = models.Task.objects.filter(agent=user).filter(deadline=date)
+    context = {
+        'user': user,
+        'date': date,
+        'tasks': tasks,
+    }
+    print(date)
+    return render(request, 'dashboard/tasks/dated_task_list.html', context=context)
+
+
 # -------------------------------- BossTasks -------------------------------
 class TaskBossListView(ListView):
     model = models.TaskBoss
@@ -2669,6 +2684,5 @@ class TradeCodeView(PermissionRequiredMixin, UpdateView):
 
     def get_success_url(self):
         return reverse('trade_list')
-
 
 

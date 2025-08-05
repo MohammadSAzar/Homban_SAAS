@@ -9,6 +9,7 @@ urlpatterns = [
     path('home/', views.home_view, name='home'),
     path('dashboard/', views.dashboard_view, name='dashboard'),
     path('calendar/', views.calendar_view, name='calendar'),
+    path('dated-task-list/', views.dated_task_list_view, name='dated_task_list'),
     # sale_file
     path('sale-files/', views.SaleFileListView.as_view(), name='sale_file_list'),
     re_path(r'sale-file/update/(?P<pk>[-\w]+)/(?P<unique_url_id>[-\w]+)/', views.SaleFileUpdateView.as_view(), name='sale_file_update'),

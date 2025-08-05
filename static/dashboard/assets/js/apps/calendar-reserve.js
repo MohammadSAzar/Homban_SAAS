@@ -55,10 +55,15 @@
             timeZone: 'UTC',
             initialView: mobileView ? 'listWeek' : 'dayGridMonth',
             themeSystem: 'bootstrap5',
+            // headerToolbar: {
+            //     left: 'title',
+            //     center: null,
+            //     right: 'today next,prev'
+            // },
             headerToolbar: {
                 left: 'title',
                 center: null,
-                right: 'today next,prev'
+                right: 'today prev'
             },
             buttonText: {
                 prev: 'قبلی',
@@ -92,33 +97,46 @@
                     calendar: 'persian'
                 }).format(gregDate).split('/');
 
-                // Get the Persian day number (keep it as string to preserve Persian numerals)
+                // Get the Persian day number
                 var persianDayStr = persianDate[2];
 
                 // Create the day number element
                 var dayNumberEl = document.createElement('div');
                 dayNumberEl.className = 'fc-daygrid-day-number';
-                dayNumberEl.innerHTML = persianDayStr; // Use the string directly
-
-                // Create the task creation button
-                var taskBtnEl = document.createElement('button');
-                taskBtnEl.className = 'btn btn-sm btn-outline-primary task-create-btn';
-                taskBtnEl.innerHTML = '<i class="icon ni ni-plus"></i>';
-                taskBtnEl.title = 'ایجاد وظیفه برای این روز';
-                taskBtnEl.style.cssText = 'position: absolute; bottom: 5px; right: 5px; padding: 2px 4px; font-size: 10px; line-height: 1; z-index: 10; min-width: 20px; min-height: 20px;';
-
-                // Add click event to redirect to task creation with deadline
-                taskBtnEl.onclick = function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    window.open('/task/create/?deadline=' + encodeURIComponent(persianDate.join('/')), '_blank');
-                };
+                dayNumberEl.innerHTML = persianDayStr;
 
                 // Create wrapper for day content
                 var wrapperEl = document.createElement('div');
                 wrapperEl.style.cssText = 'position: relative; width: 100%; height: 100%; min-height: 100px;';
                 wrapperEl.appendChild(dayNumberEl);
-                wrapperEl.appendChild(taskBtnEl);
+
+                // Only create taskCreateBtn if user.title is 'bs'
+                if (window.userData && window.userData.title === 'bs') {
+                    var taskCreateBtn = document.createElement('button');
+                    taskCreateBtn.className = 'btn btn-sm btn-outline-primary task-create-btn';
+                    taskCreateBtn.innerHTML = '<i class="icon ni ni-plus"></i>';
+                    taskCreateBtn.title = 'ایجاد وظیفه جدید';
+                    taskCreateBtn.style.cssText = 'position: absolute; bottom: 5px; right: 5px; padding: 2px 4px; font-size: 10px; line-height: 1; z-index: 10; min-width: 20px; min-height: 20px;';
+                    taskCreateBtn.onclick = function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        window.open('/task/create/?deadline=' + encodeURIComponent(persianDate.join('/')), '_blank');
+                    };
+                    wrapperEl.appendChild(taskCreateBtn);
+                }
+
+                // Create the task list button (always visible)
+                var taskListBtn = document.createElement('button');
+                taskListBtn.className = 'btn btn-sm btn-outline-secondary task-list-btn';
+                taskListBtn.innerHTML = '<i class="icon ni ni-list"></i>';
+                taskListBtn.title = 'مشاهده وظایف این روز';
+                taskListBtn.style.cssText = 'position: absolute; bottom: 5px; left: 5px; padding: 2px 4px; font-size: 10px; line-height: 1; z-index: 10; min-width: 20px; min-height: 20px;';
+                taskListBtn.onclick = function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    window.open('/dated-task-list/?date=' + encodeURIComponent(persianDate.join('/')), '_blank');
+                };
+                wrapperEl.appendChild(taskListBtn);
 
                 return { domNodes: [wrapperEl] };
             },
