@@ -55,10 +55,20 @@
             timeZone: 'UTC',
             initialView: mobileView ? 'listWeek' : 'dayGridMonth',
             themeSystem: 'bootstrap5',
+            // headerToolbar: {
+            //     left: 'title',
+            //     center: null,
+            //     right: 'today next,prev'
+            // },
             headerToolbar: {
-                left: 'title prev,next',
+                left: 'title',
                 center: null,
-                right: 'today dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+                right: 'today prev'
+            },
+            buttonText: {
+                prev: 'قبلی',
+                next: 'بعدی',
+                today: 'امروز'
             },
             height: 800,
             contentHeight: 780,
