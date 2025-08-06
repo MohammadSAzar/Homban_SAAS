@@ -1402,6 +1402,7 @@ class TaskCreateForm(forms.ModelForm):
         fields = ['title', 'type', 'agent', 'deadline', 'sale_file_code', 'rent_file_code', 'buyer_code', 'renter_code', 'description']
 
     def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop('request', None)
         super(TaskCreateForm, self).__init__(*args, **kwargs)
         initial_deadline = self.initial.get('deadline') or self.data.get('deadline')
         if 'deadline' in self.initial or 'deadline' in self.data:
@@ -1417,6 +1418,24 @@ class TaskCreateForm(forms.ModelForm):
                 required=True,
                 label='مهلت انجام'
             )
+        if self.request and self.request.user.title != 'bs':
+            self.fields['agent'].initial = self.request.user
+
+            class ReadOnlyUserWidget(forms.TextInput):
+                def __init__(self, user, *args, **kwargs):
+                    self.user = user
+                    super().__init__(*args, **kwargs)
+                    self.attrs.update({'readonly': 'readonly'})
+
+                def format_value(self, value):
+                    return self.user.username
+
+                def value_from_datadict(self, data, files, name):
+                    return self.user.pk
+
+            self.fields['agent'].widget = ReadOnlyUserWidget(self.request.user)
+        else:
+            self.fields['agent'].queryset = models.CustomUserModel.objects.exclude(title='bs')
         for field in task_required_fields:
             self.fields[field].required = True
 
@@ -2003,6 +2022,7 @@ class CombinedSessionResultForm(forms.Form):
     def save(self):
         self.boss_form.save()
         self.result_session_form.save()
+
 
 
 

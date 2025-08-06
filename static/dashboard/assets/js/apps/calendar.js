@@ -111,19 +111,19 @@
                 wrapperEl.appendChild(dayNumberEl);
 
                 // Only create taskCreateBtn if user.title is 'bs'
-                if (window.userData && window.userData.title === 'bs') {
-                    var taskCreateBtn = document.createElement('button');
-                    taskCreateBtn.className = 'btn btn-sm btn-outline-primary task-create-btn';
-                    taskCreateBtn.innerHTML = '<i class="icon ni ni-plus"></i>';
-                    taskCreateBtn.title = 'ایجاد وظیفه جدید';
-                    taskCreateBtn.style.cssText = 'position: absolute; bottom: 5px; right: 5px; padding: 2px 4px; font-size: 10px; line-height: 1; z-index: 10; min-width: 20px; min-height: 20px;';
-                    taskCreateBtn.onclick = function(e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        window.open('/task/create/?deadline=' + encodeURIComponent(persianDate.join('/')), '_blank');
-                    };
-                    wrapperEl.appendChild(taskCreateBtn);
-                }
+                // if (window.userData && window.userData.title === 'bs') {
+                var taskCreateBtn = document.createElement('button');
+                taskCreateBtn.className = 'btn btn-sm btn-outline-primary task-create-btn';
+                taskCreateBtn.innerHTML = '<i class="icon ni ni-plus"></i>';
+                taskCreateBtn.title = 'ایجاد وظیفه جدید';
+                taskCreateBtn.style.cssText = 'position: absolute; bottom: 5px; right: 5px; padding: 2px 4px; font-size: 10px; line-height: 1; z-index: 10; min-width: 20px; min-height: 20px;';
+                taskCreateBtn.onclick = function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    window.open('/task/create/?deadline=' + encodeURIComponent(persianDate.join('/')), '_blank');
+                };
+                wrapperEl.appendChild(taskCreateBtn);
+                // }
 
                 // Create the task list button (always visible)
                 var taskListBtn = document.createElement('button');

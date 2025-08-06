@@ -29,7 +29,7 @@ ROLE_PERMISSIONS = {
         'Visit': ['create', 'read', 'update', 'delete'],
         'Session': ['create', 'read', 'update', 'delete'],
         'Trade': ['create', 'read', 'update', 'delete'],
-        'Task': ['read', 'update'],
+        'Task': ['read', 'update', 'create'],
     },
 
     'cp': {
@@ -42,7 +42,7 @@ ROLE_PERMISSIONS = {
         'Visit': ['create', 'read', 'update', 'delete'],
         'Session': ['create', 'read', 'update', 'delete'],
         'Trade': ['create', 'read', 'update', 'delete'],
-        'Task': ['read', 'update'],
+        'Task': ['read', 'update', 'create'],
     },
 
     'bt': {
@@ -55,7 +55,7 @@ ROLE_PERMISSIONS = {
         'Visit': ['create', 'read', 'update', 'delete'],
         'Session': ['create', 'read', 'update', 'delete'],
         'Trade': ['create', 'read', 'update', 'delete'],
-        'Task': ['read', 'update'],
+        'Task': ['read', 'update', 'create'],
     },
 }
 
