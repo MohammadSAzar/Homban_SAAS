@@ -1,0 +1,50 @@
+{% extends '_base_dashboard.html' %}
+
+{% load static %}
+{% load i18n %}
+{% load jalali_tags %}
+{% load number_converter %}
+{% load widget_tweaks %}
+{% load humanize %}
+
+
+{% block title %}تست{% endblock %}
+
+
+{% block content %}
+
+    <!-- Info -->
+    <div class="card">
+        <div class="card-aside-wrap">
+            <div class="card-inner card-inner-lg">
+                <div class="nk-block-head nk-block-head-lg">
+                    <div class="nk-block-between">
+                        <div class="nk-block-head-content">
+                            <h5 class="nk-block-title">مشاور: {{ user.name_family|farsi_number }}</h5>
+                            <div class="nk-block-des" style="margin-top: 20px;">
+                                <h6 style="color: #00a65c">نقش: {{ user.get_title_display|farsi_number }}</h6>
+
+                                {% for day in current_month %}
+                                    {{ day }}<br>
+                                {% endfor %}<br><br>
+
+                                {{ today }}<br><br>
+                                {{ current_month }}<br><br>
+                                {{ previous_month }}<br><br>
+                                {{ previous_2_months }}<br><br>
+                                {{ next_month }}<br><br>
+                                {{ next_2_months }}<br>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+
+

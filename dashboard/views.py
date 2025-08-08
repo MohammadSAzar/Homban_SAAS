@@ -7,8 +7,10 @@ from django.urls import reverse, reverse_lazy
 from django.core.exceptions import PermissionDenied
 from django.contrib import messages
 
+from jalali_date import datetime2jalali
+from django.utils import timezone
 
-from . import models, forms
+from . import models, forms, functions
 from .permissions import PermissionRequiredMixin, ReadOnlyPermissionMixin
 
 
@@ -1799,29 +1801,6 @@ class TaskResultView(PermissionRequiredMixin, UpdateView):
         return reverse('dashboard')
 
 
-def calendar_view(request):
-    user = request.user
-    context = {
-        'user': user,
-    }
-    return render(request, 'dashboard/tasks/calendar.html', context=context)
-
-
-def dated_task_list_view(request):
-    user = request.user
-    date = request.GET.get('date')
-    tasks = models.Task.objects.filter(agent=user)
-    if date:
-        tasks = models.Task.objects.filter(agent=user).filter(deadline=date)
-    context = {
-        'user': user,
-        'date': date,
-        'tasks': tasks,
-    }
-    print(date)
-    return render(request, 'dashboard/tasks/dated_task_list.html', context=context)
-
-
 # -------------------------------- BossTasks -------------------------------
 class TaskBossListView(ListView):
     model = models.TaskBoss
@@ -2689,5 +2668,157 @@ class TradeCodeView(PermissionRequiredMixin, UpdateView):
 
     def get_success_url(self):
         return reverse('trade_list')
+
+
+# -------------------------------- Calendar -------------------------------
+def calendar_current_month_view(request):
+    user = request.user
+
+    now = timezone.now()
+    today = datetime2jalali(now)
+    month = functions.current_month()
+
+    current_month = functions.current_month_finder(today.month)
+    previous_month = functions.previous_month_finder(today.month)
+    previous_2_month = functions.previous_2_month_finder(today.month)
+    next_month = functions.next_month_finder(today.month)
+    next_2_month = functions.next_2_month_finder(today.month)
+
+    context = {
+        'user': user,
+        'today': today.strftime('%Y/%m/%d'),
+        'month': month,
+        'current_month': current_month,
+        'previous_month': previous_month,
+        'previous_2_month': previous_2_month,
+        'next_month': next_month,
+        'next_2_month': next_2_month,
+    }
+
+    return render(request, 'dashboard/calendar/current.html', context=context)
+
+
+def calendar_previous_month_view(request):
+    user = request.user
+
+    now = timezone.now()
+    today = datetime2jalali(now)
+    month = functions.previous_month()
+
+    current_month = functions.current_month_finder(today.month)
+    previous_month = functions.previous_month_finder(today.month)
+    previous_2_month = functions.previous_2_month_finder(today.month)
+    next_month = functions.next_month_finder(today.month)
+    next_2_month = functions.next_2_month_finder(today.month)
+
+    context = {
+        'user': user,
+        'today': today.strftime('%Y/%m/%d'),
+        'month': month,
+        'current_month': current_month,
+        'previous_month': previous_month,
+        'previous_2_month': previous_2_month,
+        'next_month': next_month,
+        'next_2_month': next_2_month,
+    }
+
+    return render(request, 'dashboard/calendar/previous.html', context=context)
+
+
+def calendar_previous_2_month_view(request):
+    user = request.user
+
+    now = timezone.now()
+    today = datetime2jalali(now)
+    month = functions.previous_2_month()
+
+    current_month = functions.current_month_finder(today.month)
+    previous_month = functions.previous_month_finder(today.month)
+    previous_2_month = functions.previous_2_month_finder(today.month)
+    next_month = functions.next_month_finder(today.month)
+    next_2_month = functions.next_2_month_finder(today.month)
+
+    context = {
+        'user': user,
+        'today': today.strftime('%Y/%m/%d'),
+        'month': month,
+        'current_month': current_month,
+        'previous_month': previous_month,
+        'previous_2_month': previous_2_month,
+        'next_month': next_month,
+        'next_2_month': next_2_month,
+    }
+
+    return render(request, 'dashboard/calendar/2previous.html', context=context)
+
+
+def calendar_next_month_view(request):
+    user = request.user
+
+    now = timezone.now()
+    today = datetime2jalali(now)
+    month = functions.next_month()
+
+    current_month = functions.current_month_finder(today.month)
+    previous_month = functions.previous_month_finder(today.month)
+    previous_2_month = functions.previous_2_month_finder(today.month)
+    next_month = functions.next_month_finder(today.month)
+    next_2_month = functions.next_2_month_finder(today.month)
+
+    context = {
+        'user': user,
+        'today': today.strftime('%Y/%m/%d'),
+        'month': month,
+        'current_month': current_month,
+        'previous_month': previous_month,
+        'previous_2_month': previous_2_month,
+        'next_month': next_month,
+        'next_2_month': next_2_month,
+    }
+
+    return render(request, 'dashboard/calendar/next.html', context=context)
+
+
+def calendar_next_2_month_view(request):
+    user = request.user
+
+    now = timezone.now()
+    today = datetime2jalali(now)
+    month = functions.next_2_month()
+
+    current_month = functions.current_month_finder(today.month)
+    previous_month = functions.previous_month_finder(today.month)
+    previous_2_month = functions.previous_2_month_finder(today.month)
+    next_month = functions.next_month_finder(today.month)
+    next_2_month = functions.next_2_month_finder(today.month)
+
+    context = {
+        'user': user,
+        'today': today.strftime('%Y/%m/%d'),
+        'month': month,
+        'current_month': current_month,
+        'previous_month': previous_month,
+        'previous_2_month': previous_2_month,
+        'next_month': next_month,
+        'next_2_month': next_2_month,
+    }
+
+    return render(request, 'dashboard/calendar/2next.html', context=context)
+
+
+def dated_task_list_view(request):
+    user = request.user
+    date = request.GET.get('date')
+    tasks = models.Task.objects.filter(agent=user)
+    if date:
+        tasks = models.Task.objects.filter(agent=user).filter(deadline=date)
+    context = {
+        'user': user,
+        'date': date,
+        'tasks': tasks,
+    }
+    print(date)
+    return render(request, 'dashboard/tasks/dated_task_list.html', context=context)
+
 
 

@@ -9,3 +9,4 @@ def farsi_number(number):
     converted_number = number.maketrans('1234567890', '۱۲۳۴۵۶۷۸۹۰')
     return number.translate(converted_number)
 
+

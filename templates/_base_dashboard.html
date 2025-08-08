@@ -23,9 +23,6 @@
         <script src="{% static 'dashboard/assets/js/bundle.js' %}"></script>
         <script src="{% static 'dashboard/assets/js/scripts.js' %}"></script>
         <script src="{% static 'dashboard/assets/js/jquery-3.7.1.min.js' %}"></script>
-        <script src="{% static 'dashboard/assets/js/jdate.js' %}"></script> {# for calendar #}
-        <script src="{% static 'dashboard/assets/js/apps/calendar.js' %}"></script> {# for calendar #}
-        <script src="{% static 'dashboard/assets/js/apps/fullcalendar.js' %}"></script> {# for calendar #}
 
         <!-- Favicon -->
         <link rel="icon" type="image/png" href="{% static 'main/img/logos/ho-fav.png' %}">
@@ -143,7 +140,7 @@
                                             </a>
                                             <ul class="nk-menu-sub">
                                                 <li class="nk-menu-item">
-                                                    <a href="{% url 'calendar' %}" class="nk-menu-link"><span class="nk-menu-text">تقویم</span></a>
+                                                    <a href="{% url 'current_month' %}" class="nk-menu-link"><span class="nk-menu-text">تقویم</span></a>
                                                 </li>
                                                 {% if request.user.title == 'bs' %}
                                                     <li class="nk-menu-item">

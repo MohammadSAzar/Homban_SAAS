@@ -8,7 +8,12 @@ urlpatterns = [
     path('', views.home_view, name='home'),
     path('home/', views.home_view, name='home'),
     path('dashboard/', views.dashboard_view, name='dashboard'),
-    path('calendar/', views.calendar_view, name='calendar'),
+    # calendar
+    path('calendar/current/', views.calendar_current_month_view, name='current_month'),
+    path('calendar/previous/', views.calendar_previous_month_view, name='previous_month'),
+    path('calendar/previous-2/', views.calendar_previous_2_month_view, name='previous_2_month'),
+    path('calendar/next/', views.calendar_next_month_view, name='next_month'),
+    path('calendar/next-2/', views.calendar_next_2_month_view, name='next_2_month'),
     path('dated-task-list/', views.dated_task_list_view, name='dated_task_list'),
     # sale_file
     path('sale-files/', views.SaleFileListView.as_view(), name='sale_file_list'),
