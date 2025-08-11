@@ -7,6 +7,10 @@ from django.urls import reverse, reverse_lazy
 from django.core.exceptions import PermissionDenied
 from django.contrib import messages
 
+from django.core.paginator import Paginator
+from itertools import chain
+from operator import attrgetter
+
 from jalali_date import datetime2jalali
 from django.utils import timezone
 
@@ -2221,23 +2225,65 @@ class TaskBossDeleteView(PermissionRequiredMixin, DeleteView):
 
 def delete_request_list_view(request):
     context = {}
-    querysets = {
-            'sale_files': models.SaleFile.objects.filter(delete_request='Yes'),
-            'rent_files': models.RentFile.objects.filter(delete_request='Yes'),
-            'buyers': models.Buyer.objects.filter(delete_request='Yes'),
-            'renters': models.Renter.objects.filter(delete_request='Yes'),
-            'persons': models.Person.objects.filter(delete_request='Yes'),
-        }
-    if querysets['sale_files'].exists():
-        context['sale_files'] = querysets['sale_files']
-    if querysets['rent_files'].exists():
-        context['rent_files'] = querysets['rent_files']
-    if querysets['buyers'].exists():
-        context['buyers'] = querysets['buyers']
-    if querysets['renters'].exists():
-        context['renters'] = querysets['renters']
-    if querysets['persons'].exists():
-        context['persons'] = querysets['persons']
+    sale_files = models.SaleFile.objects.filter(delete_request='Yes')
+    rent_files = models.RentFile.objects.filter(delete_request='Yes')
+    buyers = models.Buyer.objects.filter(delete_request='Yes')
+    renters = models.Renter.objects.filter(delete_request='Yes')
+    persons = models.Person.objects.filter(delete_request='Yes')
+
+    for obj in sale_files:
+        obj.model_type = 'sale_file'
+    for obj in rent_files:
+        obj.model_type = 'rent_file'
+    for obj in buyers:
+        obj.model_type = 'buyer'
+    for obj in renters:
+        obj.model_type = 'renter'
+    for obj in persons:
+        obj.model_type = 'person'
+
+    all_objects = list(chain(sale_files, rent_files, buyers, renters, persons))
+    try:
+        all_objects = sorted(all_objects, key=attrgetter('datetime_created'), reverse=True)
+    except AttributeError:
+        try:
+            all_objects = sorted(all_objects, key=attrgetter('datetime_created'), reverse=True)
+        except AttributeError:
+            all_objects = sorted(all_objects, key=attrgetter('id'), reverse=True)
+
+    paginator = Paginator(all_objects, 12)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    paginated_sale_files = []
+    paginated_rent_files = []
+    paginated_buyers = []
+    paginated_renters = []
+    paginated_persons = []
+
+    for obj in page_obj:
+        if obj.model_type == 'sale_file':
+            paginated_sale_files.append(obj)
+        elif obj.model_type == 'rent_file':
+            paginated_rent_files.append(obj)
+        elif obj.model_type == 'buyer':
+            paginated_buyers.append(obj)
+        elif obj.model_type == 'renter':
+            paginated_renters.append(obj)
+        elif obj.model_type == 'person':
+            paginated_persons.append(obj)
+
+    if paginated_sale_files:
+        context['sale_files'] = paginated_sale_files
+    if paginated_rent_files:
+        context['rent_files'] = paginated_rent_files
+    if paginated_buyers:
+        context['buyers'] = paginated_buyers
+    if paginated_renters:
+        context['renters'] = paginated_renters
+    if paginated_persons:
+        context['persons'] = paginated_persons
+    context['page_obj'] = page_obj
+
     return render(request, 'dashboard/boss/delete_item_list.html', context)
 
 

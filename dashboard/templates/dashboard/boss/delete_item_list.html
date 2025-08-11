@@ -166,13 +166,13 @@
             <div class="nk-block-head-content">
                 <div class="my-profile-pagination" style="margin-top: 1em;">
                     {% if page_obj.has_previous %}
-                        <a href="{% url 'person_list' %}?page=1">&laquo; ابتدا</a>
+                        <a href="{% url 'delete_request_list' %}?page=1">&laquo; ابتدا</a>
                     {% else %}
                         <span class="my-profile-disabled">&laquo; ابتدا</span>
                     {% endif %}
 
                     {% if page_obj.has_previous %}
-                        <a href="{% url 'person_list' %}?page={{ page_obj.previous_page_number }}">‹ قبلی</a>
+                        <a href="{% url 'delete_request_list' %}?page={{ page_obj.previous_page_number }}">‹ قبلی</a>
                     {% else %}
                         <span class="my-profile-disabled">‹ قبلی</span>
                     {% endif %}
@@ -181,18 +181,18 @@
                         {% if num == page_obj.number %}
                             <span class="my-profile-current">{{ num }}</span>
                         {% else %}
-                            <a href="{% url 'person_list' %}?page={{ num }}">{{ num }}</a>
+                            <a href="{% url 'delete_request_list' %}?page={{ num }}">{{ num }}</a>
                         {% endif %}
                     {% endfor %}
 
                     {% if page_obj.has_next %}
-                        <a href="{% url 'person_list' %}?page={{ page_obj.next_page_number }}">بعدی ›</a>
+                        <a href="{% url 'delete_request_list' %}?page={{ page_obj.next_page_number }}">بعدی ›</a>
                     {% else %}
                         <span class="my-profile-disabled">بعدی ›</span>
                     {% endif %}
 
                     {% if page_obj.has_next %}
-                        <a href="{% url 'person_list' %}?page={{ page_obj.paginator.num_pages }}">انتها &raquo;</a>
+                        <a href="{% url 'delete_request_list' %}?page={{ page_obj.paginator.num_pages }}">انتها &raquo;</a>
                     {% else %}
                         <span class="my-profile-disabled">انتها &raquo;</span>
                     {% endif %}
