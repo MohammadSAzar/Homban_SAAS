@@ -96,6 +96,8 @@ class SaleFileFilterForm(forms.Form):
     warehouse = forms.ChoiceField(choices=[('', '---------')] + choices.booleans, required=False, label=_('Warehouse'))
     has_images = forms.ChoiceField(choices=[('', '---------')] + choices.booleans, required=False, label=_('Has Images'))
     has_video = forms.ChoiceField(choices=[('', '---------')] + choices.booleans, required=False, label=_('Has Video'))
+    min_date = forms.CharField(required=False, label='از تاریخ')
+    max_date = forms.CharField(required=False, label='تا تاریخ')
 
     def clean(self):
         cleaned_data = super().clean()
@@ -279,6 +281,8 @@ class RentFileFilterForm(forms.Form):
     warehouse = forms.ChoiceField(choices=[('', '---------')] + choices.booleans, required=False, label=_('Warehouse'))
     has_images = forms.ChoiceField(choices=[('', '---------')] + choices.booleans, required=False, label=_('Has Images'))
     has_video = forms.ChoiceField(choices=[('', '---------')] + choices.booleans, required=False, label=_('Has Video'))
+    min_date = forms.CharField(required=False, label='از تاریخ')
+    max_date = forms.CharField(required=False, label='تا تاریخ')
 
     def clean(self):
         cleaned_data = super().clean()

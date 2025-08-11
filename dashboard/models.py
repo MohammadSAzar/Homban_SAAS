@@ -76,7 +76,7 @@ def next_month_shamsi():
 def last_month_shamsi():
     days = []
     today = datetime.today()
-    for i in range(1, 31):
+    for i in range(0, 31):
         prev_day = today - timedelta(days=i)
         weekday_en = prev_day.strftime('%A')
         date_str = prev_day.strftime('%Y/%m/%d')

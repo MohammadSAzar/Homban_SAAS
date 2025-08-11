@@ -3,6 +3,7 @@
 {% load static %}
 {% load i18n %}
 {% load jalali_tags %}
+{% load jalali_date_converter %}
 {% load number_converter %}
 {% load humanize %}
 {% load widget_tweaks %}
@@ -54,6 +55,7 @@
                                     </div>
                                     <div class="badge bg-light rounded-pill ucap">رهن و اجاره</div>
                                     <div style="font-size: 0.9em;">کد فایل: {{ rent_file.code }}</div>
+                                    <div style="font-size: 0.9em;">{{ rent_file.datetime_created|jalali_date_converter }}</div>
 
                                     <div style="font-size: 0.9em; margin-top: 1em;">
                                         <a href="{% url 'rent_file_update' rent_file.pk rent_file.unique_url_id %}" class="btn btn-primary">بروزرسانی</a>

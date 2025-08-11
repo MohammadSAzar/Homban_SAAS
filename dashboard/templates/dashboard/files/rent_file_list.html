@@ -3,6 +3,7 @@
 {% load static %}
 {% load i18n %}
 {% load jalali_tags %}
+{% load jalali_date_converter %}
 {% load number_converter %}
 {% load humanize %}
 {% load widget_tweaks %}
@@ -312,6 +313,38 @@
                                                     <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
                                                 {% endfor %}
                                             {% endif %}
+                                        
+                                            <!-- min_date -->
+                                            <div class="form-group">
+                                                <label class="form-label" for="{{ filter_form.min_date.id_for_label }}">از تاریخ</label>
+                                                {% render_field filter_form.min_date type="text" id="min_date" class="form-control" %}
+                                            </div>
+                                            {% if filter_form.min_date.errors %}
+                                                {% for error in filter_form.min_date.errors %}
+                                                    <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                                {% endfor %}
+                                            {% endif %}
+                                            <script type="text/javascript">
+                                                $(function() {
+                                                    $("#min_date").persianDatepicker();
+                                                });
+                                            </script>
+
+                                            <!-- max_date -->
+                                            <div class="form-group">
+                                                <label class="form-label" for="{{ filter_form.max_date.id_for_label }}">از تاریخ</label>
+                                                {% render_field filter_form.max_date type="text" id="max_date" class="form-control" %}
+                                            </div>
+                                            {% if filter_form.max_date.errors %}
+                                                {% for error in filter_form.max_date.errors %}
+                                                    <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                                {% endfor %}
+                                            {% endif %}
+                                            <script type="text/javascript">
+                                                $(function() {
+                                                    $("#max_date").persianDatepicker();
+                                                });
+                                            </script>
 
                                             <!-- button -->
                                             <div class="form-group">
@@ -514,6 +547,9 @@
                                                         <div class="nk-file-name-text" style="margin-bottom: 0.5em; height: 3em;!important; -webkit-line-clamp: 2;!important;">
                                                             <span style="font-size: 0.8em;">کد: {{ file.code }} / <span style="color: green; font-size: 1.1em;">{{ file.sub_district }}</span></span>
                                                         </div>
+                                                        <div class="nk-file-name-text">
+                                                            <span style="font-size: 0.8em;">{{ file.datetime_created|jalali_date_converter }}</span>
+                                                        </div>
                                                     </div>
     
                                                     <!-- Cover -->
@@ -611,9 +647,6 @@
 
     </div>
 {% endblock %}
-
-
-
 
 
 

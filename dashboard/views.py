@@ -390,6 +390,46 @@ class SaleFileListView(ReadOnlyPermissionMixin, ListView):
                 if form.cleaned_data['max_level']:
                     queryset_filtered = [obj for obj in queryset_filtered if
                                          int(obj.level) <= int(form.cleaned_data['max_level'])]
+                if form.cleaned_data['min_date']:
+                    try:
+                        from datetime import datetime
+                        import jdatetime
+                        jalali_date_str = form.cleaned_data['min_date']
+                        if '/' in jalali_date_str:
+                            jalali_date_parts = jalali_date_str.split('/')
+                        else:
+                            jalali_date_parts = jalali_date_str.split('-')
+                        jalali_date = jdatetime.date(
+                            int(jalali_date_parts[0]),
+                            int(jalali_date_parts[1]),
+                            int(jalali_date_parts[2])
+                        )
+                        gregorian_min_date = jalali_date.togregorian()
+
+                        queryset_filtered = [obj for obj in queryset_filtered if
+                                             obj.datetime_created.date() >= gregorian_min_date]
+                    except (ValueError, IndexError):
+                        pass
+                if form.cleaned_data['max_date']:
+                    try:
+                        from datetime import datetime
+                        import jdatetime
+                        jalali_date_str = form.cleaned_data['max_date']
+                        if '/' in jalali_date_str:
+                            jalali_date_parts = jalali_date_str.split('/')
+                        else:
+                            jalali_date_parts = jalali_date_str.split('-')
+                        jalali_date = jdatetime.date(
+                            int(jalali_date_parts[0]),
+                            int(jalali_date_parts[1]),
+                            int(jalali_date_parts[2])
+                        )
+                        gregorian_max_date = jalali_date.togregorian()
+
+                        queryset_filtered = [obj for obj in queryset_filtered if
+                                             obj.datetime_created.date() <= gregorian_max_date]
+                    except (ValueError, IndexError):
+                        pass
 
                 return queryset_filtered
             return queryset_default
@@ -460,6 +500,46 @@ class SaleFileListView(ReadOnlyPermissionMixin, ListView):
                 if form.cleaned_data['max_level']:
                     queryset_filtered = [obj for obj in queryset_filtered if
                                          int(obj.level) <= int(form.cleaned_data['max_level'])]
+                if form.cleaned_data['min_date']:
+                    try:
+                        from datetime import datetime
+                        import jdatetime
+                        jalali_date_str = form.cleaned_data['min_date']
+                        if '/' in jalali_date_str:
+                            jalali_date_parts = jalali_date_str.split('/')
+                        else:
+                            jalali_date_parts = jalali_date_str.split('-')
+                        jalali_date = jdatetime.date(
+                            int(jalali_date_parts[0]),
+                            int(jalali_date_parts[1]),
+                            int(jalali_date_parts[2])
+                        )
+                        gregorian_min_date = jalali_date.togregorian()
+
+                        queryset_filtered = [obj for obj in queryset_filtered if
+                                             obj.datetime_created.date() >= gregorian_min_date]
+                    except (ValueError, IndexError):
+                        pass
+                if form.cleaned_data['max_date']:
+                    try:
+                        from datetime import datetime
+                        import jdatetime
+                        jalali_date_str = form.cleaned_data['max_date']
+                        if '/' in jalali_date_str:
+                            jalali_date_parts = jalali_date_str.split('/')
+                        else:
+                            jalali_date_parts = jalali_date_str.split('-')
+                        jalali_date = jdatetime.date(
+                            int(jalali_date_parts[0]),
+                            int(jalali_date_parts[1]),
+                            int(jalali_date_parts[2])
+                        )
+                        gregorian_max_date = jalali_date.togregorian()
+
+                        queryset_filtered = [obj for obj in queryset_filtered if
+                                             obj.datetime_created.date() <= gregorian_max_date]
+                    except (ValueError, IndexError):
+                        pass
 
                 return queryset_filtered
             return queryset_default
@@ -689,6 +769,46 @@ class RentFileListView(ReadOnlyPermissionMixin, ListView):
                 if form.cleaned_data['max_level']:
                     queryset_filtered = [obj for obj in queryset_filtered if
                                          int(obj.level) <= int(form.cleaned_data['max_level'])]
+                if form.cleaned_data['min_date']:
+                    try:
+                        from datetime import datetime
+                        import jdatetime
+                        jalali_date_str = form.cleaned_data['min_date']
+                        if '/' in jalali_date_str:
+                            jalali_date_parts = jalali_date_str.split('/')
+                        else:
+                            jalali_date_parts = jalali_date_str.split('-')
+                        jalali_date = jdatetime.date(
+                            int(jalali_date_parts[0]),
+                            int(jalali_date_parts[1]),
+                            int(jalali_date_parts[2])
+                        )
+                        gregorian_min_date = jalali_date.togregorian()
+
+                        queryset_filtered = [obj for obj in queryset_filtered if
+                                             obj.datetime_created.date() >= gregorian_min_date]
+                    except (ValueError, IndexError):
+                        pass
+                if form.cleaned_data['max_date']:
+                    try:
+                        from datetime import datetime
+                        import jdatetime
+                        jalali_date_str = form.cleaned_data['max_date']
+                        if '/' in jalali_date_str:
+                            jalali_date_parts = jalali_date_str.split('/')
+                        else:
+                            jalali_date_parts = jalali_date_str.split('-')
+                        jalali_date = jdatetime.date(
+                            int(jalali_date_parts[0]),
+                            int(jalali_date_parts[1]),
+                            int(jalali_date_parts[2])
+                        )
+                        gregorian_max_date = jalali_date.togregorian()
+
+                        queryset_filtered = [obj for obj in queryset_filtered if
+                                             obj.datetime_created.date() <= gregorian_max_date]
+                    except (ValueError, IndexError):
+                        pass
 
                 return queryset_filtered
             return queryset_default
@@ -768,6 +888,47 @@ class RentFileListView(ReadOnlyPermissionMixin, ListView):
                 if form.cleaned_data['max_level']:
                     queryset_filtered = [obj for obj in queryset_filtered if
                                          int(obj.level) <= int(form.cleaned_data['max_level'])]
+                if form.cleaned_data['min_date']:
+                    try:
+                        from datetime import datetime
+                        import jdatetime
+                        jalali_date_str = form.cleaned_data['min_date']
+                        if '/' in jalali_date_str:
+                            jalali_date_parts = jalali_date_str.split('/')
+                        else:
+                            jalali_date_parts = jalali_date_str.split('-')
+                        jalali_date = jdatetime.date(
+                            int(jalali_date_parts[0]),
+                            int(jalali_date_parts[1]),
+                            int(jalali_date_parts[2])
+                        )
+                        gregorian_min_date = jalali_date.togregorian()
+
+                        queryset_filtered = [obj for obj in queryset_filtered if
+                                             obj.datetime_created.date() >= gregorian_min_date]
+                    except (ValueError, IndexError):
+                        pass
+                if form.cleaned_data['max_date']:
+                    try:
+                        from datetime import datetime
+                        import jdatetime
+                        jalali_date_str = form.cleaned_data['max_date']
+                        if '/' in jalali_date_str:
+                            jalali_date_parts = jalali_date_str.split('/')
+                        else:
+                            jalali_date_parts = jalali_date_str.split('-')
+                        jalali_date = jdatetime.date(
+                            int(jalali_date_parts[0]),
+                            int(jalali_date_parts[1]),
+                            int(jalali_date_parts[2])
+                        )
+                        gregorian_max_date = jalali_date.togregorian()
+
+                        queryset_filtered = [obj for obj in queryset_filtered if
+                                             obj.datetime_created.date() <= gregorian_max_date]
+                    except (ValueError, IndexError):
+                        pass
+
                 return queryset_filtered
             return queryset_default
 
