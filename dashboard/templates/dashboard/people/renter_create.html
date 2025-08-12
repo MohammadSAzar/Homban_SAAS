@@ -201,11 +201,15 @@
                             </script>
                         
                             <!-- deposit_announced -->
-                            <div class="col-lg-4 col-sm-4">
+                            <div class="col-lg-6 col-sm-6">
                                 <div class="form-group">
                                     <div class="form-control-wrap">
-                                        <label class="form-label" for="{{ form.deposit_announced.id_for_label }}">ودیعه اعلامی</label>
-                                        {% render_field form.deposit_announced id="deposit_announced" type="number" class="form-control form-control-xl form-control-outlined" %}
+                                        <label class="form-label" for="{{ form.deposit_announced.id_for_label }}">ودیعه اعلامی (تومان)</label>
+                                        <input type="text"
+                                               name="deposit_announced"
+                                               id="deposit_announced"
+                                               class="form-control form-control-xl form-control-outlined deposit-input deposit-separator"
+                                               value="{{ form.deposit_announced.value|default:'' }}">
                                     </div>
                                     {% if form.deposit_announced.errors %}
                                         {% for error in form.deposit_announced.errors %}
@@ -216,11 +220,15 @@
                             </div>
 
                             <!-- deposit_max -->
-                            <div class="col-lg-4 col-sm-4">
+                            <div class="col-lg-6 col-sm-6">
                                 <div class="form-group">
                                     <div class="form-control-wrap">
-                                        <label class="form-label" for="{{ form.deposit_max.id_for_label }}">حداکثر ودیعه</label>
-                                        {% render_field form.deposit_max id="deposit_max" type="number" class="form-control form-control-xl form-control-outlined" %}
+                                        <label class="form-label" for="{{ form.deposit_max.id_for_label }}">حداکثر ودیعه (تومان)</label>
+                                        <input type="text"
+                                               name="deposit_max"
+                                               id="deposit_max"
+                                               class="form-control form-control-xl form-control-outlined deposit-input deposit-separator"
+                                               value="{{ form.deposit_max.value|default:'' }}">
                                     </div>
                                     {% if form.deposit_max.errors %}
                                         {% for error in form.deposit_max.errors %}
@@ -229,13 +237,17 @@
                                     {% endif %}
                                 </div>
                             </div>
-                            
+
                             <!-- rent_announced -->
-                            <div class="col-lg-4 col-sm-4">
+                            <div class="col-lg-6 col-sm-6">
                                 <div class="form-group">
                                     <div class="form-control-wrap">
-                                        <label class="form-label" for="{{ form.rent_announced.id_for_label }}">اجاره اعلامی</label>
-                                        {% render_field form.rent_announced id="rent_announced" type="number" class="form-control form-control-xl form-control-outlined" %}
+                                        <label class="form-label" for="{{ form.rent_announced.id_for_label }}">اجاره اعلامی (تومان)</label>
+                                        <input type="text"
+                                               name="rent_announced"
+                                               id="rent_announced"
+                                               class="form-control form-control-xl form-control-outlined rent-input rent-separator"
+                                               value="{{ form.rent_announced.value|default:'' }}">
                                     </div>
                                     {% if form.rent_announced.errors %}
                                         {% for error in form.rent_announced.errors %}
@@ -246,11 +258,15 @@
                             </div>
 
                             <!-- rent_max -->
-                            <div class="col-lg-4 col-sm-4">
+                            <div class="col-lg-6 col-sm-6">
                                 <div class="form-group">
                                     <div class="form-control-wrap">
-                                        <label class="form-label" for="{{ form.rent_max.id_for_label }}">حداکثر اجاره</label>
-                                        {% render_field form.rent_max id="rent_max" type="number" class="form-control form-control-xl form-control-outlined" %}
+                                        <label class="form-label" for="{{ form.rent_max.id_for_label }}">حداکثر اجاره (تومان)</label>
+                                        <input type="text"
+                                               name="rent_max"
+                                               id="rent_max"
+                                               class="form-control form-control-xl form-control-outlined rent-input rent-separator"
+                                               value="{{ form.rent_max.value|default:'' }}">
                                     </div>
                                     {% if form.rent_max.errors %}
                                         {% for error in form.rent_max.errors %}
@@ -259,9 +275,9 @@
                                     {% endif %}
                                 </div>
                             </div>
-                        
+
                             <!-- budget_status -->
-                            <div class="col-lg-4 col-sm-4">
+                            <div class="col-lg-6 col-sm-6">
                                 <div class="form-group">
                                     <div class="form-control-wrap">
                                         <label class="form-label" for="{{ form.budget_status.id_for_label }}">وضعیت بودجه</label>
@@ -276,7 +292,7 @@
                             </div>
                         
                             <!-- convertable -->
-                            <div class="col-lg-4 col-sm-4">
+                            <div class="col-lg-6 col-sm-6">
                                 <div class="form-group">
                                     <div class="form-control-wrap">
                                         <label class="form-label" for="{{ form.convertable.id_for_label }}">قابل تبدیل</label>
@@ -461,7 +477,203 @@
                             </div>
                         
                         </form>
-                        <!-- end: Form -->    
+                        <!-- end: Form -->
+
+                        <!-- JS (deposit) -->
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function() {
+                                const depositInputs = document.querySelectorAll('.deposit-separator');
+
+                                // Format existing values on page load
+                                depositInputs.forEach(function(input) {
+                                    if (input.value) {
+                                        // Remove any existing separators and format
+                                        let value = input.value.replace(/[^\d]/g, '');
+                                        if (value.length > 0) {
+                                            input.value = parseInt(value).toLocaleString('en-US');
+                                        }
+                                    }
+                                });
+
+                                depositInputs.forEach(function(input) {
+                                    input.addEventListener('input', function(e) {
+                                        // Get the current cursor position
+                                        const cursorPosition = input.selectionStart;
+                                        const oldValue = input.value;
+                                        const oldLength = oldValue.length;
+
+                                        // Remove all non-digit characters
+                                        let value = input.value.replace(/[^\d]/g, '');
+
+                                        // Add thousand separators
+                                        let formattedValue = '';
+                                        if (value.length > 0) {
+                                            formattedValue = parseInt(value).toLocaleString('en-US');
+                                        }
+
+                                        // Update the input value
+                                        input.value = formattedValue;
+
+                                        // Calculate new cursor position
+                                        const newLength = formattedValue.length;
+                                        const lengthDiff = newLength - oldLength;
+                                        let newCursorPosition = cursorPosition + lengthDiff;
+
+                                        // Adjust cursor position if we're in the middle of the number
+                                        if (cursorPosition < oldLength) {
+                                            const beforeCursor = oldValue.substring(0, cursorPosition);
+                                            const digitsBeforeCursor = beforeCursor.replace(/[^\d]/g, '').length;
+
+                                            // Find the position after the same number of digits in the new formatted value
+                                            let digitCount = 0;
+                                            newCursorPosition = 0;
+                                            for (let i = 0; i < formattedValue.length; i++) {
+                                                if (/\d/.test(formattedValue[i])) {
+                                                    digitCount++;
+                                                    if (digitCount === digitsBeforeCursor) {
+                                                        newCursorPosition = i + 1;
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                        // Set cursor position (with bounds checking)
+                                        const finalPosition = Math.max(0, Math.min(newCursorPosition, newLength));
+                                        input.setSelectionRange(finalPosition, finalPosition);
+                                    });
+
+                                    // Handle paste events
+                                    input.addEventListener('paste', function(e) {
+                                        setTimeout(() => {
+                                            input.dispatchEvent(new Event('input'));
+                                        }, 0);
+                                    });
+
+                                    // Handle backspace and delete more smoothly
+                                    input.addEventListener('keydown', function(e) {
+                                        if (e.key === 'Backspace' || e.key === 'Delete') {
+                                            const cursorPosition = input.selectionStart;
+                                            const value = input.value;
+
+                                            // If cursor is on a comma, move it to delete the digit instead
+                                            if (e.key === 'Backspace' && cursorPosition > 0 && value[cursorPosition - 1] === ',') {
+                                                e.preventDefault();
+                                                const newPosition = cursorPosition - 1;
+                                                input.setSelectionRange(newPosition, newPosition);
+                                                // Trigger backspace on the digit instead
+                                                const event = new KeyboardEvent('keydown', {
+                                                    key: 'Backspace',
+                                                    code: 'Backspace',
+                                                    keyCode: 8,
+                                                    bubbles: true
+                                                });
+                                                setTimeout(() => input.dispatchEvent(event), 0);
+                                            }
+                                        }
+                                    });
+                                });
+                            });
+                        </script>
+                        <!-- end: JS (deposit) -->
+
+                        <!-- JS (rent) -->
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function() {
+                                const rentInputs = document.querySelectorAll('.rent-separator');
+
+                                // Format existing values on page load
+                                rentInputs.forEach(function(input) {
+                                    if (input.value) {
+                                        // Remove any existing separators and format
+                                        let value = input.value.replace(/[^\d]/g, '');
+                                        if (value.length > 0) {
+                                            input.value = parseInt(value).toLocaleString('en-US');
+                                        }
+                                    }
+                                });
+
+                                rentInputs.forEach(function(input) {
+                                    input.addEventListener('input', function(e) {
+                                        // Get the current cursor position
+                                        const cursorPosition = input.selectionStart;
+                                        const oldValue = input.value;
+                                        const oldLength = oldValue.length;
+
+                                        // Remove all non-digit characters
+                                        let value = input.value.replace(/[^\d]/g, '');
+
+                                        // Add thousand separators
+                                        let formattedValue = '';
+                                        if (value.length > 0) {
+                                            formattedValue = parseInt(value).toLocaleString('en-US');
+                                        }
+
+                                        // Update the input value
+                                        input.value = formattedValue;
+
+                                        // Calculate new cursor position
+                                        const newLength = formattedValue.length;
+                                        const lengthDiff = newLength - oldLength;
+                                        let newCursorPosition = cursorPosition + lengthDiff;
+
+                                        // Adjust cursor position if we're in the middle of the number
+                                        if (cursorPosition < oldLength) {
+                                            const beforeCursor = oldValue.substring(0, cursorPosition);
+                                            const digitsBeforeCursor = beforeCursor.replace(/[^\d]/g, '').length;
+
+                                            // Find the position after the same number of digits in the new formatted value
+                                            let digitCount = 0;
+                                            newCursorPosition = 0;
+                                            for (let i = 0; i < formattedValue.length; i++) {
+                                                if (/\d/.test(formattedValue[i])) {
+                                                    digitCount++;
+                                                    if (digitCount === digitsBeforeCursor) {
+                                                        newCursorPosition = i + 1;
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                        // Set cursor position (with bounds checking)
+                                        const finalPosition = Math.max(0, Math.min(newCursorPosition, newLength));
+                                        input.setSelectionRange(finalPosition, finalPosition);
+                                    });
+
+                                    // Handle paste events
+                                    input.addEventListener('paste', function(e) {
+                                        setTimeout(() => {
+                                            input.dispatchEvent(new Event('input'));
+                                        }, 0);
+                                    });
+
+                                    // Handle backspace and delete more smoothly
+                                    input.addEventListener('keydown', function(e) {
+                                        if (e.key === 'Backspace' || e.key === 'Delete') {
+                                            const cursorPosition = input.selectionStart;
+                                            const value = input.value;
+
+                                            // If cursor is on a comma, move it to delete the digit instead
+                                            if (e.key === 'Backspace' && cursorPosition > 0 && value[cursorPosition - 1] === ',') {
+                                                e.preventDefault();
+                                                const newPosition = cursorPosition - 1;
+                                                input.setSelectionRange(newPosition, newPosition);
+                                                // Trigger backspace on the digit instead
+                                                const event = new KeyboardEvent('keydown', {
+                                                    key: 'Backspace',
+                                                    code: 'Backspace',
+                                                    keyCode: 8,
+                                                    bubbles: true
+                                                });
+                                                setTimeout(() => input.dispatchEvent(event), 0);
+                                            }
+                                        }
+                                    });
+                                });
+                            });
+                        </script>
+                        <!-- end: JS (rent) -->
                     
                     </div>
                 </div>
@@ -470,8 +682,5 @@
     </div>
 
 {% endblock %}
-
-
-
 
 

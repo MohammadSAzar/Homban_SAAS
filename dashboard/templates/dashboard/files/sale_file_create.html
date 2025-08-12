@@ -8,7 +8,7 @@
 {% load widget_tweaks %}
 
 
-{% block title %}ایجاد فایل جدید{% endblock %}
+{% block title %}ایجاد فایل فروش جدید{% endblock %}
 
 
 {% block content %}
@@ -38,9 +38,9 @@
                         <!-- end: Title -->
 
                         <!-- Form -->
-                        <form class="row gy-4"  method="post" enctype="multipart/form-data" novalidate>
+                        <form class="row gy-4" method="post" enctype="multipart/form-data" novalidate>
                             {% csrf_token %}
-
+                        
                             <!-- title -->
                             <div class="col-lg-4 col-sm-4">
                                 <div class="form-group">
@@ -55,7 +55,7 @@
                                     {% endif %}
                                 </div>
                             </div>
-
+                        
                             <!-- source -->
                             <div class="col-lg-3 col-sm-3">
                                 <div class="form-group">
@@ -70,7 +70,7 @@
                                     {% endif %}
                                 </div>
                             </div>
-
+                        
                             <!-- person -->
                             <div class="col-lg-5 col-sm-5">
                                 <div class="form-group">
@@ -85,13 +85,17 @@
                                     {% endif %}
                                 </div>
                             </div>
-
+                        
                             <!-- price_announced -->
                             <div class="col-lg-6 col-sm-6">
                                 <div class="form-group">
                                     <div class="form-control-wrap">
                                         <label class="form-label" for="{{ form.price_announced.id_for_label }}">قیمت اعلامی (تومان)</label>
-                                        {% render_field form.price_announced id="price_announced" type="number" class="form-control form-control-xl form-control-outlined" %}
+                                        <input type="text" 
+                                               name="price_announced" 
+                                               id="price_announced"
+                                               class="form-control form-control-xl form-control-outlined price-input price-separator"
+                                               value="{{ form.price_announced.value|default:'' }}">
                                     </div>
                                     {% if form.price_announced.errors %}
                                         {% for error in form.price_announced.errors %}
@@ -100,13 +104,17 @@
                                     {% endif %}
                                 </div>
                             </div>
-
+                        
                             <!-- price_min -->
                             <div class="col-lg-6 col-sm-6">
                                 <div class="form-group">
                                     <div class="form-control-wrap">
                                         <label class="form-label" for="{{ form.price_min.id_for_label }}">حداقل قیمت (تومان)</label>
-                                        {% render_field form.price_min id="price_min" type="number" class="form-control form-control-xl form-control-outlined" %}
+                                        <input type="text" 
+                                               name="price_min" 
+                                               id="price_min"
+                                               class="form-control form-control-xl form-control-outlined price-input price-separator"
+                                               value="{{ form.price_min.value|default:'' }}">
                                     </div>
                                     {% if form.price_min.errors %}
                                         {% for error in form.price_min.errors %}
@@ -115,7 +123,7 @@
                                     {% endif %}
                                 </div>
                             </div>
-
+                        
                             <!-- province -->
                             <div class="col-lg-3 col-sm-3">
                                 <div class="form-group">
@@ -130,7 +138,7 @@
                                     {% endif %}
                                 </div>
                             </div>
-
+                        
                             <!-- city -->
                             <div class="col-lg-3 col-sm-3">
                                 <div class="form-group">
@@ -145,7 +153,7 @@
                                     {% endif %}
                                 </div>
                             </div>
-
+                        
                             <!-- district -->
                             <div class="col-lg-3 col-sm-3">
                                 <div class="form-group">
@@ -160,7 +168,7 @@
                                     {% endif %}
                                 </div>
                             </div>
-
+                        
                             <!-- sub_district -->
                             <div class="col-lg-3 col-sm-3">
                                 <div class="form-group">
@@ -175,7 +183,7 @@
                                     {% endif %}
                                 </div>
                             </div>
-
+                        
                             <!-- area -->
                             <div class="col-lg-3 col-sm-3">
                                 <div class="form-group">
@@ -190,7 +198,7 @@
                                     {% endif %}
                                 </div>
                             </div>
-
+                        
                             <!-- room -->
                             <div class="col-lg-3 col-sm-3">
                                 <div class="form-group">
@@ -205,7 +213,7 @@
                                     {% endif %}
                                 </div>
                             </div>
-
+                        
                             <!-- age -->
                             <div class="col-lg-3 col-sm-3">
                                 <div class="form-group">
@@ -220,7 +228,7 @@
                                     {% endif %}
                                 </div>
                             </div>
-
+                        
                             <!-- level -->
                             <div class="col-lg-3 col-sm-3">
                                 <div class="form-group">
@@ -235,7 +243,7 @@
                                     {% endif %}
                                 </div>
                             </div>
-
+                        
                             <!-- document -->
                             <div class="col-lg-3 col-sm-3">
                                 <div class="form-group">
@@ -250,7 +258,7 @@
                                     {% endif %}
                                 </div>
                             </div>
-
+                        
                             <!-- parking -->
                             <div class="col-lg-3 col-sm-3">
                                 <div class="form-group">
@@ -265,7 +273,7 @@
                                     {% endif %}
                                 </div>
                             </div>
-
+                        
                             <!-- elevator -->
                             <div class="col-lg-3 col-sm-3">
                                 <div class="form-group">
@@ -280,7 +288,7 @@
                                     {% endif %}
                                 </div>
                             </div>
-
+                        
                             <!-- warehouse -->
                             <div class="col-lg-3 col-sm-3">
                                 <div class="form-group">
@@ -295,7 +303,7 @@
                                     {% endif %}
                                 </div>
                             </div>
-
+                        
                             <!-- address -->
                             <div class="col-lg-5 col-sm-5">
                                 <div class="form-group">
@@ -310,7 +318,7 @@
                                     {% endif %}
                                 </div>
                             </div>
-
+                        
                             <!-- description -->
                             <div class="col-lg-7 col-sm-7">
                                 <div class="form-group">
@@ -325,7 +333,7 @@
                                     {% endif %}
                                 </div>
                             </div>
-
+                        
                             <!-- spacer -->
                             <div class="col-lg-12 col-sm-12">
                                 <div class="form-group">
@@ -334,7 +342,7 @@
                                     </div>
                                 </div>
                             </div>
-
+                        
                             <!-- image1 -->
                             <div class="col-lg-3 col-sm-3">
                                 <div class="form-group">
@@ -349,7 +357,7 @@
                                     {% endif %}
                                 </div>
                             </div>
-
+                        
                             <!-- image2 -->
                             <div class="col-lg-3 col-sm-3">
                                 <div class="form-group">
@@ -364,7 +372,7 @@
                                     {% endif %}
                                 </div>
                             </div>
-
+                        
                             <!-- image3 -->
                             <div class="col-lg-3 col-sm-3">
                                 <div class="form-group">
@@ -379,7 +387,7 @@
                                     {% endif %}
                                 </div>
                             </div>
-
+                        
                             <!-- image4 -->
                             <div class="col-lg-3 col-sm-3">
                                 <div class="form-group">
@@ -394,7 +402,7 @@
                                     {% endif %}
                                 </div>
                             </div>
-
+                        
                             <!-- image5 -->
                             <div class="col-lg-4 col-sm-4">
                                 <div class="form-group">
@@ -409,7 +417,7 @@
                                     {% endif %}
                                 </div>
                             </div>
-
+                        
                             <!-- image6 -->
                             <div class="col-lg-4 col-sm-4">
                                 <div class="form-group">
@@ -424,7 +432,7 @@
                                     {% endif %}
                                 </div>
                             </div>
-
+                        
                             <!-- image7 -->
                             <div class="col-lg-4 col-sm-4">
                                 <div class="form-group">
@@ -439,7 +447,7 @@
                                     {% endif %}
                                 </div>
                             </div>
-
+                        
                             <!-- image8 -->
                             <div class="col-lg-4 col-sm-4">
                                 <div class="form-group">
@@ -454,7 +462,7 @@
                                     {% endif %}
                                 </div>
                             </div>
-
+                        
                             <!-- image9 -->
                             <div class="col-lg-4 col-sm-4">
                                 <div class="form-group">
@@ -469,7 +477,7 @@
                                     {% endif %}
                                 </div>
                             </div>
-
+                        
                             <!-- video -->
                             <div class="col-lg-4 col-sm-4">
                                 <div class="form-group">
@@ -484,7 +492,7 @@
                                     {% endif %}
                                 </div>
                             </div>
-
+                        
                             <!-- spacer -->
                             <div class="col-lg-12 col-sm-12">
                                 <div class="form-group">
@@ -493,7 +501,7 @@
                                     </div>
                                 </div>
                             </div>
-
+                        
                             <!-- direction -->
                             <div class="col-lg-3 col-sm-3">
                                 <div class="form-group">
@@ -508,7 +516,7 @@
                                     {% endif %}
                                 </div>
                             </div>
-
+                        
                             <!-- file_levels -->
                             <div class="col-lg-3 col-sm-3">
                                 <div class="form-group">
@@ -523,7 +531,7 @@
                                     {% endif %}
                                 </div>
                             </div>
-
+                        
                             <!-- apartments_per_level -->
                             <div class="col-lg-3 col-sm-3">
                                 <div class="form-group">
@@ -538,7 +546,7 @@
                                     {% endif %}
                                 </div>
                             </div>
-
+                        
                             <!-- restoration -->
                             <div class="col-lg-3 col-sm-3">
                                 <div class="form-group">
@@ -553,7 +561,7 @@
                                     {% endif %}
                                 </div>
                             </div>
-
+                        
                             <!-- bench_stove -->
                             <div class="col-lg-3 col-sm-3">
                                 <div class="form-group">
@@ -568,7 +576,7 @@
                                     {% endif %}
                                 </div>
                             </div>
-
+                        
                             <!-- balcony -->
                             <div class="col-lg-3 col-sm-3">
                                 <div class="form-group">
@@ -583,7 +591,7 @@
                                     {% endif %}
                                 </div>
                             </div>
-
+                        
                             <!-- floor -->
                             <div class="col-lg-3 col-sm-3">
                                 <div class="form-group">
@@ -591,14 +599,14 @@
                                         <label class="form-label" for="{{ form.floor.id_for_label }}">وضعیت کف</label>
                                         {% render_field form.floor id="floor" type="text" class="form-control form-control-xl form-control-outlined" %}
                                     </div>
-                                    {% if form.flooe.errors %}
-                                        {% for error in form.flooe.errors %}
+                                    {% if form.floor.errors %}
+                                        {% for error in form.floor.errors %}
                                             <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
                                         {% endfor %}
                                     {% endif %}
                                 </div>
                             </div>
-
+                        
                             <!-- toilet -->
                             <div class="col-lg-3 col-sm-3">
                                 <div class="form-group">
@@ -613,7 +621,7 @@
                                     {% endif %}
                                 </div>
                             </div>
-
+                        
                             <!-- hot_water -->
                             <div class="col-lg-4 col-sm-4">
                                 <div class="form-group">
@@ -628,7 +636,7 @@
                                     {% endif %}
                                 </div>
                             </div>
-
+                        
                             <!-- heating -->
                             <div class="col-lg-4 col-sm-4">
                                 <div class="form-group">
@@ -643,7 +651,7 @@
                                     {% endif %}
                                 </div>
                             </div>
-
+                        
                             <!-- cooling -->
                             <div class="col-lg-4 col-sm-4">
                                 <div class="form-group">
@@ -658,13 +666,112 @@
                                     {% endif %}
                                 </div>
                             </div>
-
+                        
                             <!-- Submit -->
                             <div class="nk-fmg-actions" style="margin-top: 3em;">
                                 <button type="submit" class="btn btn-primary" style="line-height: 30px;">ثبت اطلاعات</button>
                             </div>
+                        
                         </form>
-                        <!-- end: Form -->    
+                        <!-- end: Form -->
+                        
+                        <!-- JS -->
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function() {
+                                const priceInputs = document.querySelectorAll('.price-separator');
+                                
+                                // Format existing values on page load
+                                priceInputs.forEach(function(input) {
+                                    if (input.value) {
+                                        // Remove any existing separators and format
+                                        let value = input.value.replace(/[^\d]/g, '');
+                                        if (value.length > 0) {
+                                            input.value = parseInt(value).toLocaleString('en-US');
+                                        }
+                                    }
+                                });
+                                
+                                priceInputs.forEach(function(input) {
+                                    input.addEventListener('input', function(e) {
+                                        // Get the current cursor position
+                                        const cursorPosition = input.selectionStart;
+                                        const oldValue = input.value;
+                                        const oldLength = oldValue.length;
+                                        
+                                        // Remove all non-digit characters
+                                        let value = input.value.replace(/[^\d]/g, '');
+                                        
+                                        // Add thousand separators
+                                        let formattedValue = '';
+                                        if (value.length > 0) {
+                                            formattedValue = parseInt(value).toLocaleString('en-US');
+                                        }
+                                        
+                                        // Update the input value
+                                        input.value = formattedValue;
+                                        
+                                        // Calculate new cursor position
+                                        const newLength = formattedValue.length;
+                                        const lengthDiff = newLength - oldLength;
+                                        let newCursorPosition = cursorPosition + lengthDiff;
+                                        
+                                        // Adjust cursor position if we're in the middle of the number
+                                        if (cursorPosition < oldLength) {
+                                            const beforeCursor = oldValue.substring(0, cursorPosition);
+                                            const digitsBeforeCursor = beforeCursor.replace(/[^\d]/g, '').length;
+                                            
+                                            // Find the position after the same number of digits in the new formatted value
+                                            let digitCount = 0;
+                                            newCursorPosition = 0;
+                                            for (let i = 0; i < formattedValue.length; i++) {
+                                                if (/\d/.test(formattedValue[i])) {
+                                                    digitCount++;
+                                                    if (digitCount === digitsBeforeCursor) {
+                                                        newCursorPosition = i + 1;
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        
+                                        // Set cursor position (with bounds checking)
+                                        const finalPosition = Math.max(0, Math.min(newCursorPosition, newLength));
+                                        input.setSelectionRange(finalPosition, finalPosition);
+                                    });
+                                    
+                                    // Handle paste events
+                                    input.addEventListener('paste', function(e) {
+                                        setTimeout(() => {
+                                            input.dispatchEvent(new Event('input'));
+                                        }, 0);
+                                    });
+                                    
+                                    // Handle backspace and delete more smoothly
+                                    input.addEventListener('keydown', function(e) {
+                                        if (e.key === 'Backspace' || e.key === 'Delete') {
+                                            const cursorPosition = input.selectionStart;
+                                            const value = input.value;
+                                            
+                                            // If cursor is on a comma, move it to delete the digit instead
+                                            if (e.key === 'Backspace' && cursorPosition > 0 && value[cursorPosition - 1] === ',') {
+                                                e.preventDefault();
+                                                const newPosition = cursorPosition - 1;
+                                                input.setSelectionRange(newPosition, newPosition);
+                                                // Trigger backspace on the digit instead
+                                                const event = new KeyboardEvent('keydown', {
+                                                    key: 'Backspace',
+                                                    code: 'Backspace',
+                                                    keyCode: 8,
+                                                    bubbles: true
+                                                });
+                                                setTimeout(() => input.dispatchEvent(event), 0);
+                                            }
+                                        }
+                                    });
+                                });
+                            });
+                        </script>
+                        <!-- end: JS -->
                     
                     </div>
                 </div>
@@ -673,9 +780,5 @@
     </div>
 
 {% endblock %}
-
-
-
-
 
 

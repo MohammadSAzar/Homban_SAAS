@@ -37,7 +37,40 @@ sale_file_required_fields = ['province', 'city', 'district', 'sub_district', 'ad
                              'age', 'document', 'level', 'parking', 'elevator', 'warehouse', 'title', 'description', 'source',]
 
 
+class NumberSeparatorWidget(forms.TextInput):
+    def __init__(self, attrs=None):
+        default_attrs = {'class': 'form-control form-control-xl form-control-outlined price-input price-separator'}
+        if attrs:
+            default_attrs.update(attrs)
+        super().__init__(attrs=default_attrs)
+
+    def format_value(self, value):
+        if value is None:
+            return ''
+        if isinstance(value, (int, float)):
+            return f"{value:,}"
+        return str(value)
+
+
 class SaleFileCreateForm(forms.ModelForm):
+    price_announced = forms.CharField(
+        required=False,
+        widget=NumberSeparatorWidget(attrs={
+            'placeholder': 'مثلاً: 30,000,000,000',
+            'maxlength': '20'
+        }),
+        label='قیمت اعلامی (تومان)'
+    )
+
+    price_min = forms.CharField(
+        required=False,
+        widget=NumberSeparatorWidget(attrs={
+            'placeholder': 'مثلاً: 27,000,000,000',
+            'maxlength': '20'
+        }),
+        label='حداقل قیمت (تومان)'
+    )
+
     class Meta:
         model = models.SaleFile
         fields = create_sale_file_fields
@@ -54,22 +87,36 @@ class SaleFileCreateForm(forms.ModelForm):
         for field in sale_file_required_fields:
             self.fields[field].required = True
 
+    def _clean_price_field(self, field_name):
+        value = self.cleaned_data.get(field_name)
+        if not value:
+            return None
+        try:
+            clean_value_str = ''.join(c for c in str(value) if c.isdigit())
+            if clean_value_str:
+                clean_value = int(clean_value_str)
+                if not checkers.file_price_checker(clean_value):
+                    raise forms.ValidationError('قیمت فایل باید بین 1 تا 1000 میلیارد تومان باشد')
+                return clean_value
+            else:
+                return None
+        except (ValueError, TypeError):
+            raise forms.ValidationError('قیمت وارد شده معتبر نیست')
+
+    def clean_price_announced(self):
+        return self._clean_price_field('price_announced')
+
+    def clean_price_min(self):
+        return self._clean_price_field('price_min')
+
     def clean(self):
         cleaned_data = super().clean()
-        price_announced = cleaned_data.get('price_announced')
-        price_min = cleaned_data.get('price_min')
         area = cleaned_data.get('area')
         sub_district = cleaned_data.get('sub_district')
-
-        if price_announced and not checkers.file_price_checker(price_announced):
-            self.add_error('price_announced', 'قیمت فایل باید بین 1 تا 1000 میلیارد تومان باشد')
-        if price_min and not checkers.file_price_checker(price_min):
-            self.add_error('price_min', 'قیمت فایل باید بین 1 تا 1000 میلیارد تومان باشد')
         if area and not checkers.area_checker(area):
             self.add_error('area', 'متراژ فایل باید بین 20 تا 10000 متر باشد.')
         if self.user.title != 'bs' and sub_district != self.user.sub_district:
             self.add_error('sub_district', 'مشاور اجازه ایجاد فایل جدید در این زیرمحله را ندارد')
-
         return cleaned_data
 
 
@@ -140,6 +187,8 @@ class SaleFileAgentFilterForm(forms.Form):
     warehouse = forms.ChoiceField(choices=[('', '---------')] + choices.booleans, required=False, label=_('Warehouse'))
     has_images = forms.ChoiceField(choices=[('', '---------')] + choices.booleans, required=False, label=_('Has Images'))
     has_video = forms.ChoiceField(choices=[('', '---------')] + choices.booleans, required=False, label=_('Has Video'))
+    min_date = forms.CharField(required=False, label='از تاریخ')
+    max_date = forms.CharField(required=False, label='تا تاریخ')
 
     def clean(self):
         cleaned_data = super().clean()
@@ -214,6 +263,39 @@ rent_file_required_fields = ['province', 'city', 'district', 'sub_district', 'ad
 
 
 class RentFileCreateForm(forms.ModelForm):
+    deposit_announced = forms.CharField(
+        required=False,
+        widget=NumberSeparatorWidget(attrs={
+            'placeholder': 'مثلاً: 1,500,000,000',
+            'maxlength': '20'
+        }),
+        label='ودیعه اعلامی (تومان)'
+    )
+    deposit_min = forms.CharField(
+        required=False,
+        widget=NumberSeparatorWidget(attrs={
+            'placeholder': 'مثلاً: 1,300,000,000',
+            'maxlength': '20'
+        }),
+        label='حداقل ودیعه (تومان)'
+    )
+    rent_announced = forms.CharField(
+        required=False,
+        widget=NumberSeparatorWidget(attrs={
+            'placeholder': 'مثلاً: 15,000,000',
+            'maxlength': '20'
+        }),
+        label='اجاره اعلامی (تومان)'
+    )
+    rent_min = forms.CharField(
+        required=False,
+        widget=NumberSeparatorWidget(attrs={
+            'placeholder': 'مثلاً: 10,000,000',
+            'maxlength': '20'
+        }),
+        label='حداقل اجاره (تومان)'
+    )
+
     class Meta:
         model = models.RentFile
         fields = create_rent_file_fields
@@ -230,23 +312,55 @@ class RentFileCreateForm(forms.ModelForm):
         for field in rent_file_required_fields:
             self.fields[field].required = True
 
+    def _clean_deposit_field(self, field_name):
+        value = self.cleaned_data.get(field_name)
+        if not value:
+            return None
+        try:
+            clean_value_str = ''.join(c for c in str(value) if c.isdigit())
+            if clean_value_str:
+                clean_value = int(clean_value_str)
+                if not checkers.rent_file_deposit_price_checker(clean_value):
+                    raise forms.ValidationError('مبلغ ودیعه باید بین 1 تا 100 میلیارد تومان باشد')
+                return clean_value
+            else:
+                return None
+        except (ValueError, TypeError):
+            raise forms.ValidationError('مبلغ ودیعه وارد شده معتبر نیست')
+
+    def _clean_rent_field(self, field_name):
+        value = self.cleaned_data.get(field_name)
+        if not value:
+            return None
+        try:
+            clean_value_str = ''.join(c for c in str(value) if c.isdigit())
+            if clean_value_str:
+                clean_value = int(clean_value_str)
+                if not checkers.rent_file_rent_price_checker(clean_value):
+                    raise forms.ValidationError('مبلغ اجاره باید بین 1 تا 100 میلیارد تومان باشد')
+                return clean_value
+            else:
+                return None
+        except (ValueError, TypeError):
+            raise forms.ValidationError('مبلغ اجاره وارد شده معتبر نیست')
+
+    def clean_deposit_announced(self):
+        return self._clean_deposit_field('deposit_announced')
+
+    def clean_deposit_min(self):
+        return self._clean_deposit_field('deposit_min')
+
+    def clean_rent_announced(self):
+        return self._clean_rent_field('rent_announced')
+
+    def clean_rent_min(self):
+        return self._clean_rent_field('rent_min')
+
     def clean(self):
         cleaned_data = super().clean()
-        deposit_announced = cleaned_data.get('deposit_announced')
-        deposit_min = cleaned_data.get('deposit_min')
-        rent_announced = cleaned_data.get('rent_announced')
-        rent_min = cleaned_data.get('rent_min')
         area = cleaned_data.get('area')
         sub_district = cleaned_data.get('sub_district')
 
-        if deposit_announced and not checkers.rent_file_deposit_price_checker(deposit_announced):
-            self.add_error('deposit_announced', 'مبلغ رهن باید بین صفر تا 100 میلیارد تومان باشد')
-        if deposit_min and not checkers.rent_file_deposit_price_checker(deposit_min):
-            self.add_error('deposit_min', 'مبلغ رهن باید بین صفر تا 100 میلیارد تومان باشد')
-        if rent_announced and not checkers.rent_file_rent_price_checker(rent_announced):
-            self.add_error('rent_announced', 'مبلغ اجاره باید بین صفر تا 10 میلیارد تومان باشد')
-        if rent_min and not checkers.rent_file_rent_price_checker(rent_min):
-            self.add_error('rent_min', 'مبلغ اجاره باید بین صفر تا 10 میلیارد تومان باشد')
         if area and not checkers.area_checker(area):
             self.add_error('area', 'متراژ فایل باید بین 20 تا 10000 متر باشد.')
         if self.user.title != 'bs' and sub_district != self.user.sub_district:
@@ -336,6 +450,8 @@ class RentFileAgentFilterForm(forms.Form):
     warehouse = forms.ChoiceField(choices=[('', '---------')] + choices.booleans, required=False, label=_('Warehouse'))
     has_images = forms.ChoiceField(choices=[('', '---------')] + choices.booleans, required=False, label=_('Has Images'))
     has_video = forms.ChoiceField(choices=[('', '---------')] + choices.booleans, required=False, label=_('Has Video'))
+    min_date = forms.CharField(required=False, label='از تاریخ')
+    max_date = forms.CharField(required=False, label='تا تاریخ')
 
     def clean(self):
         cleaned_data = super().clean()
@@ -473,6 +589,22 @@ class PersonRecoverForm(forms.ModelForm):
 
 
 class BuyerCreateForm(forms.ModelForm):
+    budget_announced = forms.CharField(
+        required=False,
+        widget=NumberSeparatorWidget(attrs={
+            'placeholder': 'مثلاً: 20,500,000,000',
+            'maxlength': '20'
+        }),
+        label='بودجه اعلامی (تومان)'
+    )
+    budget_max = forms.CharField(
+        required=False,
+        widget=NumberSeparatorWidget(attrs={
+            'placeholder': 'مثلاً: 22,500,000,000',
+            'maxlength': '20'
+        }),
+        label='حداکثر بودجه (تومان)'
+    )
     sub_districts = forms.ModelMultipleChoiceField(
         queryset=models.SubDistrict.objects.all(),
         widget=forms.SelectMultiple(attrs={'class': 'select2'}),
@@ -496,21 +628,37 @@ class BuyerCreateForm(forms.ModelForm):
         for field in buyer_required_fields:
             self.fields[field].required = True
 
+    def _clean_budget_field(self, field_name):
+        value = self.cleaned_data.get(field_name)
+        if not value:
+            return None
+        try:
+            clean_value_str = ''.join(c for c in str(value) if c.isdigit())
+            if clean_value_str:
+                clean_value = int(clean_value_str)
+                if not checkers.file_price_checker(clean_value):
+                    raise forms.ValidationError('بودجه باید بین 1 تا 1000 میلیارد تومان باشد')
+                return clean_value
+            else:
+                return None
+        except (ValueError, TypeError):
+            raise forms.ValidationError('بودجه وارد شده معتبر نیست')
+
+    def clean_budget_announced(self):
+        return self._clean_budget_field('budget_announced')
+
+    def clean_budget_max(self):
+        return self._clean_budget_field('budget_max')
+
     def clean(self):
         cleaned_data = super().clean()
         phone_number = cleaned_data.get('phone_number')
-        budget_announced = cleaned_data.get('budget_announced')
-        budget_max = cleaned_data.get('budget_max')
         area_max = cleaned_data.get('area_max')
         area_min = cleaned_data.get('area_min')
         name = cleaned_data.get('name')
 
         if phone_number and not checkers.phone_checker(phone_number):
             self.add_error('phone_number', 'شماره تلفن همراه وارد شده صحیح نیست')
-        if budget_announced and not checkers.file_price_checker(budget_announced):
-            self.add_error('budget_announced', 'بودجه خریدار باید بین 1 تا 1000 میلیارد تومان باشد')
-        if budget_max and not checkers.file_price_checker(budget_max):
-            self.add_error('budget_max', 'بودجه خریدار باید بین 1 تا 1000 میلیارد تومان باشد')
         if area_max and not checkers.area_checker(area_max):
             self.add_error('area_max', 'متراژ درخواستی خریدار باید بین 20 تا 10000 متر باشد.')
         if area_min and not checkers.area_checker(area_min):
@@ -590,6 +738,38 @@ class BuyerRecoverForm(forms.ModelForm):
 
 
 class RenterCreateForm(forms.ModelForm):
+    deposit_announced = forms.CharField(
+        required=False,
+        widget=NumberSeparatorWidget(attrs={
+            'placeholder': 'مثلاً: 1,500,000,000',
+            'maxlength': '20'
+        }),
+        label='ودیعه اعلامی (تومان)'
+    )
+    deposit_max = forms.CharField(
+        required=False,
+        widget=NumberSeparatorWidget(attrs={
+            'placeholder': 'مثلاً: 1,700,000,000',
+            'maxlength': '20'
+        }),
+        label='حداکثر ودیعه (تومان)'
+    )
+    rent_announced = forms.CharField(
+        required=False,
+        widget=NumberSeparatorWidget(attrs={
+            'placeholder': 'مثلاً: 10,000,000',
+            'maxlength': '20'
+        }),
+        label='اجاره اعلامی (تومان)'
+    )
+    rent_max = forms.CharField(
+        required=False,
+        widget=NumberSeparatorWidget(attrs={
+            'placeholder': 'مثلاً: 12,000,000',
+            'maxlength': '20'
+        }),
+        label='حداکثر اجاره (تومان)'
+    )
     sub_districts = forms.ModelMultipleChoiceField(
         queryset=models.SubDistrict.objects.all(),
         widget=forms.SelectMultiple(attrs={'class': 'select2'}),
@@ -614,27 +794,59 @@ class RenterCreateForm(forms.ModelForm):
         for field in renter_required_fields:
             self.fields[field].required = True
 
+    def _clean_deposit_field(self, field_name):
+        value = self.cleaned_data.get(field_name)
+        if not value:
+            return None
+        try:
+            clean_value_str = ''.join(c for c in str(value) if c.isdigit())
+            if clean_value_str:
+                clean_value = int(clean_value_str)
+                if not checkers.rent_file_deposit_price_checker(clean_value):
+                    raise forms.ValidationError('مبلغ ودیعه باید بین 1 تا 100 میلیارد تومان باشد')
+                return clean_value
+            else:
+                return None
+        except (ValueError, TypeError):
+            raise forms.ValidationError('مبلغ ودیعه وارد شده معتبر نیست')
+
+    def _clean_rent_field(self, field_name):
+        value = self.cleaned_data.get(field_name)
+        if not value:
+            return None
+        try:
+            clean_value_str = ''.join(c for c in str(value) if c.isdigit())
+            if clean_value_str:
+                clean_value = int(clean_value_str)
+                if not checkers.rent_file_rent_price_checker(clean_value):
+                    raise forms.ValidationError('مبلغ اجاره باید بین 1 تا 100 میلیارد تومان باشد')
+                return clean_value
+            else:
+                return None
+        except (ValueError, TypeError):
+            raise forms.ValidationError('مبلغ اجاره وارد شده معتبر نیست')
+
+    def clean_deposit_announced(self):
+        return self._clean_deposit_field('deposit_announced')
+
+    def clean_deposit_max(self):
+        return self._clean_deposit_field('deposit_max')
+
+    def clean_rent_announced(self):
+        return self._clean_rent_field('rent_announced')
+
+    def clean_rent_max(self):
+        return self._clean_rent_field('rent_max')
+
     def clean(self):
         cleaned_data = super().clean()
         phone_number = cleaned_data.get('phone_number')
-        deposit_announced = cleaned_data.get('deposit_announced')
-        deposit_max = cleaned_data.get('deposit_max')
-        rent_announced = cleaned_data.get('rent_announced')
-        rent_max = cleaned_data.get('rent_max')
         area_max = cleaned_data.get('area_max')
         area_min = cleaned_data.get('area_min')
         name = cleaned_data.get('name')
 
         if phone_number and not checkers.phone_checker(phone_number):
             self.add_error('phone_number', 'شماره تلفن همراه وارد شده صحیح نیست')
-        if deposit_announced and not checkers.rent_file_deposit_price_checker(deposit_announced):
-            self.add_error('deposit_announced', 'بودجه رهن باید بین 0 تا 100 میلیارد تومان باشد')
-        if deposit_max and not checkers.rent_file_deposit_price_checker(deposit_max):
-            self.add_error('deposit_max', 'بودجه رهن باید بین 0 تا 100 میلیارد تومان باشد')
-        if rent_announced and not checkers.rent_file_rent_price_checker(rent_announced):
-            self.add_error('rent_announced', 'بودجه اجاره باید بین 0 تا 10 میلیارد تومان باشد')
-        if rent_max and not checkers.rent_file_rent_price_checker(rent_max):
-            self.add_error('rent_max', 'بودجه اجاره باید بین 0 تا 10 میلیارد تومان باشد')
         if area_max and not checkers.area_checker(area_max):
             self.add_error('area_max', 'متراژ درخواستی خریدار باید بین 20 تا 10000 متر باشد.')
         if area_min and not checkers.area_checker(area_min):
@@ -1306,6 +1518,31 @@ class ServiceFilterForm(forms.Form):
 
 
 class TradeCreateForm(forms.ModelForm):
+    price = forms.CharField(
+        required=False,
+        widget=NumberSeparatorWidget(attrs={
+            'placeholder': 'مثلاً: 24,500,000,000',
+            'maxlength': '20'
+        }),
+        label='قیمت فایل (تومان)'
+    )
+    deposit = forms.CharField(
+        required=False,
+        widget=NumberSeparatorWidget(attrs={
+            'placeholder': 'مثلاً: 1,500,000,000',
+            'maxlength': '20'
+        }),
+        label='مبلغ ودیعه (تومان)'
+    )
+    rent = forms.CharField(
+        required=False,
+        widget=NumberSeparatorWidget(attrs={
+            'placeholder': 'مثلاً: 14,000,000',
+            'maxlength': '20'
+        }),
+        label='مبلغ اجاره (تومان)'
+    )
+
     class Meta:
         model = models.Trade
         fields = ['type', 'session_code', 'date', 'price', 'deposit', 'rent', 'followup_code', 'description',
@@ -1321,6 +1558,63 @@ class TradeCreateForm(forms.ModelForm):
         )
         for field in trade_required_fields:
             self.fields[field].required = True
+
+    def _clean_price_field(self, field_name):
+        value = self.cleaned_data.get(field_name)
+        if not value:
+            return None
+        try:
+            clean_value_str = ''.join(c for c in str(value) if c.isdigit())
+            if clean_value_str:
+                clean_value = int(clean_value_str)
+                if not checkers.file_price_checker(clean_value):
+                    raise forms.ValidationError('قیمت معامله باید بین 1 تا 1000 میلیارد تومان باشد')
+                return clean_value
+            else:
+                return None
+        except (ValueError, TypeError):
+            raise forms.ValidationError('بودجه وارد شده معتبر نیست')
+
+    def clean_price(self):
+        return self._clean_price_field('price')
+
+    def _clean_deposit_field(self, field_name):
+        value = self.cleaned_data.get(field_name)
+        if not value:
+            return None
+        try:
+            clean_value_str = ''.join(c for c in str(value) if c.isdigit())
+            if clean_value_str:
+                clean_value = int(clean_value_str)
+                if not checkers.rent_file_deposit_price_checker(clean_value):
+                    raise forms.ValidationError('مبلغ ودیعه باید بین 1 تا 100 میلیارد تومان باشد')
+                return clean_value
+            else:
+                return None
+        except (ValueError, TypeError):
+            raise forms.ValidationError('مبلغ ودیعه وارد شده معتبر نیست')
+
+    def _clean_rent_field(self, field_name):
+        value = self.cleaned_data.get(field_name)
+        if not value:
+            return None
+        try:
+            clean_value_str = ''.join(c for c in str(value) if c.isdigit())
+            if clean_value_str:
+                clean_value = int(clean_value_str)
+                if not checkers.rent_file_rent_price_checker(clean_value):
+                    raise forms.ValidationError('مبلغ اجاره باید بین 1 تا 100 میلیارد تومان باشد')
+                return clean_value
+            else:
+                return None
+        except (ValueError, TypeError):
+            raise forms.ValidationError('مبلغ اجاره وارد شده معتبر نیست')
+
+    def clean_deposit(self):
+        return self._clean_deposit_field('deposit')
+
+    def clean_rent(self):
+        return self._clean_rent_field('rent')
 
     def clean(self):
         cleaned_data = super().clean()
@@ -1366,13 +1660,6 @@ class TradeCreateForm(forms.ModelForm):
                 self.add_error('contract_renter', 'تعیین نام مستاجر (طبق قرارداد) الزامی است')
             if contract_renter and not checkers.name_checker(contract_renter):
                 self.add_error('contract_renter', 'فرمت نام صحیح نیست')
-
-        if price and not checkers.file_price_checker(price):
-            self.add_error('price', 'قیمت معامله باید بین 1 تا 1000 میلیارد تومان باشد')
-        if deposit and not checkers.rent_file_deposit_price_checker(deposit):
-            self.add_error('deposit', 'مبلغ ودیعه (رهن) باید بین صفر تا 100 میلیارد تومان باشد')
-        if rent and not checkers.rent_file_rent_price_checker(rent):
-            self.add_error('rent', 'مبلغ اجاره باید بین صفر تا 10 میلیارد تومان باشد')
 
 
 class TradeCodeForm(forms.ModelForm):
@@ -2026,7 +2313,6 @@ class CombinedSessionResultForm(forms.Form):
     def save(self):
         self.boss_form.save()
         self.result_session_form.save()
-
 
 
 

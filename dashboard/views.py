@@ -2809,6 +2809,18 @@ class TradeCreateView(PermissionRequiredMixin, CreateView):
         kwargs['user'] = self.request.user
         return kwargs
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        session_code = self.request.GET.get('session_code')
+        if session_code:
+            try:
+                session = models.Session.objects.get(code=session_code)
+                context['session'] = session
+                context['pre_selected_session'] = True
+            except models.Session.DoesNotExist:
+                pass
+        return context
+
     def post(self, request, *args, **kwargs):
         form = self.get_form()
         if form.is_valid():
@@ -2817,10 +2829,12 @@ class TradeCreateView(PermissionRequiredMixin, CreateView):
             return self.form_invalid(form)
 
     def form_valid(self, form):
-        messages.success(self.request, "نشست جدید در سامانه ثبت شد.")
+        self.object = form.save()
+        messages.success(self.request, "معامله جدید در سامانه ثبت شد.")
         return super().form_valid(form)
 
     def form_invalid(self, form):
+        self.object = None
         return self.render_to_response(self.get_context_data(form=form))
 
     def get_success_url(self):
