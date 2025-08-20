@@ -4,6 +4,7 @@
 {% load i18n %}
 {% load jalali_tags %}
 {% load number_converter %}
+{% load price_converter %}
 {% load widget_tweaks %}
 {% load humanize %}
 
@@ -136,7 +137,7 @@
                             <div class="data-item" data-bs-toggle="modal" data-bs-target="#profile-edit">
                                 <div class="data-col">
                                     <span class="data-label">قیمت:</span>
-                                    <span class="data-value">{{ trade.price|intcomma:False|farsi_number }} تومان</span>
+                                    <span class="data-value">{{ trade.price|price_converter|intcomma:False|farsi_number }} تومان</span>
                                 </div>
                             </div>
                         {% else %}
@@ -144,14 +145,14 @@
                             <div class="data-item" data-bs-toggle="modal" data-bs-target="#profile-edit">
                                 <div class="data-col">
                                     <span class="data-label">قیمت:</span>
-                                    <span class="data-value">{{ trade.deposit|intcomma:False|farsi_number }} تومان</span>
+                                    <span class="data-value">{{ trade.deposit|price_converter|intcomma:False|farsi_number }} تومان</span>
                                 </div>
                             </div>
                             <!-- rent -->
                             <div class="data-item" data-bs-toggle="modal" data-bs-target="#profile-edit">
                                 <div class="data-col">
                                     <span class="data-label">قیمت:</span>
-                                    <span class="data-value">{{ trade.rent|farsi_number }} تومان</span>
+                                    <span class="data-value">{{ trade.rent|price_converter|farsi_number }} تومان</span>
                                 </div>
                             </div>
                         {% endif %}

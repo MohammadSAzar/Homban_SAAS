@@ -4,6 +4,7 @@
 {% load i18n %}
 {% load jalali_tags %}
 {% load number_converter %}
+{% load price_converter %}
 {% load widget_tweaks %}
 {% load humanize %}
 
@@ -82,14 +83,14 @@
                         <div class="data-item" data-bs-toggle="modal" data-bs-target="#profile-edit">
                             <div class="data-col">
                                 <span class="data-label">بودجه اعلامی:</span>
-                                <span class="data-value">{{ buyer.budget_announced|intcomma:False|farsi_number }} تومان</span>
+                                <span class="data-value">{{ buyer.budget_announced|price_converter|intcomma:False|farsi_number }} تومان</span>
                             </div>
                         </div>
                         <!-- budget_max -->
                         <div class="data-item" data-bs-toggle="modal" data-bs-target="#profile-edit">
                             <div class="data-col">
                                 <span class="data-label">حداکثر بودجه:</span>
-                                <span class="data-value">{{ buyer.budget_max|intcomma:False|farsi_number }} تومان</span>
+                                <span class="data-value">{{ buyer.budget_max|price_converter|intcomma:False|farsi_number }} تومان</span>
                             </div>
                         </div>
                         <!-- budget_status -->

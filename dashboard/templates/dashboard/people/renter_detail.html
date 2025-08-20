@@ -4,6 +4,7 @@
 {% load i18n %}
 {% load jalali_tags %}
 {% load number_converter %}
+{% load price_converter %}
 {% load widget_tweaks %}
 {% load humanize %}
 
@@ -89,14 +90,14 @@
                         <div class="data-item" data-bs-toggle="modal" data-bs-target="#profile-edit">
                             <div class="data-col">
                                 <span class="data-label">حداکثر ودیعه:</span>
-                                <span class="data-value">{{ renter.deposit_max|intcomma:False|farsi_number }} تومان</span>
+                                <span class="data-value">{{ renter.deposit_max|price_converter|intcomma:False|farsi_number }} تومان</span>
                             </div>
                         </div>
                         <!-- rent_announced -->
                         <div class="data-item" data-bs-toggle="modal" data-bs-target="#profile-edit">
                             <div class="data-col">
                                 <span class="data-label">اجاره اعلامی:</span>
-                                <span class="data-value">{{ renter.rent_announced|intcomma:False|farsi_number }} تومان</span>
+                                <span class="data-value">{{ renter.rent_announced|price_converter|intcomma:False|farsi_number }} تومان</span>
                             </div>
                         </div>
                         <!-- rent_max -->

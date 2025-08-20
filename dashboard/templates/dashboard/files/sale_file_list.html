@@ -5,6 +5,7 @@
 {% load jalali_tags %}
 {% load jalali_date_converter %}
 {% load number_converter %}
+{% load price_converter %}
 {% load humanize %}
 {% load widget_tweaks %}
 
@@ -541,7 +542,7 @@
     
                                                     <!-- Price -->
                                                     <div class="nk-file-name">
-                                                        <span class="title" style="font-size: 0.8em; color: green;">قیمت: {{ file.price_announced|intcomma:False|farsi_number }} تومان</span>
+                                                        <span class="title" style="font-size: 0.8em; color: green;">قیمت: {{ file.price_announced|price_converter|intcomma:False|farsi_number }} تومان</span>
                                                     </div>
     
                                                     <!-- More -->

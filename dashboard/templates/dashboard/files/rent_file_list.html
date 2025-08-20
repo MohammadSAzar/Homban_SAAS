@@ -5,6 +5,7 @@
 {% load jalali_tags %}
 {% load jalali_date_converter %}
 {% load number_converter %}
+{% load price_converter %}
 {% load humanize %}
 {% load widget_tweaks %}
 
@@ -574,12 +575,12 @@
     
                                                     <!-- Deposit -->
                                                     <div class="nk-file-name">
-                                                        <span class="title" style="font-size: 0.8em; color: green;">رهن: {{ file.deposit_announced|intcomma:False|farsi_number }} تومان</span>
+                                                        <span class="title" style="font-size: 0.8em; color: green;">رهن: {{ file.deposit_announced|price_converter|intcomma:False|farsi_number }} تومان</span>
                                                     </div>
                                                 
                                                     <!-- Rent -->
                                                     <div class="nk-file-name">
-                                                        <span class="title" style="font-size: 0.8em; color: green;">اجاره: {{ file.rent_announced|intcomma:False|farsi_number }} تومان</span>
+                                                        <span class="title" style="font-size: 0.8em; color: green;">اجاره: {{ file.rent_announced|price_converter|intcomma:False|farsi_number }} تومان</span>
                                                     </div>
     
                                                     <!-- More -->

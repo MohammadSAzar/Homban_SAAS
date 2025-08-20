@@ -4,6 +4,7 @@
 {% load i18n %}
 {% load jalali_tags %}
 {% load number_converter %}
+{% load price_converter %}
 {% load widget_tweaks %}
 {% load humanize %}
 
@@ -416,8 +417,8 @@
                                                     <div class="project-head" style="margin-bottom: 0.5em;!important;">
                                                         <div class="project-title">
                                                             <div class="project-info">
-                                                                <h6 class="sub-text" style="font-size: 0.9em; line-height: 25px;">ودیعه: {{ renter.deposit_announced|intcomma:False|farsi_number }} تومان</h6>
-                                                                <h6 class="sub-text" style="font-size: 0.9em; line-height: 25px;">اجاره: {{ renter.rent_announced|intcomma:False|farsi_number }} تومان</h6>
+                                                                <h6 class="sub-text" style="font-size: 0.9em; line-height: 25px;">ودیعه: {{ renter.deposit_announced|price_converter|intcomma:False|farsi_number }} تومان</h6>
+                                                                <h6 class="sub-text" style="font-size: 0.9em; line-height: 25px;">اجاره: {{ renter.rent_announced|price_converter|intcomma:False|farsi_number }} تومان</h6>
                                                             </div>
                                                         </div>
                                                     </div>
