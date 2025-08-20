@@ -13,7 +13,7 @@
 
 {% block content %}
     
-    <!-- Messages -->
+    <!-- Messages2 -->
     {% if messages %}
         <ul class="messages">
             {% for message in messages %}
@@ -148,33 +148,25 @@
                         
                             <!-- price -->
                             <div class="col-lg-4 col-sm-4">
-                                <div class="form-group">
-                                    <div class="form-control-wrap">
-                                        <label class="form-label" for="{{ form.price.id_for_label }}">قیمت (تومان)</label>
-                                        <input type="text"
-                                               name="price"
-                                               id="price"
-                                               class="form-control form-control-xl form-control-outlined price-input price-separator"
-                                               value="{{ form.price.value|default:'' }}">
+                                    <div class="form-group">
+                                        <div class="form-control-wrap">
+                                            <label class="form-label" for="{{ form.price.id_for_label }}">قیمت فروش</label>
+                                            {% render_field form.price id="price" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                        </div>
+                                        {% if form.price.errors %}
+                                            {% for error in form.price.errors %}
+                                                <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                            {% endfor %}
+                                        {% endif %}
                                     </div>
-                                    {% if form.price.errors %}
-                                        {% for error in form.price.errors %}
-                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
-                                        {% endfor %}
-                                    {% endif %}
                                 </div>
-                            </div>
                         
                             <!-- deposit -->
                             <div class="col-lg-4 col-sm-4">
                                 <div class="form-group">
                                     <div class="form-control-wrap">
-                                        <label class="form-label" for="{{ form.deposit.id_for_label }}">ودیعه (تومان)</label>
-                                        <input type="text"
-                                               name="deposit"
-                                               id="deposit"
-                                               class="form-control form-control-xl form-control-outlined deposit-input deposit-separator"
-                                               value="{{ form.deposit.value|default:'' }}">
+                                        <label class="form-label" for="{{ form.deposit.id_for_label }}">ودیعه (رهن)</label>
+                                        {% render_field form.deposit id="deposit" type="text" class="form-control form-control-xl form-control-outlined" %}
                                     </div>
                                     {% if form.deposit.errors %}
                                         {% for error in form.deposit.errors %}
@@ -183,17 +175,13 @@
                                     {% endif %}
                                 </div>
                             </div>
-
+                        
                             <!-- rent -->
                             <div class="col-lg-4 col-sm-4">
                                 <div class="form-group">
                                     <div class="form-control-wrap">
-                                        <label class="form-label" for="{{ form.rent.id_for_label }}">اجاره (تومان)</label>
-                                        <input type="text"
-                                               name="rent"
-                                               id="rent"
-                                               class="form-control form-control-xl form-control-outlined rent-input rent-separator"
-                                               value="{{ form.rent.value|default:'' }}">
+                                        <label class="form-label" for="{{ form.rent.id_for_label }}">اجاره ماهانه</label>
+                                        {% render_field form.rent id="rent" type="text" class="form-control form-control-xl form-control-outlined" %}
                                     </div>
                                     {% if form.rent.errors %}
                                         {% for error in form.rent.errors %}
@@ -202,7 +190,7 @@
                                     {% endif %}
                                 </div>
                             </div>
-
+                        
                             <!-- description -->
                             <div class="col-lg-12 col-sm-12">
                                 <div class="form-group">
@@ -222,349 +210,8 @@
                             <div class="nk-fmg-actions" style="margin-top: 3em;">
                                 <button type="submit" class="btn btn-primary" style="line-height: 30px;">ثبت اطلاعات</button>
                             </div>
-
                         </form>
-                        <!-- end: Form -->
-
-                        <!-- JS (price) -->
-                        <script>
-                            document.addEventListener('DOMContentLoaded', function() {
-                                const priceInputs = document.querySelectorAll('.price-separator');
-
-                                // Format existing values on page load
-                                priceInputs.forEach(function(input) {
-                                    if (input.value) {
-                                        // Remove any existing separators and format
-                                        let value = input.value.replace(/[^\d]/g, '');
-                                        if (value.length > 0) {
-                                            input.value = parseInt(value).toLocaleString('en-US');
-                                        }
-                                    }
-                                });
-
-                                priceInputs.forEach(function(input) {
-                                    input.addEventListener('input', function(e) {
-                                        // Get the current cursor position
-                                        const cursorPosition = input.selectionStart;
-                                        const oldValue = input.value;
-                                        const oldLength = oldValue.length;
-
-                                        // Remove all non-digit characters
-                                        let value = input.value.replace(/[^\d]/g, '');
-
-                                        // Add thousand separators
-                                        let formattedValue = '';
-                                        if (value.length > 0) {
-                                            formattedValue = parseInt(value).toLocaleString('en-US');
-                                        }
-
-                                        // Update the input value
-                                        input.value = formattedValue;
-
-                                        // Calculate new cursor position
-                                        const newLength = formattedValue.length;
-                                        const lengthDiff = newLength - oldLength;
-                                        let newCursorPosition = cursorPosition + lengthDiff;
-
-                                        // Adjust cursor position if we're in the middle of the number
-                                        if (cursorPosition < oldLength) {
-                                            const beforeCursor = oldValue.substring(0, cursorPosition);
-                                            const digitsBeforeCursor = beforeCursor.replace(/[^\d]/g, '').length;
-
-                                            // Find the position after the same number of digits in the new formatted value
-                                            let digitCount = 0;
-                                            newCursorPosition = 0;
-                                            for (let i = 0; i < formattedValue.length; i++) {
-                                                if (/\d/.test(formattedValue[i])) {
-                                                    digitCount++;
-                                                    if (digitCount === digitsBeforeCursor) {
-                                                        newCursorPosition = i + 1;
-                                                        break;
-                                                    }
-                                                }
-                                            }
-                                        }
-
-                                        // Set cursor position (with bounds checking)
-                                        const finalPosition = Math.max(0, Math.min(newCursorPosition, newLength));
-                                        input.setSelectionRange(finalPosition, finalPosition);
-                                    });
-
-                                    // Handle paste events
-                                    input.addEventListener('paste', function(e) {
-                                        setTimeout(() => {
-                                            input.dispatchEvent(new Event('input'));
-                                        }, 0);
-                                    });
-
-                                    // Handle backspace and delete more smoothly
-                                    input.addEventListener('keydown', function(e) {
-                                        if (e.key === 'Backspace' || e.key === 'Delete') {
-                                            const cursorPosition = input.selectionStart;
-                                            const value = input.value;
-
-                                            // If cursor is on a comma, move it to delete the digit instead
-                                            if (e.key === 'Backspace' && cursorPosition > 0 && value[cursorPosition - 1] === ',') {
-                                                e.preventDefault();
-                                                const newPosition = cursorPosition - 1;
-                                                input.setSelectionRange(newPosition, newPosition);
-                                                // Trigger backspace on the digit instead
-                                                const event = new KeyboardEvent('keydown', {
-                                                    key: 'Backspace',
-                                                    code: 'Backspace',
-                                                    keyCode: 8,
-                                                    bubbles: true
-                                                });
-                                                setTimeout(() => input.dispatchEvent(event), 0);
-                                            }
-                                        }
-                                    });
-                                });
-                            });
-                        </script>
-                        <!-- end: JS (price) -->
-
-                        <!-- JS (deposit) -->
-                        <script>
-                            document.addEventListener('DOMContentLoaded', function() {
-                                const depositInputs = document.querySelectorAll('.deposit-separator');
-
-                                // Format existing values on page load
-                                depositInputs.forEach(function(input) {
-                                    if (input.value) {
-                                        // Remove any existing separators and format
-                                        let value = input.value.replace(/[^\d]/g, '');
-                                        if (value.length > 0) {
-                                            input.value = parseInt(value).toLocaleString('en-US');
-                                        }
-                                    }
-                                });
-
-                                depositInputs.forEach(function(input) {
-                                    input.addEventListener('input', function(e) {
-                                        // Get the current cursor position
-                                        const cursorPosition = input.selectionStart;
-                                        const oldValue = input.value;
-                                        const oldLength = oldValue.length;
-
-                                        // Remove all non-digit characters
-                                        let value = input.value.replace(/[^\d]/g, '');
-
-                                        // Add thousand separators
-                                        let formattedValue = '';
-                                        if (value.length > 0) {
-                                            formattedValue = parseInt(value).toLocaleString('en-US');
-                                        }
-
-                                        // Update the input value
-                                        input.value = formattedValue;
-
-                                        // Calculate new cursor position
-                                        const newLength = formattedValue.length;
-                                        const lengthDiff = newLength - oldLength;
-                                        let newCursorPosition = cursorPosition + lengthDiff;
-
-                                        // Adjust cursor position if we're in the middle of the number
-                                        if (cursorPosition < oldLength) {
-                                            const beforeCursor = oldValue.substring(0, cursorPosition);
-                                            const digitsBeforeCursor = beforeCursor.replace(/[^\d]/g, '').length;
-
-                                            // Find the position after the same number of digits in the new formatted value
-                                            let digitCount = 0;
-                                            newCursorPosition = 0;
-                                            for (let i = 0; i < formattedValue.length; i++) {
-                                                if (/\d/.test(formattedValue[i])) {
-                                                    digitCount++;
-                                                    if (digitCount === digitsBeforeCursor) {
-                                                        newCursorPosition = i + 1;
-                                                        break;
-                                                    }
-                                                }
-                                            }
-                                        }
-
-                                        // Set cursor position (with bounds checking)
-                                        const finalPosition = Math.max(0, Math.min(newCursorPosition, newLength));
-                                        input.setSelectionRange(finalPosition, finalPosition);
-                                    });
-
-                                    // Handle paste events
-                                    input.addEventListener('paste', function(e) {
-                                        setTimeout(() => {
-                                            input.dispatchEvent(new Event('input'));
-                                        }, 0);
-                                    });
-
-                                    // Handle backspace and delete more smoothly
-                                    input.addEventListener('keydown', function(e) {
-                                        if (e.key === 'Backspace' || e.key === 'Delete') {
-                                            const cursorPosition = input.selectionStart;
-                                            const value = input.value;
-
-                                            // If cursor is on a comma, move it to delete the digit instead
-                                            if (e.key === 'Backspace' && cursorPosition > 0 && value[cursorPosition - 1] === ',') {
-                                                e.preventDefault();
-                                                const newPosition = cursorPosition - 1;
-                                                input.setSelectionRange(newPosition, newPosition);
-                                                // Trigger backspace on the digit instead
-                                                const event = new KeyboardEvent('keydown', {
-                                                    key: 'Backspace',
-                                                    code: 'Backspace',
-                                                    keyCode: 8,
-                                                    bubbles: true
-                                                });
-                                                setTimeout(() => input.dispatchEvent(event), 0);
-                                            }
-                                        }
-                                    });
-                                });
-                            });
-                        </script>
-                        <!-- end: JS (deposit) -->
-
-                        <!-- JS (rent) -->
-                        <script>
-                            document.addEventListener('DOMContentLoaded', function() {
-                                const rentInputs = document.querySelectorAll('.rent-separator');
-
-                                // Format existing values on page load
-                                rentInputs.forEach(function(input) {
-                                    if (input.value) {
-                                        // Remove any existing separators and format
-                                        let value = input.value.replace(/[^\d]/g, '');
-                                        if (value.length > 0) {
-                                            input.value = parseInt(value).toLocaleString('en-US');
-                                        }
-                                    }
-                                });
-
-                                rentInputs.forEach(function(input) {
-                                    input.addEventListener('input', function(e) {
-                                        // Get the current cursor position
-                                        const cursorPosition = input.selectionStart;
-                                        const oldValue = input.value;
-                                        const oldLength = oldValue.length;
-
-                                        // Remove all non-digit characters
-                                        let value = input.value.replace(/[^\d]/g, '');
-
-                                        // Add thousand separators
-                                        let formattedValue = '';
-                                        if (value.length > 0) {
-                                            formattedValue = parseInt(value).toLocaleString('en-US');
-                                        }
-
-                                        // Update the input value
-                                        input.value = formattedValue;
-
-                                        // Calculate new cursor position
-                                        const newLength = formattedValue.length;
-                                        const lengthDiff = newLength - oldLength;
-                                        let newCursorPosition = cursorPosition + lengthDiff;
-
-                                        // Adjust cursor position if we're in the middle of the number
-                                        if (cursorPosition < oldLength) {
-                                            const beforeCursor = oldValue.substring(0, cursorPosition);
-                                            const digitsBeforeCursor = beforeCursor.replace(/[^\d]/g, '').length;
-
-                                            // Find the position after the same number of digits in the new formatted value
-                                            let digitCount = 0;
-                                            newCursorPosition = 0;
-                                            for (let i = 0; i < formattedValue.length; i++) {
-                                                if (/\d/.test(formattedValue[i])) {
-                                                    digitCount++;
-                                                    if (digitCount === digitsBeforeCursor) {
-                                                        newCursorPosition = i + 1;
-                                                        break;
-                                                    }
-                                                }
-                                            }
-                                        }
-
-                                        // Set cursor position (with bounds checking)
-                                        const finalPosition = Math.max(0, Math.min(newCursorPosition, newLength));
-                                        input.setSelectionRange(finalPosition, finalPosition);
-                                    });
-
-                                    // Handle paste events
-                                    input.addEventListener('paste', function(e) {
-                                        setTimeout(() => {
-                                            input.dispatchEvent(new Event('input'));
-                                        }, 0);
-                                    });
-
-                                    // Handle backspace and delete more smoothly
-                                    input.addEventListener('keydown', function(e) {
-                                        if (e.key === 'Backspace' || e.key === 'Delete') {
-                                            const cursorPosition = input.selectionStart;
-                                            const value = input.value;
-
-                                            // If cursor is on a comma, move it to delete the digit instead
-                                            if (e.key === 'Backspace' && cursorPosition > 0 && value[cursorPosition - 1] === ',') {
-                                                e.preventDefault();
-                                                const newPosition = cursorPosition - 1;
-                                                input.setSelectionRange(newPosition, newPosition);
-                                                // Trigger backspace on the digit instead
-                                                const event = new KeyboardEvent('keydown', {
-                                                    key: 'Backspace',
-                                                    code: 'Backspace',
-                                                    keyCode: 8,
-                                                    bubbles: true
-                                                });
-                                                setTimeout(() => input.dispatchEvent(event), 0);
-                                            }
-                                        }
-                                    });
-                                });
-                            });
-                        </script>
-                        <!-- end: JS (rent) -->
-                    
-                        <!-- JS (type) -->
-                        <script>
-                            document.addEventListener('DOMContentLoaded', function() {
-                                const typeField = document.getElementById('type');
-                                const priceField = document.getElementById('price');
-                                const depositField = document.getElementById('deposit');
-                                const rentField = document.getElementById('rent');
-                            
-                                // Function to toggle field states based on selected type
-                                function updateFieldStates() {
-                                    const selectedType = typeField.value;
-                                    
-                                    if (selectedType === 'sale') {
-                                        // Disable deposit and rent fields for sale
-                                        depositField.disabled = true;
-                                        depositField.value = '';
-                                        rentField.disabled = true;
-                                        rentField.value = '';
-                                        priceField.disabled = false;
-                                    } else if (selectedType === 'rent') {
-                                        // Disable price field for rent
-                                        priceField.disabled = true;
-                                        priceField.value = '';
-                                        depositField.disabled = false;
-                                        rentField.disabled = false;
-                                    } else {
-                                        // Enable all fields if no type selected
-                                        priceField.disabled = false;
-                                        depositField.disabled = false;
-                                        rentField.disabled = false;
-                                    }
-                                }
-                            
-                                // Initial state setup
-                                updateFieldStates();
-                            
-                                // Update fields when type changes
-                                typeField.addEventListener('change', updateFieldStates);
-                            
-                                // Also handle the case where the form is re-displayed with errors
-                                // This ensures fields stay disabled even after form submission with errors
-                                window.addEventListener('load', updateFieldStates);
-                            });
-                        </script>
-                        <!-- end: JS (type) -->
+                        <!-- end: Form -->    
                     
                     </div>
                 </div>
@@ -573,6 +220,5 @@
     </div>
 
 {% endblock %}
-
 
 
