@@ -231,53 +231,42 @@
                                     {% if sale_file.zip_file %}
                                         <a href="{{ sale_file.zip_file }}" class="btn btn-primary">دانلود یکجای محتوا</a>
                                     {% else %}
-                                        <a href="#" class="btn btn-danger">محتوایی موجود نیست</a>
+                                        <button class="btn btn-danger">محتوایی برای دانلود موجود نیست</button>
                                     {% endif %}
                                 </li>
 
                                 <!-- Link -->
                                 <li>
-                                    {% if sale_file.zip_file %}
-                                        <a href="{% url 'sale_file_gallery' sale_file.pk sale_file.unique_url_id %}"
-                                           class="btn btn-primary"
-                                           onclick="copyToClipboard(event, this)">
-                                           کپی لینک مشاهده محتوا
-                                        </a>
+                                    <a href="{% url 'sale_file_gallery' sale_file.pk sale_file.unique_url_id %}"
+                                       class="btn btn-primary"
+                                       onclick="copyToClipboard(event, this)">
+                                       کپی لینک برای مشتری
+                                    </a>
 
-                                        <!-- Message -->
-                                        <span id="copy-message" style="display:none; color:green; margin-right:10px; margin-top: 5px;">شد!</span>
+                                    <!-- Message -->
+                                    <span id="copy-message" style="display:none; color:green; margin-right:10px; margin-top: 5px;">شد!</span>
 
-                                        <!-- JS -->
-                                        <script>
-                                            function copyToClipboard(event, element) {
-                                                event.preventDefault();
-                                                const baseUrl = window.location.origin;
-                                                const relativeUrl = element.getAttribute('href');
-                                                const fullUrl = baseUrl + relativeUrl;
-                                                navigator.clipboard.writeText(fullUrl).then(() => {
-                                                    const message = document.getElementById("copy-message");
-                                                    message.style.display = "inline";
-                                                    setTimeout(() => {
-                                                        message.style.display = "none";
-                                                    }, 2000);
-                                                }).catch(err => {
-                                                    console.error("Failed to copy: ", err);
-                                                });
-                                            }
-                                        </script>
+                                    <!-- JS -->
+                                    <script>
+                                        function copyToClipboard(event, element) {
+                                            event.preventDefault();
+                                            const baseUrl = window.location.origin;
+                                            const relativeUrl = element.getAttribute('href');
+                                            const fullUrl = baseUrl + relativeUrl;
+                                            navigator.clipboard.writeText(fullUrl).then(() => {
+                                                const message = document.getElementById("copy-message");
+                                                message.style.display = "inline";
+                                                setTimeout(() => {
+                                                    message.style.display = "none";
+                                                }, 2000);
+                                            }).catch(err => {
+                                                console.error("Failed to copy: ", err);
+                                            });
+                                        }
+                                    </script>
 
-                                    {% else %}
-                                        <a href="#" class="btn btn-danger">لینک حاوی محتوا موجود نیست</a>
-                                    {% endif %}
                                 </li>
-                                <!-- Share -->
-{#                                <li>#}
-{#                                    {% if sale_file.zip_file %}#}
-{#                                        <a href="{{ sale_file.zip_file }}" class="btn btn-primary">دانلود یکجای محتوا</a>#}
-{#                                    {% else %}#}
-{#                                        <a href="#" class="btn btn-danger">محتوایی موجود نیست</a>#}
-{#                                    {% endif %}#}
-{#                                </li>#}
+
                             </ul>
                         </div>
                         <!-- end: Share -->
@@ -804,5 +793,6 @@
     </div>
 
 {% endblock %}
+
 
 
