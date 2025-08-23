@@ -83,14 +83,18 @@
                         <div class="data-item" data-bs-toggle="modal" data-bs-target="#profile-edit">
                             <div class="data-col">
                                 <span class="data-label">ودیعه اعلامی:</span>
-                                <span class="data-value">{{ renter.deposit_announced|intcomma:False|farsi_number }} تومان</span>
+                                {% if renter.deposit_announced %}
+                                    <span class="data-value">{{ renter.deposit_announced|intcomma:False|farsi_number }} تومان</span>
+                                {% endif %}
                             </div>
                         </div>
                         <!-- deposit_max -->
                         <div class="data-item" data-bs-toggle="modal" data-bs-target="#profile-edit">
                             <div class="data-col">
                                 <span class="data-label">حداکثر ودیعه:</span>
-                                <span class="data-value">{{ renter.deposit_max|price_converter|intcomma:False|farsi_number }} تومان</span>
+                                {% if renter.deposit_max %}
+                                    <span class="data-value">{{ renter.deposit_max|price_converter|intcomma:False|farsi_number }} تومان</span>
+                                {% endif %}
                             </div>
                         </div>
                         <!-- rent_announced -->
@@ -221,6 +225,7 @@
     </div>
 
 {% endblock %}
+
 
 
 

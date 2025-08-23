@@ -11,5 +11,8 @@ def price_converter(price):
             return price
         else:
             return int(price) * 1000000
+    else:
+        return ''
+
 
 

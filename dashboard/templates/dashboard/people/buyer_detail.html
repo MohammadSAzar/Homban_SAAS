@@ -83,14 +83,18 @@
                         <div class="data-item" data-bs-toggle="modal" data-bs-target="#profile-edit">
                             <div class="data-col">
                                 <span class="data-label">بودجه اعلامی:</span>
-                                <span class="data-value">{{ buyer.budget_announced|price_converter|intcomma:False|farsi_number }} تومان</span>
+                                {% if buyer.budget_announced %}
+                                    <span class="data-value">{{ buyer.budget_announced|price_converter|intcomma:False|farsi_number }} تومان</span>
+                                {% endif %}
                             </div>
                         </div>
                         <!-- budget_max -->
                         <div class="data-item" data-bs-toggle="modal" data-bs-target="#profile-edit">
                             <div class="data-col">
                                 <span class="data-label">حداکثر بودجه:</span>
-                                <span class="data-value">{{ buyer.budget_max|price_converter|intcomma:False|farsi_number }} تومان</span>
+                                {% if buyer.budget_max %}
+                                    <span class="data-value">{{ buyer.budget_max|price_converter|intcomma:False|farsi_number }} تومان</span>
+                                {% endif %}
                             </div>
                         </div>
                         <!-- budget_status -->
@@ -200,7 +204,5 @@
     </div>
 
 {% endblock %}
-
-
 
 

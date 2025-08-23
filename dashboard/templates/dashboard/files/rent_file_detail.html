@@ -113,7 +113,9 @@
                                     <div class="nk-tb-col"><span class="fw-bold">رهن:</span></div>
                                     <div class="nk-tb-col">
                                         <span class="tb-product">
-                                            <span class="title" style="font-size: 1em;">{{ rent_file.deposit_announced|price_converter|intcomma:False|farsi_number }} تومان</span>
+                                            {% if rent_file.deposit_announced %}
+                                                <span class="title" style="font-size: 1em;">{{ rent_file.deposit_announced|price_converter|intcomma:False|farsi_number }} تومان</span>
+                                            {% endif %}
                                         </span>
                                     </div>
                                 </div>
@@ -123,7 +125,9 @@
                                     <div class="nk-tb-col"><span class="fw-bold">اجاره:</span></div>
                                     <div class="nk-tb-col">
                                         <span class="tb-product">
-                                            <span class="title" style="font-size: 1em;">{{ rent_file.rent_announced|price_converter|intcomma:False|farsi_number }} تومان</span>
+                                            {% if rent_file.rent_announced %}
+                                                <span class="title" style="font-size: 1em;">{{ rent_file.rent_announced|price_converter|intcomma:False|farsi_number }} تومان</span>
+                                            {% endif %}
                                         </span>
                                     </div>
                                 </div>

@@ -137,7 +137,9 @@
                             <div class="data-item" data-bs-toggle="modal" data-bs-target="#profile-edit">
                                 <div class="data-col">
                                     <span class="data-label">قیمت:</span>
-                                    <span class="data-value">{{ trade.price|price_converter|intcomma:False|farsi_number }} تومان</span>
+                                    {% if trade.price %}
+                                        <span class="data-value">{{ trade.price|price_converter|intcomma:False|farsi_number }} تومان</span>
+                                    {% endif %}
                                 </div>
                             </div>
                         {% else %}
@@ -145,14 +147,18 @@
                             <div class="data-item" data-bs-toggle="modal" data-bs-target="#profile-edit">
                                 <div class="data-col">
                                     <span class="data-label">قیمت:</span>
-                                    <span class="data-value">{{ trade.deposit|price_converter|intcomma:False|farsi_number }} تومان</span>
+                                    {% if trade.deposit %}
+                                        <span class="data-value">{{ trade.deposit|price_converter|intcomma:False|farsi_number }} تومان</span>
+                                    {% endif %}
                                 </div>
                             </div>
                             <!-- rent -->
                             <div class="data-item" data-bs-toggle="modal" data-bs-target="#profile-edit">
                                 <div class="data-col">
                                     <span class="data-label">قیمت:</span>
-                                    <span class="data-value">{{ trade.rent|price_converter|farsi_number }} تومان</span>
+                                    {% if trade.rent %}
+                                        <span class="data-value">{{ trade.rent|price_converter|farsi_number }} تومان</span>
+                                    {% endif %}
                                 </div>
                             </div>
                         {% endif %}
@@ -174,8 +180,5 @@
     </div>
 
 {% endblock %}
-
-
-
 
 

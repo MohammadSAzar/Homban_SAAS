@@ -113,7 +113,9 @@
                                     <div class="nk-tb-col"><span class="fw-bold">قیمت کل:</span></div>
                                     <div class="nk-tb-col">
                                         <span class="tb-product">
-                                            <span class="title" style="font-size: 1em;">{{ sale_file.price_announced|price_converter|intcomma:False|farsi_number }} تومان</span>
+                                            {% if sale_file.price_announced%}
+                                                <span class="title" style="font-size: 1em;">{{ sale_file.price_announced|price_converter|intcomma:False|farsi_number }} تومان</span>
+                                            {% endif %}
                                         </span>
                                     </div>
                                 </div>
@@ -123,7 +125,9 @@
                                     <div class="nk-tb-col"><span class="fw-bold">قیمت متری:</span></div>
                                     <div class="nk-tb-col">
                                         <span class="tb-product">
-                                            <span class="title" style="font-size: 1em;">{{ sale_file.price_per_meter|price_converter|intcomma:False|farsi_number }} تومان</span>
+                                            {% if sale_file.price_announced%}
+                                                <span class="title" style="font-size: 1em;">{{ sale_file.price_per_meter|price_converter|intcomma:False|farsi_number }} تومان</span>
+                                            {% endif %}
                                         </span>
                                     </div>
                                 </div>
@@ -800,6 +804,5 @@
     </div>
 
 {% endblock %}
-
 
 
