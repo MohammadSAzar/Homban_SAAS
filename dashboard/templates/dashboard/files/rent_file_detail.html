@@ -132,6 +132,107 @@
                                     </div>
                                 </div>
 
+                                <!-- Conversion -->
+                                {% if rent_file.convertable == 'is' %}
+                                    <!-- Bar -->
+                                    <div class="nk-tb-item">
+                                        <div class="nk-tb-col"><span class="fw-bold">تبدیل:</span></div>
+                                        <div class="nk-tb-col">
+                                            <div class="conversion-tool" style="padding: 15px; border: 1px solid #e5e9f2; border-radius: 8px; background-color: #f8f9fa;">
+
+                                                <!-- Current Values Display -->
+                                                <div style="display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 0.9em;">
+                                                    <div>
+                                                        <strong>رهن فعلی:</strong>
+                                                        <span id="current-deposit">{{ rent_file.deposit_announced|price_converter|intcomma:False|farsi_number }}</span>
+                                                    </div>
+                                                    <div>
+                                                        <strong>اجاره فعلی:</strong>
+                                                        <span id="current-rent">{{ rent_file.rent_announced|price_converter|intcomma:False|farsi_number }}</span>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Slider Container -->
+                                                <div style="margin: 20px 0;">
+                                                    <input type="range" id="conversion-slider"
+                                                           style="width: 100%; height: 6px; border-radius: 5px; background: #ddd; outline: none;"
+                                                           min="0" max="100" value="50">
+                                                </div>
+
+                                                <!-- Converted Values Display -->
+                                                <div style="display: flex; justify-content: space-between; font-size: 0.9em; color: #526484;">
+                                                    <div>
+                                                        <strong>رهن جدید:</strong>
+                                                        <span id="converted-deposit">-</span>
+                                                    </div>
+                                                    <div>
+                                                        <strong>اجاره جدید:</strong>
+                                                        <span id="converted-rent">-</span>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- JS -->
+                                    <script>
+                                    document.addEventListener('DOMContentLoaded', function() {
+                                        // Original values from the model
+                                        const originalDeposit = {{ rent_file.deposit_announced|default:0 }};
+                                        const originalRent = {{ rent_file.rent_announced|default:0 }};
+
+                                        // Conversion ratio: 100 deposit = 3 rent
+                                        const conversionRatio = 3 / 100;
+
+                                        // Calculate total value in rent units
+                                        const totalValueInRent = originalRent + (originalDeposit * conversionRatio);
+
+                                        // Calculate max values
+                                        const maxDeposit = totalValueInRent / conversionRatio;
+                                        const maxRent = totalValueInRent;
+
+                                        const slider = document.getElementById('conversion-slider');
+                                        const convertedDepositSpan = document.getElementById('converted-deposit');
+                                        const convertedRentSpan = document.getElementById('converted-rent');
+
+                                        // Function to format numbers with Persian digits and commas
+                                        function formatNumber(num) {
+                                            const persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+                                            return Math.round(num).toLocaleString().replace(/\d/g, function(match) {
+                                                return persianDigits[parseInt(match)];
+                                            });
+                                        }
+
+                                        // Function to update conversion display
+                                        function updateConversion() {
+                                            const sliderValue = parseFloat(slider.value);
+
+                                            // Calculate new values based on slider position
+                                            // 0 = all rent, 100 = all deposit
+                                            const depositPercentage = sliderValue / 100;
+                                            const convertedDeposit = maxDeposit * depositPercentage;
+                                            const convertedRent = maxRent * (1 - depositPercentage);
+
+                                            // Update display
+                                            convertedDepositSpan.textContent = formatNumber(convertedDeposit);
+                                            convertedRentSpan.textContent = formatNumber(convertedRent);
+                                        }
+
+                                        // Set initial position based on current values
+                                        if (maxDeposit > 0) {
+                                            const currentDepositPercentage = (originalDeposit / maxDeposit) * 100;
+                                            slider.value = currentDepositPercentage;
+                                        }
+
+                                        // Initialize display
+                                        updateConversion();
+
+                                        // Add event listener for slider changes
+                                        slider.addEventListener('input', updateConversion);
+                                    });
+                                    </script>
+                                {% endif %}
+
                                 <!-- Level -->
                                 <div class="nk-tb-item">
                                     <div class="nk-tb-col"><span class="fw-bold">طبقه</span></div>
