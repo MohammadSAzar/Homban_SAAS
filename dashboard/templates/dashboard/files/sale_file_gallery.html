@@ -65,9 +65,136 @@
                                                     
                                                         <!-- Main -->
                                                         <div class="row g-gs"> 
-                                                            
+                                                        
+                                                            <!-- Gallery -->
+                                                            <div class="col-lg-8 col-xl-8 col-xxl-8">
+                                                                <div class="card">
+                                                                    <div class="card-inner">
+                                                                        <div class="nk-block"  style="margin-top: 2em;">
+                                                
+                                                                            <!-- Title (images) -->
+                                                                            <div class="nk-block-head nk-block-head-sm">
+                                                                                <div class="nk-block-between g-3">
+                                                                                    <div class="nk-block-head-content">
+                                                                                        <h5 class="nk-block-title">گالری تصویر</h5>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                
+                                                                            <!-- Media (images) -->
+                                                                            <div class="nk-block nk-block-lg">
+                                                                                <div class="card card-bordered card-preview">
+                                                                                    <div class="card-inner">
+                                                                                        <div class="example-carousel">
+                                                                                            <div id="carouselExConInd" class="carousel slide" data-bs-ride="carousel">
+                                                
+                                                                                                <!-- Carousel -->
+                                                                                                <div class="carousel-inner">
+                                                                                                    {% if sale_file.image1 %}
+                                                                                                        <div class="carousel-item active">
+                                                                                                            <img src="{{ sale_file.image1.url }}" class="d-block w-100">
+                                                                                                        </div>
+                                                                                                    {% endif %}
+                                                                                                    {% if sale_file.image2 %}
+                                                                                                        <div class="carousel-item">
+                                                                                                            <img src="{{ sale_file.image2.url }}" class="d-block w-100">
+                                                                                                        </div>
+                                                                                                    {% endif %}
+                                                                                                    {% if sale_file.image3 %}
+                                                                                                        <div class="carousel-item">
+                                                                                                            <img src="{{ sale_file.image3.url }}" class="d-block w-100">
+                                                                                                        </div>
+                                                                                                    {% endif %}
+                                                                                                    {% if sale_file.image4 %}
+                                                                                                        <div class="carousel-item active">
+                                                                                                            <img src="{{ sale_file.image4.url }}" class="d-block w-100">
+                                                                                                        </div>
+                                                                                                    {% endif %}
+                                                                                                    {% if sale_file.image5 %}
+                                                                                                        <div class="carousel-item">
+                                                                                                            <img src="{{ sale_file.image5.url }}" class="d-block w-100">
+                                                                                                        </div>
+                                                                                                    {% endif %}
+                                                                                                    {% if sale_file.image6 %}
+                                                                                                        <div class="carousel-item">
+                                                                                                            <img src="{{ sale_file.image6.url }}" class="d-block w-100">
+                                                                                                                <a href="{{ sale_file.image1.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
+                                                                                                        </div>
+                                                                                                    {% endif %}
+                                                                                                    {% if sale_file.image7 %}
+                                                                                                        <div class="carousel-item active">
+                                                                                                            <img src="{{ sale_file.image7.url }}" class="d-block w-100">
+                                                                                                        </div>
+                                                                                                    {% endif %}
+                                                                                                    {% if sale_file.image8 %}
+                                                                                                        <div class="carousel-item">
+                                                                                                            <img src="{{ sale_file.image8.url }}" class="d-block w-100">
+                                                                                                        </div>
+                                                                                                    {% endif %}
+                                                                                                    {% if sale_file.image9 %}
+                                                                                                        <div class="carousel-item">
+                                                                                                            <img src="{{ sale_file.image9.url }}" class="d-block w-100">
+                                                                                                        </div>
+                                                                                                    {% endif %}
+                                                                                                </div>
+                                                
+                                                                                                <!-- Navigators -->
+                                                                                                <a class="carousel-control-prev" href="#carouselExConInd" role="button" data-bs-slide="prev">
+                                                                                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                                                                                    <span class="visually-hidden">قبلی</span>
+                                                                                                </a>
+                                                                                                <a class="carousel-control-next" href="#carouselExConInd" role="button" data-bs-slide="next">
+                                                                                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                                                                                    <span class="visually-hidden">بعدی</span>
+                                                                                                </a>
+                                                
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                
+                                                                            <!-- Title (video) -->
+                                                                            <div class="nk-block-head nk-block-head-sm" style="margin-top: 2em;">
+                                                                                <div class="nk-block-between g-3">
+                                                                                    <div class="nk-block-head-content">
+                                                                                        <h5 class="nk-block-title">ویدئو معرفی</h5>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                
+                                                                            <!-- Media (video) -->
+                                                                            <div class="row g-gs">
+                                                                                <!-- video -->
+                                                                                {% if sale_file.video %}
+                                                                                    <div class="col-sm-6 col-lg-4 col-xxl-4">
+                                                                                        <div class="gallery card">
+                                                                                            {% if sale_file.video %}
+                                                                                                <a class="gallery-image popup-image" href="#">
+                                                                                                    <video controls loop muted width="100%">
+                                                                                                        <source src="{{ sale_file.video.url }}" type="video/mp4">
+                                                                                                    </video>
+                                                                                                </a>
+                                                                                            {% endif %}
+                                                                                        </div>
+                                                                                    </div>
+                                                                                {% else %}
+                                                                                    <div class="nk-block-head-content">
+                                                                                        <span class="nk-block-title">هنوز ویدئویی موجود نیست!</span>
+                                                                                    </div>
+                                                                                {% endif %}
+                                                                            </div>
+                                                                        
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <!-- end: Gallery -->
+                                                        
                                                             <!-- Sidebar -->
                                                             <div class="col-lg-4  col-xl-4 col-xxl-4">
+                                                            
+                                                                <!-- Info -->
                                                                 <div class="card">
                                                                     <div class="card-inner-group" >
                                                 
@@ -214,396 +341,269 @@
                                                                     
                                                                     </div>
                                                                 </div>
-                                                            </div>
-                                                            <!-- end: Sidebar -->
-                                                
-                                                            <!-- Other -->
-                                                            <div class="col-lg-8 col-xl-8 col-xxl-8">
-                                                                <div class="card">
-                                                                    <div class="card-inner">
-                                                
-                                                                        <!-- Gallery -->
-                                                                        <div class="nk-block"  style="margin-top: 2em;">
-                                                
-                                                                            <!-- Title (images) -->
-                                                                            <div class="nk-block-head nk-block-head-sm">
-                                                                                <div class="nk-block-between g-3">
-                                                                                    <div class="nk-block-head-content">
-                                                                                        <h5 class="nk-block-title">گالری تصویر</h5>
-                                                                                    </div>
+                                                                <!-- end: Info -->
+                                                            
+                                                                <!-- Cards -->
+                                                                <div class="nk-block" style="margin-top: 3em;">
+                                                                    <div class="row">
+                                        
+                                                                        <!-- Title (other) -->
+                                                                        <div class="nk-block-head nk-block-head-sm">
+                                                                            <div class="nk-block-between g-3">
+                                                                                <div class="nk-block-head-content">
+                                                                                    <h5 class="nk-block-title">سایر مشخصات</h5>
                                                                                 </div>
-                                                                            </div>
-                                                
-                                                                            <!-- Media (images) -->
-                                                                            <div class="nk-block nk-block-lg">
-                                                                                <div class="card card-bordered card-preview">
-                                                                                    <div class="card-inner">
-                                                                                        <div class="example-carousel">
-                                                                                            <div id="carouselExConInd" class="carousel slide" data-bs-ride="carousel">
-                                                
-                                                                                                <!-- Carousel -->
-                                                                                                <div class="carousel-inner">
-                                                                                                    {% if sale_file.image1 %}
-                                                                                                        <div class="carousel-item active">
-                                                                                                            <img src="{{ sale_file.image1.url }}" class="d-block w-100">
-                                                                                                        </div>
-                                                                                                    {% endif %}
-                                                                                                    {% if sale_file.image2 %}
-                                                                                                        <div class="carousel-item">
-                                                                                                            <img src="{{ sale_file.image2.url }}" class="d-block w-100">
-                                                                                                        </div>
-                                                                                                    {% endif %}
-                                                                                                    {% if sale_file.image3 %}
-                                                                                                        <div class="carousel-item">
-                                                                                                            <img src="{{ sale_file.image3.url }}" class="d-block w-100">
-                                                                                                        </div>
-                                                                                                    {% endif %}
-                                                                                                    {% if sale_file.image4 %}
-                                                                                                        <div class="carousel-item active">
-                                                                                                            <img src="{{ sale_file.image4.url }}" class="d-block w-100">
-                                                                                                        </div>
-                                                                                                    {% endif %}
-                                                                                                    {% if sale_file.image5 %}
-                                                                                                        <div class="carousel-item">
-                                                                                                            <img src="{{ sale_file.image5.url }}" class="d-block w-100">
-                                                                                                        </div>
-                                                                                                    {% endif %}
-                                                                                                    {% if sale_file.image6 %}
-                                                                                                        <div class="carousel-item">
-                                                                                                            <img src="{{ sale_file.image6.url }}" class="d-block w-100">
-                                                                                                                <a href="{{ sale_file.image1.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
-                                                                                                        </div>
-                                                                                                    {% endif %}
-                                                                                                    {% if sale_file.image7 %}
-                                                                                                        <div class="carousel-item active">
-                                                                                                            <img src="{{ sale_file.image7.url }}" class="d-block w-100">
-                                                                                                        </div>
-                                                                                                    {% endif %}
-                                                                                                    {% if sale_file.image8 %}
-                                                                                                        <div class="carousel-item">
-                                                                                                            <img src="{{ sale_file.image8.url }}" class="d-block w-100">
-                                                                                                        </div>
-                                                                                                    {% endif %}
-                                                                                                    {% if sale_file.image9 %}
-                                                                                                        <div class="carousel-item">
-                                                                                                            <img src="{{ sale_file.image9.url }}" class="d-block w-100">
-                                                                                                        </div>
-                                                                                                    {% endif %}
-                                                                                                </div>
-                                                
-                                                                                                <!-- Navigators -->
-                                                                                                <a class="carousel-control-prev" href="#carouselExConInd" role="button" data-bs-slide="prev">
-                                                                                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                                                                                    <span class="visually-hidden">قبلی</span>
-                                                                                                </a>
-                                                                                                <a class="carousel-control-next" href="#carouselExConInd" role="button" data-bs-slide="next">
-                                                                                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                                                                                    <span class="visually-hidden">بعدی</span>
-                                                                                                </a>
-                                                
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-                                                
-                                                                            <!-- Title (video) -->
-                                                                            <div class="nk-block-head nk-block-head-sm" style="margin-top: 2em;">
-                                                                                <div class="nk-block-between g-3">
-                                                                                    <div class="nk-block-head-content">
-                                                                                        <h5 class="nk-block-title">ویدئو معرفی</h5>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-                                                
-                                                                            <!-- Media (video) -->
-                                                                            <div class="row g-gs">
-                                                                                <!-- video -->
-                                                                                {% if sale_file.video %}
-                                                                                    <div class="col-sm-6 col-lg-4 col-xxl-4">
-                                                                                        <div class="gallery card">
-                                                                                            {% if sale_file.video %}
-                                                                                                <a class="gallery-image popup-image" href="#">
-                                                                                                    <video controls loop muted width="100%">
-                                                                                                        <source src="{{ sale_file.video.url }}" type="video/mp4">
-                                                                                                    </video>
-                                                                                                </a>
-                                                                                            {% endif %}
-                                                                                        </div>
-                                                                                    </div>
-                                                                                {% else %}
-                                                                                    <div class="nk-block-head-content">
-                                                                                        <span class="nk-block-title">هنوز ویدئویی موجود نیست!</span>
-                                                                                    </div>
-                                                                                {% endif %}
-                                                                            </div>
-                                                                        
-                                                                        </div>
-                                                                        <!-- end: Gallery -->
-                                                
-                                                                        <!-- Cards -->
-                                                                        <div class="nk-block" style="margin-top: 3em;">
-                                                                            <div class="row">
-                                                
-                                                                                <!-- Title (other) -->
-                                                                                <div class="nk-block-head nk-block-head-sm">
-                                                                                    <div class="nk-block-between g-3">
-                                                                                        <div class="nk-block-head-content">
-                                                                                            <h5 class="nk-block-title">سایر مشخصات</h5>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div>
-                                                                            
-                                                                                <!-- Direction -->
-                                                                                <div class="col-xl-12 col-xxl-3" style="margin-top: 13px; box-shadow: rgba(99, 99, 99, 0.35) 0px 2px 8px 0px;">
-                                                                                    <div class="card">
-                                                                                        <div class="card-inner">
-                                                                                            <div class="d-flex justify-content-center">
-                                                                                                <div style="display: flex; flex-direction: column; align-items: center;">
-                                                                                                    <h6 class="lead-text">
-                                                                                                        <span class="text-soft ml-1">جهت ملک:</span>
-                                                                                                    </h6>
-                                                                                                    <h6 class="lead-text">
-                                                                                                        {% if sale_file.direction %}
-                                                                                                            <span class="text-soft ml-1">{{ sale_file.get_direction_display }}</span>
-                                                                                                        {% else %}
-                                                                                                            <span class="text-soft ml-1">----</span>
-                                                                                                        {% endif %}
-                                                                                                    </h6>
-                                                                                                </div>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div>
-                                                
-                                                                                <!-- Levels -->
-                                                                                <div class="col-xl-12 col-xxl-3" style="margin-top: 13px; box-shadow: rgba(99, 99, 99, 0.35) 0px 2px 8px 0px;">
-                                                                                    <div class="card">
-                                                                                        <div class="card-inner">
-                                                                                            <div class="d-flex justify-content-center">
-                                                                                                <div style="display: flex; flex-direction: column; align-items: center;">
-                                                                                                    <h6 class="lead-text">
-                                                                                                        <span class="text-soft ml-1">طبقات ساختمان:</span>
-                                                                                                    </h6>
-                                                                                                    <h6 class="lead-text">
-                                                                                                        {% if sale_file.file_levels %}
-                                                                                                            <span class="text-soft ml-1">{{ sale_file.get_file_levels_display }}</span>
-                                                                                                        {% else %}
-                                                                                                            <span class="text-soft ml-1">----</span>
-                                                                                                        {% endif %}
-                                                                                                    </h6>
-                                                                                                </div>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div>
-                                                
-                                                                                 <!-- Aparts -->
-                                                                                <div class="col-xl-12 col-xxl-3" style="margin-top: 13px; box-shadow: rgba(99, 99, 99, 0.35) 0px 2px 8px 0px;">
-                                                                                    <div class="card">
-                                                                                        <div class="card-inner">
-                                                                                            <div class="d-flex justify-content-center">
-                                                                                                <div style="display: flex; flex-direction: column; align-items: center;">
-                                                                                                    <h6 class="lead-text">
-                                                                                                        <span class="text-soft ml-1">واحد در طبقه:</span>
-                                                                                                    </h6>
-                                                                                                    <h6 class="lead-text">
-                                                                                                        {% if sale_file.apartments_per_level %}
-                                                                                                            <span class="text-soft ml-1">{{ sale_file.get_apartments_per_level_display }}</span>
-                                                                                                        {% else %}
-                                                                                                            <span class="text-soft ml-1">----</span>
-                                                                                                        {% endif %}
-                                                                                                    </h6>
-                                                                                                </div>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div>
-                                                
-                                                                                <!-- Restorations -->
-                                                                                <div class="col-xl-12 col-xxl-3" style="margin-top: 13px; box-shadow: rgba(99, 99, 99, 0.35) 0px 2px 8px 0px;">
-                                                                                    <div class="card">
-                                                                                        <div class="card-inner">
-                                                                                            <div class="d-flex justify-content-center">
-                                                                                                <div style="display: flex; flex-direction: column; align-items: center;">
-                                                                                                    <h6 class="lead-text">
-                                                                                                        <span class="text-soft ml-1">بازسازی:</span>
-                                                                                                    </h6>
-                                                                                                    <h6 class="lead-text">
-                                                                                                        {% if sale_file.restoration %}
-                                                                                                            <span class="text-soft ml-1">{{ sale_file.get_restoration_display }}</span>
-                                                                                                        {% else %}
-                                                                                                            <span class="text-soft ml-1">----</span>
-                                                                                                        {% endif %}
-                                                                                                    </h6>
-                                                                                                </div>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div>
-                                                
-                                                                                <!-- Stove -->
-                                                                                <div class="col-xl-12 col-xxl-3" style="margin-top: 13px; box-shadow: rgba(99, 99, 99, 0.35) 0px 2px 8px 0px;">
-                                                                                    <div class="card">
-                                                                                        <div class="card-inner">
-                                                                                            <div class="d-flex justify-content-center">
-                                                                                                <div style="display: flex; flex-direction: column; align-items: center;">
-                                                                                                    <h6 class="lead-text">
-                                                                                                        <span class="text-soft ml-1">گاز رومیزی:</span>
-                                                                                                    </h6>
-                                                                                                    <h6 class="lead-text">
-                                                                                                        {% if sale_file.bench_stove %}
-                                                                                                            <span class="text-soft ml-1">{{ sale_file.get_bench_stove_display }}</span>
-                                                                                                        {% else %}
-                                                                                                            <span class="text-soft ml-1">----</span>
-                                                                                                        {% endif %}
-                                                                                                    </h6>
-                                                                                                </div>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div>
-                                                
-                                                                                <!-- Balcony -->
-                                                                                <div class="col-xl-12 col-xxl-3" style="margin-top: 13px; box-shadow: rgba(99, 99, 99, 0.35) 0px 2px 8px 0px;">
-                                                                                    <div class="card">
-                                                                                        <div class="card-inner">
-                                                                                            <div class="d-flex justify-content-center">
-                                                                                                <div style="display: flex; flex-direction: column; align-items: center;">
-                                                                                                    <h6 class="lead-text">
-                                                                                                        <span class="text-soft ml-1">بالکن:</span>
-                                                                                                    </h6>
-                                                                                                    <h6 class="lead-text">
-                                                                                                        {% if sale_file.balcony %}
-                                                                                                            <span class="text-soft ml-1">{{ sale_file.get_balcony_display }}</span>
-                                                                                                        {% else %}
-                                                                                                            <span class="text-soft ml-1">----</span>
-                                                                                                        {% endif %}
-                                                                                                    </h6>
-                                                                                                </div>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div>
-                                                
-                                                                                 <!-- Floor -->
-                                                                                <div class="col-xl-12 col-xxl-3" style="margin-top: 13px; box-shadow: rgba(99, 99, 99, 0.35) 0px 2px 8px 0px;">
-                                                                                    <div class="card">
-                                                                                        <div class="card-inner">
-                                                                                            <div class="d-flex justify-content-center">
-                                                                                                <div style="display: flex; flex-direction: column; align-items: center;">
-                                                                                                    <h6 class="lead-text">
-                                                                                                        <span class="text-soft ml-1">جنس کف:</span>
-                                                                                                    </h6>
-                                                                                                    <h6 class="lead-text">
-                                                                                                        {% if sale_file.floor %}
-                                                                                                            <span class="text-soft ml-1">{{ sale_file.floor }}</span>
-                                                                                                        {% else %}
-                                                                                                            <span class="text-soft ml-1">----</span>
-                                                                                                        {% endif %}
-                                                                                                    </h6>
-                                                                                                </div>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div>
-                                                
-                                                                                <!-- Toilet -->
-                                                                                <div class="col-xl-12 col-xxl-3" style="margin-top: 13px; box-shadow: rgba(99, 99, 99, 0.35) 0px 2px 8px 0px;">
-                                                                                    <div class="card">
-                                                                                        <div class="card-inner">
-                                                                                            <div class="d-flex justify-content-center">
-                                                                                                <div style="display: flex; flex-direction: column; align-items: center;">
-                                                                                                    <h6 class="lead-text">
-                                                                                                        <span class="text-soft ml-1">سرویس بهداشتی:</span>
-                                                                                                    </h6>
-                                                                                                    <h6 class="lead-text">
-                                                                                                        {% if sale_file.toilet %}
-                                                                                                            <span class="text-soft ml-1">{{ sale_file.get_toilet_display }}</span>
-                                                                                                        {% else %}
-                                                                                                            <span class="text-soft ml-1">----</span>
-                                                                                                        {% endif %}
-                                                                                                    </h6>
-                                                                                                </div>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div>
-                                                
-                                                                                <!-- Cooling -->
-                                                                                <div class="col-xl-12 col-xxl-3" style="margin-top: 13px; box-shadow: rgba(99, 99, 99, 0.35) 0px 2px 8px 0px;">
-                                                                                    <div class="card">
-                                                                                        <div class="card-inner">
-                                                                                            <div class="d-flex justify-content-center">
-                                                                                                <div style="display: flex; flex-direction: column; align-items: center;">
-                                                                                                    <h6 class="lead-text">
-                                                                                                        <span class="text-soft ml-1">سرمایش:</span>
-                                                                                                    </h6>
-                                                                                                    <h6 class="lead-text">
-                                                                                                        {% if sale_file.cooling %}
-                                                                                                            <span class="text-soft ml-1">{{ sale_file.cooling }}</span>
-                                                                                                        {% else %}
-                                                                                                            <span class="text-soft ml-1">----</span>
-                                                                                                        {% endif %}
-                                                                                                    </h6>
-                                                                                                </div>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div>
-                                                
-                                                                                <!-- Heating -->
-                                                                                <div class="col-xl-12 col-xxl-3" style="margin-top: 13px; box-shadow: rgba(99, 99, 99, 0.35) 0px 2px 8px 0px;">
-                                                                                    <div class="card">
-                                                                                        <div class="card-inner">
-                                                                                            <div class="d-flex justify-content-center">
-                                                                                                <div style="display: flex; flex-direction: column; align-items: center;">
-                                                                                                    <h6 class="lead-text">
-                                                                                                        <span class="text-soft ml-1">گرمایش:</span>
-                                                                                                    </h6>
-                                                                                                    <h6 class="lead-text">
-                                                                                                        {% if sale_file.heating %}
-                                                                                                            <span class="text-soft ml-1">{{ sale_file.heating }}</span>
-                                                                                                        {% else %}
-                                                                                                            <span class="text-soft ml-1">----</span>
-                                                                                                        {% endif %}
-                                                                                                    </h6>
-                                                                                                </div>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div>
-                                                
-                                                                                <!-- Hot Water -->
-                                                                                <div class="col-xl-12 col-xxl-3" style="margin-top: 13px; box-shadow: rgba(99, 99, 99, 0.35) 0px 2px 8px 0px;">
-                                                                                    <div class="card">
-                                                                                        <div class="card-inner">
-                                                                                            <div class="d-flex justify-content-center">
-                                                                                                <div style="display: flex; flex-direction: column; align-items: center;">
-                                                                                                    <h6 class="lead-text">
-                                                                                                        <span class="text-soft ml-1">تامین آب گرم:</span>
-                                                                                                    </h6>
-                                                                                                    <h6 class="lead-text">
-                                                                                                        {% if sale_file.hot_water %}
-                                                                                                            <span class="text-soft ml-1">{{ sale_file.get_hot_water_display }}</span>
-                                                                                                        {% else %}
-                                                                                                            <span class="text-soft ml-1">----</span>
-                                                                                                        {% endif %}
-                                                                                                    </h6>
-                                                                                                </div>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div>
-                                                                            
                                                                             </div>
                                                                         </div>
-                                                                        <!-- end: Cards -->
-                                                
+                                                                    
+                                                                        <!-- Direction -->
+                                                                        <div class="col-xl-12 col-xxl-3" style="margin-top: 13px; box-shadow: rgba(99, 99, 99, 0.35) 0px 2px 8px 0px;">
+                                                                            <div class="card">
+                                                                                <div class="card-inner">
+                                                                                    <div class="d-flex justify-content-center">
+                                                                                        <div style="display: flex; flex-direction: column; align-items: center;">
+                                                                                            <h6 class="lead-text">
+                                                                                                <span class="text-soft ml-1">جهت ملک:</span>
+                                                                                            </h6>
+                                                                                            <h6 class="lead-text">
+                                                                                                {% if sale_file.direction %}
+                                                                                                    <span class="text-soft ml-1">{{ sale_file.get_direction_display }}</span>
+                                                                                                {% else %}
+                                                                                                    <span class="text-soft ml-1">----</span>
+                                                                                                {% endif %}
+                                                                                            </h6>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                        
+                                                                        <!-- Levels -->
+                                                                        <div class="col-xl-12 col-xxl-3" style="margin-top: 13px; box-shadow: rgba(99, 99, 99, 0.35) 0px 2px 8px 0px;">
+                                                                            <div class="card">
+                                                                                <div class="card-inner">
+                                                                                    <div class="d-flex justify-content-center">
+                                                                                        <div style="display: flex; flex-direction: column; align-items: center;">
+                                                                                            <h6 class="lead-text">
+                                                                                                <span class="text-soft ml-1">طبقات ساختمان:</span>
+                                                                                            </h6>
+                                                                                            <h6 class="lead-text">
+                                                                                                {% if sale_file.file_levels %}
+                                                                                                    <span class="text-soft ml-1">{{ sale_file.get_file_levels_display }}</span>
+                                                                                                {% else %}
+                                                                                                    <span class="text-soft ml-1">----</span>
+                                                                                                {% endif %}
+                                                                                            </h6>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                        
+                                                                         <!-- Aparts -->
+                                                                        <div class="col-xl-12 col-xxl-3" style="margin-top: 13px; box-shadow: rgba(99, 99, 99, 0.35) 0px 2px 8px 0px;">
+                                                                            <div class="card">
+                                                                                <div class="card-inner">
+                                                                                    <div class="d-flex justify-content-center">
+                                                                                        <div style="display: flex; flex-direction: column; align-items: center;">
+                                                                                            <h6 class="lead-text">
+                                                                                                <span class="text-soft ml-1">واحد در طبقه:</span>
+                                                                                            </h6>
+                                                                                            <h6 class="lead-text">
+                                                                                                {% if sale_file.apartments_per_level %}
+                                                                                                    <span class="text-soft ml-1">{{ sale_file.get_apartments_per_level_display }}</span>
+                                                                                                {% else %}
+                                                                                                    <span class="text-soft ml-1">----</span>
+                                                                                                {% endif %}
+                                                                                            </h6>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                        
+                                                                        <!-- Restorations -->
+                                                                        <div class="col-xl-12 col-xxl-3" style="margin-top: 13px; box-shadow: rgba(99, 99, 99, 0.35) 0px 2px 8px 0px;">
+                                                                            <div class="card">
+                                                                                <div class="card-inner">
+                                                                                    <div class="d-flex justify-content-center">
+                                                                                        <div style="display: flex; flex-direction: column; align-items: center;">
+                                                                                            <h6 class="lead-text">
+                                                                                                <span class="text-soft ml-1">بازسازی:</span>
+                                                                                            </h6>
+                                                                                            <h6 class="lead-text">
+                                                                                                {% if sale_file.restoration %}
+                                                                                                    <span class="text-soft ml-1">{{ sale_file.get_restoration_display }}</span>
+                                                                                                {% else %}
+                                                                                                    <span class="text-soft ml-1">----</span>
+                                                                                                {% endif %}
+                                                                                            </h6>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                        
+                                                                        <!-- Stove -->
+                                                                        <div class="col-xl-12 col-xxl-3" style="margin-top: 13px; box-shadow: rgba(99, 99, 99, 0.35) 0px 2px 8px 0px;">
+                                                                            <div class="card">
+                                                                                <div class="card-inner">
+                                                                                    <div class="d-flex justify-content-center">
+                                                                                        <div style="display: flex; flex-direction: column; align-items: center;">
+                                                                                            <h6 class="lead-text">
+                                                                                                <span class="text-soft ml-1">گاز رومیزی:</span>
+                                                                                            </h6>
+                                                                                            <h6 class="lead-text">
+                                                                                                {% if sale_file.bench_stove %}
+                                                                                                    <span class="text-soft ml-1">{{ sale_file.get_bench_stove_display }}</span>
+                                                                                                {% else %}
+                                                                                                    <span class="text-soft ml-1">----</span>
+                                                                                                {% endif %}
+                                                                                            </h6>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                        
+                                                                        <!-- Balcony -->
+                                                                        <div class="col-xl-12 col-xxl-3" style="margin-top: 13px; box-shadow: rgba(99, 99, 99, 0.35) 0px 2px 8px 0px;">
+                                                                            <div class="card">
+                                                                                <div class="card-inner">
+                                                                                    <div class="d-flex justify-content-center">
+                                                                                        <div style="display: flex; flex-direction: column; align-items: center;">
+                                                                                            <h6 class="lead-text">
+                                                                                                <span class="text-soft ml-1">بالکن:</span>
+                                                                                            </h6>
+                                                                                            <h6 class="lead-text">
+                                                                                                {% if sale_file.balcony %}
+                                                                                                    <span class="text-soft ml-1">{{ sale_file.get_balcony_display }}</span>
+                                                                                                {% else %}
+                                                                                                    <span class="text-soft ml-1">----</span>
+                                                                                                {% endif %}
+                                                                                            </h6>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                        
+                                                                         <!-- Floor -->
+                                                                        <div class="col-xl-12 col-xxl-3" style="margin-top: 13px; box-shadow: rgba(99, 99, 99, 0.35) 0px 2px 8px 0px;">
+                                                                            <div class="card">
+                                                                                <div class="card-inner">
+                                                                                    <div class="d-flex justify-content-center">
+                                                                                        <div style="display: flex; flex-direction: column; align-items: center;">
+                                                                                            <h6 class="lead-text">
+                                                                                                <span class="text-soft ml-1">جنس کف:</span>
+                                                                                            </h6>
+                                                                                            <h6 class="lead-text">
+                                                                                                {% if sale_file.floor %}
+                                                                                                    <span class="text-soft ml-1">{{ sale_file.floor }}</span>
+                                                                                                {% else %}
+                                                                                                    <span class="text-soft ml-1">----</span>
+                                                                                                {% endif %}
+                                                                                            </h6>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                        
+                                                                        <!-- Toilet -->
+                                                                        <div class="col-xl-12 col-xxl-3" style="margin-top: 13px; box-shadow: rgba(99, 99, 99, 0.35) 0px 2px 8px 0px;">
+                                                                            <div class="card">
+                                                                                <div class="card-inner">
+                                                                                    <div class="d-flex justify-content-center">
+                                                                                        <div style="display: flex; flex-direction: column; align-items: center;">
+                                                                                            <h6 class="lead-text">
+                                                                                                <span class="text-soft ml-1">سرویس بهداشتی:</span>
+                                                                                            </h6>
+                                                                                            <h6 class="lead-text">
+                                                                                                {% if sale_file.toilet %}
+                                                                                                    <span class="text-soft ml-1">{{ sale_file.get_toilet_display }}</span>
+                                                                                                {% else %}
+                                                                                                    <span class="text-soft ml-1">----</span>
+                                                                                                {% endif %}
+                                                                                            </h6>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                        
+                                                                        <!-- Cooling -->
+                                                                        <div class="col-xl-12 col-xxl-3" style="margin-top: 13px; box-shadow: rgba(99, 99, 99, 0.35) 0px 2px 8px 0px;">
+                                                                            <div class="card">
+                                                                                <div class="card-inner">
+                                                                                    <div class="d-flex justify-content-center">
+                                                                                        <div style="display: flex; flex-direction: column; align-items: center;">
+                                                                                            <h6 class="lead-text">
+                                                                                                <span class="text-soft ml-1">سرمایش:</span>
+                                                                                            </h6>
+                                                                                            <h6 class="lead-text">
+                                                                                                {% if sale_file.cooling %}
+                                                                                                    <span class="text-soft ml-1">{{ sale_file.cooling }}</span>
+                                                                                                {% else %}
+                                                                                                    <span class="text-soft ml-1">----</span>
+                                                                                                {% endif %}
+                                                                                            </h6>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                        
+                                                                        <!-- Heating -->
+                                                                        <div class="col-xl-12 col-xxl-3" style="margin-top: 13px; box-shadow: rgba(99, 99, 99, 0.35) 0px 2px 8px 0px;">
+                                                                            <div class="card">
+                                                                                <div class="card-inner">
+                                                                                    <div class="d-flex justify-content-center">
+                                                                                        <div style="display: flex; flex-direction: column; align-items: center;">
+                                                                                            <h6 class="lead-text">
+                                                                                                <span class="text-soft ml-1">گرمایش:</span>
+                                                                                            </h6>
+                                                                                            <h6 class="lead-text">
+                                                                                                {% if sale_file.heating %}
+                                                                                                    <span class="text-soft ml-1">{{ sale_file.heating }}</span>
+                                                                                                {% else %}
+                                                                                                    <span class="text-soft ml-1">----</span>
+                                                                                                {% endif %}
+                                                                                            </h6>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                        
+                                                                        <!-- Hot Water -->
+                                                                        <div class="col-xl-12 col-xxl-3" style="margin-top: 13px; box-shadow: rgba(99, 99, 99, 0.35) 0px 2px 8px 0px;">
+                                                                            <div class="card">
+                                                                                <div class="card-inner">
+                                                                                    <div class="d-flex justify-content-center">
+                                                                                        <div style="display: flex; flex-direction: column; align-items: center;">
+                                                                                            <h6 class="lead-text">
+                                                                                                <span class="text-soft ml-1">تامین آب گرم:</span>
+                                                                                            </h6>
+                                                                                            <h6 class="lead-text">
+                                                                                                {% if sale_file.hot_water %}
+                                                                                                    <span class="text-soft ml-1">{{ sale_file.get_hot_water_display }}</span>
+                                                                                                {% else %}
+                                                                                                    <span class="text-soft ml-1">----</span>
+                                                                                                {% endif %}
+                                                                                            </h6>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    
                                                                     </div>
                                                                 </div>
+                                                                <!-- end: Cards -->
+                                                            
                                                             </div>
-                                                            <!-- end: Other -->
+                                                            <!-- end: Sidebar -->
                                                         
                                                         </div>
                                                         <!-- end: Main -->
