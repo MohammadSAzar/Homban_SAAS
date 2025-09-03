@@ -193,7 +193,7 @@ class CustomUserModel(AbstractUser):
 # --------------------------------- FILE -----------------------------------
 class Person(models.Model):
     name = models.CharField(max_length=100, verbose_name=_('Name'))
-    phone_number = models.CharField(max_length=11, unique=True, verbose_name=_('Phone Number'))
+    phone_number = models.CharField(max_length=11, verbose_name=_('Phone Number'))
     description = models.TextField(max_length=150, blank=True, null=True, verbose_name=_('Description'))
     status = models.CharField(max_length=10, choices=choices.statuses, default='pen', verbose_name=_('Status'))
     datetime_created = models.DateTimeField(auto_now_add=True, null=True)
@@ -520,7 +520,7 @@ class Buyer(models.Model):
     warehouse = models.CharField(max_length=15, choices=choices.booleans, verbose_name=_('Warehouse'))
     # info
     name = models.CharField(max_length=100, verbose_name=_('Name'))
-    phone_number = models.CharField(max_length=11, unique=True, verbose_name=_('Phone Number'))
+    phone_number = models.CharField(max_length=11, verbose_name=_('Phone Number'))
     description = models.TextField(max_length=2000, blank=True, null=True, verbose_name=_('Description'))
     code = models.CharField(max_length=10, null=True, unique=True, blank=True, verbose_name=_('Code'))
     status = models.CharField(max_length=10, choices=choices.statuses, default='pen', verbose_name=_('Status'))
@@ -575,7 +575,7 @@ class Renter(models.Model):
     warehouse = models.CharField(max_length=15, choices=choices.booleans, verbose_name=_('Warehouse'))
     # info
     name = models.CharField(max_length=100, verbose_name=_('Name'))
-    phone_number = models.CharField(max_length=11, unique=True, verbose_name=_('Phone Number'))
+    phone_number = models.CharField(max_length=11, verbose_name=_('Phone Number'))
     description = models.TextField(max_length=2000, blank=True, null=True, verbose_name=_('Description'))
     code = models.CharField(max_length=10, null=True, unique=True, blank=True, verbose_name=_('Code'))
     status = models.CharField(max_length=10, choices=choices.statuses, default='pen', verbose_name=_('Status'))

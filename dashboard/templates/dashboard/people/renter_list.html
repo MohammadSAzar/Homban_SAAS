@@ -390,7 +390,11 @@
                                                 <div class="project-head">
                                                     <div class="project-title">
                                                         <div class="project-info">
-                                                            <h5 class="title" style="font-size: 1.1em;">{{ renter.name }} | {{ renter.code }}</h5>
+                                                            <h5 class="title" style="font-size: 1.1em;">{{ renter.name }} | {{ renter.code }}
+                                                                {% if renter.phone_number in duplicate_phone_numbers %}
+                                                                    <span style="color: red; font-size: 0.6em;">( مستاجر تکراری )</span>
+                                                                {% endif %}
+                                                            </h5>
                                                         </div>
                                                     </div>
                                                 </div>

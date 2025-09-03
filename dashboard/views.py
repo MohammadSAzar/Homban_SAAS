@@ -2,7 +2,7 @@ from django.http import JsonResponse
 from django.views import View
 from django.views.generic import DetailView, CreateView, ListView, UpdateView, DeleteView, TemplateView
 from django.shortcuts import get_object_or_404, render, redirect
-from django.db.models import Prefetch
+from django.db.models import Prefetch, Count
 from django.urls import reverse, reverse_lazy
 from django.core.exceptions import PermissionDenied
 from django.contrib import messages
@@ -1090,6 +1090,18 @@ class PersonListView(ReadOnlyPermissionMixin, ListView):
                     .filter(status='acc').exclude(delete_request='Yes'))
         return queryset
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        duplicate_phone_numbers = (models.Person.objects
+                                   .filter(status='acc')
+                                   .exclude(delete_request='Yes')
+                                   .values('phone_number')
+                                   .annotate(count=Count('phone_number'))
+                                   .filter(count__gt=1)
+                                   .values_list('phone_number', flat=True))
+        context['duplicate_phone_numbers'] = list(duplicate_phone_numbers)
+        return context
+
 
 class PersonCreateView(PermissionRequiredMixin, CreateView):
     model = models.Person
@@ -1287,13 +1299,20 @@ class BuyerListView(ReadOnlyPermissionMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         form = forms.BuyerFilterForm(self.request.GET)
-
         if self.request.GET.get('province'):
             form.fields['city'].queryset = models.City.objects.filter(province_id=self.request.GET.get('province'))
         if self.request.GET.get('city'):
             form.fields['district'].queryset = models.District.objects.filter(city_id=self.request.GET.get('city'))
+        duplicate_phone_numbers = (models.Buyer.objects
+                                   .filter(status='acc')
+                                   .exclude(delete_request='Yes')
+                                   .values('phone_number')
+                                   .annotate(count=Count('phone_number'))
+                                   .filter(count__gt=1)
+                                   .values_list('phone_number', flat=True))
 
         context['filter_form'] = form
+        context['duplicate_phone_numbers'] = list(duplicate_phone_numbers)
         return context
 
 
@@ -1309,6 +1328,19 @@ class BuyerDetailView(ReadOnlyPermissionMixin, DetailView):
         if user.title != 'bs' and buyer.delete_request == 'Yes':
             raise PermissionDenied("شما اجازه مشاهده این محتوا را ندارید")
         return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        duplicate_phone_numbers = (models.Buyer.objects
+                                   .filter(status='acc')
+                                   .exclude(delete_request='Yes')
+                                   .values('phone_number')
+                                   .annotate(count=Count('phone_number'))
+                                   .filter(count__gt=1)
+                                   .values_list('phone_number', flat=True))
+
+        context['duplicate_phone_numbers'] = list(duplicate_phone_numbers)
+        return context
 
 
 class BuyerCreateView(PermissionRequiredMixin, CreateView):
@@ -1523,13 +1555,20 @@ class RenterListView(ReadOnlyPermissionMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         form = forms.RenterFilterForm(self.request.GET)
-
         if self.request.GET.get('province'):
             form.fields['city'].queryset = models.City.objects.filter(province_id=self.request.GET.get('province'))
         if self.request.GET.get('city'):
             form.fields['district'].queryset = models.District.objects.filter(city_id=self.request.GET.get('city'))
+        duplicate_phone_numbers = (models.Renter.objects
+                                   .filter(status='acc')
+                                   .exclude(delete_request='Yes')
+                                   .values('phone_number')
+                                   .annotate(count=Count('phone_number'))
+                                   .filter(count__gt=1)
+                                   .values_list('phone_number', flat=True))
 
         context['filter_form'] = form
+        context['duplicate_phone_numbers'] = list(duplicate_phone_numbers)
         return context
 
 
@@ -1545,6 +1584,19 @@ class RenterDetailView(ReadOnlyPermissionMixin, DetailView):
         if user.title != 'bs' and renter.delete_request == 'Yes':
             raise PermissionDenied("شما اجازه مشاهده این محتوا را ندارید")
         return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        duplicate_phone_numbers = (models.Renter.objects
+                                   .filter(status='acc')
+                                   .exclude(delete_request='Yes')
+                                   .values('phone_number')
+                                   .annotate(count=Count('phone_number'))
+                                   .filter(count__gt=1)
+                                   .values_list('phone_number', flat=True))
+
+        context['duplicate_phone_numbers'] = list(duplicate_phone_numbers)
+        return context
 
 
 class RenterCreateView(PermissionRequiredMixin, CreateView):

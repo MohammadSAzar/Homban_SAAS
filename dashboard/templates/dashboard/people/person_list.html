@@ -119,7 +119,11 @@
                                     <div class="project-head">
                                         <div class="project-title">
                                             <div class="project-info">
-                                                <h6 class="title">{{ person.name }}</h6>
+                                                <h6 class="title">{{ person.name }}
+                                                    {% if person.phone_number in duplicate_phone_numbers %}
+                                                        | <span style="color: red; font-size: 0.7em;">آگهی‌دهنده تکراری</span>
+                                                    {% endif %}
+                                                </h6>
                                                 <span class="sub-text" style="font-size: 0.95em; margin-top: 0.7em;">{{ person.phone_number }}</span>
                                             </div>
                                         </div>

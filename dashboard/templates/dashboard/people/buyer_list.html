@@ -356,11 +356,15 @@
                                                 <div class="project-head">
                                                     <div class="project-title">
                                                         <div class="project-info">
-                                                            <h5 class="title" style="font-size: 1.1em;">{{ buyer.name }} | {{ buyer.code }}</h5>
+                                                            <h5 class="title" style="font-size: 1.1em;">{{ buyer.name }} | {{ buyer.code }}
+                                                                {% if buyer.phone_number in duplicate_phone_numbers %}
+                                                                    <span style="color: red; font-size: 0.6em;">( خریدار تکراری )</span>
+                                                                {% endif %}
+                                                            </h5>
                                                         </div>
                                                     </div>
                                                 </div>
-    
+
                                                 <!-- Location -->
                                                 <div style="height: 4em;!important; -webkit-line-clamp: 2;!important;">
                                                     <div class="project-head" style="margin-bottom: 0.5em;!important;">
