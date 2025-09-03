@@ -134,59 +134,80 @@
 
                                 <!-- Conversion -->
                                 {% if rent_file.convertable == 'is' %}
-                                    <!-- Bar -->
+
+                                    <!-- Button -->
                                     <div class="nk-tb-item">
-                                        <div class="nk-tb-col"><span class="fw-bold">تبدیل:</span></div>
+                                        <div class="nk-tb-col"><span class="fw-bold">قابل تبدیل:</span></div>
                                         <div class="nk-tb-col">
-                                            <div class="conversion-tool" style="padding: 15px; border: 1px solid #e5e9f2; border-radius: 8px; background-color: #f8f9fa;">
+                                            <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#conversionModal">
+                                                <i class="fas fa-exchange-alt me-1"></i>هست (کلیک کنید)
+                                            </button>
+                                        </div>
+                                    </div>
 
-                                                <!-- Mode Toggle -->
-                                                <div style="margin-bottom: 15px; text-align: center;">
-                                                    <button id="slider-mode-btn" class="btn btn-sm btn-primary" style="margin-left: 5px;">حالت اسلایدر</button>
-                                                    <button id="input-mode-btn" class="btn btn-sm btn-outline-primary">حالت ورودی</button>
+                                    <!-- Modal -->
+                                    <div class="modal fade" id="conversionModal" tabindex="-1" aria-labelledby="conversionModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog modal-lg">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="conversionModalLabel">تبدیل رهن و اجاره</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                 </div>
+                                                <div class="modal-body">
+                                                    <div class="p-3 bg-white border border-light round-lg">
 
-                                                <!-- Slider Mode -->
-                                                <div id="slider-mode" style="display: block;">
-                                                    <!-- Slider Container -->
-                                                    <div style="margin: 20px 0;">
-                                                        <input type="range" id="conversion-slider"
-                                                               style="width: 100%; height: 6px; border-radius: 5px; background: #ddd; outline: none;"
-                                                               min="0" max="100" value="50">
-                                                    </div>
-                                                </div>
-
-                                                <!-- Input Mode -->
-                                                <div id="input-mode" style="display: none;">
-                                                    <div style="margin: 20px 0; display: flex; gap: 5px; align-items: center; justify-content: center;">
-                                                        <div style="text-align: center;">
-                                                            <label style="display: block; margin-bottom: 5px; font-size: 0.85em;">رهن (تومان)</label>
-                                                            <input type="number" id="deposit-input"
-                                                                   style="width: 90px; border: 1px solid #ccc; border-radius: 4px; text-align: center;">
+                                                        <!-- Mode Toggle -->
+                                                        <div style="margin-bottom: 15px; text-align: center;">
+                                                            <button id="slider-mode-btn" class="btn btn-sm btn-primary" style="margin-left: 5px;">با اسلایدر</button>
+                                                            <button id="input-mode-btn" class="btn btn-sm btn-outline-primary">با ورودی</button>
                                                         </div>
-                                                        <div style="text-align: center;">
-                                                            <label style="display: block; margin-bottom: 5px; font-size: 0.85em;">اجاره (تومان)</label>
-                                                            <input type="number" id="rent-input"
-                                                                   style="width: 90px; border: 1px solid #ccc; border-radius: 4px; text-align: center;">
+
+                                                        <!-- Slider -->
+                                                        <div id="slider-mode" style="display: block;">
+                                                            <div style="margin: 20px 0;">
+                                                                <input type="range" id="conversion-slider"
+                                                                       style="width: 100%; height: 6px; border-radius: 5px; background: #ddd; outline: none;"
+                                                                       min="0" max="100" value="50">
+                                                            </div>
                                                         </div>
+
+                                                        <!-- Input -->
+                                                        <div id="input-mode" style="display: none;">
+                                                            <div style="margin: 20px 0; display: flex; gap: 5px; align-items: center; justify-content: center;">
+                                                                <div style="text-align: center;">
+                                                                    <label style="display: block; margin-bottom: 5px; font-size: 0.85em;">رهن (تومان)</label>
+                                                                    <input type="number" id="deposit-input"
+                                                                           style="width: 90px; border: 1px solid #ccc; border-radius: 4px; text-align: center;">
+                                                                </div>
+                                                                <div style="text-align: center;">
+                                                                    <label style="display: block; margin-bottom: 5px; font-size: 0.85em;">اجاره (تومان)</label>
+                                                                    <input type="number" id="rent-input"
+                                                                           style="width: 90px; border: 1px solid #ccc; border-radius: 4px; text-align: center;">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- Converted -->
+                                                        <div style="display: flex; justify-content: space-between; font-size: 0.9em; color: black;">
+                                                            <div>
+                                                                <strong>رهن جدید:</strong>
+                                                                <span id="converted-deposit">-</span>
+                                                            </div>
+                                                            <div>
+                                                                <strong>اجاره جدید:</strong>
+                                                                <span id="converted-rent">-</span>
+                                                            </div>
+                                                        </div>
+
                                                     </div>
                                                 </div>
-
-                                                <!-- Converted Values Display -->
-                                                <div style="display: flex; justify-content: space-between; font-size: 0.9em; color: black;">
-                                                    <div>
-                                                        <strong>رهن جدید:</strong>
-                                                        <span id="converted-deposit">-</span>
-                                                    </div>
-                                                    <div>
-                                                        <strong>اجاره جدید:</strong>
-                                                        <span id="converted-rent">-</span>
-                                                    </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-primary" id="reset-conversion">بازنشانی</button>
                                                 </div>
-
                                             </div>
                                         </div>
                                     </div>
+
                                     <!-- JS -->
                                     <script>
                                         document.addEventListener('DOMContentLoaded', function() {
@@ -214,6 +235,7 @@
                                             const inputModeBtn = document.getElementById('input-mode-btn');
                                             const sliderMode = document.getElementById('slider-mode');
                                             const inputMode = document.getElementById('input-mode');
+                                            const resetBtn = document.getElementById('reset-conversion');
 
                                             // Mode switching
                                             sliderModeBtn.addEventListener('click', function() {
@@ -299,17 +321,48 @@
                                                 depositInput.value = '';
                                             }
 
-                                            // Set initial position to show exact original values
-                                            let initialSliderValue = 50;
-                                            if (totalValueInRent > 0) {
-                                                // Calculate the exact percentage that gives us the original deposit
-                                                initialSliderValue = (originalDeposit / maxDeposit) * 100;
-                                                slider.value = initialSliderValue;
+                                            // Function to reset conversion tool
+                                            function resetConversionTool() {
+                                                // Reset slider to original position
+                                                let initialSliderValue = 50;
+                                                if (totalValueInRent > 0) {
+                                                    initialSliderValue = (originalDeposit / maxDeposit) * 100;
+                                                    slider.value = initialSliderValue;
+                                                }
+
+                                                // Clear inputs
+                                                depositInput.value = '';
+                                                rentInput.value = '';
+
+                                                // Reset display to original values
+                                                convertedDepositSpan.textContent = formatNumber(originalDeposit);
+                                                convertedRentSpan.textContent = formatNumber(originalRent);
+
+                                                // Ensure slider mode is active
+                                                sliderMode.style.display = 'block';
+                                                inputMode.style.display = 'none';
+                                                sliderModeBtn.classList.add('btn-primary');
+                                                sliderModeBtn.classList.remove('btn-outline-primary');
+                                                inputModeBtn.classList.add('btn-outline-primary');
+                                                inputModeBtn.classList.remove('btn-primary');
                                             }
 
-                                            // Initialize display with original values
-                                            convertedDepositSpan.textContent = formatNumber(originalDeposit);
-                                            convertedRentSpan.textContent = formatNumber(originalRent);
+                                            // Initialize the conversion tool when modal is shown
+                                            $('#conversionModal').on('shown.bs.modal', function () {
+                                                // Set initial position to show exact original values
+                                                let initialSliderValue = 50;
+                                                if (totalValueInRent > 0) {
+                                                    initialSliderValue = (originalDeposit / maxDeposit) * 100;
+                                                    slider.value = initialSliderValue;
+                                                }
+
+                                                // Initialize display with original values
+                                                convertedDepositSpan.textContent = formatNumber(originalDeposit);
+                                                convertedRentSpan.textContent = formatNumber(originalRent);
+                                            });
+
+                                            // Reset conversion tool when reset button is clicked
+                                            resetBtn.addEventListener('click', resetConversionTool);
 
                                             // Add event listeners
                                             slider.addEventListener('input', updateConversionFromSlider);
@@ -317,6 +370,7 @@
                                             rentInput.addEventListener('input', updateFromRentInput);
                                         });
                                     </script>
+
                                 {% endif %}
 
                                 <!-- Level -->
@@ -1002,5 +1056,6 @@
     </div>
 
 {% endblock %}
+
 
 
