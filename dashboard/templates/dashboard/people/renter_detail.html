@@ -105,14 +105,18 @@
                         <div class="data-item" data-bs-toggle="modal" data-bs-target="#profile-edit">
                             <div class="data-col">
                                 <span class="data-label">اجاره اعلامی:</span>
-                                <span class="data-value">{{ renter.rent_announced|price_converter|intcomma:False|farsi_number }} تومان</span>
+                                {% if renter.rent_announced %}
+                                    <span class="data-value">{{ renter.rent_announced|price_converter|intcomma:False|farsi_number }} تومان</span>
+                                {% endif %}
                             </div>
                         </div>
                         <!-- rent_max -->
                         <div class="data-item" data-bs-toggle="modal" data-bs-target="#profile-edit">
                             <div class="data-col">
                                 <span class="data-label">حداکثر اجاره:</span>
-                                <span class="data-value">{{ renter.rent_max|intcomma:False|farsi_number }} تومان</span>
+                                {% if renter.rent_max %}
+                                    <span class="data-value">{{ renter.rent_max|intcomma:False|farsi_number }} تومان</span>
+                                {% endif %}
                             </div>
                         </div>
                         <!-- budget_status -->
@@ -223,13 +227,109 @@
                     </div>
                 </div>
                 <!-- end: Services -->
-            
+
+                <!-- Suggestions (Box) -->
+                <div class=" nk-block">
+                    <div class="nk-data data-list">
+                        <div class="data-head">
+                            <h6 class="title">فایل‌های پیشنهادی</h6>
+                        </div>
+                        <div class="data-item" data-bs-toggle="modal" data-bs-target="#profile-edit">
+                            <div style="font-size: 0.9em; margin-top: 0.4em;">
+                                <div class="btn btn-primary" style="font-size: 0.9em;">
+                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalLarge">برای مشاهده فایل‌های پیشنهادی کلیک کنید</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- end: Suggestions (Box) -->
+                <!-- Suggestions (Modal) -->
+                <div class="modal fade" tabindex="-1" id="modalLarge">
+                    <div class="modal-dialog modal-lg" role="document">
+                        <div class="modal-content">
+
+                            <!-- Title -->
+                            <div class="modal-header">
+                                <h5 class="modal-title">فایل‌های پیشنهادی</h5>
+                                <a href="#" class="close" data-bs-dismiss="modal" aria-label="بستن">
+                                    <em class="icon ni ni-cross"></em>
+                                </a>
+                            </div>
+
+                            <!-- Files -->
+                            <div class="modal-body">
+                                <div class="card card-bordered card-preview">
+                                    <div class="card-inner">
+                                        <div class="row g-gs">
+                                            {% for file in suggested_files %}
+                                                <div class="col-lg-4">
+                                                    <div class="card">
+                                                        <!-- Code -->
+                                                        <div class="card-header border-bottom">
+                                                            <a href="{{ file.get_absolute_url }}" target="_blank" style="color: #00a65c; border-bottom: 1px solid #00a65c">
+                                                                {{ file.code }}
+                                                            </a>
+                                                        </div>
+                                                        <div class="card-inner" style="background-color: #FAFAFA">
+                                                            <!-- Info -->
+                                                            <p class="card-text" style="color: #00a65c;">{{ file.sub_district }}</p>
+                                                            <p class="card-text">رهن: {{ file.deposit_announced|intcomma:False|farsi_number }}</p>
+                                                            <p class="card-text">اجاره: {{ file.rent_announced|intcomma:False|farsi_number }}</p>
+                                                            <p class="card-text">متراژ: {{ file.area }}</p>
+                                                            <p class="card-text">اتاق: {{ file.room }}</p>
+                                                            <!-- Link -->
+                                                            <a href="{% url 'rent_file_gallery' file.pk file.unique_url_id %}"
+                                                               class="btn btn-primary"
+                                                               style="font-size: 0.75em; width:100%; text-align: center; justify-content: center;"
+                                                               onclick="copyToClipboard(event, this)">
+                                                               کپی لینک
+                                                            </a>
+                                                            <!-- Message -->
+                                                            <span id="copy-message" style="display:none; color:green; margin-right:10px; margin-top: 5px;">شد!</span>
+                                                            <!-- JS -->
+                                                            <script>
+                                                                function copyToClipboard(event, element) {
+                                                                    event.preventDefault();
+                                                                    const baseUrl = window.location.origin;
+                                                                    const relativeUrl = element.getAttribute('href');
+                                                                    const fullUrl = baseUrl + relativeUrl;
+                                                                    navigator.clipboard.writeText(fullUrl).then(() => {
+                                                                        const message = document.getElementById("copy-message");
+                                                                        message.style.display = "inline";
+                                                                        setTimeout(() => {
+                                                                            message.style.display = "none";
+                                                                        }, 2000);
+                                                                    }).catch(err => {
+                                                                        console.error("Failed to copy: ", err);
+                                                                    });
+                                                                }
+                                                            </script>
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- More -->
+                            <div class="modal-footer bg-light">
+                                <a href="{% url 'renter_suggested_files' renter.pk renter.code %}" target="_blank" class="sub-text">مشاهده همه</a>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <!-- end:Suggestions (Modal) -->
+
             </div>
         </div>
     </div>
 
 {% endblock %}
-
 
 
 

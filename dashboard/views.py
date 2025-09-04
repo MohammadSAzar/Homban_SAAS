@@ -5,7 +5,9 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.db.models import Prefetch, Count
 from django.urls import reverse, reverse_lazy
 from django.core.exceptions import PermissionDenied
+from django.core.paginator import Paginator
 from django.contrib import messages
+
 
 from jalali_date import datetime2jalali
 from django.utils import timezone
@@ -435,8 +437,9 @@ class SaleFileListView(ReadOnlyPermissionMixin, ListView):
             return queryset_default
 
         else:
-            queryset_default = (models.SaleFile.objects.select_related('province', 'city', 'district', 'sub_district', 'person')
-                                .filter(status='acc').exclude(delete_request='Yes'))
+            queryset_default = (
+                models.SaleFile.objects.select_related('province', 'city', 'district', 'sub_district', 'person')
+                .filter(status='acc').exclude(delete_request='Yes'))
             form = forms.SaleFileFilterForm(self.request.GET)
 
             if form.is_valid():
@@ -813,8 +816,9 @@ class RentFileListView(ReadOnlyPermissionMixin, ListView):
                 return queryset_filtered
             return queryset_default
         else:
-            queryset_default = (models.RentFile.objects.select_related('province', 'city', 'district', 'sub_district', 'person')
-                                .filter(status='acc')).exclude(delete_request='Yes')
+            queryset_default = (
+                models.RentFile.objects.select_related('province', 'city', 'district', 'sub_district', 'person')
+                .filter(status='acc')).exclude(delete_request='Yes')
             form = forms.RentFileFilterForm(self.request.GET)
 
             if form.is_valid():
@@ -1255,8 +1259,9 @@ class BuyerListView(ReadOnlyPermissionMixin, ListView):
 
         else:
             queryset_default = ((
-                models.Buyer.objects.select_related('province', 'city', 'district').prefetch_related('sub_districts')
-                .filter(sub_districts__name__contains=self.request.user.sub_district.name))
+                                    models.Buyer.objects.select_related('province', 'city',
+                                                                        'district').prefetch_related('sub_districts')
+                                    .filter(sub_districts__name__contains=self.request.user.sub_district.name))
                                 .exclude(delete_request='Yes').distinct())
 
             form = forms.BuyerFilterForm(self.request.GET)
@@ -1322,6 +1327,12 @@ class BuyerDetailView(ReadOnlyPermissionMixin, DetailView):
     template_name = 'dashboard/people/buyer_detail.html'
     permission_model = 'Buyer'
 
+    def get_template_names(self):
+        if 'suggested' in self.request.path:
+            return 'dashboard/people/buyer_detail_suggested.html'
+        else:
+            return 'dashboard/people/buyer_detail.html'
+
     def dispatch(self, request, *args, **kwargs):
         buyer = self.get_object()
         user = request.user
@@ -1338,8 +1349,25 @@ class BuyerDetailView(ReadOnlyPermissionMixin, DetailView):
                                    .annotate(count=Count('phone_number'))
                                    .filter(count__gt=1)
                                    .values_list('phone_number', flat=True))
-
         context['duplicate_phone_numbers'] = list(duplicate_phone_numbers)
+
+        buyer = self.get_object()
+        similar_sub_districts = buyer.sub_districts.all()
+        similar_files = (models.SaleFile.objects
+                         .filter(price_announced__gt=0.9 * buyer.budget_announced)
+                         .filter(price_announced__lt=1.1 * buyer.budget_announced)
+                         .filter(area__gt=0.8 * buyer.area_min)
+                         .filter(area__lt=1.2 * buyer.area_max))
+        suggested_files_queryset = similar_files.filter(sub_district__in=similar_sub_districts)
+
+        paginator = Paginator(suggested_files_queryset, 6)
+        page_number = self.request.GET.get('page', 1)
+        page_obj = paginator.get_page(page_number)
+
+        context['suggested_files'] = page_obj.object_list
+        context['page_obj'] = page_obj
+        context['is_paginated'] = page_obj.has_other_pages()
+
         return context
 
 
@@ -1575,8 +1603,13 @@ class RenterListView(ReadOnlyPermissionMixin, ListView):
 class RenterDetailView(ReadOnlyPermissionMixin, DetailView):
     model = models.Renter
     context_object_name = 'renter'
-    template_name = 'dashboard/people/renter_detail.html'
     permission_model = 'Renter'
+
+    def get_template_names(self):
+        if 'suggested' in self.request.path:
+            return 'dashboard/people/renter_detail_suggested.html'
+        else:
+            return 'dashboard/people/renter_detail.html'
 
     def dispatch(self, request, *args, **kwargs):
         renter = self.get_object()
@@ -1594,8 +1627,27 @@ class RenterDetailView(ReadOnlyPermissionMixin, DetailView):
                                    .annotate(count=Count('phone_number'))
                                    .filter(count__gt=1)
                                    .values_list('phone_number', flat=True))
-
         context['duplicate_phone_numbers'] = list(duplicate_phone_numbers)
+
+        renter = self.get_object()
+        similar_sub_districts = renter.sub_districts.all()
+        similar_files = (models.RentFile.objects
+                         .filter(deposit_announced__gt=0.8 * renter.deposit_announced)
+                         .filter(deposit_announced__lt=1.2 * renter.deposit_announced)
+                         .filter(rent_announced__gt=0.8 * renter.rent_announced)
+                         .filter(rent_announced__lt=1.2 * renter.rent_announced)
+                         .filter(area__gt=0.8 * renter.area_min)
+                         .filter(area__lt=1.2 * renter.area_max))
+        suggested_files_queryset = similar_files.filter(sub_district__in=similar_sub_districts)
+
+        paginator = Paginator(suggested_files_queryset, 6)
+        page_number = self.request.GET.get('page', 1)
+        page_obj = paginator.get_page(page_number)
+
+        context['suggested_files'] = page_obj.object_list
+        context['page_obj'] = page_obj
+        context['is_paginated'] = page_obj.has_other_pages()
+
         return context
 
 
@@ -2274,12 +2326,12 @@ class TaskBossDeleteView(PermissionRequiredMixin, DeleteView):
 def delete_request_list_view(request):
     context = {}
     querysets = {
-            'sale_files': models.SaleFile.objects.filter(delete_request='Yes'),
-            'rent_files': models.RentFile.objects.filter(delete_request='Yes'),
-            'buyers': models.Buyer.objects.filter(delete_request='Yes'),
-            'renters': models.Renter.objects.filter(delete_request='Yes'),
-            'persons': models.Person.objects.filter(delete_request='Yes'),
-        }
+        'sale_files': models.SaleFile.objects.filter(delete_request='Yes'),
+        'rent_files': models.RentFile.objects.filter(delete_request='Yes'),
+        'buyers': models.Buyer.objects.filter(delete_request='Yes'),
+        'renters': models.Renter.objects.filter(delete_request='Yes'),
+        'persons': models.Person.objects.filter(delete_request='Yes'),
+    }
     if querysets['sale_files'].exists():
         context['sale_files'] = querysets['sale_files']
     if querysets['rent_files'].exists():
@@ -2759,7 +2811,8 @@ class TradeListView(ReadOnlyPermissionMixin, ListView):
                 if form.cleaned_data['type']:
                     queryset_filtered = queryset_filtered.filter(type=form.cleaned_data['type'])
                 if form.cleaned_data['followup_code_status']:
-                    queryset_filtered = queryset_filtered.filter(followup_code_status=form.cleaned_data['followup_code_status'])
+                    queryset_filtered = queryset_filtered.filter(
+                        followup_code_status=form.cleaned_data['followup_code_status'])
                 queryset_filtered = list(queryset_filtered)
                 return queryset_filtered
             return queryset
@@ -3032,5 +3085,7 @@ def dated_task_list_view(request):
     }
     print(date)
     return render(request, 'dashboard/tasks/dated_task_list.html', context=context)
+
+
 
 

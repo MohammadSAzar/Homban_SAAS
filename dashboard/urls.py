@@ -58,6 +58,7 @@ urlpatterns = [
     re_path(r'buyer/delete/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/', views.BuyerDeleteView.as_view(), name='buyer_delete'),
     re_path(r'buyer/delete-request/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/', views.BuyerDeleteRequestView.as_view(), name='buyer_delete_request'),
     re_path(r'buyer/recover/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/', views.BuyerRecoverView.as_view(), name='buyer_recover'),
+    re_path(r'buyer/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/suggested-files/', views.BuyerDetailView.as_view(), name='buyer_suggested_files'),
     re_path(r'buyer/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/', views.BuyerDetailView.as_view(), name='buyer_detail'),
     re_path(r'buyers/create/', views.BuyerCreateView.as_view(), name='buyer_create'),
     # renters
@@ -67,6 +68,7 @@ urlpatterns = [
     re_path(r'renter/delete-request/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/', views.RenterDeleteRequestView.as_view(), name='renter_delete_request'),
     re_path(r'renter/recover/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/', views.RenterRecoverView.as_view(), name='renter_recover'),
     re_path(r'renter/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/', views.RenterDetailView.as_view(), name='renter_detail'),
+    re_path(r'renter/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/suggested-files/', views.RenterDetailView.as_view(), name='renter_suggested_files'),
     re_path(r'renters/create/', views.RenterCreateView.as_view(), name='renter_create'),
     # tasks
     path('tasks/for-files/', views.TaskFPListView.as_view(), name='task_fp_list'),
@@ -104,5 +106,6 @@ urlpatterns = [
     re_path(r'tasks/boss/approve/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/', views.TaskBossApproveView.as_view(), name='boss_task_approve'),
     re_path(r'tasks/boss/delete/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/', views.TaskBossDeleteView.as_view(), name='boss_task_delete'),
 ]
+
 
 

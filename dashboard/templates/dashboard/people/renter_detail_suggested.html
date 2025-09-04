@@ -1,0 +1,208 @@
+{% extends '_base_dashboard.html' %}
+
+{% load static %}
+{% load i18n %}
+{% load jalali_tags %}
+{% load jalali_date_converter %}
+{% load number_converter %}
+{% load price_converter %}
+{% load humanize %}
+{% load widget_tweaks %}
+
+
+{% block title %}
+    فایل‌های پیشنهادی برای مستاجر: "{{ renter.name }}"
+{% endblock %}
+
+
+{% block content %}
+    
+    <!-- Title -->
+    <div class="nk-block-head nk-block-head-sm" style="margin-bottom: 1.2em;">
+        <div class="nk-block-between position-relative">
+            <div class="nk-block-head-content">
+                <h5 class="nk-block-title page-title">فایل‌های پیشنهادی برای مستاجر: "{{ renter.name }}"</h5>
+            </div>
+        </div>
+    </div>
+    <!-- end: Title -->
+
+    <!-- Main -->
+    <div class="nk-fmg" style="padding-right: 0; !important;">
+    
+        <!-- Files -->
+        <div class="nk-fmg-quick-list nk-block">
+            <div class="toggle-expand-content expanded" data-content="quick-access">
+                <div class="nk-files nk-files-view-grid">
+                    <div class="nk-files-list">
+
+                        <!-- Loop -->
+                        {% for file in suggested_files %}
+                            {% if file.status == 'acc' %}
+                                <div class="nk-file-item nk-file">
+                                    <div class="nk-file-info">
+                                        <div class="nk-file-title">
+
+                                            <!-- Code / Sub-district -->
+                                            <div class="nk-file-name">
+                                                <div class="nk-file-name-text" style="margin-bottom: 0.5em; height: 3em;!important; -webkit-line-clamp: 2;!important;">
+                                                    <span style="font-size: 0.8em;">کد: {{ file.code }} / <span style="color: green; font-size: 1.1em;">{{ file.sub_district }}</span></span>
+                                                </div>
+                                            </div>
+                                            <div class="nk-file-name">
+                                                <div class="nk-file-name-text">
+                                                    <span style="font-size: 0.8em;">{{ file.datetime_created|jalali_date_converter }}</span>
+                                                </div>
+                                            </div>
+
+                                            <!-- Cover -->
+                                            <a href="{{ file.get_absolute_url }}" class="nk-file-link">
+                                                <div class="nk-file-icon">
+                                                    <figure class="product-image--holder" style="height: 12.3em;!important; -webkit-line-clamp: 12.3;!important;">
+                                                        {% if file.image1 %}
+                                                            <img src="{{ file.image1.url }}" alt="File Cover" style="height: 12.3em;!important; -webkit-line-clamp: 12.3;!important;">
+                                                        {% else %}
+                                                            <img src="{% static 'dashboard/images/blank_file.jpg' %}" alt="File Cover" style="height: 12.3em;!important; -webkit-line-clamp: 12.3;!important;">
+                                                        {% endif %}
+                                                    </figure>
+                                                </div>
+                                            </a>
+
+                                            <!-- Title -->
+                                            <div class="nk-file-name">
+                                                <div class="nk-file-name-text" style="height: 4em;!important; -webkit-line-clamp: 2;!important;">
+                                                    <span class="title" style="font-size: 0.9em;">{{ file.title|linebreaksbr|farsi_number }}</span>
+                                                </div>
+                                            </div>
+
+                                            <!-- Deposit -->
+                                            <div class="nk-file-name">
+                                                <span class="title" style="font-size: 0.8em; color: green;">رهن: {{ file.deposit_announced|price_converter|intcomma:False|farsi_number }} تومان</span>
+                                            </div>
+
+                                            <!-- Rent -->
+                                            <div class="nk-file-name">
+                                                <span class="title" style="font-size: 0.8em; color: green;">اجاره: {{ file.rent_announced|price_converter|intcomma:False|farsi_number }} تومان</span>
+                                            </div>
+
+                                            <!-- More -->
+                                            <a href="{{ file.get_absolute_url }}" class="btn btn-primary" style="margin-top: 1em;"><em class="icon ni ni-eye"></em><span>مشاهده</span></a>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                        <!-- end: Loop -->
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- end: Files -->
+
+        <!-- Pagination -->
+        {% if is_paginated %}
+            <div class="nk-block-head nk-block-head-lg" style="margin-top: 1.5em;">
+                <div class="nk-block-between" style="justify-items: center; justify-content: center; text-align: center">
+                    <div class="nk-block-head-content">
+                        <div class="my-profile-pagination" style="margin-top: 1em;">
+                            {% if page_obj.has_previous %}
+                                <a href="{% url 'renter_suggested_files' renter.pk renter.code %}?page=1">&laquo; ابتدا</a>
+                            {% else %}
+                                <span class="my-profile-disabled">&laquo; ابتدا</span>
+                            {% endif %}
+
+                            {% if page_obj.has_previous %}
+                                <a href="{% url 'renter_suggested_files' renter.pk renter.code %}?page={{ page_obj.previous_page_number }}">‹ قبلی</a>
+                            {% else %}
+                                <span class="my-profile-disabled">‹ قبلی</span>
+                            {% endif %}
+
+                            {% for num in page_obj.paginator.page_range %}
+                                {% if num == page_obj.number %}
+                                    <span class="my-profile-current">{{ num }}</span>
+                                {% else %}
+                                    <a href="{% url 'renter_suggested_files' renter.pk renter.code %}?page={{ num }}">{{ num }}</a>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if page_obj.has_next %}
+                                <a href="{% url 'renter_suggested_files' renter.pk renter.code %}?page={{ page_obj.next_page_number }}">بعدی ›</a>
+                            {% else %}
+                                <span class="my-profile-disabled">بعدی ›</span>
+                            {% endif %}
+
+                            {% if page_obj.has_next %}
+                                <a href="{% url 'renter_suggested_files' renter.pk renter.code %}?page={{ page_obj.paginator.num_pages }}">انتها &raquo;</a>
+                            {% else %}
+                                <span class="my-profile-disabled">انتها &raquo;</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        <!-- end: Pagination -->
+
+        <!-- JS -->
+        <script>
+            function copyToClipboard(event, element) {
+                event.preventDefault();
+                const baseUrl = window.location.origin;
+                const relativeUrl = element.getAttribute('href');
+                const fullUrl = baseUrl + relativeUrl;
+                navigator.clipboard.writeText(fullUrl).then(() => {
+                    const message = element.parentElement.querySelector('.copy-message');
+                    message.style.display = "inline";
+                    setTimeout(() => {
+                        message.style.display = "none";
+                    }, 2000);
+                }).catch(err => {
+                    console.error("Failed to copy: ", err);
+                });
+            }
+
+            function loadModalPage(pageNum) {
+                // Show loading spinner
+                const contentArea = document.getElementById('modal-content-area');
+                contentArea.innerHTML = '<div class="text-center py-5"><div class="spinner-border" role="status"><span class="sr-only">در حال بارگذاری...</span></div><p class="mt-2">در حال بارگذاری...</p></div>';
+
+                // Get current URL and add page parameter
+                const currentUrl = new URL(window.location);
+                currentUrl.searchParams.set('page', pageNum);
+
+                // Fetch new page content
+                fetch(currentUrl.toString(), {
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const newContent = doc.getElementById('modal-content-area');
+
+                    if (newContent) {
+                        contentArea.innerHTML = newContent.innerHTML;
+                    } else {
+                        contentArea.innerHTML = '<div class="text-center py-4 text-danger">خطا در بارگذاری محتوا</div>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading page:', error);
+                    contentArea.innerHTML = '<div class="text-center py-4 text-danger">خطا در بارگذاری صفحه</div>';
+                });
+            }
+        </script>
+        <!-- end: JS -->
+
+    </div>
+    <!-- end: Main -->
+
+{% endblock %}
+
+
+
