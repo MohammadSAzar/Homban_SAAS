@@ -17,7 +17,7 @@ from django.utils.translation import gettext as _
 from . import choices
 
 
-# -------------------------------- CODES ----------------------------------
+# -------------------------------- CODES ---------------------------------
 def generate_unique_id():
     return ''.join(random.choices(string.ascii_letters + string.digits, k=20))
 
@@ -30,7 +30,7 @@ def generate_unique_code_longer():
     return ''.join(random.choices(string.digits + string.digits, k=10))
 
 
-# -------------------------------- TIMES ----------------------------------
+# -------------------------------- TIMES ---------------------------------
 def next_week_shamsi():
     days = []
     today = datetime.today()

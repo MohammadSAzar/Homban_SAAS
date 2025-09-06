@@ -2,7 +2,8 @@ from django.http import JsonResponse
 from django.views import View
 from django.views.generic import DetailView, CreateView, ListView, UpdateView, DeleteView, TemplateView
 from django.shortcuts import get_object_or_404, render, redirect
-from django.db.models import Prefetch, Count
+from django.db.models import Prefetch, Count, F, IntegerField, PositiveBigIntegerField
+from django.db.models.functions import Cast
 from django.urls import reverse, reverse_lazy
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
@@ -1355,20 +1356,15 @@ class BuyerDetailView(ReadOnlyPermissionMixin, DetailView):
 
         buyer = self.get_object()
 
+        suggested_files_queryset = (models.SaleFile.objects
+                                    .filter(status='acc')
+                                    .filter(price_announced__gt=0.9 * buyer.budget_announced)
+                                    .filter(price_announced__lt=1.1 * buyer.budget_announced)
+                                    .filter(area__gt=0.8 * buyer.area_min)
+                                    .filter(area__lt=1.2 * buyer.area_max))
         if self.request.user != 'bs':
             similar_sub_districts = buyer.sub_districts.all()
-            suggested_files_queryset = (models.SaleFile.objects
-                                        .filter(price_announced__gt=0.9 * buyer.budget_announced)
-                                        .filter(price_announced__lt=1.1 * buyer.budget_announced)
-                                        .filter(area__gt=0.8 * buyer.area_min)
-                                        .filter(area__lt=1.2 * buyer.area_max))
             suggested_files_queryset = suggested_files_queryset.filter(sub_district__in=similar_sub_districts)
-        else:
-            suggested_files_queryset = (models.SaleFile.objects
-                                        .filter(price_announced__gt=0.9 * buyer.budget_announced)
-                                        .filter(price_announced__lt=1.1 * buyer.budget_announced)
-                                        .filter(area__gt=0.8 * buyer.area_min)
-                                        .filter(area__lt=1.2 * buyer.area_max))
 
         paginator = Paginator(suggested_files_queryset, 6)
         page_number = self.request.GET.get('page', 1)
@@ -1641,24 +1637,29 @@ class RenterDetailView(ReadOnlyPermissionMixin, DetailView):
         context['duplicate_phone_numbers'] = list(duplicate_phone_numbers)
 
         renter = self.get_object()
+        base_queryset = models.RentFile.objects.annotate(
+            deposit_total_calc=Cast(F('deposit_announced') + (100 * F('rent_announced') / 3), PositiveBigIntegerField()))
+        non_convertable_suggested_files_queryset = (models.RentFile.objects
+                                                    .filter(status='acc')
+                                                    .filter(convertable='isnt')
+                                                    .filter(deposit_announced__gt=0.8 * renter.deposit_announced)
+                                                    .filter(deposit_announced__lt=1.2 * renter.deposit_announced)
+                                                    .filter(rent_announced__gt=0.8 * renter.rent_announced)
+                                                    .filter(rent_announced__lt=1.2 * renter.rent_announced)
+                                                    .filter(area__gt=0.8 * renter.area_min)
+                                                    .filter(area__lt=1.2 * renter.area_max))
+        convertable_suggested_files_queryset = (base_queryset
+                                                .filter(status='acc')
+                                                .filter(convertable='is')
+                                                .filter(deposit_total_calc__gt=0.8 * (renter.deposit_announced + 100 * (renter.rent_announced / 3)))
+                                                .filter(deposit_total_calc__lt=1.2 * (renter.deposit_announced + 100 * (renter.rent_announced / 3)))
+                                                .filter(area__gt=0.8 * renter.area_min)
+                                                .filter(area__lt=1.2 * renter.area_max))
+
+        suggested_files_queryset = (
+                    non_convertable_suggested_files_queryset | convertable_suggested_files_queryset).distinct()
         if self.request.user.title != 'bs':
-            similar_sub_districts = renter.sub_districts.all()
-            suggested_files_queryset = (models.RentFile.objects
-                                        .filter(deposit_announced__gt=0.8 * renter.deposit_announced)
-                                        .filter(deposit_announced__lt=1.2 * renter.deposit_announced)
-                                        .filter(rent_announced__gt=0.8 * renter.rent_announced)
-                                        .filter(rent_announced__lt=1.2 * renter.rent_announced)
-                                        .filter(area__gt=0.8 * renter.area_min)
-                                        .filter(area__lt=1.2 * renter.area_max))
-            suggested_files_queryset = suggested_files_queryset.filter(sub_district__in=similar_sub_districts)
-        else:
-            suggested_files_queryset = (models.RentFile.objects
-                                        .filter(deposit_announced__gt=0.8 * renter.deposit_announced)
-                                        .filter(deposit_announced__lt=1.2 * renter.deposit_announced)
-                                        .filter(rent_announced__gt=0.8 * renter.rent_announced)
-                                        .filter(rent_announced__lt=1.2 * renter.rent_announced)
-                                        .filter(area__gt=0.8 * renter.area_min)
-                                        .filter(area__lt=1.2 * renter.area_max))
+            suggested_files_queryset = suggested_files_queryset.filter(sub_district__in=renter.sub_districts.all())
 
         paginator = Paginator(suggested_files_queryset, 6)
         page_number = self.request.GET.get('page', 1)
@@ -1686,11 +1687,11 @@ class RenterCreateView(PermissionRequiredMixin, CreateView):
             return self.form_invalid(form)
 
     def form_valid(self, form):
+        form.instance.created_by = self.request.user
         messages.success(self.request, "موجر جدید سامانه ثبت شد (این اطلاعات توسط مدیر بررسی خواهد شد).")
         return super().form_valid(form)
 
     def form_invalid(self, form):
-        form.instance.created_by = self.request.user
         self.object = None
         return self.render_to_response(self.get_context_data(form=form))
 
