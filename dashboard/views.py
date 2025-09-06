@@ -1222,7 +1222,7 @@ class BuyerListView(ReadOnlyPermissionMixin, ListView):
     def get_queryset(self):
         if self.request.user.title == 'bs':
             queryset_default = models.Buyer.objects.select_related('province', 'city', 'district').prefetch_related(
-                'sub_districts').exclude(delete_request='Yes')
+                'sub_districts').exclude(delete_request='Yes').filter(status='acc')
 
             form = forms.BuyerFilterForm(self.request.GET)
             if form.is_valid():
@@ -1265,7 +1265,7 @@ class BuyerListView(ReadOnlyPermissionMixin, ListView):
                                     models.Buyer.objects.select_related('province', 'city',
                                                                         'district').prefetch_related('sub_districts')
                                     .filter(sub_districts__name__contains=self.request.user.sub_district.name))
-                                .exclude(delete_request='Yes').distinct())
+                                .exclude(delete_request='Yes').filter(status='acc').distinct())
 
             form = forms.BuyerFilterForm(self.request.GET)
             if form.is_valid():
@@ -1490,7 +1490,7 @@ class RenterListView(ReadOnlyPermissionMixin, ListView):
     def get_queryset(self):
         if self.request.user.title == 'bs':
             queryset_default = models.Renter.objects.select_related('province', 'city', 'district').prefetch_related(
-                'sub_districts').exclude(delete_request='Yes')
+                'sub_districts').exclude(delete_request='Yes').filter(status='acc')
 
             form = forms.RenterFilterForm(self.request.GET)
             if form.is_valid():
@@ -1539,7 +1539,7 @@ class RenterListView(ReadOnlyPermissionMixin, ListView):
         else:
             queryset_default = (models.Renter.objects.select_related('province', 'city', 'district').prefetch_related(
                 'sub_districts').filter(sub_districts__name__contains=self.request.user.sub_district.name)
-                                .exclude(delete_request='Yes').distinct())
+                                .exclude(delete_request='Yes').filter(status='acc').distinct())
             form = forms.RenterFilterForm(self.request.GET)
 
             if form.is_valid():
@@ -2372,7 +2372,7 @@ class VisitListView(ReadOnlyPermissionMixin, ListView):
     model = models.Visit
     template_name = 'dashboard/services/visit_list.html'
     context_object_name = 'visits'
-    paginate_by = 12
+    paginate_by = 6
     permission_model = 'Visit'
 
     def get_queryset(self):
@@ -2602,7 +2602,7 @@ class SessionListView(ReadOnlyPermissionMixin, ListView):
     model = models.Session
     template_name = 'dashboard/services/session_list.html'
     context_object_name = 'sessions'
-    paginate_by = 12
+    paginate_by = 6
     permission_model = 'Session'
 
     def get_queryset(self):
@@ -2819,7 +2819,7 @@ class TradeListView(ReadOnlyPermissionMixin, ListView):
     model = models.Trade
     template_name = 'dashboard/services/trade_list.html'
     context_object_name = 'trades'
-    paginate_by = 12
+    paginate_by = 6
     permission_model = 'Trade'
 
     def get_queryset(self):
@@ -3107,6 +3107,5 @@ def dated_task_list_view(request):
     }
     print(date)
     return render(request, 'dashboard/tasks/dated_task_list.html', context=context)
-
 
 

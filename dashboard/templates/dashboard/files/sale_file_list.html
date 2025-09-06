@@ -8,6 +8,7 @@
 {% load price_converter %}
 {% load humanize %}
 {% load widget_tweaks %}
+{% load pagination %}
 
 
 {% block title %}
@@ -565,45 +566,7 @@
             <!-- end: List -->
         
             <!-- Pagination -->
-            <div class="nk-block-head  nk-block-head-lg" style="margin-top: 1.5em;">
-                <div class="nk-block-between" style="justify-items: center; justify-content: center; text-align: center">
-                    <div class="nk-block-head-content">
-                        <div class="my-profile-pagination" style="margin-top: 1em;">
-                            {% if page_obj.has_previous %}
-                                <a href="{% url 'sale_file_list' %}?page=1">&laquo; ابتدا</a>
-                            {% else %}
-                                <span class="my-profile-disabled">&laquo; ابتدا</span>
-                            {% endif %}
-
-                            {% if page_obj.has_previous %}
-                                <a href="{% url 'sale_file_list' %}?page={{ page_obj.previous_page_number }}">‹ قبلی</a>
-                            {% else %}
-                                <span class="my-profile-disabled">‹ قبلی</span>
-                            {% endif %}
-
-                            {% for num in page_obj.paginator.page_range %}
-                                {% if num == page_obj.number %}
-                                    <span class="my-profile-current">{{ num }}</span>
-                                {% else %}
-                                    <a href="{% url 'sale_file_list' %}?page={{ num }}">{{ num }}</a>
-                                {% endif %}
-                            {% endfor %}
-
-                            {% if page_obj.has_next %}
-                                <a href="{% url 'sale_file_list' %}?page={{ page_obj.next_page_number }}">بعدی ›</a>
-                            {% else %}
-                                <span class="my-profile-disabled">بعدی ›</span>
-                            {% endif %}
-
-                            {% if page_obj.has_next %}
-                                <a href="{% url 'sale_file_list' %}?page={{ page_obj.paginator.num_pages }}">انتها &raquo;</a>
-                            {% else %}
-                                <span class="my-profile-disabled">انتها &raquo;</span>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-            </div>
+            {% pagination page_obj request 'sale_file_list' %}
             <!-- end: Pagination -->
 
         </div>
@@ -611,6 +574,5 @@
 
     </div>
 {% endblock %}
-
 
 
