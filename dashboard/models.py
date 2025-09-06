@@ -199,6 +199,7 @@ class Person(models.Model):
     datetime_created = models.DateTimeField(auto_now_add=True, null=True)
     delete_request = models.CharField(max_length=3, choices=choices.yes_or_no, blank=True, null=True, default='No',
                                       verbose_name=_('Delete Request'))
+    created_by = models.ForeignKey(CustomUserModel, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='ایجاد شده توسط')
 
     class Meta:
         ordering = ('-datetime_created',)
@@ -277,6 +278,7 @@ class SaleFile(models.Model):
     datetime_expired = models.DateTimeField(blank=True, null=True)
     delete_request = models.CharField(max_length=3, choices=choices.yes_or_no, blank=True, null=True, default='No',
                                       verbose_name=_('Delete Request'))
+    created_by = models.ForeignKey(CustomUserModel, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='ایجاد شده توسط')
 
     @property
     def price_per_meter(self):
@@ -421,6 +423,7 @@ class RentFile(models.Model):
     datetime_expired = models.DateTimeField(blank=True, null=True)
     delete_request = models.CharField(max_length=3, choices=choices.yes_or_no, blank=True, null=True, default='No',
                                       verbose_name=_('Delete Request'))
+    created_by = models.ForeignKey(CustomUserModel, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='ایجاد شده توسط')
 
     @property
     def has_images(self):
@@ -527,6 +530,7 @@ class Buyer(models.Model):
     datetime_created = models.DateTimeField(default=timezone.now, verbose_name=_('Date and Time of Creation'))
     delete_request = models.CharField(max_length=3, choices=choices.yes_or_no, blank=True, null=True, default='No',
                                       verbose_name=_('Delete Request'))
+    created_by = models.ForeignKey(CustomUserModel, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='ایجاد شده توسط')
 
     def save(self, *args, **kwargs):
         if not self.code:
@@ -582,6 +586,7 @@ class Renter(models.Model):
     datetime_created = models.DateTimeField(default=timezone.now, verbose_name=_('Date and Time of Creation'))
     delete_request = models.CharField(max_length=3, choices=choices.yes_or_no, blank=True, null=True, default='No',
                                       verbose_name=_('Delete Request'))
+    created_by = models.ForeignKey(CustomUserModel, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='ایجاد شده توسط')
 
     def save(self, *args, **kwargs):
         if not self.code:
@@ -889,6 +894,20 @@ class TaskBoss(models.Model):
     code = models.CharField(max_length=10, null=True, unique=True, blank=True)
     datetime_created = models.DateTimeField(auto_now_add=True, verbose_name=_('Date and Time of Creation'))
 
+    @property
+    def agent(self):
+        if self.new_sale_file:
+            return getattr(self.new_sale_file, 'created_by', None)
+        elif self.new_rent_file:
+            return getattr(self.new_rent_file, 'created_by', None)
+        elif self.new_buyer:
+            return getattr(self.new_buyer, 'created_by', None)
+        elif self.new_renter:
+            return getattr(self.new_renter, 'created_by', None)
+        elif self.new_person:
+            return getattr(self.new_person, 'created_by', None)
+        return None
+
     def save(self, *args, **kwargs):
         if not self.code:
             self.code = generate_unique_code_longer()
@@ -904,5 +923,6 @@ class TaskBoss(models.Model):
 
     def get_absolute_url(self):
         return reverse('boss_task_approve', args=[self.pk, self.code])
+
 
 

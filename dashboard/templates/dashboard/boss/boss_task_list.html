@@ -105,9 +105,27 @@
                                         <div class="project-head"  style="margin-bottom: 1.7em;">
                                             <div class="project-title">
                                                 <div class="project-info">
+                                                    <!-- code -->
                                                     <h6 class="title" style="margin-bottom: 0.85em;">کد: {{ boss_task.code }}</h6>
+                                                    <!-- type -->
                                                     <div style="margin-bottom: 0.6em;">
                                                         <span style="font-size: 0.9em;">نوع: {{ boss_task.get_type_display }}</span>
+                                                    </div>
+                                                    <!-- agent -->
+                                                    <div style="margin-bottom: 0.6em;">
+                                                        {% if boss_task.type == 'ts' %}
+                                                            <span style="font-size: 0.9em;">مشاور: {{ boss_task.ur_task.agent }}</span>
+                                                        {% elif boss_task.type == 'rs' %}
+                                                            <span style="font-size: 0.9em;">مشاور: {{ boss_task.result_session.agent }}</span>
+                                                        {% elif boss_task.type == 'ss' %}
+                                                            <span style="font-size: 0.9em;">مشاور: {{ boss_task.new_session.agent }}</span>
+                                                        {% elif boss_task.type == 'rv' %}
+                                                            <span style="font-size: 0.9em;">مشاور: {{ boss_task.result_visit.agent }}</span>
+                                                        {% elif boss_task.type == 'vs' %}
+                                                            <span style="font-size: 0.9em;">مشاور: {{ boss_task.new_visit.agent }}</span>
+                                                        {% else %}
+                                                            <span style="font-size: 0.9em;">مشاور: {{ boss_task.agent }}</span>
+                                                        {% endif %}
                                                     </div>
                                                 </div>
                                             </div>

@@ -1,5 +1,6 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+
 from . import models
 
 
@@ -43,6 +44,5 @@ def boss_task_visit(sender, instance, created, **kwargs):
 def boss_task_session(sender, instance, created, **kwargs):
     if created:
         models.TaskBoss.objects.create(new_session=instance, type='ss')
-
 
 
