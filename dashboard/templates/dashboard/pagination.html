@@ -1,23 +1,38 @@
+
+
+<!-- Pagination -->
 <div class="nk-block-head nk-block-head-lg" style="margin-top: 1.5em;">
     <div class="nk-block-between" style="justify-items: center; justify-content: center; text-align: center">
         <div class="nk-block-head-content">
             <div class="my-profile-pagination" style="margin-top: 1em;">
                 <!-- First/Previous buttons -->
                 {% if page_obj.has_previous %}
-                    <a href="{% url url_name %}?page=1{{ query_string }}">&laquo; ابتدا</a>
+                    {% if url_args %}
+                        <a href="{% url url_name url_args.0 url_args.1 %}?page=1{{ query_string }}">&laquo; ابتدا</a>
+                    {% else %}
+                        <a href="{% url url_name %}?page=1{{ query_string }}">&laquo; ابتدا</a>
+                    {% endif %}
                 {% else %}
                     <span class="my-profile-disabled">&laquo; ابتدا</span>
                 {% endif %}
 
                 {% if page_obj.has_previous %}
-                    <a href="{% url url_name %}?page={{ page_obj.previous_page_number }}{{ query_string }}">‹ قبلی</a>
+                    {% if url_args %}
+                        <a href="{% url url_name url_args.0 url_args.1 %}?page={{ page_obj.previous_page_number }}{{ query_string }}">‹ قبلی</a>
+                    {% else %}
+                        <a href="{% url url_name %}?page={{ page_obj.previous_page_number }}{{ query_string }}">‹ قبلی</a>
+                    {% endif %}
                 {% else %}
                     <span class="my-profile-disabled">‹ قبلی</span>
                 {% endif %}
 
                 <!-- First page and dots before (if needed) -->
                 {% if show_first %}
-                    <a href="{% url url_name %}?page={{ first_page }}{{ query_string }}">{{ first_page }}</a>
+                    {% if url_args %}
+                        <a href="{% url url_name url_args.0 url_args.1 %}?page={{ first_page }}{{ query_string }}">{{ first_page }}</a>
+                    {% else %}
+                        <a href="{% url url_name %}?page={{ first_page }}{{ query_string }}">{{ first_page }}</a>
+                    {% endif %}
                 {% endif %}
                 
                 {% if show_dots_before %}
@@ -29,7 +44,11 @@
                     {% if num == page_obj.number %}
                         <span class="my-profile-current">{{ num }}</span>
                     {% else %}
-                        <a href="{% url url_name %}?page={{ num }}{{ query_string }}">{{ num }}</a>
+                        {% if url_args %}
+                            <a href="{% url url_name url_args.0 url_args.1 %}?page={{ num }}{{ query_string }}">{{ num }}</a>
+                        {% else %}
+                            <a href="{% url url_name %}?page={{ num }}{{ query_string }}">{{ num }}</a>
+                        {% endif %}
                     {% endif %}
                 {% endfor %}
 
@@ -39,18 +58,30 @@
                 {% endif %}
                 
                 {% if show_last %}
-                    <a href="{% url url_name %}?page={{ last_page }}{{ query_string }}">{{ last_page }}</a>
+                    {% if url_args %}
+                        <a href="{% url url_name url_args.0 url_args.1 %}?page={{ last_page }}{{ query_string }}">{{ last_page }}</a>
+                    {% else %}
+                        <a href="{% url url_name %}?page={{ last_page }}{{ query_string }}">{{ last_page }}</a>
+                    {% endif %}
                 {% endif %}
 
                 <!-- Next/Last buttons -->
                 {% if page_obj.has_next %}
-                    <a href="{% url url_name %}?page={{ page_obj.next_page_number }}{{ query_string }}">بعدی ›</a>
+                    {% if url_args %}
+                        <a href="{% url url_name url_args.0 url_args.1 %}?page={{ page_obj.next_page_number }}{{ query_string }}">بعدی ›</a>
+                    {% else %}
+                        <a href="{% url url_name %}?page={{ page_obj.next_page_number }}{{ query_string }}">بعدی ›</a>
+                    {% endif %}
                 {% else %}
                     <span class="my-profile-disabled">بعدی ›</span>
                 {% endif %}
 
                 {% if page_obj.has_next %}
-                    <a href="{% url url_name %}?page={{ page_obj.paginator.num_pages }}{{ query_string }}">انتها &raquo;</a>
+                    {% if url_args %}
+                        <a href="{% url url_name url_args.0 url_args.1 %}?page={{ page_obj.paginator.num_pages }}{{ query_string }}">انتها &raquo;</a>
+                    {% else %}
+                        <a href="{% url url_name %}?page={{ page_obj.paginator.num_pages }}{{ query_string }}">انتها &raquo;</a>
+                    {% endif %}
                 {% else %}
                     <span class="my-profile-disabled">انتها &raquo;</span>
                 {% endif %}
@@ -58,5 +89,6 @@
         </div>
     </div>
 </div>
+<!-- end: Pagination -->
 
 

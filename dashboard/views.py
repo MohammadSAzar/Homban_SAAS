@@ -1,3 +1,6 @@
+from itertools import chain
+from operator import attrgetter
+
 from django.http import JsonResponse
 from django.views import View
 from django.views.generic import DetailView, CreateView, ListView, UpdateView, DeleteView, TemplateView
@@ -8,6 +11,7 @@ from django.urls import reverse, reverse_lazy
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
 from django.contrib import messages
+
 
 from jalali_date import datetime2jalali
 from django.utils import timezone
@@ -1362,12 +1366,12 @@ class BuyerDetailView(ReadOnlyPermissionMixin, DetailView):
                                     .filter(price_announced__lt=1.1 * buyer.budget_announced)
                                     .filter(area__gt=0.8 * buyer.area_min)
                                     .filter(area__lt=1.2 * buyer.area_max))
-        if self.request.user != 'bs':
+        if self.request.user.title != 'bs':  # Fixed: added .title
             similar_sub_districts = buyer.sub_districts.all()
             suggested_files_queryset = suggested_files_queryset.filter(sub_district__in=similar_sub_districts)
 
-        paginator = Paginator(suggested_files_queryset, 6)
-        page_number = self.request.GET.get('page', 1)
+        paginator = Paginator(suggested_files_queryset, 1)
+        page_number = self.request.GET.get('page', 6)
         page_obj = paginator.get_page(page_number)
 
         context['suggested_files'] = page_obj.object_list
@@ -1833,7 +1837,7 @@ class TaskFPListView(ReadOnlyPermissionMixin, ListView):
     def get_queryset(self):
         if self.request.user.title == 'bs':
             queryset = models.Task.objects.select_related('agent', 'sale_file', 'rent_file', 'buyer', 'renter',
-                                                          'agent__sub_district')
+                                                          'agent__sub_district').filter(type='fp')
             form = forms.TaskFilterForm(self.request.GET)
             if form.is_valid():
                 queryset_filtered = queryset
@@ -1846,7 +1850,7 @@ class TaskFPListView(ReadOnlyPermissionMixin, ListView):
         elif self.request.user.title == 'fp':
             agent = self.request.user
             queryset = models.Task.objects.select_related('agent', 'sale_file', 'rent_file', 'buyer', 'renter',
-                                                          'agent__sub_district').filter(agent=agent)
+                                                          'agent__sub_district').filter(agent=agent).filter(type='fp')
             form = forms.TaskFilterForm(self.request.GET)
             if form.is_valid():
                 queryset_filtered = queryset
@@ -1861,7 +1865,6 @@ class TaskFPListView(ReadOnlyPermissionMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         form = forms.TaskFilterForm(self.request.GET)
-
         context['filter_form'] = form
         return context
 
@@ -1876,7 +1879,7 @@ class TaskCPListView(ReadOnlyPermissionMixin, ListView):
     def get_queryset(self):
         if self.request.user.title == 'bs':
             queryset = models.Task.objects.select_related('agent', 'sale_file', 'rent_file', 'buyer', 'renter',
-                                                          'agent__sub_district')
+                                                          'agent__sub_district').filter(type='cp')
             form = forms.TaskFilterForm(self.request.GET)
             if form.is_valid():
                 queryset_filtered = queryset
@@ -1889,7 +1892,7 @@ class TaskCPListView(ReadOnlyPermissionMixin, ListView):
         elif self.request.user.title == 'cp':
             agent = self.request.user
             queryset = models.Task.objects.select_related('agent', 'sale_file', 'rent_file', 'buyer', 'renter',
-                                                          'agent__sub_district').filter(agent=agent)
+                                                          'agent__sub_district').filter(agent=agent).filter(type='cp')
             form = forms.TaskFilterForm(self.request.GET)
             if form.is_valid():
                 queryset_filtered = queryset
@@ -1919,7 +1922,7 @@ class TaskBTListView(ReadOnlyPermissionMixin, ListView):
     def get_queryset(self):
         if self.request.user.title == 'bs':
             queryset = models.Task.objects.select_related('agent', 'sale_file', 'rent_file', 'buyer', 'renter',
-                                                          'agent__sub_district')
+                                                          'agent__sub_district').filter(type='bt')
             form = forms.TaskFilterForm(self.request.GET)
             if form.is_valid():
                 queryset_filtered = queryset
@@ -1932,7 +1935,7 @@ class TaskBTListView(ReadOnlyPermissionMixin, ListView):
         elif self.request.user.title == 'bt':
             agent = self.request.user
             queryset = models.Task.objects.select_related('agent', 'sale_file', 'rent_file', 'buyer', 'renter',
-                                                          'agent__sub_district').filter(agent=agent)
+                                                          'agent__sub_district').filter(agent=agent).filter(type='bt')
             form = forms.TaskFilterForm(self.request.GET)
             if form.is_valid():
                 queryset_filtered = queryset
@@ -2354,16 +2357,67 @@ def delete_request_list_view(request):
         'renters': models.Renter.objects.filter(delete_request='Yes'),
         'persons': models.Person.objects.filter(delete_request='Yes'),
     }
-    if querysets['sale_files'].exists():
-        context['sale_files'] = querysets['sale_files']
-    if querysets['rent_files'].exists():
-        context['rent_files'] = querysets['rent_files']
-    if querysets['buyers'].exists():
-        context['buyers'] = querysets['buyers']
-    if querysets['renters'].exists():
-        context['renters'] = querysets['renters']
-    if querysets['persons'].exists():
-        context['persons'] = querysets['persons']
+
+    all_items = []
+    for item in querysets['sale_files']:
+        item.model_type = 'sale_file'
+        all_items.append(item)
+    for item in querysets['rent_files']:
+        item.model_type = 'rent_file'
+        all_items.append(item)
+    for item in querysets['buyers']:
+        item.model_type = 'buyer'
+        all_items.append(item)
+    for item in querysets['renters']:
+        item.model_type = 'renter'
+        all_items.append(item)
+    for item in querysets['persons']:
+        item.model_type = 'person'
+        all_items.append(item)
+
+    try:
+        all_items.sort(key=attrgetter('created_at'), reverse=True)
+    except AttributeError:
+        try:
+            all_items.sort(key=attrgetter('id'), reverse=True)
+        except AttributeError:
+            pass
+
+    # Pagination
+    paginator = Paginator(all_items, 12)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    paginated_sale_files = []
+    paginated_rent_files = []
+    paginated_buyers = []
+    paginated_renters = []
+    paginated_persons = []
+
+    for item in page_obj:
+        if hasattr(item, 'model_type'):
+            if item.model_type == 'sale_file':
+                paginated_sale_files.append(item)
+            elif item.model_type == 'rent_file':
+                paginated_rent_files.append(item)
+            elif item.model_type == 'buyer':
+                paginated_buyers.append(item)
+            elif item.model_type == 'renter':
+                paginated_renters.append(item)
+            elif item.model_type == 'person':
+                paginated_persons.append(item)
+
+    if paginated_sale_files:
+        context['sale_files'] = paginated_sale_files
+    if paginated_rent_files:
+        context['rent_files'] = paginated_rent_files
+    if paginated_buyers:
+        context['buyers'] = paginated_buyers
+    if paginated_renters:
+        context['renters'] = paginated_renters
+    if paginated_persons:
+        context['persons'] = paginated_persons
+
+    context['page_obj'] = page_obj
     return render(request, 'dashboard/boss/delete_item_list.html', context)
 
 

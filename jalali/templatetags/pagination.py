@@ -4,7 +4,7 @@ register = template.Library()
 
 
 @register.inclusion_tag('dashboard/pagination.html')
-def pagination(page_obj, request, url_name='rent_file_list'):
+def pagination(page_obj, request, url_name, *url_args, **url_kwargs):
     current_page = page_obj.number
     total_pages = page_obj.paginator.num_pages
 
@@ -43,7 +43,7 @@ def pagination(page_obj, request, url_name='rent_file_list'):
         show_first = start_page > 1
         show_dots_before = start_page > 2
 
-        # Determine if we need to show last page and dots after  
+        # Determine if we need to show last page and dots after
         show_last = end_page < total_pages
         show_dots_after = end_page < total_pages - 1
 
@@ -58,6 +58,8 @@ def pagination(page_obj, request, url_name='rent_file_list'):
         'last_page': total_pages,
         'query_string': query_string,
         'url_name': url_name,
+        'url_args': url_args,
+        'url_kwargs': url_kwargs,
     }
 
 
