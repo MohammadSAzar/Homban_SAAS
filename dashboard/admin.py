@@ -153,7 +153,7 @@ class TaskAdmin(admin.ModelAdmin):
 
 @admin.register(models.TaskBoss)
 class TaskBossAdmin(admin.ModelAdmin):
-    list_display = ('type', 'code', 'condition', 'datetime_created')
+    list_display = ('type', 'agent', 'code', 'condition', 'datetime_created')
     ordering = ('-datetime_created',)
     list_filter = ['type', 'condition']
     readonly_fields = ('code', 'datetime_created',)
