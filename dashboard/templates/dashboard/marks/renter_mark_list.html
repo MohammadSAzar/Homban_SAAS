@@ -1,0 +1,155 @@
+{% extends '_base_dashboard.html' %}
+
+{% load static %}
+{% load i18n %}
+{% load jalali_tags %}
+{% load jalali_date_converter %}
+{% load number_converter %}
+{% load price_converter %}
+{% load humanize %}
+{% load widget_tweaks %}
+{% load pagination %}
+
+
+{% block title %}مستاجران نشان‌شده{% endblock %}
+
+
+{% block content %}
+
+    <!-- Message -->
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <h4 class="modal-title" style="padding: 20px 20px 10px 0;!important;">عملیات با موفقیت انجام شد (اطلاعات مربوطه توسط مدیر بررسی خواهد شد).</h4>
+            <button class="modal-my-button">بستن پیام</button>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function() {
+            var messages = "{% for message in messages %}{{ message }}{% if not forloop.last %}\\n{% endif %}{% endfor %}";
+            if (messages) {
+                $('#modal-message').text(messages);
+                $('#successModal').show();
+            }
+            $('.modal-my-button').on('click', function() {
+                $('#successModal').hide();
+            });
+        });
+    </script>
+
+    <!-- Title -->
+    <div class="nk-block-head nk-block-head-sm" style="margin-bottom: 1.2em;">
+        <div class="nk-block-between position-relative">
+            <div class="nk-block-head-content">
+                <h5 class="nk-block-title page-title">مستاجران نشان‌شده</h5>
+            </div>
+        </div>
+    </div>
+    <!-- end: Title -->
+
+    <!-- List -->
+    <div class="row g-gs">
+        {% for mark in renter_marks %}
+            <div class="col-sm-6 col-lg-6 col-xxl-6">
+                <div class="card h-100">
+                    <div class="card-inner">
+                        <div class="project">
+
+                            <!-- Name & Code & Phone -->
+                            <div class="project-head" style="height: 4em;!important; -webkit-line-clamp: 2;!important;">
+                                <div class="project-title">
+                                    <div class="project-info">
+                                        <h5 class="title" style="font-size: 1.1em;">{{ mark.renter.name }} | {{ mark.renter.code }}
+                                            {% if mark.renter.phone_number in duplicate_phone_numbers %}
+                                                <span style="color: red; font-size: 0.6em;">( خریدار تکراری )</span>
+                                            {% endif %}
+                                        </h5>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Location -->
+                            <div style="height: 4em;!important; -webkit-line-clamp: 2;!important;">
+                                <div class="project-head" style="margin-bottom: 0.5em;!important;">
+                                    <div class="project-title">
+                                        <div class="project-info">
+                                            <span class="sub-text" style="font-size: 0.75em; line-height: 25px;">
+                                                {% for sub_district in mark.renter.sub_districts.all %}
+                                                    {{ sub_district.name }} |
+                                                {% empty %}
+                                                    <span>هیچ زیرمحله‌ای انتخاب نشده است</span>
+                                                {% endfor %}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Deposit -->
+                            <div style="height: 4em;!important; -webkit-line-clamp: 2;!important;">
+                                <div class="project-head">
+                                    <div class="project-title">
+                                        <div class="project-info">
+                                            <h6 class="sub-text" style="font-size: 0.9em; line-height: 25px;">رهن: {{ mark.renter.deposit_announced|price_converter|intcomma:False|farsi_number }} تومان</h6>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Rent -->
+                            <div style="height: 4em;!important; -webkit-line-clamp: 2;!important;">
+                                <div class="project-head">
+                                    <div class="project-title">
+                                        <div class="project-info">
+                                            <h6 class="sub-text" style="font-size: 0.9em; line-height: 25px;">اجاره: {{ mark.renter.rent_announced|price_converter|intcomma:False|farsi_number }} تومان</h6>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- More -->
+                            <div class="project-meta" style="float: left;">
+                                <a href="{{ mark.renter.get_absolute_url }}" class="btn btn-primary" style="margin-top: 1em;"><em class="icon ni ni-eye"></em><span>مشاهده</span></a>
+                            </div>
+
+                            <!-- Delete -->
+                            <div class="project-meta">
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ mark.id }}" style="margin-top: 1em;">
+                                    <em class="icon ni ni-trash"></em>
+                                </button>
+                            </div>
+                        
+                            <!-- Delete (Modal) -->
+                            <div class="modal fade" id="deleteModal{{ mark.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ mark.id }}" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-body">
+                                            آیا از حذف این نشان اطمینان دارید؟
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">خیر</button>
+                                            <form method="post" action="{% url 'renter_mark_delete' mark.id %}" class="delete-form">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-danger">بله</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    <!-- end: List -->
+
+    <!-- Pagination -->
+    {% if page_obj.paginator.num_pages > 1 %}
+        {% pagination page_obj request 'renter_marks' %}
+    {% endif %}
+    <!-- end: Pagination -->
+    
+{% endblock %}
+
+
+

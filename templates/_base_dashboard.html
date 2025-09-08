@@ -177,13 +177,43 @@
                                             </ul>
                                         </li>
 
-                                        <!-- Chat -->
+                                        <!-- Marked -->
                                         <li class="nk-menu-item has-sub">
                                             <a href="#" class="nk-menu-link nk-menu-toggle">
-                                                <span class="nk-menu-icon"><em class="icon ni ni-mail"></em></span>
-                                                <span class="nk-menu-text">{% trans 'Online Chat' %}</span>
+                                                <span class="nk-menu-icon"><em class="icon ni ni-save"></em></span>
+                                                <span class="nk-menu-text">نشان‌شده‌ها</span>
                                             </a>
+                                            <ul class="nk-menu-sub">
+                                                {% if request.user.title == 'bs' or request.user.title == 'bt' or request.user.title == 'fp' %}
+                                                    <li class="nk-menu-item">
+                                                        <a href="{% url 'sale_file_marks' %}" class="nk-menu-link"><span class="nk-menu-text">فایل‌های فروش</span></a>
+                                                    </li>
+                                                {% endif %}
+                                                {% if request.user.title == 'bs' or request.user.title == 'bt' or request.user.title == 'fp' %}
+                                                    <li class="nk-menu-item">
+                                                        <a href="{% url 'rent_file_marks' %}" class="nk-menu-link"><span class="nk-menu-text">فایل‌های اجاره</span></a>
+                                                    </li>
+                                                {% endif %}
+                                                {% if request.user.title == 'bs' or request.user.title == 'bt' or request.user.title == 'cp' %}
+                                                    <li class="nk-menu-item">
+                                                        <a href="{% url 'buyer_marks' %}" class="nk-menu-link"><span class="nk-menu-text">خریداران</span></a>
+                                                    </li>
+                                                {% endif %}
+                                                {% if request.user.title == 'bs' or request.user.title == 'bt' or request.user.title == 'cp' %}
+                                                    <li class="nk-menu-item">
+                                                        <a href="{% url 'renter_marks' %}" class="nk-menu-link"><span class="nk-menu-text">مستاجران</span></a>
+                                                    </li>
+                                                {% endif %}
+                                            </ul>
                                         </li>
+
+{#                                        <!-- Chat -->#}
+{#                                        <li class="nk-menu-item has-sub">#}
+{#                                            <a href="#" class="nk-menu-link nk-menu-toggle">#}
+{#                                                <span class="nk-menu-icon"><em class="icon ni ni-mail"></em></span>#}
+{#                                                <span class="nk-menu-text">{% trans 'Online Chat' %}</span>#}
+{#                                            </a>#}
+{#                                        </li>#}
 
                                     </ul>
                                     <!-- end:Sidebar >>> menu >>> items -->

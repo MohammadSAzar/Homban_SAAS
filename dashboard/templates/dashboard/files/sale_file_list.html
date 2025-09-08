@@ -511,6 +511,7 @@
                                             <div class="nk-file-info">
                                                 <div class="nk-file-title">
     
+                                                    <!-- Code / Sub-district -->
                                                     <div class="nk-file-name">
                                                         <div class="nk-file-name-text" style="margin-bottom: 0.5em; height: 3em;!important; -webkit-line-clamp: 2;!important;">
                                                             <span style="font-size: 0.8em;">کد: {{ file.code }} / <span style="color: green; font-size: 1.1em;">{{ file.sub_district }}</span></span>
@@ -550,6 +551,20 @@
                                                     <!-- More -->
                                                     <a href="{{ file.get_absolute_url }}" class="btn btn-primary" style="margin-top: 1em;"><em class="icon ni ni-eye"></em><span>مشاهده</span></a>
     
+                                                    <!-- Mark -->
+                                                    {% if file.id not in marked_sale_file_ids %}
+                                                        <form method="post" action="{% url 'mark_sale_file_create' 'sale_file' file.id %}">
+                                                           {% csrf_token %}
+                                                            <button type="submit" class="btn btn-gray" style="margin-top: 1em; font-size: 0.7em; line-height: 0.7em;">
+                                                                <em class="icon ni ni-bookmark"></em>
+                                                            </button>
+                                                        </form>
+                                                    {% else %}
+                                                        <span class="btn btn-warning" style="margin-top: 1em; margin-left: 5px; font-size: 0.7em; line-height: 0.7em;" title="نشان‌شده">
+                                                            <em class="icon ni ni-check"></em>
+                                                        </span>
+                                                    {% endif %}
+                                                
                                                 </div>
                                             </div>
                                         </div>

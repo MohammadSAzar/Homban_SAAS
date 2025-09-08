@@ -199,7 +199,8 @@ class Person(models.Model):
     datetime_created = models.DateTimeField(auto_now_add=True, null=True)
     delete_request = models.CharField(max_length=3, choices=choices.yes_or_no, blank=True, null=True, default='No',
                                       verbose_name=_('Delete Request'))
-    created_by = models.ForeignKey(CustomUserModel, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='ایجاد شده توسط')
+    created_by = models.ForeignKey(CustomUserModel, on_delete=models.SET_NULL, null=True, blank=True,
+                                   verbose_name='ایجاد شده توسط')
 
     class Meta:
         ordering = ('-datetime_created',)
@@ -278,7 +279,8 @@ class SaleFile(models.Model):
     datetime_expired = models.DateTimeField(blank=True, null=True)
     delete_request = models.CharField(max_length=3, choices=choices.yes_or_no, blank=True, null=True, default='No',
                                       verbose_name=_('Delete Request'))
-    created_by = models.ForeignKey(CustomUserModel, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='ایجاد شده توسط')
+    created_by = models.ForeignKey(CustomUserModel, on_delete=models.SET_NULL, null=True, blank=True,
+                                   verbose_name='ایجاد شده توسط')
 
     @property
     def price_per_meter(self):
@@ -423,7 +425,8 @@ class RentFile(models.Model):
     datetime_expired = models.DateTimeField(blank=True, null=True)
     delete_request = models.CharField(max_length=3, choices=choices.yes_or_no, blank=True, null=True, default='No',
                                       verbose_name=_('Delete Request'))
-    created_by = models.ForeignKey(CustomUserModel, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='ایجاد شده توسط')
+    created_by = models.ForeignKey(CustomUserModel, on_delete=models.SET_NULL, null=True, blank=True,
+                                   verbose_name='ایجاد شده توسط')
 
     @property
     def has_images(self):
@@ -530,7 +533,8 @@ class Buyer(models.Model):
     datetime_created = models.DateTimeField(default=timezone.now, verbose_name=_('Date and Time of Creation'))
     delete_request = models.CharField(max_length=3, choices=choices.yes_or_no, blank=True, null=True, default='No',
                                       verbose_name=_('Delete Request'))
-    created_by = models.ForeignKey(CustomUserModel, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='ایجاد شده توسط')
+    created_by = models.ForeignKey(CustomUserModel, on_delete=models.SET_NULL, null=True, blank=True,
+                                   verbose_name='ایجاد شده توسط')
 
     def save(self, *args, **kwargs):
         if not self.code:
@@ -586,7 +590,8 @@ class Renter(models.Model):
     datetime_created = models.DateTimeField(default=timezone.now, verbose_name=_('Date and Time of Creation'))
     delete_request = models.CharField(max_length=3, choices=choices.yes_or_no, blank=True, null=True, default='No',
                                       verbose_name=_('Delete Request'))
-    created_by = models.ForeignKey(CustomUserModel, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='ایجاد شده توسط')
+    created_by = models.ForeignKey(CustomUserModel, on_delete=models.SET_NULL, null=True, blank=True,
+                                   verbose_name='ایجاد شده توسط')
 
     def save(self, *args, **kwargs):
         if not self.code:
@@ -804,7 +809,7 @@ class Trade(models.Model):
         return reverse('trade_detail', args=[self.pk, self.code])
 
 
-# --------------------------------- MNGs ---------------------------------
+# --------------------------------- USERS ---------------------------------
 class Task(models.Model):
     title = models.CharField(max_length=200, verbose_name=_('Title'))
     deadline = models.CharField(max_length=200, verbose_name=_('Deadline'))
@@ -924,5 +929,45 @@ class TaskBoss(models.Model):
     def get_absolute_url(self):
         return reverse('boss_task_approve', args=[self.pk, self.code])
 
+
+class Mark(models.Model):
+    sale_file = models.ForeignKey(SaleFile, on_delete=models.CASCADE, blank=True, null=True,
+                                  related_name='marks', verbose_name='فایل فروش نشان‌شده')
+    rent_file = models.ForeignKey(RentFile, on_delete=models.CASCADE, blank=True, null=True,
+                                  related_name='marks', verbose_name='فایل اجاره نشان‌شده')
+    buyer = models.ForeignKey(Buyer, on_delete=models.CASCADE, blank=True, null=True,
+                              related_name='marks', verbose_name='خریدار نشان‌شده')
+    renter = models.ForeignKey(Renter, on_delete=models.CASCADE, blank=True, null=True,
+                               related_name='marks', verbose_name='مستاجر نشان‌شده')
+    agent = models.ForeignKey(CustomUserModel, on_delete=models.CASCADE, related_name='marks', verbose_name='مشاور')
+    type = models.CharField(max_length=10, choices=choices.mark_types, verbose_name='نوع نشان‌شده')
+    code = models.CharField(max_length=10, null=True, blank=True)
+    slug = models.SlugField(max_length=150, blank=True, verbose_name='اسلاگ')
+    datetime_created = models.DateTimeField(auto_now_add=True, verbose_name=_('Date and Time of Creation'))
+
+    def save(self, *args, **kwargs):
+        if not self.code:
+            self.code = generate_unique_code_longer()
+        if self.sale_file:
+            self.type = choices.mark_types[0][0]
+        if self.rent_file:
+            self.type = choices.mark_types[1][0]
+        if self.buyer:
+            self.type = choices.mark_types[2][0]
+        if self.renter:
+            self.type = choices.mark_types[3][0]
+        self.slug = slugify(self.agent.username)
+        super(Mark, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return f'{self.agent} / {self.get_type_display()} / {self.code}'
+
+    class Meta:
+        ordering = ('-datetime_created',)
+        verbose_name = 'نشان‌شده'
+        verbose_name_plural = 'نشان‌شده‌ها'
+
+    def get_absolute_url(self):
+        return reverse('mark_detail', args=[self.pk])
 
 

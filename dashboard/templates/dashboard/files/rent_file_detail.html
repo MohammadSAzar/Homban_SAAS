@@ -51,6 +51,7 @@
                         <div class="card-inner">
                             <div class="user-card user-card-s2">
                                 <div class="user-info">
+                                
                                     <div class="justify-center" style="height: 4em;!important; -webkit-line-clamp: 2;!important;">
                                         <h6>{{ rent_file.title|linebreaksbr|farsi_number }}</h6>
                                     </div>
@@ -62,6 +63,22 @@
                                         <a href="{% url 'rent_file_update' rent_file.pk rent_file.unique_url_id %}" class="btn btn-primary">بروزرسانی</a>
                                         <a href="{% url 'rent_file_delete_request' rent_file.pk rent_file.unique_url_id %}" class="btn btn-danger">حذف کردن</a>
                                     </div>
+                                    <!-- Mark -->
+                                    <div style="font-size: 0.9em; margin-top: 1em;">
+                                        {% if not is_marked %}
+                                            <form method="post" action="{% url 'mark_rent_file_create' 'rent_file' rent_file.id %}" style="display: inline-block;">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-gray" title="نشان کردن">
+                                                    <em class="icon ni ni-bookmark"></em>
+                                                </button>
+                                            </form>
+                                        {% else %}
+                                            <span class="btn btn-warning" title="نشان‌شده">
+                                                <em class="icon ni ni-check"></em>
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                
                                 </div>
                             </div>
                         </div>

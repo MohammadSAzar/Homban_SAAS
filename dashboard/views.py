@@ -5,11 +5,12 @@ from django.http import JsonResponse
 from django.views import View
 from django.views.generic import DetailView, CreateView, ListView, UpdateView, DeleteView, TemplateView
 from django.shortcuts import get_object_or_404, render, redirect
-from django.db.models import Prefetch, Count, F, IntegerField, PositiveBigIntegerField
+from django.db.models import Prefetch, Count, F, PositiveBigIntegerField
 from django.db.models.functions import Cast
 from django.urls import reverse, reverse_lazy
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 
 
@@ -565,6 +566,17 @@ class SaleFileListView(ReadOnlyPermissionMixin, ListView):
                 form.fields['sub_district'].queryset = models.SubDistrict.objects.filter(
                     district_id=self.request.GET.get('district'))
         context['filter_form'] = form
+
+        # Marking
+        marked_sale_file_ids = set()
+        if self.request.user.is_authenticated:
+            marked_sale_file_ids = set(
+                models.Mark.objects.filter(
+                    agent=self.request.user,
+                    sale_file__isnull=False
+                ).values_list('sale_file_id', flat=True)
+            )
+        context['marked_sale_file_ids'] = marked_sale_file_ids
         return context
 
 
@@ -580,6 +592,18 @@ class SaleFileDetailView(ReadOnlyPermissionMixin, DetailView):
         if user.title != 'bs' and sale_file.delete_request == 'Yes':
             raise PermissionDenied("شما اجازه مشاهده این محتوا را ندارید")
         return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        sale_file = self.get_object()
+        is_marked = False
+        if self.request.user.is_authenticated:
+            is_marked = models.Mark.objects.filter(
+                agent=self.request.user,
+                sale_file=sale_file
+            ).exists()
+        context['is_marked'] = is_marked
+        return context
 
 
 class SaleFileGalleryView(DetailView):
@@ -955,6 +979,17 @@ class RentFileListView(ReadOnlyPermissionMixin, ListView):
                 form.fields['sub_district'].queryset = models.SubDistrict.objects.filter(
                     district_id=self.request.GET.get('district'))
         context['filter_form'] = form
+
+        # Marking
+        marked_rent_file_ids = set()
+        if self.request.user.is_authenticated:
+            marked_rent_file_ids = set(
+                models.Mark.objects.filter(
+                    agent=self.request.user,
+                    rent_file__isnull=False
+                ).values_list('rent_file_id', flat=True)
+            )
+        context['marked_rent_file_ids'] = marked_rent_file_ids
         return context
 
 
@@ -970,6 +1005,18 @@ class RentFileDetailView(ReadOnlyPermissionMixin, DetailView):
         if user.title != 'bs' and rent_file.delete_request == 'Yes':
             raise PermissionDenied("شما اجازه مشاهده این محتوا را ندارید")
         return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        rent_file = self.get_object()
+        is_marked = False
+        if self.request.user.is_authenticated:
+            is_marked = models.Mark.objects.filter(
+                agent=self.request.user,
+                rent_file=rent_file
+            ).exists()
+        context['is_marked'] = is_marked
+        return context
 
 
 class RentFileGalleryView(DetailView):
@@ -1325,6 +1372,17 @@ class BuyerListView(ReadOnlyPermissionMixin, ListView):
 
         context['filter_form'] = form
         context['duplicate_phone_numbers'] = list(duplicate_phone_numbers)
+
+        # Marking
+        marked_buyer_ids = set()
+        if self.request.user.is_authenticated:
+            marked_buyer_ids = set(
+                models.Mark.objects.filter(
+                    agent=self.request.user,
+                    buyer__isnull=False
+                ).values_list('buyer_id', flat=True)
+            )
+        context['marked_buyer_ids'] = marked_buyer_ids
         return context
 
 
@@ -1359,7 +1417,6 @@ class BuyerDetailView(ReadOnlyPermissionMixin, DetailView):
         context['duplicate_phone_numbers'] = list(duplicate_phone_numbers)
 
         buyer = self.get_object()
-
         suggested_files_queryset = (models.SaleFile.objects
                                     .filter(status='acc')
                                     .filter(price_announced__gt=0.9 * buyer.budget_announced)
@@ -1378,6 +1435,14 @@ class BuyerDetailView(ReadOnlyPermissionMixin, DetailView):
         context['page_obj'] = page_obj
         context['is_paginated'] = page_obj.has_other_pages()
 
+        # Marking
+        is_marked = False
+        if self.request.user.is_authenticated:
+            is_marked = models.Mark.objects.filter(
+                agent=self.request.user,
+                buyer=buyer
+            ).exists()
+        context['is_marked'] = is_marked
         return context
 
 
@@ -1608,6 +1673,17 @@ class RenterListView(ReadOnlyPermissionMixin, ListView):
 
         context['filter_form'] = form
         context['duplicate_phone_numbers'] = list(duplicate_phone_numbers)
+
+        # Marking
+        marked_renter_ids = set()
+        if self.request.user.is_authenticated:
+            marked_renter_ids = set(
+                models.Mark.objects.filter(
+                    agent=self.request.user,
+                    renter__isnull=False
+                ).values_list('renter_id', flat=True)
+            )
+        context['marked_renter_ids'] = marked_renter_ids
         return context
 
 
@@ -1673,6 +1749,14 @@ class RenterDetailView(ReadOnlyPermissionMixin, DetailView):
         context['page_obj'] = page_obj
         context['is_paginated'] = page_obj.has_other_pages()
 
+        # Marking
+        is_marked = False
+        if self.request.user.is_authenticated:
+            is_marked = models.Mark.objects.filter(
+                agent=self.request.user,
+                renter=renter
+            ).exists()
+        context['is_marked'] = is_marked
         return context
 
 
@@ -1776,6 +1860,201 @@ class RenterRecoverView(PermissionRequiredMixin, UpdateView):
 
     def get_success_url(self):
         return reverse_lazy('renter_list')
+
+
+# --------------------------------- Marks ---------------------------------
+class SaleFileMarksListView(ReadOnlyPermissionMixin, ListView):
+    model = models.Mark
+    template_name = 'dashboard/marks/sale_file_mark_list.html'
+    context_object_name = 'sale_file_marks'
+    paginate_by = 12
+    permission_model = 'Mark'
+
+    def get_queryset(self):
+        agent = self.request.user
+        queryset = models.Mark.objects.select_related('sale_file').filter(agent=agent).filter(type='sf')
+        return queryset
+
+
+class SaleFileMarkDeleteView(LoginRequiredMixin, DeleteView):
+    model = models.Mark
+    success_url = reverse_lazy('sale_file_marks')
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if self.object.agent != request.user:
+            return JsonResponse({
+                'success': False,
+                'message': 'غیر مجاز!'
+            }, status=403)
+
+        self.object.delete()
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({
+                'success': True,
+                'message': 'حذف شد!'
+            })
+        return super().delete(request, *args, **kwargs)
+
+
+class RentFileMarksListView(ReadOnlyPermissionMixin, ListView):
+    model = models.Mark
+    template_name = 'dashboard/marks/rent_file_mark_list.html'
+    context_object_name = 'rent_file_marks'
+    paginate_by = 12
+    permission_model = 'Mark'
+
+    def get_queryset(self):
+        agent = self.request.user
+        queryset = models.Mark.objects.select_related('rent_file').filter(agent=agent).filter(type='rf')
+        return queryset
+
+
+class RentFileMarkDeleteView(LoginRequiredMixin, DeleteView):
+    model = models.Mark
+    success_url = reverse_lazy('rent_file_marks')
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if self.object.agent != request.user:
+            return JsonResponse({
+                'success': False,
+                'message': 'غیر مجاز!'
+            }, status=403)
+
+        self.object.delete()
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({
+                'success': True,
+                'message': 'حذف شد!'
+            })
+        return super().delete(request, *args, **kwargs)
+
+
+class BuyerMarksListView(ReadOnlyPermissionMixin, ListView):
+    model = models.Mark
+    template_name = 'dashboard/marks/buyer_mark_list.html'
+    context_object_name = 'buyer_marks'
+    paginate_by = 12
+    permission_model = 'Mark'
+
+    def get_queryset(self):
+        agent = self.request.user
+        queryset = models.Mark.objects.select_related('buyer').filter(agent=agent).filter(type='by')
+        return queryset
+
+
+class BuyerMarkDeleteView(LoginRequiredMixin, DeleteView):
+    model = models.Mark
+    success_url = reverse_lazy('buyer_marks')
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if self.object.agent != request.user:
+            return JsonResponse({
+                'success': False,
+                'message': 'غیر مجاز!'
+            }, status=403)
+
+        self.object.delete()
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({
+                'success': True,
+                'message': 'حذف شد!'
+            })
+        return super().delete(request, *args, **kwargs)
+
+
+class RenterMarksListView(ReadOnlyPermissionMixin, ListView):
+    model = models.Mark
+    template_name = 'dashboard/marks/renter_mark_list.html'
+    context_object_name = 'renter_marks'
+    paginate_by = 12
+    permission_model = 'Mark'
+
+    def get_queryset(self):
+        agent = self.request.user
+        queryset = models.Mark.objects.select_related('renter').filter(agent=agent).filter(type='rt')
+        return queryset
+
+
+class RenterMarkDeleteView(LoginRequiredMixin, DeleteView):
+    model = models.Mark
+    success_url = reverse_lazy('renter_marks')
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if self.object.agent != request.user:
+            return JsonResponse({
+                'success': False,
+                'message': 'غیر مجاز!'
+            }, status=403)
+
+        self.object.delete()
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({
+                'success': True,
+                'message': 'حذف شد!'
+            })
+        return super().delete(request, *args, **kwargs)
+
+
+class MarkCreateView(LoginRequiredMixin, CreateView):
+    model = models.Mark
+    form_class = forms.MarkCreateForm
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['request'] = self.request
+        return kwargs
+
+    def form_valid(self, form):
+        # Get the object type and ID from URL parameters
+        object_type = self.kwargs.get('object_type')
+        object_id = self.kwargs.get('object_id')
+
+        # Set the mark instance attributes based on object type
+        mark = form.save(commit=False)
+        mark.agent = self.request.user
+
+        if object_type == 'sale_file':
+            mark.sale_file = get_object_or_404(models.SaleFile, id=object_id)
+        elif object_type == 'rent_file':
+            mark.rent_file = get_object_or_404(models.RentFile, id=object_id)
+        elif object_type == 'buyer':
+            mark.buyer = get_object_or_404(models.Buyer, id=object_id)
+        elif object_type == 'renter':
+            mark.renter = get_object_or_404(models.Renter, id=object_id)
+        mark.save()
+
+        # Return JSON response for AJAX requests
+        if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({
+                'success': True,
+                'message': 'با موفقیت نشان شد',
+                'mark_code': mark.code
+            })
+        if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({
+                'success': True,
+                'message': 'با موفقیت نشان شد',
+                'mark_id': mark.id,  # Add mark ID to response
+                'mark_code': mark.code
+            })
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({
+                'success': False,
+                'message': 'خطا در ایجاد نشان'
+            })
+        return super().form_invalid(form)
+
+    def get_success_url(self):
+        # Redirect to the same page where the button was clicked
+        referer = self.request.META.get('HTTP_REFERER', '/')
+        return referer
 
 
 # ---------------------------------- Tasks ---------------------------------

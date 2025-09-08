@@ -728,6 +728,17 @@ class RenterRecoverForm(forms.ModelForm):
         return cleaned_data
 
 
+# --------------------------------- Marks ---------------------------------
+class MarkCreateForm(forms.ModelForm):
+    class Meta:
+        model = models.Mark
+        fields = []
+
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop('request', None)
+        super().__init__(*args, **kwargs)
+
+
 # --------------------------------- Locations ---------------------------------
 class ProvinceCreateForm(forms.ModelForm):
     class Meta:
@@ -2030,6 +2041,5 @@ class CombinedSessionResultForm(forms.Form):
     def save(self):
         self.boss_form.save()
         self.result_session_form.save()
-
 
 

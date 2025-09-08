@@ -1,0 +1,151 @@
+{% extends '_base_dashboard.html' %}
+
+{% load static %}
+{% load i18n %}
+{% load jalali_tags %}
+{% load jalali_date_converter %}
+{% load number_converter %}
+{% load price_converter %}
+{% load humanize %}
+{% load widget_tweaks %}
+{% load pagination %}
+
+
+{% block title %}فایل‌های اجاره نشان‌شده{% endblock %}
+
+
+{% block content %}
+
+    <!-- Message -->
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <h4 class="modal-title" style="padding: 20px 20px 10px 0;!important;">عملیات با موفقیت انجام شد (اطلاعات مربوطه توسط مدیر بررسی خواهد شد).</h4>
+            <button class="modal-my-button">بستن پیام</button>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function() {
+            var messages = "{% for message in messages %}{{ message }}{% if not forloop.last %}\\n{% endif %}{% endfor %}";
+            if (messages) {
+                $('#modal-message').text(messages);
+                $('#successModal').show();
+            }
+            $('.modal-my-button').on('click', function() {
+                $('#successModal').hide();
+            });
+        });
+    </script>
+
+    <!-- Title -->
+    <div class="nk-block-head nk-block-head-sm" style="margin-bottom: 1.2em;">
+        <div class="nk-block-between position-relative">
+
+            <div class="nk-block-head-content">
+                <h5 class="nk-block-title page-title">فایل‌های اجاره نشان‌شده</h5>
+            </div>
+
+        </div>
+    </div>
+    <!-- end: Title -->
+
+    <!-- List -->
+    <div class=" nk-fmg-body-content">
+        <div class="nk-fmg-quick-list nk-block">
+            <div class="toggle-expand-content expanded" data-content="quick-access">
+                <div class="nk-files nk-files-view-grid">
+                    <div class="nk-files-list">
+
+                        <!-- Loop -->
+                        {% for mark in rent_file_marks %}
+                                <div class="nk-file-item nk-file">
+                                    <div class="nk-file-info">
+                                        <div class="nk-file-title">
+
+                                            <!-- Code / Sub-district -->
+                                            <div class="nk-file-name">
+                                                <div class="nk-file-name-text" style="margin-bottom: 0.5em; height: 3em;!important; -webkit-line-clamp: 2;!important;">
+                                                    <span style="font-size: 0.8em;">کد: {{ mark.rent_file.code }} / <span style="color: green; font-size: 1.1em;">{{ mark.rent_file.sub_district }}</span></span>
+                                                </div>
+                                            </div>
+                                            <div class="nk-file-name">
+                                                <div class="nk-file-name-text">
+                                                    <span style="font-size: 0.8em;">{{ mark.rent_file.datetime_created|jalali_date_converter }}</span>
+                                                </div>
+                                            </div>
+
+                                            <!-- Cover -->
+                                            <a href="{{ mark.rent_file.get_absolute_url }}" class="nk-file-link">
+                                                <div class="nk-file-icon">
+                                                    <figure class="product-image--holder" style="height: 12.3em;!important; -webkit-line-clamp: 12.3;!important;">
+                                                        {% if mark.rent_file.image1 %}
+                                                            <img src="{{ mark.rent_file.image1.url }}" alt="File Cover" style="height: 12.3em;!important; -webkit-line-clamp: 12.3;!important;">
+                                                        {% else %}
+                                                            <img src="{% static 'dashboard/images/blank_file.jpg' %}" alt="File Cover" style="height: 12.3em;!important; -webkit-line-clamp: 12.3;!important;">
+                                                        {% endif %}
+                                                    </figure>
+                                                </div>
+                                            </a>
+
+                                            <!-- Title -->
+                                            <div class="nk-file-name">
+                                                <div class="nk-file-name-text" style="height: 4em;!important; -webkit-line-clamp: 2;!important;">
+                                                    <span class="title" style="font-size: 0.9em;">{{ mark.rent_file.title|linebreaksbr|farsi_number }}</span>
+                                                </div>
+                                            </div>
+
+                                            <!-- Deposit/Rent -->
+                                            <div class="nk-file-name">
+                                                <span class="title" style="font-size: 0.8em; color: green;">رهن: {{ mark.rent_file.deposit_announced|price_converter|intcomma:False|farsi_number }} تومان</span>
+                                            </div>
+                                            <div class="nk-file-name">
+                                                <span class="title" style="font-size: 0.8em; color: green;">اجاره: {{ mark.rent_file.rent_announced|price_converter|intcomma:False|farsi_number }} تومان</span>
+                                            </div>
+
+                                            <!-- More -->
+                                            <a href="{{ mark.rent_file.get_absolute_url }}" class="btn btn-primary" style="margin-top: 1em;"><em class="icon ni ni-eye"></em><span>مشاهده</span></a>
+
+                                            <!-- Delete -->
+                                            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ mark.id }}" style="margin-top: 0.6em">
+                                                <em class="icon ni ni-trash"></em>
+                                            </button>
+
+                                            <!-- Delete (Modal) -->
+                                            <div class="modal fade" id="deleteModal{{ mark.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ mark.id }}" aria-hidden="true">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <div class="modal-body">
+                                                            آیا از حذف این نشان اطمینان دارید؟
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">خیر</button>
+                                                            <form method="post" action="{% url 'rent_file_mark_delete' mark.id %}" class="delete-form">
+                                                                {% csrf_token %}
+                                                                <button type="submit" class="btn btn-danger">بله</button>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                        {% endfor %}
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- end: List -->
+
+    <!-- Pagination -->
+    {% if page_obj.paginator.num_pages > 1 %}
+        {% pagination page_obj request 'rent_file_marks' %}
+    {% endif %}
+    <!-- end: Pagination -->
+    
+{% endblock %}
+
+
+

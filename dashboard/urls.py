@@ -70,6 +70,19 @@ urlpatterns = [
     re_path(r'renter/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/', views.RenterDetailView.as_view(), name='renter_detail'),
     re_path(r'renter/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/suggested-files/', views.RenterDetailView.as_view(), name='renter_suggested_files'),
     re_path(r'renters/create/', views.RenterCreateView.as_view(), name='renter_create'),
+    # marks
+    path('marks/sale-files', views.SaleFileMarksListView.as_view(), name='sale_file_marks'),
+    path('marks/rent-files', views.RentFileMarksListView.as_view(), name='rent_file_marks'),
+    path('marks/buyers', views.BuyerMarksListView.as_view(), name='buyer_marks'),
+    path('marks/renters', views.RenterMarksListView.as_view(), name='renter_marks'),
+    path('marked-sale-file-delete/<int:pk>/', views.SaleFileMarkDeleteView.as_view(), name='sale_file_mark_delete'),
+    path('marked-rent-file-delete/<int:pk>/', views.RentFileMarkDeleteView.as_view(), name='rent_file_mark_delete'),
+    path('marked-buyer-delete/<int:pk>/', views.BuyerMarkDeleteView.as_view(), name='buyer_mark_delete'),
+    path('marked-renter-delete/<int:pk>/', views.RenterMarkDeleteView.as_view(), name='renter_mark_delete'),
+    path('mark-sale_file-create/<str:object_type>/<int:object_id>/', views.MarkCreateView.as_view(), name='mark_sale_file_create'),
+    path('mark-rent_file-create/<str:object_type>/<int:object_id>/', views.MarkCreateView.as_view(), name='mark_rent_file_create'),
+    path('mark-buyer-create/<str:object_type>/<int:object_id>/', views.MarkCreateView.as_view(), name='mark_buyer_create'),
+    path('mark-renter-create/<str:object_type>/<int:object_id>/', views.MarkCreateView.as_view(), name='mark_renter_create'),
     # tasks
     path('tasks/for-files/', views.TaskFPListView.as_view(), name='task_fp_list'),
     path('tasks/for-customers/', views.TaskCPListView.as_view(), name='task_cp_list'),
@@ -106,6 +119,5 @@ urlpatterns = [
     re_path(r'tasks/boss/approve/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/', views.TaskBossApproveView.as_view(), name='boss_task_approve'),
     re_path(r'tasks/boss/delete/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/', views.TaskBossDeleteView.as_view(), name='boss_task_delete'),
 ]
-
 
 

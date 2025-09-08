@@ -17,6 +17,7 @@ ROLE_PERMISSIONS = {
         'Trade': ['create', 'read', 'update', 'delete'],
         'Task': ['create', 'read', 'update', 'delete'],
         'TaskBoss': ['create', 'read', 'update', 'delete'],
+        'Mark': ['create', 'read', 'update', 'delete'],
     },
 
     'fp': {
@@ -98,6 +99,5 @@ class PermissionRequiredMixin:
 
 class ReadOnlyPermissionMixin(PermissionRequiredMixin):
     permission_action = 'read'
-
 
 

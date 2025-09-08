@@ -144,5 +144,12 @@ class TaskBossAdmin(admin.ModelAdmin):
     readonly_fields = ('code', 'datetime_created',)
 
 
+@admin.register(models.Mark)
+class MarkAdmin(admin.ModelAdmin):
+    list_display = ('agent', 'type', 'code', 'sale_file', 'rent_file', 'buyer', 'renter', 'datetime_created')
+    ordering = ('-datetime_created',)
+    list_filter = ['type', 'agent']
+    readonly_fields = ('code', 'datetime_created',)
+
 
 

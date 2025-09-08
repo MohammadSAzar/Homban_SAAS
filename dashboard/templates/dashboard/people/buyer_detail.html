@@ -37,6 +37,21 @@
                             <div class="nk-block-des">
                                 <p>کد: {{ buyer.code }}</p>
                             </div>
+                        
+                            <!-- Mark -->
+                            {% if not is_marked %}
+                                <form method="post" action="{% url 'mark_buyer_create' 'buyer' buyer.id %}" style="display: inline-block;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-gray" title="نشان کردن">
+                                        <em class="icon ni ni-bookmark"></em>
+                                    </button>
+                                </form>
+                            {% else %}
+                                <span class="btn btn-warning" title="نشان‌شده">
+                                    <em class="icon ni ni-check"></em>
+                                </span>
+                            {% endif %}
+                        
                         </div>
                     </div>
                 </div>
