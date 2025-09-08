@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.conf import settings
 
 from . import models
 from .forms import AdminCustomUserCreationForm, AdminCustomUserChangeForm, TaskAdminForm
@@ -25,6 +26,7 @@ class CustomUserAdmin(BaseUserAdmin):
     search_fields = ('username',)
     ordering = ('username',)
     filter_horizontal = ()
+    list_per_page = getattr(settings, 'DJANGO_ADMIN_PER_PAGE', 20)
 
 
 admin.site.register(models.CustomUserModel, CustomUserAdmin)
@@ -34,21 +36,25 @@ admin.site.register(models.CustomUserModel, CustomUserAdmin)
 @admin.register(models.Province)
 class ProvinceAdmin(admin.ModelAdmin):
     list_display = ('name',)
+    list_per_page = getattr(settings, 'DJANGO_ADMIN_PER_PAGE', 20)
 
 
 @admin.register(models.City)
 class CityAdmin(admin.ModelAdmin):
     list_display = ('name', 'province')
+    list_per_page = getattr(settings, 'DJANGO_ADMIN_PER_PAGE', 20)
 
 
 @admin.register(models.District)
 class DistrictAdmin(admin.ModelAdmin):
     list_display = ('name', 'city')
+    list_per_page = getattr(settings, 'DJANGO_ADMIN_PER_PAGE', 20)
 
 
 @admin.register(models.SubDistrict)
 class SubDistrictAdmin(admin.ModelAdmin):
     list_display = ('name', 'district', 'description')
+    list_per_page = getattr(settings, 'DJANGO_ADMIN_PER_PAGE', 20)
 
 
 # --------------------------------- FILE ----------------------------------
@@ -56,6 +62,7 @@ class SubDistrictAdmin(admin.ModelAdmin):
 class PersonAdmin(admin.ModelAdmin):
     list_display = ('name', 'phone_number', 'datetime_created')
     ordering = ('-datetime_created',)
+    list_per_page = getattr(settings, 'DJANGO_ADMIN_PER_PAGE', 20)
 
 
 @admin.register(models.SaleFile)
@@ -67,6 +74,7 @@ class SaleFileAdmin(admin.ModelAdmin):
     ordering = ('-datetime_created',)
     list_filter = ('status', 'sub_district',)
     readonly_fields = ('code', 'datetime_created', 'datetime_expired',)
+    list_per_page = getattr(settings, 'DJANGO_ADMIN_PER_PAGE', 20)
 
 
 @admin.register(models.RentFile)
@@ -78,6 +86,7 @@ class RentFileAdmin(admin.ModelAdmin):
     ordering = ('-datetime_created',)
     list_filter = ('status', 'sub_district',)
     readonly_fields = ('code', 'datetime_created', 'datetime_expired',)
+    list_per_page = getattr(settings, 'DJANGO_ADMIN_PER_PAGE', 20)
 
 
 # --------------------------------- PPL ---------------------------------
@@ -88,6 +97,7 @@ class BuyerAdmin(admin.ModelAdmin):
     ordering = ('-datetime_created',)
     readonly_fields = ('code', 'datetime_created',)
     filter_horizontal = ('sub_districts',)
+    list_per_page = getattr(settings, 'DJANGO_ADMIN_PER_PAGE', 20)
 
 
 @admin.register(models.Renter)
@@ -97,6 +107,7 @@ class RenterAdmin(admin.ModelAdmin):
     ordering = ('-datetime_created',)
     readonly_fields = ('code', 'datetime_created',)
     filter_horizontal = ('sub_districts',)
+    list_per_page = getattr(settings, 'DJANGO_ADMIN_PER_PAGE', 20)
 
 
 # --------------------------------- SERV ---------------------------------
@@ -106,6 +117,7 @@ class VisitAdmin(admin.ModelAdmin):
     ordering = ('-datetime_created',)
     list_filter = ('type', 'status',)
     readonly_fields = ('code', 'datetime_created',)
+    list_per_page = getattr(settings, 'DJANGO_ADMIN_PER_PAGE', 20)
 
 
 @admin.register(models.Session)
@@ -114,6 +126,7 @@ class SessionAdmin(admin.ModelAdmin):
     ordering = ('-datetime_created',)
     list_filter = ('type', 'status',)
     readonly_fields = ('code', 'datetime_created',)
+    list_per_page = getattr(settings, 'DJANGO_ADMIN_PER_PAGE', 20)
 
 
 @admin.register(models.Trade)
@@ -123,6 +136,7 @@ class TradeAdmin(admin.ModelAdmin):
     ordering = ('-datetime_created',)
     list_filter = ('type',)
     readonly_fields = ('code', 'datetime_created',)
+    list_per_page = getattr(settings, 'DJANGO_ADMIN_PER_PAGE', 20)
 
 
 # --------------------------------- MNGs ----------------------------------
@@ -134,6 +148,7 @@ class TaskAdmin(admin.ModelAdmin):
     list_filter = ['type', 'status', 'deadline']
     search_fields = ['title', 'agent__username', 'code']
     readonly_fields = ('code', 'datetime_created',)
+    list_per_page = getattr(settings, 'DJANGO_ADMIN_PER_PAGE', 20)
 
 
 @admin.register(models.TaskBoss)
@@ -142,6 +157,7 @@ class TaskBossAdmin(admin.ModelAdmin):
     ordering = ('-datetime_created',)
     list_filter = ['type', 'condition']
     readonly_fields = ('code', 'datetime_created',)
+    list_per_page = getattr(settings, 'DJANGO_ADMIN_PER_PAGE', 20)
 
 
 @admin.register(models.Mark)
@@ -150,6 +166,6 @@ class MarkAdmin(admin.ModelAdmin):
     ordering = ('-datetime_created',)
     list_filter = ['type', 'agent']
     readonly_fields = ('code', 'datetime_created',)
-
+    list_per_page = getattr(settings, 'DJANGO_ADMIN_PER_PAGE', 20)
 
 
