@@ -56,10 +56,42 @@
                                         <h6>{{ sale_file.title|linebreaksbr|farsi_number }}</h6>
                                     </div>
                                     <div class="badge bg-light rounded-pill ucap">خرید و فروش</div>
-                                    <div style="font-size: 0.9em;">کد فایل: {{ sale_file.code }}</div>
-                                    <div style="font-size: 0.9em;">{{ sale_file.datetime_created|jalali_date_converter }}</div>
+                                    <div style="font-size: 0.9em;">کد فایل:
+                                        <button style="border: none; background-color:transparent; margin-top: 0.8em; line-height: 10px; border-bottom: solid 1px #00a65c; color: #00a65c" onclick="copyCode(this)">
+                                           {{ sale_file.code }}
+                                        </button>
+                                        <span class="feedback" id="feedback-{{ sale_file.code }}" style="display: none; color: #00a65c">شد!</span>
+                                        <script>
+                                            function copyCode(element) {
+                                                // Get the code from the button's text content instead of parameter
+                                                const code = element.textContent.trim();
 
-                                    <div style="font-size: 0.9em; margin-top: 1em;">
+                                                // Create a temporary input element to hold the text
+                                                const tempInput = document.createElement("input");
+                                                tempInput.value = code;
+                                                document.body.appendChild(tempInput);
+
+                                                // Select and copy the text
+                                                tempInput.select();
+                                                document.execCommand("copy");
+
+                                                // Remove the temporary input
+                                                document.body.removeChild(tempInput);
+
+                                                // Show feedback message
+                                                const feedback = document.getElementById(`feedback-${code}`);
+                                                feedback.style.display = 'inline';
+
+                                                // Hide feedback after 3 seconds
+                                                setTimeout(() => {
+                                                    feedback.style.display = 'none';
+                                                }, 3000);
+                                            }
+                                        </script>
+                                    </div>
+                                    <div style="font-size: 0.9em; margin-top: 0.5em;">{{ sale_file.datetime_created|jalali_date_converter }}</div>
+
+                                    <div style="font-size: 0.9em; margin-top: 1.3em;">
                                         <a href="{% url 'sale_file_update' sale_file.pk sale_file.unique_url_id %}" class="btn btn-primary">بروزرسانی</a>
                                         <a href="{% url 'sale_file_delete_request' sale_file.pk sale_file.unique_url_id %}" class="btn btn-danger">حذف کردن</a>
                                     </div>
