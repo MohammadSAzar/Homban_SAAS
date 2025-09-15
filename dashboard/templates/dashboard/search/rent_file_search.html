@@ -1,0 +1,308 @@
+{% extends '_base_dashboard.html' %}
+
+{% load static %}
+{% load i18n %}
+{% load jalali_tags %}
+{% load jalali_date_converter %}
+{% load number_converter %}
+{% load price_converter %}
+{% load humanize %}
+{% load widget_tweaks %}
+{% load pagination %}
+
+
+{% block title %}
+    جستجوی سریع فایل‌های اجاره
+{% endblock %}
+
+
+{% block content %}
+
+    <!-- Main -->
+    <div class="nk-fmg" style="padding-right: 0;!important;">
+        <div class="nk-fmg-body">
+            <div class="nk-fmg-body-content">
+
+                <!-- Title -->
+                <div class="nk-block-head-content" style="margin-bottom: 1em;">
+                    <h5 class="nk-block-title page-title">جستجوی سریع فایل‌های اجاره</h5>
+                </div>
+
+                <!-- Form-->
+                <div class="nk-block" >
+                    <div class="nk-fmg-actions">
+                        <div class="modal-body">
+                            <div class="card h-100">
+                                <div class="card-inner">
+                                    <form id="search-form" class="row gy-4" method="get" action="{% url 'search_rent_files' %}" enctype="multipart/form-data">
+                                        {% csrf_token %}
+
+                                        <!-- min_deposit -->
+                                        <div class="col-lg-6 col-sm-6">
+                                            <div class="form-group">
+                                                <div class="form-control-wrap">
+                                                    <label class="form-label" for="{{ form.min_deposit.id_for_label }}">حداقل ودیعه</label>
+                                                    {% render_field form.min_deposit id="min_deposit" type="number" class="form-control form-control-xl form-control-outlined" %}
+                                                </div>
+                                                {% if form.min_deposit.errors %}
+                                                    {% for error in form.min_deposit.errors %}
+                                                        <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </div>
+                                        </div>
+
+                                        <!-- max_deposit -->
+                                        <div class="col-lg-6 col-sm-6">
+                                            <div class="form-group">
+                                                <div class="form-control-wrap">
+                                                    <label class="form-label" for="{{ form.max_deposit.id_for_label }}">حداکثر ودیعه</label>
+                                                    {% render_field form.max_deposit id="max_deposit" type="number" class="form-control form-control-xl form-control-outlined" %}
+                                                </div>
+                                                {% if form.max_deposit.errors %}
+                                                    {% for error in form.max_deposit.errors %}
+                                                        <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </div>
+                                        </div>
+
+                                        <!-- min_rent -->
+                                        <div class="col-lg-6 col-sm-6">
+                                            <div class="form-group">
+                                                <div class="form-control-wrap">
+                                                    <label class="form-label" for="{{ form.min_rent.id_for_label }}">حداقل اجاره</label>
+                                                    {% render_field form.min_rent id="min_rent" type="number" class="form-control form-control-xl form-control-outlined" %}
+                                                </div>
+                                                {% if form.min_rent.errors %}
+                                                    {% for error in form.min_rent.errors %}
+                                                        <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </div>
+                                        </div>
+
+                                        <!-- max_rent -->
+                                        <div class="col-lg-6 col-sm-6">
+                                            <div class="form-group">
+                                                <div class="form-control-wrap">
+                                                    <label class="form-label" for="{{ form.max_rent.id_for_label }}">حداکثر اجاره</label>
+                                                    {% render_field form.max_rent id="max_rent" type="number" class="form-control form-control-xl form-control-outlined" %}
+                                                </div>
+                                                {% if form.max_rent.errors %}
+                                                    {% for error in form.max_rent.errors %}
+                                                        <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </div>
+                                        </div>
+
+                                        <!-- min_area -->
+                                        <div class="col-lg-6 col-sm-6">
+                                            <div class="form-group">
+                                                <div class="form-control-wrap">
+                                                    <label class="form-label" for="{{ form.min_area.id_for_label }}">حداقل متراژ</label>
+                                                    {% render_field form.min_area id="min_area" type="number" class="form-control form-control-xl form-control-outlined" %}
+                                                </div>
+                                                {% if form.min_area.errors %}
+                                                    {% for error in form.min_area.errors %}
+                                                        <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </div>
+                                        </div>
+
+                                        <!-- max_area -->
+                                        <div class="col-lg-6 col-sm-6">
+                                            <div class="form-group">
+                                                <div class="form-control-wrap">
+                                                    <label class="form-label" for="{{ form.max_area.id_for_label }}">حداکثر متراژ</label>
+                                                    {% render_field form.max_area id="max_area" type="number" class="form-control form-control-xl form-control-outlined" %}
+                                                </div>
+                                                {% if form.max_area.errors %}
+                                                    {% for error in form.max_area.errors %}
+                                                        <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </div>
+                                        </div>
+
+                                        <!-- button -->
+                                        <div class="form-group align-center">
+                                            <button type="submit" onclick="submitFormAndRefresh()" class="btn btn-primary justify-center" style="width: 49%;!important; margin-left: 2%;">جستجو</button>
+                                            <a href="{% url 'search_rent_files' %}" class="btn btn-danger justify-center" style="width: 49%;!important;">بازنشانی</a>
+                                        </div>
+
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- end: Form -->
+
+                <!-- Files -->
+                <div class="nk-fmg-quick-list nk-block">
+                    <div class="toggle-expand-content expanded" data-content="quick-access">
+                        <div class="nk-files nk-files-view-grid">
+                            <div class="nk-files-list">
+                            
+                                <!-- Loop -->
+                                {% for file in rent_files %}
+                                    {% if file.status == 'acc' %}
+                                        <div class="nk-file-item nk-file">
+                                            <div class="nk-file-info">
+                                                <div class="nk-file-title">
+    
+                                                    <!-- Code -->
+                                                    <div class="nk-file-name">
+                                                        <div class="nk-file-name-text" style="margin-bottom: 0.5em; height: 2em;!important; -webkit-line-clamp: 2;!important; font-size: 0.9em;">
+                                                            <button style="border: none; background-color:transparent; margin-top: 0.8em; line-height: 10px; border-bottom: solid 1px #00a65c; color: #00a65c" onclick="copyCode(this)">
+                                                               {{ file.code }}
+                                                            </button>
+                                                            <span class="feedback" id="feedback-{{ file.code }}" style="display: none; color: #00a65c">شد!</span>
+                                                        </div>
+                                                    </div>
+                                                    <!-- Code (JS) -->
+                                                    <script>
+                                                        function copyCode(element) {
+                                                            // Get the code from the button's text content instead of parameter
+                                                            const code = element.textContent.trim();
+                                                            
+                                                            // Create a temporary input element to hold the text
+                                                            const tempInput = document.createElement("input");
+                                                            tempInput.value = code;
+                                                            document.body.appendChild(tempInput);
+                                                    
+                                                            // Select and copy the text
+                                                            tempInput.select();
+                                                            document.execCommand("copy");
+                                                    
+                                                            // Remove the temporary input
+                                                            document.body.removeChild(tempInput);
+                                                    
+                                                            // Show feedback message
+                                                            const feedback = document.getElementById(`feedback-${code}`);
+                                                            feedback.style.display = 'inline';
+                                                    
+                                                            // Hide feedback after 3 seconds
+                                                            setTimeout(() => {
+                                                                feedback.style.display = 'none';
+                                                            }, 3000);
+                                                        }
+                                                    </script>
+
+                                                    <!-- Agent -->
+                                                    <div class="nk-file-name">
+                                                        <div class="nk-file-name-text" style="margin-bottom: 0.5em; height: 2em;!important; -webkit-line-clamp: 2;!important; font-size: 0.9em;">
+                                                            {% if file.created_by.name_family %}
+                                                                مشاور: {{ file.created_by.name_family }}
+                                                            {% else %}
+                                                                مشاور: {{ file.created_by }}
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Sub-district -->
+                                                    <div class="nk-file-name">
+                                                        <div class="nk-file-name-text" style="margin-bottom: 0.5em; height: 3em;!important; -webkit-line-clamp: 2;!important;">
+                                                            <span style="color: #00a65c; font-size: 1em;">{{ file.sub_district }}</span>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Date -->
+                                                    <div class="nk-file-name">
+                                                        <div class="nk-file-name-text">
+                                                            <span style="font-size: 0.8em;">{{ file.datetime_created|jalali_date_converter }}</span>
+                                                        </div>
+                                                    </div>
+    
+                                                    <!-- Cover -->
+                                                    {% if request.user.title == 'bs' or request.user.sub_district == file.sub_district %}
+                                                        <a href="{{ file.get_absolute_url }}" class="nk-file-link">
+                                                            <div class="nk-file-icon">
+                                                                <figure class="product-image--holder" style="height: 12.3em;!important; -webkit-line-clamp: 12.3;!important;">
+                                                                    {% if file.image1 %}
+                                                                        <img src="{{ file.image1.url }}" alt="File Cover" style="height: 12.3em;!important; -webkit-line-clamp: 12.3;!important;">
+                                                                    {% else %}
+                                                                        <img src="{% static 'dashboard/images/blank_file.jpg' %}" alt="File Cover" style="height: 12.3em;!important; -webkit-line-clamp: 12.3;!important;">
+                                                                    {% endif %}
+                                                                </figure>
+                                                            </div>
+                                                        </a>
+                                                    {% else %}
+                                                         <div class="nk-file-link">
+                                                            <div class="nk-file-icon">
+                                                                <figure class="product-image--holder" style="height: 12.3em;!important; -webkit-line-clamp: 12.3;!important;">
+                                                                    {% if file.image1 %}
+                                                                        <img src="{{ file.image1.url }}" alt="File Cover" style="height: 12.3em;!important; -webkit-line-clamp: 12.3;!important;">
+                                                                    {% else %}
+                                                                        <img src="{% static 'dashboard/images/blank_file.jpg' %}" alt="File Cover" style="height: 12.3em;!important; -webkit-line-clamp: 12.3;!important;">
+                                                                    {% endif %}
+                                                                </figure>
+                                                            </div>
+                                                         </div>
+                                                    {% endif %}
+    
+                                                    <!-- Title -->
+                                                    <div class="nk-file-name">
+                                                        <div class="nk-file-name-text" style="height: 4em;!important; -webkit-line-clamp: 2;!important;">
+                                                            <span class="title" style="font-size: 0.9em;">{{ file.title|linebreaksbr|farsi_number }}</span>
+                                                        </div>
+                                                    </div>
+    
+                                                    <!-- Deposit -->
+                                                    <div class="nk-file-name">
+                                                        <span class="title" style="font-size: 0.8em; color: green;">رهن: {{ file.deposit_announced|price_converter|intcomma:False|farsi_number }} تومان</span>
+                                                    </div>
+                                                
+                                                    <!-- Rent -->
+                                                    <div class="nk-file-name">
+                                                        <span class="title" style="font-size: 0.8em; color: green;">اجاره: {{ file.rent_announced|price_converter|intcomma:False|farsi_number }} تومان</span>
+                                                    </div>
+    
+                                                    <!-- More -->
+                                                    {% if request.user.title == 'bs' or request.user.sub_district == file.sub_district %}
+                                                        <a href="{{ file.get_absolute_url }}" class="btn btn-primary" style="margin-top: 1em;"><em class="icon ni ni-eye"></em><span>مشاهده</span></a>
+                                                    {% endif %}
+
+                                                    <!-- Mark -->
+                                                    {% if request.user.title == 'bs' or request.user.sub_district == file.sub_district %}
+                                                        {% if file.id not in marked_sale_file_ids %}
+                                                            <form method="post" action="{% url 'mark_sale_file_create' 'sale_file' file.id %}">
+                                                               {% csrf_token %}
+                                                                <button type="submit" class="btn btn-gray" style="margin-top: 1em; font-size: 0.7em; line-height: 0.7em;">
+                                                                    <em class="icon ni ni-bookmark"></em>
+                                                                </button>
+                                                            </form>
+                                                        {% else %}
+                                                            <span class="btn btn-warning" style="margin-top: 1em; margin-left: 5px; font-size: 0.7em; line-height: 0.7em;" title="نشان‌شده">
+                                                                <em class="icon ni ni-check"></em>
+                                                            </span>
+                                                        {% endif %}
+                                                    {% endif %}
+                                                
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                                <!-- end: Loop -->
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- end: Files -->
+
+                <!-- Pagination -->
+                {% pagination page_obj request 'sale_file_search' %}
+                <!-- end: Pagination -->
+            
+            </div>
+        </div>
+    </div>
+    <!-- end: Main -->
+    
+{% endblock %}
+

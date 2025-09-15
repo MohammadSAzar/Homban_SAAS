@@ -207,6 +207,29 @@
                                             </ul>
                                         </li>
 
+                                        <!-- Search -->
+                                        <li class="nk-menu-item has-sub">
+                                            <a href="#" class="nk-menu-link nk-menu-toggle">
+                                                <span class="nk-menu-icon"><em class="icon ni ni-search"></em></span>
+                                                <span class="nk-menu-text">جستجوی سریع</span>
+                                            </a>
+                                            <ul class="nk-menu-sub">
+                                                <li class="nk-menu-item">
+                                                    <a href="{% url 'search_sale_files' %}" class="nk-menu-link"><span class="nk-menu-text">فایل‌های فروش</span></a>
+                                                </li>
+                                                <li class="nk-menu-item">
+                                                    <a href="{% url 'search_rent_files' %}" class="nk-menu-link"><span class="nk-menu-text">فایل‌های اجاره</span></a>
+                                                </li>
+{#                                                <li class="nk-menu-item">#}
+{#                                                    <a href="#" class="nk-menu-link"><span class="nk-menu-text">خریداران</span></a>#}
+{#                                                </li>#}
+{#                                                <li class="nk-menu-item">#}
+{#                                                    <a href="#" class="nk-menu-link"><span class="nk-menu-text">مستاجران</span></a>#}
+{#                                                </li>#}
+                                            </ul>
+                                        </li>
+
+
 {#                                        <!-- Chat -->#}
 {#                                        <li class="nk-menu-item has-sub">#}
 {#                                            <a href="#" class="nk-menu-link nk-menu-toggle">#}
@@ -314,5 +337,7 @@
     </body>
 
 </html>
+
+
 
 

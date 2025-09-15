@@ -1862,6 +1862,85 @@ class RenterRecoverView(PermissionRequiredMixin, UpdateView):
         return reverse_lazy('renter_list')
 
 
+# --------------------------------- Search ---------------------------------
+class SaleFileSearchView(ReadOnlyPermissionMixin, ListView):
+    model = models.SaleFile
+    template_name = 'dashboard/search/sale_file_search.html'
+    context_object_name = 'sale_files'
+    paginate_by = 12
+    permission_model = 'SaleFile'
+
+    def get_queryset(self):
+        queryset = models.SaleFile.objects.none()
+
+        form = forms.SaleFileFilterForm(self.request.GET or None)
+        if form.is_bound and form.is_valid():
+            min_price = form.cleaned_data.get('min_price')
+            max_price = form.cleaned_data.get('max_price')
+            min_area = form.cleaned_data.get('min_area')
+            max_area = form.cleaned_data.get('max_area')
+
+            if any([min_price, max_price, min_area, max_area]):
+                queryset = models.SaleFile.objects.select_related('province', 'city', 'district', 'sub_district',
+                                                                  'person', 'created_by').all()
+                if min_price is not None:
+                    queryset = queryset.filter(price_announced__gte=min_price)
+                if max_price is not None:
+                    queryset = queryset.filter(price_announced__lte=max_price)
+                if min_area is not None:
+                    queryset = queryset.filter(area__gte=min_area)
+                if max_area is not None:
+                    queryset = queryset.filter(area__lte=max_area)
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = forms.SaleFileFilterForm(self.request.GET or None)
+        return context
+
+
+class RentFileSearchView(ReadOnlyPermissionMixin, ListView):
+    model = models.RentFile
+    template_name = 'dashboard/search/rent_file_search.html'
+    context_object_name = 'rent_files'
+    paginate_by = 12
+    permission_model = 'RentFile'
+
+    def get_queryset(self):
+        queryset = models.RentFile.objects.none()
+
+        form = forms.RentFileFilterForm(self.request.GET or None)
+        if form.is_bound and form.is_valid():
+            min_deposit = form.cleaned_data.get('min_deposit')
+            max_deposit = form.cleaned_data.get('max_deposit')
+            min_rent = form.cleaned_data.get('min_rent')
+            max_rent = form.cleaned_data.get('max_rent')
+            min_area = form.cleaned_data.get('min_area')
+            max_area = form.cleaned_data.get('max_area')
+
+            if any([min_deposit, max_deposit, min_rent, max_rent, min_area, max_area]):
+                queryset = models.RentFile.objects.select_related('province', 'city', 'district', 'sub_district',
+                                                                  'person', 'created_by').all()
+                if min_deposit is not None:
+                    queryset = queryset.filter(deposit_announced__gte=min_deposit)
+                if max_deposit is not None:
+                    queryset = queryset.filter(deposit_announced__lte=max_deposit)
+                if min_rent is not None:
+                    queryset = queryset.filter(rent_announced__gte=min_rent)
+                if max_rent is not None:
+                    queryset = queryset.filter(rent_announced__lte=max_rent)
+                if min_area is not None:
+                    queryset = queryset.filter(area__gte=min_area)
+                if max_area is not None:
+                    queryset = queryset.filter(area__lte=max_area)
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = forms.RentFileFilterForm(self.request.GET or None)
+        return context
+
+
 # --------------------------------- Marks ---------------------------------
 class SaleFileMarksListView(ReadOnlyPermissionMixin, ListView):
     model = models.Mark

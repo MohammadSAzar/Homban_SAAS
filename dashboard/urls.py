@@ -70,6 +70,9 @@ urlpatterns = [
     re_path(r'renter/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/', views.RenterDetailView.as_view(), name='renter_detail'),
     re_path(r'renter/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/suggested-files/', views.RenterDetailView.as_view(), name='renter_suggested_files'),
     re_path(r'renters/create/', views.RenterCreateView.as_view(), name='renter_create'),
+    # search
+    path('quick-search/sale_files/', views.SaleFileSearchView.as_view(), name='search_sale_files'),
+    path('quick-search/rent_files/', views.RentFileSearchView.as_view(), name='search_rent_files'),
     # marks
     path('marks/sale-files', views.SaleFileMarksListView.as_view(), name='sale_file_marks'),
     path('marks/rent-files', views.RentFileMarksListView.as_view(), name='rent_file_marks'),
@@ -114,7 +117,7 @@ urlpatterns = [
     re_path(r'trade/detail/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/', views.TradeDetailView.as_view(), name='trade_detail'),
     re_path(r'trade/create/', views.TradeCreateView.as_view(), name='trade_create'),
     # boss
-    path('tasks/boss/', views.TaskBossListView.as_view(), name='boss_task_list'),
+    path('boss-tasks/', views.TaskBossListView.as_view(), name='boss_task_list'),
     path('tasks/boss/delete-requests/', views.delete_request_list_view, name='delete_request_list'),
     re_path(r'tasks/boss/approve/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/', views.TaskBossApproveView.as_view(), name='boss_task_approve'),
     re_path(r'tasks/boss/delete/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/', views.TaskBossDeleteView.as_view(), name='boss_task_delete'),
