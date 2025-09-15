@@ -17,19 +17,97 @@
 
 
 {% block content %}
-    <div class="nk-fmg">
+    
+    <!-- Message -->
+    <div id="successModal"  class="modal">
+        <div class="modal-content">
+            <h5 class="modal-title" style="padding: 20px 20px 10px 0;!important;">عملیات با موفقیت انجام شد (عملیات مربوطه توسط مدیر بررسی خواهد شد).</h5>
+            <button class="modal-my-button">بستن پیام</button>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function() {
+            var messages = "{% for message in messages %}{{ message }}{% if not forloop.last %}\\n{% endif %}{% endfor %}";
+            if (messages) {
+                $('#modal-message').text(messages);
+                $('#successModal').show();
+            }
+            $('.modal-my-button').on('click', function() {
+                $('#successModal').hide();
+            });
+        });
+    </script>
+    <!-- end: Message -->
 
-        <!-- ّFilter -->
-        <div class="nk-fmg-aside" data-content="files-aside" data-toggle-overlay="true" data-toggle-body="true" data-toggle-screen="lg" data-simplebar>
-            <div class="nk-fmg-aside-wrap">
-                <div class="nk-fmg-aside-top" data-simplebar>
-                    <div class="nk-block nk-block-lg">
-                        <div class="row g-gs">
-                            <div class="col-lg-12">
+    <!-- Main -->
+    <div class="nk-fmg" style="padding-right: 0;!important;">
+        <div class="nk-fmg-body">
+            <div class="nk-fmg-body-content">
+
+                <!-- Add / Filter-->
+                <div class="nk-fmg-body-head  d-none d-lg-flex" >
+                    <div class="nk-fmg-actions">
+                        <ul class="nk-block-tools g-3">
+                            <li>
+                                <a href="{% url 'rent_file_create' %}" class="btn btn-primary"><em class="icon ni ni-plus"></em><span>ایجاد فایل جدید</span></a>
+                            </li>
+                            <li>
+                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#filterModal">
+                                    <em class="icon ni ni-filter"></em><span>فیلتر فایل</span>
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- end: Add / Filter -->
+
+                <!-- Add / Filter (Mobile) -->
+                <div class="nk-block-head nk-block-head-sm" style="margin-bottom: 1.2em; margin-top: 1.2em;">
+                    <div class="nk-block-between position-relative">
+
+                        <!-- Title -->
+                        <div class="nk-block-head-content">
+                            <h5 class="nk-block-title page-title">فایل‌های اجاره</h5>
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="nk-block-head-content">
+                            <ul class="nk-block-tools g-1">
+                                <li class="d-lg-none">
+                                    <div class="dropdown">
+                                        <a href="{% url 'rent_file_create' %}" class="btn btn-primary"><em class="icon ni ni-plus"></em></a>
+                                    </div>
+                                </li>
+                                <li class="d-lg-none">
+                                    <div class="dropdown">
+                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#filterModal">
+                                            <em class="icon ni ni-filter"></em>
+                                        </button>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+
+                    </div>
+                </div>
+                <!-- end: Upper + Mobile -->
+
+                <!-- Filter (Modal) -->
+                <div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                        
+                            <!-- Upper -->
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="filterModalLabel">فیلتر فایل</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <!-- end: Upper -->
+                        
+                            <!-- Form -->
+                            <div class="modal-body">
                                 <div class="card h-100">
                                     <div class="card-inner">
-
-                                        <!-- Form -->
                                         <form id="filter-form" method="get" action="{% url 'rent_file_list' %}" enctype="multipart/form-data">
                                             {% csrf_token %}
     
@@ -354,189 +432,85 @@
                                                 <a href="{% url 'rent_file_list' %}" class="btn btn-danger justify-center" style="width: 100%;!important; margin-top: 10px;">حذف فیلترها</a>
                                             </div>
                                         </form>
-                                        <!-- end: Form -->
-                                        
-                                        <!-- JS for filter Form -->
-                                        <script>
-                                            function submitFormAndRefresh() {
-                                                document.getElementById('filter-form').submit();
-                                                location.reload();
-                                            }
-                                        </script>
-        
-                                        <script>
-                                            document.addEventListener('DOMContentLoaded', function() {
-                                                const province = document.getElementById('province').value;
-                                                const city = document.getElementById('city').value;
-        
-                                                if (province) {
-                                                    updateCities(province);
-                                                }
-                                                if (city) {
-                                                    updateDistricts(city);
-                                                }
-                                            });
-        
-                                            function updateCities(provinceId) {
-                                                const url = `/get-cities/?province_id=${provinceId}`;
-                                                fetch(url)
-                                                    .then(response => response.json())
-                                                    .then(data => {
-                                                        const citySelect = document.getElementById('city');
-                                                        citySelect.innerHTML = '<option value="">Select City</option>';
-                                                        data.cities.forEach(city => {
-                                                            citySelect.innerHTML += `<option value="${city.id}">${city.name}</option>`;
-                                                        });
-        
-                                                        const selectedCity = '{{ request.GET.city }}';
-                                                        if (selectedCity) {
-                                                            citySelect.value = selectedCity;
-                                                        }
-                                                    });
-                                            }
-        
-                                            function updateDistricts(cityId) {
-                                                const url = `/get-districts/?city_id=${cityId}`;
-                                                fetch(url)
-                                                    .then(response => response.json())
-                                                    .then(data => {
-                                                        const districtSelect = document.getElementById('district');
-                                                        districtSelect.innerHTML = '<option value="">Select District</option>';
-                                                        data.districts.forEach(district => {
-                                                            districtSelect.innerHTML += `<option value="${district.id}">${district.name}</option>`;
-                                                        });
-        
-                                                        const selectedDistrict = '{{ request.GET.district }}';
-                                                        if (selectedDistrict) {
-                                                            districtSelect.value = selectedDistrict;
-                                                        }
-                                                    });
-                                            }
-        
-                                            function submitFormAndRefresh() {
-                                                document.getElementById('filter-form').submit();
-                                                location.reload();
-                                            }
-                                        </script>
-                                        <!-- end: JS for filter Form -->
-
                                     </div>
                                 </div>
                             </div>
+                            <!-- end: Form -->
+                        
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-        <!-- end: Filter -->
+                <!-- end: Filter (Modal) -->
 
-        <!-- Main -->
-        <div class="nk-fmg-body">
-
-            <!-- File create message -->
-            <div id="successModal"  class="modal">
-                <div class="modal-content">
-                    <h5 class="modal-title" style="padding: 20px 20px 10px 0;!important;">عملیات با موفقیت انجام شد (عملیات مربوطه توسط مدیر بررسی خواهد شد).</h5>
-                    <button class="modal-my-button">بستن پیام</button>
-                </div>
-            </div>
-            <script>
-                $(document).ready(function() {
-                    var messages = "{% for message in messages %}{{ message }}{% if not forloop.last %}\\n{% endif %}{% endfor %}";
-                    if (messages) {
-                        $('#modal-message').text(messages);
-                        $('#successModal').show();
+                <!-- Filter (JS)-->
+                <script>
+                    function submitFormAndRefresh() {
+                        document.getElementById('filter-form').submit();
+                        location.reload();
                     }
-                    $('.modal-my-button').on('click', function() {
-                        $('#successModal').hide();
+                </script>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const province = document.getElementById('province').value;
+                        const city = document.getElementById('city').value;
+
+                        if (province) {
+                            updateCities(province);
+                        }
+                        if (city) {
+                            updateDistricts(city);
+                        }
                     });
-                });
-            </script>
-            <!-- end: File create message -->
 
-            <!-- Upper Navbar -->
-            <div class=" nk-fmg-body-head d-none d-lg-flex" >
+                    function updateCities(provinceId) {
+                        const url = `/get-cities/?province_id=${provinceId}`;
+                        fetch(url)
+                            .then(response => response.json())
+                            .then(data => {
+                                const citySelect = document.getElementById('city');
+                                citySelect.innerHTML = '<option value="">Select City</option>';
+                                data.cities.forEach(city => {
+                                    citySelect.innerHTML += `<option value="${city.id}">${city.name}</option>`;
+                                });
 
-                <!-- Search -->
-                <div class="nk-fmg-search">
-                    <em class="icon ni ni-search"></em>
-                    <input type="text" class="form-control border-transparent form-focus-none" placeholder="جستجو در میان فایل‌ها"/>
-                </div>
+                                const selectedCity = '{{ request.GET.city }}';
+                                if (selectedCity) {
+                                    citySelect.value = selectedCity;
+                                }
+                            });
+                    }
 
-                <!-- Add Link -->
-                <div class="nk-fmg-actions">
-                    <ul class="nk-block-tools g-3">
-                        <li>
-                            <a href="{% url 'rent_file_create' %}" class="btn btn-primary"><em class="icon ni ni-plus"></em><span>ایجاد فایل جدید</span></a>
-                        </li>
-                    </ul>
-                </div>
+                    function updateDistricts(cityId) {
+                        const url = `/get-districts/?city_id=${cityId}`;
+                        fetch(url)
+                            .then(response => response.json())
+                            .then(data => {
+                                const districtSelect = document.getElementById('district');
+                                districtSelect.innerHTML = '<option value="">Select District</option>';
+                                data.districts.forEach(district => {
+                                    districtSelect.innerHTML += `<option value="${district.id}">${district.name}</option>`;
+                                });
 
-            </div>
-            <!-- end: Upper Navbar -->
+                                const selectedDistrict = '{{ request.GET.district }}';
+                                if (selectedDistrict) {
+                                    districtSelect.value = selectedDistrict;
+                                }
+                            });
+                    }
 
-            <!-- List -->
-            <div class=" nk-fmg-body-content">
-
-                <!-- Upper + Mobile -->
-                <div class="nk-block-head nk-block-head-sm" style="margin-bottom: 1.2em;">
-                    <div class="nk-block-between position-relative">
-
-                        <!-- Title -->
-                        <div class="nk-block-head-content">
-                            <h5 class="nk-block-title page-title">فایل‌های اجاره</h5>
-                        </div>
-
-                        <!-- Mobile Navbar -->
-                        <div class="nk-block-head-content">
-                            <ul class="nk-block-tools g-1">
-
-                                <!-- Search -->
-                                <li class="d-lg-none">
-                                    <a href="#" class="btn btn-trigger btn-icon search-toggle toggle-search" data-target="search"><em class="icon ni ni-search"></em></a>
-                                </li>
-
-                                <!-- Add Link -->
-                                <li class="d-lg-none">
-                                    <div class="dropdown">
-                                        <a href="#" class="btn btn-trigger btn-icon" data-bs-toggle="dropdown"><em class="icon ni ni-plus"></em></a>
-                                        <div class="dropdown-menu dropdown-menu-end">
-                                            <ul class="link-list-opt no-bdr">
-                                                <li><a href="{% url 'rent_file_create' %}"><em class="icon ni ni-upload-cloud"></em><span>ایجاد فایل جدید</span></a></li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </li>
-
-                                <!-- Filter Navigator -->
-                                <li class="d-lg-none me-n1">
-                                    <a href="#" class="btn btn-trigger btn-icon toggle" data-target="files-aside"><em class="icon ni ni-menu-alt-r"></em></a>
-                                </li>
-
-                            </ul>
-                        </div>
-
-                        <!-- Mobile Search Box -->
-                        <div class="search-wrap px-2 d-lg-none" data-search="search">
-                            <div class="search-content">
-                                <a href="#" class="search-back btn btn-icon toggle-search" data-target="search"><em class="icon ni ni-arrow-left"></em></a>
-                                <input type="text" class="form-control border-transparent form-focus-none" placeholder="جستجو در میان فایل‌ها"/>
-                                <button class="search-submit btn btn-icon">
-                                    <em class="icon ni ni-search"></em>
-                                </button>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-                <!-- end: Upper + Mobile -->
+                    function submitFormAndRefresh() {
+                        document.getElementById('filter-form').submit();
+                        location.reload();
+                    }
+                </script>
+                <!-- end: Filter (JS)-->
 
                 <!-- Files -->
                 <div class="nk-fmg-quick-list nk-block">
                     <div class="toggle-expand-content expanded" data-content="quick-access">
                         <div class="nk-files nk-files-view-grid">
                             <div class="nk-files-list">
-
+                            
                                 <!-- Loop -->
                                 {% for file in rent_files %}
                                     {% if file.status == 'acc' %}
@@ -546,7 +520,7 @@
     
                                                     <!-- Code -->
                                                     <div class="nk-file-name">
-                                                        <div class="nk-file-name-text" style="margin-bottom: 0.5em; height: 2em;!important; -webkit-line-clamp: 2;!important;">
+                                                        <div class="nk-file-name-text" style="margin-bottom: 0.5em; height: 2em;!important; -webkit-line-clamp: 2;!important; font-size: 0.9em;">
                                                             <button style="border: none; background-color:transparent; margin-top: 0.8em; line-height: 10px; border-bottom: solid 1px #00a65c; color: #00a65c" onclick="copyCode(this)">
                                                                {{ file.code }}
                                                             </button>
@@ -558,34 +532,45 @@
                                                         function copyCode(element) {
                                                             // Get the code from the button's text content instead of parameter
                                                             const code = element.textContent.trim();
-                                                            
+
                                                             // Create a temporary input element to hold the text
                                                             const tempInput = document.createElement("input");
                                                             tempInput.value = code;
                                                             document.body.appendChild(tempInput);
-                                                    
+
                                                             // Select and copy the text
                                                             tempInput.select();
                                                             document.execCommand("copy");
-                                                    
+
                                                             // Remove the temporary input
                                                             document.body.removeChild(tempInput);
-                                                    
+
                                                             // Show feedback message
                                                             const feedback = document.getElementById(`feedback-${code}`);
                                                             feedback.style.display = 'inline';
-                                                    
+
                                                             // Hide feedback after 3 seconds
                                                             setTimeout(() => {
                                                                 feedback.style.display = 'none';
                                                             }, 3000);
                                                         }
                                                     </script>
-                                                
+
+                                                    <!-- Agent -->
+                                                    <div class="nk-file-name">
+                                                        <div class="nk-file-name-text" style="margin-bottom: 0.5em; height: 2em;!important; -webkit-line-clamp: 2;!important; font-size: 0.9em;">
+                                                            {% if file.created_by.name_family %}
+                                                                مشاور: {{ file.created_by.name_family }}
+                                                            {% else %}
+                                                                مشاور: {{ file.created_by }}
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+
                                                     <!-- Sub-district -->
                                                     <div class="nk-file-name">
                                                         <div class="nk-file-name-text" style="margin-bottom: 0.5em; height: 3em;!important; -webkit-line-clamp: 2;!important;">
-                                                            <span style="color: green; font-size: 1.1em;">{{ file.sub_district }}</span>
+                                                            <span style="color: #00a65c; font-size: 1em;">{{ file.sub_district }}</span>
                                                         </div>
                                                     </div>
 
@@ -648,24 +633,23 @@
                                         </div>
                                     {% endif %}
                                 {% endfor %}
-
+                                <!-- end: Loop -->
+                            
                             </div>
                         </div>
                     </div>
                 </div>
                 <!-- end: Files -->
 
+                <!-- Pagination -->
+                {% pagination page_obj request 'rent_file_list' %}
+                <!-- end: Pagination -->
+            
             </div>
-            <!-- end: List -->
-        
-            <!-- Pagination -->
-            {% pagination page_obj request 'rent_file_list' %}
-            <!-- end: Pagination -->
-
         </div>
-        <!-- end: Main -->
-
     </div>
+    <!-- end: Main -->
+    
 {% endblock %}
 
 

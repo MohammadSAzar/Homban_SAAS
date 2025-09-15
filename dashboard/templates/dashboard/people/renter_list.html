@@ -3,34 +3,114 @@
 {% load static %}
 {% load i18n %}
 {% load jalali_tags %}
+{% load jalali_date_converter %}
 {% load number_converter %}
 {% load price_converter %}
-{% load widget_tweaks %}
 {% load humanize %}
+{% load widget_tweaks %}
 {% load pagination %}
 
 
-{% block title %}مستاجران{% endblock %}
+{% block title %}
+    مستاجران
+{% endblock %}
 
 
 {% block content %}
 
-    <div class="nk-fmg">
+    <!-- Message -->
+    <div id="successModal"  class="modal">
+        <div class="modal-content">
+            <h5 class="modal-title" style="padding: 20px 20px 10px 0;!important;">عملیات با موفقیت انجام شد (عملیات مربوطه توسط مدیر بررسی خواهد شد).</h5>
+            <button class="modal-my-button">بستن پیام</button>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function() {
+            var messages = "{% for message in messages %}{{ message }}{% if not forloop.last %}\\n{% endif %}{% endfor %}";
+            if (messages) {
+                $('#modal-message').text(messages);
+                $('#successModal').show();
+            }
+            $('.modal-my-button').on('click', function() {
+                $('#successModal').hide();
+            });
+        });
+    </script>
+    <!-- end: Message -->
 
-        <!-- ّFilter -->
-        <div class="nk-fmg-aside" data-content="files-aside" data-toggle-overlay="true" data-toggle-body="true" data-toggle-screen="lg" data-simplebar>
-            <div class="nk-fmg-aside-wrap">
-                <div class="nk-fmg-aside-top" data-simplebar>
-                    <div class="nk-block nk-block-lg">
-                        <div class="row g-gs">
-                            <div class="col-lg-12">
+    <!-- Main -->
+    <div class="nk-fmg" style="padding-right: 0;!important;">
+        <div class="nk-fmg-body">
+            <div class="nk-fmg-body-content">
+
+                <!-- Add / Filter-->
+                <div class="nk-fmg-body-head d-none d-lg-flex" >
+                    <div class="nk-fmg-actions">
+                        <ul class="nk-block-tools g-3">
+                            <li>
+                                <a href="{% url 'renter_create' %}" class="btn btn-primary"><em class="icon ni ni-plus"></em><span>ایجاد مستاجر جدید</span></a>
+                            </li>
+                            <li>
+                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#filterModal">
+                                    <em class="icon ni ni-filter"></em><span>فیلتر مستاجر</span>
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- end: Add / Filter -->
+
+                <!-- Add / Filter (Mobile) -->
+                <div class="nk-block-head nk-block-head-sm" style="margin-bottom: 1.2em; margin-top: 1.2em;">
+                    <div class="nk-block-between position-relative">
+
+                        <!-- Title -->
+                        <div class="nk-block-head-content">
+                            <h5 class="nk-block-title page-title">مستاجران</h5>
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="nk-block-head-content">
+                            <ul class="nk-block-tools g-1">
+                                <li class="d-lg-none">
+                                    <div class="dropdown">
+                                        <a href="{% url 'renter_create' %}" class="btn btn-primary"><em class="icon ni ni-plus"></em></a>
+                                    </div>
+                                </li>
+                                <li class="d-lg-none">
+                                    <div class="dropdown">
+                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#filterModal">
+                                            <em class="icon ni ni-filter"></em>
+                                        </button>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+
+                    </div>
+                </div>
+                <!-- end: Upper + Mobile -->
+
+                <!-- Filter (Modal) -->
+                <div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+
+                            <!-- Upper -->
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="filterModalLabel">فیلتر مستاجر</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <!-- end: Upper -->
+
+                            <!-- Form -->
+                            <div class="modal-body">
                                 <div class="card h-100">
                                     <div class="card-inner">
-
-                                        <!-- Form -->
                                         <form id="filter-form" method="get" action="{% url 'renter_list' %}" enctype="multipart/form-data">
                                             {% csrf_token %}
-
+            
                                             <!-- province -->
                                             {% if request.user.title == 'bs' %}
                                                 <div class="form-group">
@@ -43,7 +123,7 @@
                                                     {% endfor %}
                                                 {% endif %}
                                             {% endif %}
-
+            
                                             <!-- city -->
                                             {% if request.user.title == 'bs' %}
                                                 <div class="form-group">
@@ -56,7 +136,7 @@
                                                     {% endfor %}
                                                 {% endif %}
                                             {% endif %}
-
+            
                                             <!-- district -->
                                             {% if request.user.title == 'bs' %}
                                                 <div class="form-group">
@@ -69,7 +149,7 @@
                                                     {% endfor %}
                                                 {% endif %}
                                             {% endif %}
-                                        
+            
                                             <!-- sub_districts -->
                                             {% if request.user.title == 'bs' %}
                                                 <div class="form-group">
@@ -83,7 +163,7 @@
                                                     {% endfor %}
                                                 {% endif %}
                                             {% endif %}
-
+            
                                             <!-- max_deposit -->
                                             <div class="form-group">
                                                 <label class="form-label" for="{{ filter_form.max_deposit.id_for_label }}">حداکثر ودیعه</label>
@@ -94,7 +174,7 @@
                                                     <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
                                                 {% endfor %}
                                             {% endif %}
-
+            
                                             <!-- min_deposit -->
                                             <div class="form-group">
                                                 <label class="form-label" for="{{ filter_form.min_deposit.id_for_label }}">حداقل ودیعه</label>
@@ -105,7 +185,7 @@
                                                     <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
                                                 {% endfor %}
                                             {% endif %}
-                                        
+            
                                             <!-- max_rent -->
                                             <div class="form-group">
                                                 <label class="form-label" for="{{ filter_form.max_rent.id_for_label }}">حداکثر اجاره</label>
@@ -116,7 +196,7 @@
                                                     <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
                                                 {% endfor %}
                                             {% endif %}
-
+            
                                             <!-- min_rent -->
                                             <div class="form-group">
                                                 <label class="form-label" for="{{ filter_form.min_rent.id_for_label }}">حداقل اجاره</label>
@@ -127,7 +207,7 @@
                                                     <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
                                                 {% endfor %}
                                             {% endif %}
-
+            
                                             <!-- budget status -->
                                             <div class="form-group">
                                                 <label class="form-label" for="{{ filter_form.budget_status.id_for_label }}">وضعیت بودجه</label>
@@ -138,7 +218,7 @@
                                                     <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
                                                 {% endfor %}
                                             {% endif %}
-                                        
+            
                                             <!-- convertable -->
                                             <div class="form-group">
                                                 <label class="form-label" for="{{ filter_form.convertable.id_for_label }}">قابل تبدیل</label>
@@ -149,7 +229,7 @@
                                                     <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
                                                 {% endfor %}
                                             {% endif %}
-                                            
+            
                                             <!-- document -->
                                             <div class="form-group">
                                                 <label class="form-label" for="{{ filter_form.document.id_for_label }}">وضعیت سند</label>
@@ -160,7 +240,7 @@
                                                     <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
                                                 {% endfor %}
                                             {% endif %}
-
+            
                                             <!-- parking -->
                                             <div class="form-group">
                                                 <label class="form-label" for="{{ filter_form.parking.id_for_label }}">وضعیت پارکینگ</label>
@@ -171,7 +251,7 @@
                                                     <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
                                                 {% endfor %}
                                             {% endif %}
-
+            
                                             <!-- elevator -->
                                             <div class="form-group">
                                                 <label class="form-label" for="{{ filter_form.elevator.id_for_label }}">وضعیت آسانسور</label>
@@ -182,7 +262,7 @@
                                                     <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
                                                 {% endfor %}
                                             {% endif %}
-
+            
                                             <!-- warehouse -->
                                             <div class="form-group">
                                                 <label class="form-label" for="{{ filter_form.warehouse.id_for_label }}">وضعیت انباری</label>
@@ -193,324 +273,225 @@
                                                     <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
                                                 {% endfor %}
                                             {% endif %}
-
+            
                                             <!-- button -->
                                             <div class="form-group" style="width: 100%;!important;">
                                                 <button type="submit" onclick="submitFormAndRefresh()" class="btn btn-primary justify-center" style="width: 100%;!important;">اعمال فیلتر</button>
                                                 <a href="{% url 'renter_list' %}" class="btn btn-danger justify-center" style="width: 100%;!important; margin-top: 10px;">حذف فیلترها</a>
                                             </div>
                                         </form>
-                                        <!-- end: Form -->
-
-                                        <!-- JS for filter Form -->
-                                        <script>
-                                            function submitFormAndRefresh() {
-                                                document.getElementById('filter-form').submit();
-                                                location.reload();
-                                            }
-                                        </script>
-
-                                        <script>
-                                            document.addEventListener('DOMContentLoaded', function() {
-                                                const province = document.getElementById('province').value;
-                                                const city = document.getElementById('city').value;
-
-                                                if (province) {
-                                                    updateCities(province);
-                                                }
-                                                if (city) {
-                                                    updateDistricts(city);
-                                                }
-                                            });
-
-                                            function updateCities(provinceId) {
-                                                const url = `/get-cities/?province_id=${provinceId}`;
-                                                fetch(url)
-                                                    .then(response => response.json())
-                                                    .then(data => {
-                                                        const citySelect = document.getElementById('city');
-                                                        citySelect.innerHTML = '<option value="">Select City</option>';
-                                                        data.cities.forEach(city => {
-                                                            citySelect.innerHTML += `<option value="${city.id}">${city.name}</option>`;
-                                                        });
-
-                                                        const selectedCity = '{{ request.GET.city }}';
-                                                        if (selectedCity) {
-                                                            citySelect.value = selectedCity;
-                                                        }
-                                                    });
-                                            }
-
-                                            function updateDistricts(cityId) {
-                                                const url = `/get-districts/?city_id=${cityId}`;
-                                                fetch(url)
-                                                    .then(response => response.json())
-                                                    .then(data => {
-                                                        const districtSelect = document.getElementById('district');
-                                                        districtSelect.innerHTML = '<option value="">Select District</option>';
-                                                        data.districts.forEach(district => {
-                                                            districtSelect.innerHTML += `<option value="${district.id}">${district.name}</option>`;
-                                                        });
-
-                                                        const selectedDistrict = '{{ request.GET.district }}';
-                                                        if (selectedDistrict) {
-                                                            districtSelect.value = selectedDistrict;
-                                                        }
-                                                    });
-                                            }
-
-                                            function submitFormAndRefresh() {
-                                                document.getElementById('filter-form').submit();
-                                                location.reload();
-                                            }
-                                        </script>
-                                        <!-- end: JS for filter Form -->
-
                                     </div>
                                 </div>
                             </div>
+                            <!-- end: Form -->
+
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-        <!-- end: Filter -->
+                <!-- end: Filter (Modal) -->
 
-        <!-- Main -->
-        <div class=" nk-fmg-body">
-
-            <!-- Message -->
-            <div id="successModal" class="modal">
-                <div class="modal-content">
-                    <h5 class="modal-title" style="padding: 20px 20px 10px 0;!important;">عملیات با موفقیت انجام شد (عملیات مربوطه توسط مدیر بررسی خواهد شد).</h5>
-                    <button class="modal-my-button">بستن پیام</button>
-                </div>
-            </div>
-            <script>
-                $(document).ready(function() {
-                    var messages = "{% for message in messages %}{{ message }}{% if not forloop.last %}\\n{% endif %}{% endfor %}";
-                    if (messages) {
-                        $('#modal-message').text(messages);
-                        $('#successModal').show();
+                <!-- Filter (JS)-->
+                <script>
+                    function submitFormAndRefresh() {
+                        document.getElementById('filter-form').submit();
+                        location.reload();
                     }
-                    $('.modal-my-button').on('click', function() {
-                        $('#successModal').hide();
+                </script>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const province = document.getElementById('province').value;
+                        const city = document.getElementById('city').value;
+
+                        if (province) {
+                            updateCities(province);
+                        }
+                        if (city) {
+                            updateDistricts(city);
+                        }
                     });
-                });
-            </script>
-            <!-- end: Message -->
-        
-            <!-- Upper Navbar -->
-            <div class="nk-fmg-body-head d-none d-lg-flex" >
 
-                <!-- Search -->
-                <div class="nk-fmg-search">
-                    <em class="icon ni ni-search"></em>
-                    <input type="text" class="form-control border-transparent form-focus-none" placeholder="جستجو در میان مستاجران"/>
-                </div>
+                    function updateCities(provinceId) {
+                        const url = `/get-cities/?province_id=${provinceId}`;
+                        fetch(url)
+                            .then(response => response.json())
+                            .then(data => {
+                                const citySelect = document.getElementById('city');
+                                citySelect.innerHTML = '<option value="">Select City</option>';
+                                data.cities.forEach(city => {
+                                    citySelect.innerHTML += `<option value="${city.id}">${city.name}</option>`;
+                                });
 
-                <!-- Add Link -->
-                <div class="nk-fmg-actions">
-                    <ul class="nk-block-tools g-3">
-                        <li>
-                            <a href="{% url 'renter_create' %}" class="btn btn-primary"><em class="icon ni ni-plus"></em><span>ایجاد مستاجر جدید</span></a>
-                        </li>
-                    </ul>
-                </div>
+                                const selectedCity = '{{ request.GET.city }}';
+                                if (selectedCity) {
+                                    citySelect.value = selectedCity;
+                                }
+                            });
+                    }
 
-            </div>
-            <!-- end: Upper Navbar -->
+                    function updateDistricts(cityId) {
+                        const url = `/get-districts/?city_id=${cityId}`;
+                        fetch(url)
+                            .then(response => response.json())
+                            .then(data => {
+                                const districtSelect = document.getElementById('district');
+                                districtSelect.innerHTML = '<option value="">Select District</option>';
+                                data.districts.forEach(district => {
+                                    districtSelect.innerHTML += `<option value="${district.id}">${district.name}</option>`;
+                                });
 
-            <!-- List -->
-            <div class="nk-fmg-body-content">
+                                const selectedDistrict = '{{ request.GET.district }}';
+                                if (selectedDistrict) {
+                                    districtSelect.value = selectedDistrict;
+                                }
+                            });
+                    }
 
-                <!-- Upper + Mobile -->
-                <div class="nk-block-head nk-block-head-sm" style="margin-bottom: 1.2em;">
-                    <div class="nk-block-between position-relative">
-
-                        <!-- Title -->
-                        <div class="nk-block-head-content">
-                            <h5 class="nk-block-title page-title">مستاجران</h5>
-                        </div>
-
-                        <!-- Mobile Navbar -->
-                        <div class="nk-block-head-content">
-                            <ul class="nk-block-tools g-1">
-
-                                <!-- Search -->
-                                <li class="d-lg-none">
-                                    <a href="#" class="btn btn-trigger btn-icon search-toggle toggle-search" data-target="search"><em class="icon ni ni-search"></em></a>
-                                </li>
-
-                                <!-- Add Link -->
-                                <li class="d-lg-none">
-                                    <div class="dropdown">
-                                        <a href="#" class="btn btn-trigger btn-icon" data-bs-toggle="dropdown"><em class="icon ni ni-plus"></em></a>
-                                        <div class="dropdown-menu dropdown-menu-end">
-                                            <ul class="link-list-opt no-bdr">
-                                                <li><a href="{% url 'renter_create' %}"><em class="icon ni ni-upload-cloud"></em><span>ایجاد مستاجر جدید</span></a></li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </li>
-
-                                <!-- Filter Navigator -->
-                                <li class="d-lg-none me-n1">
-                                    <a href="#" class="btn btn-trigger btn-icon toggle" data-target="files-aside"><em class="icon ni ni-menu-alt-r"></em></a>
-                                </li>
-
-                            </ul>
-                        </div>
-
-                        <!-- Mobile Search Box -->
-                        <div class="search-wrap px-2 d-lg-none" data-search="search">
-                            <div class="search-content">
-                                <a href="#" class="search-back btn btn-icon toggle-search" data-target="search"><em class="icon ni ni-arrow-left"></em></a>
-                                <input type="text" class="form-control border-transparent form-focus-none" placeholder="جستجو در میان مستاجران"/>
-                                <button class="search-submit btn btn-icon">
-                                    <em class="icon ni ni-search"></em>
-                                </button>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-                <!-- end: Upper + Mobile -->
+                    function submitFormAndRefresh() {
+                        document.getElementById('filter-form').submit();
+                        location.reload();
+                    }
+                </script>
+                <!-- end: Filter (JS)-->
 
                 <!-- Renters -->
-                <div class="nk-block" >
-                    <div class="row g-gs">
-                        {% for renter in renters %}
-                            {% if renter.status == 'acc' %}
-                                <div class="col-sm-6 col-lg-6 col-xxl-6">
-                                    <div class="card h-100">
-                                        <div class="card-inner">
-                                            <div class="project">
+                <div class="nk-fmg-quick-list nk-block">
+                    <div class="toggle-expand-content expanded" data-content="quick-access">
+                        <div class="nk-files nk-files-view-grid">
+                            <div class="nk-files-list">
 
-                                                <!-- Mark -->
-                                                <div class="project-head" style="margin-bottom: 2em;">
-                                                    <div class="project-title">
-                                                        <div class="project-info">
-                                                            <div class="title" style="font-size: 1.1em;">
-                                                                {% if renter.id not in marked_renter_ids %}
-                                                                    <form method="post" action="{% url 'mark_renter_create' 'renter' renter.id %}" style="display: inline-block; margin-top: 1em; margin-left: 5px;">
-                                                                        {% csrf_token %}
-                                                                        <button type="submit" class="btn btn-gray" style="font-size: 0.7em; line-height: 0.7em;">
-                                                                            <em class="icon ni ni-bookmark"></em>
+                                <!-- Loop -->
+                                {% for renter in renters %}
+                                    {% if renter.status == 'acc' %}
+                                        <div class="col-sm-12 col-lg-6 col-xxl-6" style="padding: 5px;">
+                                            <div class="card h-100" style="box-shadow: rgba(0, 0, 0, 0.10) 0 5px 15px;">
+                                                <div class="card-inner">
+                                                    <div class="project">
+
+                                                        <!-- Mark -->
+                                                        <div class="project-head" style="margin-bottom: 2em;">
+                                                            <div class="project-title">
+                                                                <div class="project-info">
+                                                                    <div class="title" style="font-size: 1.1em;">
+                                                                        {% if renter.id not in marked_renter_ids %}
+                                                                            <form method="post" action="{% url 'mark_renter_create' 'renter' renter.id %}" style="display: inline-block; margin-top: 1em; margin-left: 5px;">
+                                                                                {% csrf_token %}
+                                                                                <button type="submit" class="btn btn-gray" style="font-size: 0.7em; line-height: 0.7em;">
+                                                                                    <em class="icon ni ni-bookmark"></em>
+                                                                                </button>
+                                                                            </form>
+                                                                        {% else %}
+                                                                            <span class="btn btn-warning" style="margin-top: 1em; margin-left: 5px; font-size: 0.7em; line-height: 0.7em;" title="نشان‌شده">
+                                                                                <em class="icon ni ni-check"></em>
+                                                                            </span>
+                                                                        {% endif %}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- Name & Code & Phone -->
+                                                        <div class="project-head">
+                                                            <div class="project-title">
+                                                                <div class="project-info">
+                                                                    <h5 class="title" style="font-size: 1.1em;">{{ renter.name }} |
+                                                                        <!-- Code -->
+                                                                        <button style="border: none; background-color:transparent; margin-top: 0.8em; line-height: 10px; border-bottom: solid 1px #00a65c; color: #00a65c" onclick="copyCode(this)">
+                                                                           {{ renter.code }}
                                                                         </button>
-                                                                    </form>
-                                                                {% else %}
-                                                                    <span class="btn btn-warning" style="margin-top: 1em; margin-left: 5px; font-size: 0.7em; line-height: 0.7em;" title="نشان‌شده">
-                                                                        <em class="icon ni ni-check"></em>
-                                                                    </span>
-                                                                {% endif %}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                                                        <span class="feedback" id="feedback-{{ renter.code }}" style="display: none; color: #00a65c">شد!</span>
+                                                                        <!-- Code (JS) -->
+                                                                        <script>
+                                                                function copyCode(element) {
+                                                                    // Get the code from the button's text content instead of parameter
+                                                                    const code = element.textContent.trim();
 
-                                                <!-- Name & Code & Phone -->
-                                                <div class="project-head">
-                                                    <div class="project-title">
-                                                        <div class="project-info">
-                                                            <h5 class="title" style="font-size: 1.1em;">{{ renter.name }} | 
-                                                                <!-- Code -->
-                                                                <button style="border: none; background-color:transparent; margin-top: 0.8em; line-height: 10px; border-bottom: solid 1px #00a65c; color: #00a65c" onclick="copyCode(this)">
-                                                                   {{ renter.code }}
-                                                                </button>
-                                                                <span class="feedback" id="feedback-{{ renter.code }}" style="display: none; color: #00a65c">شد!</span>
-                                                                <!-- Code (JS) -->
-                                                                <script>
-                                                        function copyCode(element) {
-                                                            // Get the code from the button's text content instead of parameter
-                                                            const code = element.textContent.trim();
-                                                            
-                                                            // Create a temporary input element to hold the text
-                                                            const tempInput = document.createElement("input");
-                                                            tempInput.value = code;
-                                                            document.body.appendChild(tempInput);
-                                                    
-                                                            // Select and copy the text
-                                                            tempInput.select();
-                                                            document.execCommand("copy");
-                                                    
-                                                            // Remove the temporary input
-                                                            document.body.removeChild(tempInput);
-                                                    
-                                                            // Show feedback message
-                                                            const feedback = document.getElementById(`feedback-${code}`);
-                                                            feedback.style.display = 'inline';
-                                                    
-                                                            // Hide feedback after 3 seconds
-                                                            setTimeout(() => {
-                                                                feedback.style.display = 'none';
-                                                            }, 3000);
-                                                        }
-                                                    </script>
-                                                                
-                                                                {% if renter.phone_number in duplicate_phone_numbers %}
-                                                                    <span style="color: red; font-size: 0.6em;">( مستاجر تکراری )</span>
-                                                                {% endif %}
-                                                            </h5>
-                                                        </div>
-                                                    </div>
-                                                </div>
-    
-                                                <!-- Location -->
-                                                <div style="height: 4em;!important; -webkit-line-clamp: 2;!important;">
-                                                    <div class="project-head" style="margin-bottom: 0.5em;!important;">
-                                                        <div class="project-title">
-                                                            <div class="project-info">
-                                                                <span class="sub-text" style="font-size: 0.75em; line-height: 25px;">
-                                                                    {% for sub_district in renter.sub_districts.all %}
-                                                                        {{ sub_district.name }} |
-                                                                    {% empty %}
-                                                                        <span>هیچ زیرمحله‌ای انتخاب نشده است</span>
-                                                                    {% endfor %}
-                                                                </span>
+                                                                    // Create a temporary input element to hold the text
+                                                                    const tempInput = document.createElement("input");
+                                                                    tempInput.value = code;
+                                                                    document.body.appendChild(tempInput);
+
+                                                                    // Select and copy the text
+                                                                    tempInput.select();
+                                                                    document.execCommand("copy");
+
+                                                                    // Remove the temporary input
+                                                                    document.body.removeChild(tempInput);
+
+                                                                    // Show feedback message
+                                                                    const feedback = document.getElementById(`feedback-${code}`);
+                                                                    feedback.style.display = 'inline';
+
+                                                                    // Hide feedback after 3 seconds
+                                                                    setTimeout(() => {
+                                                                        feedback.style.display = 'none';
+                                                                    }, 3000);
+                                                                }
+                                                            </script>
+
+                                                                        {% if renter.phone_number in duplicate_phone_numbers %}
+                                                                            <span style="color: red; font-size: 0.6em;">( مستاجر تکراری )</span>
+                                                                        {% endif %}
+                                                                    </h5>
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                </div>
-    
-                                                <!-- Info -->
-                                                <div style="height: 4em;!important; -webkit-line-clamp: 2;!important;">
-                                                    <div class="project-head" style="margin-bottom: 0.5em;!important;">
-                                                        <div class="project-title">
-                                                            <div class="project-info">
-                                                                <h6 class="sub-text" style="font-size: 0.9em; line-height: 25px;">ودیعه: {{ renter.deposit_announced|price_converter|intcomma:False|farsi_number }} تومان</h6>
-                                                                <h6 class="sub-text" style="font-size: 0.9em; line-height: 25px;">اجاره: {{ renter.rent_announced|price_converter|intcomma:False|farsi_number }} تومان</h6>
+
+                                                        <!-- Location -->
+                                                        <div style="height: 4em;!important; -webkit-line-clamp: 2;!important;">
+                                                            <div class="project-head" style="margin-bottom: 0.5em;!important;">
+                                                                <div class="project-title">
+                                                                    <div class="project-info">
+                                                                        <span class="sub-text" style="font-size: 0.75em; line-height: 25px;">
+                                                                            {% for sub_district in renter.sub_districts.all %}
+                                                                                {{ sub_district.name }} |
+                                                                            {% empty %}
+                                                                                <span>هیچ زیرمحله‌ای انتخاب نشده است</span>
+                                                                            {% endfor %}
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
                                                             </div>
                                                         </div>
+
+                                                        <!-- Info -->
+                                                        <div style="height: 4em;!important; -webkit-line-clamp: 2;!important;">
+                                                            <div class="project-head" style="margin-bottom: 0.5em;!important;">
+                                                                <div class="project-title">
+                                                                    <div class="project-info">
+                                                                        <h6 class="sub-text" style="font-size: 0.9em; line-height: 25px;">ودیعه: {{ renter.deposit_announced|price_converter|intcomma:False|farsi_number }} تومان</h6>
+                                                                        <h6 class="sub-text" style="font-size: 0.9em; line-height: 25px;">اجاره: {{ renter.rent_announced|price_converter|intcomma:False|farsi_number }} تومان</h6>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- More -->
+                                                        <div class="project-meta" style="float: left;">
+                                                            <a href="{{ renter.get_absolute_url }}" class="btn btn-primary" style="margin-top: 1em;"><em class="icon ni ni-eye"></em><span>مشاهده</span></a>
+                                                        </div>
+
                                                     </div>
                                                 </div>
-    
-                                                <!-- More -->
-                                                <div class="project-meta" style="float: left;">
-                                                    <a href="{{ renter.get_absolute_url }}" class="btn btn-primary" style="margin-top: 1em;"><em class="icon ni ni-eye"></em><span>مشاهده</span></a>
-                                                </div>
-    
                                             </div>
                                         </div>
-                                    </div>
-                                </div>
-                            {% endif %}
-                        {% endfor %}
+                                    {% endif %}
+                                {% endfor %}
+                                <!-- end: Loop -->
+
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <!-- end: Renters -->
 
+                <!-- Pagination -->
+                {% pagination page_obj request 'renter_list' %}
+                <!-- end: Pagination -->
+
             </div>
-            <!-- end: List -->
-
-            <!-- Pagination -->
-            {% pagination page_obj request 'renter_list' %}
-            <!-- end: Pagination -->
-
         </div>
-        <!-- end: Main -->
-
     </div>
+    <!-- end: Main -->
 
 {% endblock %}
 

@@ -34,32 +34,21 @@
         });
     </script>
 
-    <!-- Upper Navbar -->
+    <!-- Add -->
     <div class="nk-fmg-body-head d-none d-lg-flex" >
-
-        <!-- Search -->
-        <div class="nk-fmg-search">
-            <em class="icon ni ni-search"></em>
-            <input type="text" class="form-control border-transparent form-focus-none" placeholder="جستجو در میان افراد آگهی‌دهنده"/>
-        </div>
-
-        <!-- Add Link -->
         <div class="nk-fmg-actions">
             <ul class="nk-block-tools g-3">
-                <li>
-                    <a href="{% url 'person_create' %}" class="btn btn-primary"><em class="icon ni ni-plus"></em><span>ایجاد آگهی‌دهنده جدید</span></a>
-                </li>
+                <li><a href="{% url 'person_create' %}" class="btn btn-primary"><em class="icon ni ni-plus"></em><span>ایجاد آگهی‌دهنده جدید</span></a></li>
             </ul>
         </div>
-
     </div>
-    <!-- end: Upper Navbar -->
+    <!-- end: Add -->
     
 
     <!-- List -->
     <div class="nk-block">
 
-        <!-- Upper + Mobile -->
+        <!-- Add (Mobile) -->
         <div class="nk-block-head nk-block-head-sm" style="margin-bottom: 1.2em;">
             <div class="nk-block-between position-relative">
 
@@ -68,16 +57,9 @@
                     <h5 class="nk-block-title page-title">افراد آگهی‌دهنده</h5>
                 </div>
 
-                <!-- Mobile Navbar -->
+                <!-- Add -->
                 <div class="nk-block-head-content">
                     <ul class="nk-block-tools g-1">
-
-                        <!-- Search -->
-                        <li class="d-lg-none">
-                            <a href="#" class="btn btn-trigger btn-icon search-toggle toggle-search" data-target="search"><em class="icon ni ni-search"></em></a>
-                        </li>
-
-                        <!-- Add Link -->
                         <li class="d-lg-none">
                             <div class="dropdown">
                                 <a href="#" class="btn btn-trigger btn-icon" data-bs-toggle="dropdown"><em class="icon ni ni-plus"></em></a>
@@ -88,30 +70,18 @@
                                 </div>
                             </div>
                         </li>
-
                     </ul>
                 </div>
-
-                <!-- Mobile Search Box -->
-                <div class="search-wrap px-2 d-lg-none" data-search="search">
-                    <div class="search-content">
-                        <a href="#" class="search-back btn btn-icon toggle-search" data-target="search"><em class="icon ni ni-arrow-left"></em></a>
-                        <input type="text" class="form-control border-transparent form-focus-none" placeholder="جستجو در میان افراد آگهی‌دهنده"/>
-                        <button class="search-submit btn btn-icon">
-                            <em class="icon ni ni-search"></em>
-                        </button>
-                    </div>
-                </div>
-
+            
             </div>
         </div>
-        <!-- end: Upper + Mobile -->
+        <!-- end: Add (Mobile) -->
 
         <!-- Person -->
         <div class="row g-gs">
             {% for person in persons %}
                  {% if person.status == 'acc' %}   
-                    <div class="col-sm-6 col-lg-4 col-xxl-4">
+                    <div class="col-sm-12 col-lg-6 col-xxl-4">
                         <div class="card h-100">
                             <div class="card-inner">
                                 <div class="project">

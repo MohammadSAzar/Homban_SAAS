@@ -11,10 +11,10 @@ class CustomUserAdmin(BaseUserAdmin):
     form = AdminCustomUserChangeForm
     add_form = AdminCustomUserCreationForm
 
-    list_display = ('name_family', 'username', 'title', 'sub_district',)
+    list_display = ('name_family', 'username', 'title', 'sub_district', 'id',)
     list_filter = ('title',)
     fieldsets = (
-        (None, {'fields': ('username', 'password', 'sub_district',)}),
+        (None, {'fields': ('username', 'password', 'sub_district', 'name_family',)}),
         ('Permissions', {'fields': ('title',)}),
     )
     add_fieldsets = (
@@ -53,7 +53,7 @@ class DistrictAdmin(admin.ModelAdmin):
 
 @admin.register(models.SubDistrict)
 class SubDistrictAdmin(admin.ModelAdmin):
-    list_display = ('name', 'district', 'description')
+    list_display = ('name', 'district', 'description', 'id')
     list_per_page = getattr(settings, 'DJANGO_ADMIN_PER_PAGE', 20)
 
 
@@ -68,32 +68,29 @@ class PersonAdmin(admin.ModelAdmin):
 @admin.register(models.SaleFile)
 class SaleFileAdmin(admin.ModelAdmin):
     list_display = (
-        'title', 'code', 'source', 'status', 'sub_district', 'price_announced', 'price_min', 'price_per_meter', 'room', 'area',
-        'age', 'document', 'level', 'parking', 'elevator', 'warehouse', 'has_images', 'has_video', 'zip_file_admin',
-        'datetime_created', 'datetime_expired')
+        'title', 'created_by', 'code', 'source', 'status', 'sub_district', 'price_announced', 'price_per_meter', 'room',
+        'area', 'age', 'zip_file_admin', 'datetime_created')
     ordering = ('-datetime_created',)
     list_filter = ('status', 'sub_district',)
-    readonly_fields = ('code', 'datetime_created', 'datetime_expired',)
+    readonly_fields = ('code', 'datetime_created',)
     list_per_page = getattr(settings, 'DJANGO_ADMIN_PER_PAGE', 20)
 
 
 @admin.register(models.RentFile)
 class RentFileAdmin(admin.ModelAdmin):
     list_display = (
-        'title', 'code', 'source', 'status', 'sub_district', 'deposit_announced', 'deposit_min', 'rent_announced', 'rent_min',
-        'convertable', 'room', 'area', 'age', 'document', 'level', 'parking', 'elevator', 'warehouse', 'has_images', 'has_video',
-        'datetime_created', 'datetime_expired')
+        'title', 'created_by', 'code', 'source', 'status', 'sub_district', 'deposit_announced', 'rent_announced',
+        'convertable', 'room', 'area', 'age', 'datetime_created')
     ordering = ('-datetime_created',)
     list_filter = ('status', 'sub_district',)
-    readonly_fields = ('code', 'datetime_created', 'datetime_expired',)
+    readonly_fields = ('code', 'datetime_created',)
     list_per_page = getattr(settings, 'DJANGO_ADMIN_PER_PAGE', 20)
 
 
 # --------------------------------- PPL ---------------------------------
 @admin.register(models.Buyer)
 class BuyerAdmin(admin.ModelAdmin):
-    list_display = ('name', 'phone_number', 'code', 'province', 'city', 'district', 'budget_announced', 'budget_status',
-                    'datetime_created')
+    list_display = ('name', 'created_by', 'phone_number', 'code', 'budget_announced', 'datetime_created')
     ordering = ('-datetime_created',)
     readonly_fields = ('code', 'datetime_created',)
     filter_horizontal = ('sub_districts',)
@@ -102,8 +99,7 @@ class BuyerAdmin(admin.ModelAdmin):
 
 @admin.register(models.Renter)
 class RenterAdmin(admin.ModelAdmin):
-    list_display = ('name', 'phone_number', 'code', 'province', 'city', 'district', 'deposit_announced',  'rent_announced',
-                    'budget_status', 'convertable', 'datetime_created')
+    list_display = ('name', 'created_by', 'phone_number', 'code', 'deposit_announced', 'rent_announced', 'datetime_created')
     ordering = ('-datetime_created',)
     readonly_fields = ('code', 'datetime_created',)
     filter_horizontal = ('sub_districts',)
@@ -167,5 +163,6 @@ class MarkAdmin(admin.ModelAdmin):
     list_filter = ['type', 'agent']
     readonly_fields = ('code', 'datetime_created',)
     list_per_page = getattr(settings, 'DJANGO_ADMIN_PER_PAGE', 20)
+
 
 
