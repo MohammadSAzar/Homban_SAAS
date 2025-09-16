@@ -805,7 +805,7 @@ class VisitCreateForm(forms.ModelForm):
         super(VisitCreateForm, self).__init__(*args, **kwargs)
 
         self.fields['date'] = forms.ChoiceField(
-            choices=models.next_week_shamsi(),
+            choices=models.last_and_next_week_shamsi(),
             required=True,
             label=self.fields['date'].label,
         )

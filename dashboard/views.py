@@ -1882,7 +1882,7 @@ class SaleFileSearchView(ReadOnlyPermissionMixin, ListView):
 
             if any([min_price, max_price, min_area, max_area]):
                 queryset = models.SaleFile.objects.select_related('province', 'city', 'district', 'sub_district',
-                                                                  'person', 'created_by').all()
+                                                                  'person', 'created_by').all().exclude(delete_request='Yes')
                 if min_price is not None:
                     queryset = queryset.filter(price_announced__gte=min_price)
                 if max_price is not None:
@@ -1920,7 +1920,7 @@ class RentFileSearchView(ReadOnlyPermissionMixin, ListView):
 
             if any([min_deposit, max_deposit, min_rent, max_rent, min_area, max_area]):
                 queryset = models.RentFile.objects.select_related('province', 'city', 'district', 'sub_district',
-                                                                  'person', 'created_by').all()
+                                                                  'person', 'created_by').all().exclude(delete_request='Yes')
                 if min_deposit is not None:
                     queryset = queryset.filter(deposit_announced__gte=min_deposit)
                 if max_deposit is not None:

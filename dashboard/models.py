@@ -52,6 +52,30 @@ def next_week_shamsi():
     return days
 
 
+def last_and_next_week_shamsi():
+    days = []
+    today = datetime.today()
+    for i in range(-7, 8):
+        target_day = today + timedelta(days=i)
+        weekday_en = target_day.strftime('%A')
+        date_str = target_day.strftime('%Y/%m/%d')
+        weekday_fa = {
+            'Monday': 'دوشنبه',
+            'Tuesday': 'سه‌شنبه',
+            'Wednesday': 'چهارشنبه',
+            'Thursday': 'پنج‌شنبه',
+            'Friday': 'جمعه',
+            'Saturday': 'شنبه',
+            'Sunday': 'یکشنبه',
+        }.get(weekday_en, weekday_en)
+        if i == 0:
+            label = f"{weekday_fa} | {date_str} (امروز)"
+        else:
+            label = f"{weekday_fa} | {date_str}"
+        days.append((date_str, label))
+    return days
+
+
 def next_month_shamsi():
     days = []
     today = datetime.today()
