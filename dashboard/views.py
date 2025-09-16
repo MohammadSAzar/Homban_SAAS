@@ -3511,13 +3511,15 @@ def dated_task_list_view(request):
     date = request.GET.get('date')
     tasks = models.Task.objects.filter(agent=user)
     if date:
-        tasks = models.Task.objects.filter(agent=user).filter(deadline=date)
+        if user.title != 'bs':
+            tasks = models.Task.objects.filter(agent=user).filter(deadline=date)
+        else:
+            tasks = models.Task.objects.filter(deadline=date)
     context = {
         'user': user,
         'date': date,
         'tasks': tasks,
     }
-    print(date)
     return render(request, 'dashboard/tasks/dated_task_list.html', context=context)
 
 
