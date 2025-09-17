@@ -85,54 +85,55 @@
                                     {% endif %}
                                 </div>
                             </div>
-                        
-                            <!-- contract_owner -->
-                            <div class="col-lg-3 col-sm-3">
-                                <div class="form-group">
-                                    <div class="form-control-wrap">
-                                        <label class="form-label" for="{{ form.contract_owner.id_for_label }}">نام مالک (در قرارداد)</label>
-                                        {% render_field form.contract_owner id="contract_owner" type="text" class="form-control form-control-xl form-control-outlined" %}
-                                    </div>
-                                    {% if form.contract_owner.errors %}
-                                        {% for error in form.contract_owner.errors %}
-                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
-                                        {% endfor %}
-                                    {% endif %}
-                                </div>
-                            </div>
-                            
-                            <!-- contract_buyer -->
-                            <div class="col-lg-3 col-sm-3">
-                                <div class="form-group">
-                                    <div class="form-control-wrap">
-                                        <label class="form-label" for="{{ form.contract_buyer.id_for_label }}">نام خریدار (در قرارداد)</label>
-                                        {% render_field form.contract_buyer id="contract_buyer" type="text" class="form-control form-control-xl form-control-outlined" %}
-                                    </div>
-                                    {% if form.contract_buyer.errors %}
-                                        {% for error in form.contract_buyer.errors %}
-                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
-                                        {% endfor %}
-                                    {% endif %}
-                                </div>
-                            </div>
 
-                            <!-- contract_renter -->
-                            <div class="col-lg-3 col-sm-3">
-                                <div class="form-group">
-                                    <div class="form-control-wrap">
-                                        <label class="form-label" for="{{ form.contract_renter.id_for_label }}">نام مستاجر (در قرارداد)</label>
-                                        {% render_field form.contract_renter id="contract_renter" type="text" class="form-control form-control-xl form-control-outlined" %}
+                            {% if request.user.title == 'bs' %}
+                                <!-- contract_owner -->
+                                <div class="col-lg-3 col-sm-3">
+                                    <div class="form-group">
+                                        <div class="form-control-wrap">
+                                            <label class="form-label" for="{{ form.contract_owner.id_for_label }}">نام مالک (در قرارداد)</label>
+                                            {% render_field form.contract_owner id="contract_owner" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                        </div>
+                                        {% if form.contract_owner.errors %}
+                                            {% for error in form.contract_owner.errors %}
+                                                <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                            {% endfor %}
+                                        {% endif %}
                                     </div>
-                                    {% if form.contract_renter.errors %}
-                                        {% for error in form.contract_renter.errors %}
-                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
-                                        {% endfor %}
-                                    {% endif %}
                                 </div>
-                            </div>
 
-                            <!-- followup_code -->
-                            <div class="col-lg-3 col-sm-3">
+                                <!-- contract_buyer -->
+                                <div class="col-lg-3 col-sm-3">
+                                    <div class="form-group">
+                                        <div class="form-control-wrap">
+                                            <label class="form-label" for="{{ form.contract_buyer.id_for_label }}">نام خریدار (در قرارداد)</label>
+                                            {% render_field form.contract_buyer id="contract_buyer" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                        </div>
+                                        {% if form.contract_buyer.errors %}
+                                            {% for error in form.contract_buyer.errors %}
+                                                <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <!-- contract_renter -->
+                                <div class="col-lg-3 col-sm-3">
+                                    <div class="form-group">
+                                        <div class="form-control-wrap">
+                                            <label class="form-label" for="{{ form.contract_renter.id_for_label }}">نام مستاجر (در قرارداد)</label>
+                                            {% render_field form.contract_renter id="contract_renter" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                        </div>
+                                        {% if form.contract_renter.errors %}
+                                            {% for error in form.contract_renter.errors %}
+                                                <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <!-- followup_code -->
+                                <div class="col-lg-3 col-sm-3">
                                 <div class="form-group">
                                     <div class="form-control-wrap">
                                         <label class="form-label" for="{{ form.followup_code.id_for_label }}">کد رهگیری</label>
@@ -145,7 +146,54 @@
                                     {% endif %}
                                 </div>
                             </div>
-                        
+                            {% else %}
+                                <!-- contract_owner -->
+                                <div class="col-lg-4 col-sm-4">
+                                    <div class="form-group">
+                                        <div class="form-control-wrap">
+                                            <label class="form-label" for="{{ form.contract_owner.id_for_label }}">نام مالک (در قرارداد)</label>
+                                            {% render_field form.contract_owner id="contract_owner" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                        </div>
+                                        {% if form.contract_owner.errors %}
+                                            {% for error in form.contract_owner.errors %}
+                                                <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <!-- contract_buyer -->
+                                <div class="col-lg-4 col-sm-4">
+                                    <div class="form-group">
+                                        <div class="form-control-wrap">
+                                            <label class="form-label" for="{{ form.contract_buyer.id_for_label }}">نام خریدار (در قرارداد)</label>
+                                            {% render_field form.contract_buyer id="contract_buyer" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                        </div>
+                                        {% if form.contract_buyer.errors %}
+                                            {% for error in form.contract_buyer.errors %}
+                                                <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <!-- contract_renter -->
+                                <div class="col-lg-4 col-sm-4">
+                                    <div class="form-group">
+                                        <div class="form-control-wrap">
+                                            <label class="form-label" for="{{ form.contract_renter.id_for_label }}">نام مستاجر (در قرارداد)</label>
+                                            {% render_field form.contract_renter id="contract_renter" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                        </div>
+                                        {% if form.contract_renter.errors %}
+                                            {% for error in form.contract_renter.errors %}
+                                                <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                            {% endif %}
+
                             <!-- price -->
                             <div class="col-lg-4 col-sm-4">
                                     <div class="form-group">
@@ -220,7 +268,5 @@
     </div>
 
 {% endblock %}
-
-
 
 

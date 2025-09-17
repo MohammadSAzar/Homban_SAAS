@@ -146,7 +146,7 @@
                             <!-- deposit -->
                             <div class="data-item" data-bs-toggle="modal" data-bs-target="#profile-edit">
                                 <div class="data-col">
-                                    <span class="data-label">قیمت:</span>
+                                    <span class="data-label">ودیعه:</span>
                                     {% if trade.deposit %}
                                         <span class="data-value">{{ trade.deposit|price_converter|intcomma:False|farsi_number }} تومان</span>
                                     {% endif %}
@@ -155,7 +155,7 @@
                             <!-- rent -->
                             <div class="data-item" data-bs-toggle="modal" data-bs-target="#profile-edit">
                                 <div class="data-col">
-                                    <span class="data-label">قیمت:</span>
+                                    <span class="data-label">اجاره:</span>
                                     {% if trade.rent %}
                                         <span class="data-value">{{ trade.rent|price_converter|farsi_number }} تومان</span>
                                     {% endif %}

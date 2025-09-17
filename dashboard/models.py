@@ -758,9 +758,9 @@ class Session(models.Model):
 
 
 class Trade(models.Model):
-    session_code = models.CharField(max_length=10, null=True, unique=True, blank=True, verbose_name=_('Session Code'))
+    session_code = models.CharField(max_length=10, null=True, unique=True, blank=True, verbose_name='کد جلسه')
     session = models.ForeignKey(Session, on_delete=models.SET_NULL, null=True, blank=True, related_name='trades',
-                                verbose_name=_('Session'))
+                                verbose_name='جلسه')
     type = models.CharField(max_length=10, choices=choices.types, blank=True, null=True,
                             verbose_name=_('Type of Trade'))
     description = models.TextField(max_length=1000, blank=True, null=True, verbose_name=_('Description'))
@@ -769,15 +769,15 @@ class Trade(models.Model):
     deposit = models.PositiveBigIntegerField(blank=True, null=True, verbose_name=_('Deposit'))
     rent = models.PositiveBigIntegerField(blank=True, null=True, verbose_name=_('Rent'))
     contract_owner = models.CharField(max_length=200, blank=True, null=True,
-                                      verbose_name=_('Contract Owner (Seller / Lessor)'))
+                                      verbose_name='نام فروشنده / موجر (قرارداد)')
     contract_buyer = models.CharField(max_length=200, blank=True, null=True,
-                                      verbose_name=_('Contract Customer (Buyer)'))
+                                      verbose_name='نام خریدار (قرارداد)')
     contract_renter = models.CharField(max_length=200, blank=True, null=True,
-                                       verbose_name=_('Contract Customer (Renter)'))
+                                       verbose_name='نام مستاجر (قرارداد)')
     code = models.CharField(max_length=6, null=True, unique=True, blank=True, verbose_name=_('Code'))
-    followup_code = models.CharField(max_length=20, null=True, unique=True, blank=True, verbose_name=_('Followup Code'))
+    followup_code = models.CharField(max_length=20, null=True, unique=True, blank=True, verbose_name='کد رهگیری')
     followup_code_status = models.CharField(max_length=10, choices=choices.fc_statuses, default='ntk',
-                                            verbose_name=_('Followup Code Status'))
+                                            verbose_name='وضعیت کد رهگیری')
     datetime_created = models.DateTimeField(auto_now_add=True, verbose_name=_('Date and Time of Creation'))
 
     @property
@@ -993,5 +993,6 @@ class Mark(models.Model):
 
     def get_absolute_url(self):
         return reverse('mark_detail', args=[self.pk])
+
 
 

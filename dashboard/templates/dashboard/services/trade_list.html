@@ -34,334 +34,304 @@
         });
     </script>
 
-    <!-- Upper Navbar -->
-    <div class="nk-fmg-body-head d-none d-lg-flex" >
-
-        <!-- Search -->
-        <div class="nk-fmg-search">
-            <em class="icon ni ni-search"></em>
-            <input type="text" class="form-control border-transparent form-focus-none" placeholder="جستجو در میان معاملات"/>
-        </div>
-
-        <!-- Add Link -->
-        <div class="nk-fmg-actions">
-            <ul class="nk-block-tools g-3">
-                <li>
-                    <a href="{% url 'trade_create' %}" class="btn btn-primary"><em class="icon ni ni-plus"></em><span>ایجاد معامله جدید</span></a>
-                </li>
-            </ul>
-        </div>
-
-    </div>
-    <!-- end: Upper Navbar -->
-
     <!-- Main -->
-    <div class="nk-block">
+    <div class="nk-fmg" style="padding-right: 0;!important;">
+        <div class="nk-fmg-body">
+            <div class="nk-fmg-body-content">
 
-        <!-- Upper + Mobile -->
-        <div class="nk-block-head nk-block-head-sm" style="margin-bottom: 1.2em;">
-            <div class="nk-block-between position-relative">
-
-                <!-- Title -->
-                <div class="nk-block-head-content" style="margin-top: 2em;">
-                    <h5 class="nk-block-title page-title">معاملات</h5>
-                </div>
-
-                <!-- Mobile Navbar -->
-                <div class="nk-block-head-content">
-                    <ul class="nk-block-tools g-1">
-
-                        <!-- Search -->
-                        <li class="d-lg-none">
-                            <a href="#" class="btn btn-trigger btn-icon search-toggle toggle-search" data-target="search"><em class="icon ni ni-search"></em></a>
-                        </li>
-
-                    </ul>
-                </div>
-
-                <!-- Mobile Search Box -->
-                <div class="search-wrap px-2 d-lg-none" data-search="search">
-                    <div class="search-content">
-                        <a href="#" class="search-back btn btn-icon toggle-search" data-target="search"><em class="icon ni ni-arrow-left"></em></a>
-                        <input type="text" class="form-control border-transparent form-focus-none" placeholder="جستجو در میان معاملات"/>
-                        <button class="search-submit btn btn-icon">
-                            <em class="icon ni ni-search"></em>
-                        </button>
+                <!-- Add / Filter-->
+                <div class="nk-fmg-body-head  d-none d-lg-flex" >
+                    <div class="nk-fmg-actions">
+                        <ul class="nk-block-tools g-3">
+                            <li>
+                                <a href="{% url 'trade_create' %}" class="btn btn-primary"><em class="icon ni ni-plus"></em><span>ایجاد معامله جدید</span></a>
+                            </li>
+                            <li>
+                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#filterModal">
+                                    <em class="icon ni ni-filter"></em><span>فیلتر معاملات</span>
+                                </button>
+                            </li>
+                        </ul>
                     </div>
                 </div>
+                <!-- end: Add / Filter -->
 
-            </div>
-        </div>
-        <!-- end: Upper + Mobile -->
+                <!-- Add / Filter (Mobile) -->
+                <div class="nk-block-head nk-block-head-sm" style="margin-bottom: 1.2em; margin-top: 1.2em;">
+                    <div class="nk-block-between position-relative">
 
-        <!-- Trades -->
-        <div class="row g-gs">
-        
-            <!-- ّFilter -->
-            <div class="col-lg-2">
-                <div class="card h-100">
-                    <div class="card-inner">
-
-                        <!-- Form -->
-                        <form id="filter-form" method="get" action="{% url 'trade_list' %}" enctype="multipart/form-data">
-                            {% csrf_token %}
-                        
-                            <!-- type -->
-                            <div class="form-group">
-                                <label class="form-label" for="{{ filter_form.type.id_for_label }}">نوع معامله</label>
-                                {% render_field filter_form.type type="text" id="type" class="form-control" %}
-                            </div>
-                            {% if filter_form.type.errors %}
-                                {% for error in filter_form.type.errors %}
-                                    <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
-                                {% endfor %}
-                            {% endif %}
-                        
-                            <!-- followup_code_status -->
-                            <div class="form-group">
-                                <label class="form-label" for="{{ filter_form.followup_code_status.id_for_label }}">کد رهگیری</label>
-                                {% render_field filter_form.followup_code_status type="text" id="followup_code_status" class="form-control" %}
-                            </div>
-                            {% if filter_form.followup_code_status.errors %}
-                                {% for error in filter_form.followup_code_status.errors %}
-                                    <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
-                                {% endfor %}
-                            {% endif %}
-
-                            <!-- button -->
-                            <div class="form-group" style="width: 100%;!important;">
-                                <button type="submit" onclick="submitFormAndRefresh()" class="btn btn-primary justify-center" style="width: 100%;!important;">اعمال</button>
-                                <a href="{% url 'trade_list' %}" class="btn btn-danger justify-center" style="width: 100%;!important; margin-top: 10px;">حذف</a>
-                            </div>
-                        
-                        </form>
-                        <!-- end: Form -->
-
-                        <!-- JS -->
-                        <script>
-                            function submitFormAndRefresh() {
-                                document.getElementById('filter-form').submit();
-                                location.reload();
-                            }
-                        </script>
-                        <!-- end: JS -->
-
-                    </div>
-                </div>
-            </div>
-            <!-- end: Filter -->
-        
-            <!-- List -->
-            <div class="col-lg-10">
-                <div class="row g-gs">
-                    {% for trade in trades %}
-                        <div class="col-sm-6 col-lg-6 col-xxl-6">
-        
-                            {% if trade.followup_code_status == 'tkn' %}
-                                <div class="card h-100" style="background-color: #C8E6C9">
-                                    <div class="card-inner">
-                                        <div class="project">
-        
-                                            <!-- Up -->
-                                            <div class="project-head"  style="margin-bottom: 3em;">
-                                                <div class="project-title">
-                                                    <div class="project-info">
-                                                        <h6 class="title" style="margin-bottom: 0.85em;">معامله در تاریخ: "{{ trade.date }}"</h6>
-                                                        <div style="margin-bottom: 0.6em;">
-                                                            <span style="font-size: 0.9em;">کد معامله: {{ trade.code }}</span>
-                                                        </div>
-                                                        <div style="margin-bottom: 0.6em;">
-                                                            <span style="font-size: 0.9em;">نوع معامله: "{{ trade.get_type_display }}"</span>
-                                                        </div>
-                                                        <div style="margin-bottom: 0.6em;">
-                                                            {% if trade.followup_code %}
-                                                                <span style="font-size: 0.9em;">کد رهگیری: "{{ trade.followup_code }}"</span>
-                                                            {% else %}
-                                                                <span style="font-size: 0.9em;">کد رهگیری: "{{ trade.get_followup_code_status_display }}"</span>
-                                                            {% endif %}
-                                                        </div>
-                                                        <div style="margin-bottom: 0.6em;">
-                                                            <span style="font-size: 0.9em;">مشاور: "{{ trade.session.agent }}"</span>
-                                                        </div>
-                                                        <div style="margin-bottom: 0.6em;">
-                                                            <span style="font-size: 0.9em;">زیرمحله: "{{ trade.session.agent.sub_district }}"</span>
-                                                        </div>
-                                                        <div style="margin-bottom: 0.6em;">
-                                                            <span style="font-size: 0.9em;">کد جلسه مربوطه: {{ trade.session_code }}</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-        
-                                            <!-- File -->
-                                            <div class=" project-head">
-                                                <div class="project-title">
-                                                    <div class="project-info" style="height: 6em;!important; -webkit-line-clamp: 3;!important;">
-                                                        <h6 class="title" style="margin-bottom: 0.7em;">فایل مربوطه:</h6>
-                                                        {% if trade.type == 'sale' %}
-                                                            <a href="{{ trade.sale_file.get_absolute_url }}">
-                                                                <span class="sub-text" style="font-size: 0.85em;">{{ trade.sale_file.title|farsi_number }} | {{ trade.sale_file.code }}</span>
-                                                            </a>
-                                                        {% elif trade.type == 'rent' %}
-                                                            <a href="{{ trade.rent_file.get_absolute_url }}">
-                                                                <span class="sub-text" style="font-size: 0.85em;">{{ trade.rent_file.title|farsi_number }} | {{ trade.rent_file.code }}</span>
-                                                            </a>
-                                                        {% endif %}
-                                                    </div>
-                                                </div>
-                                            </div>
-        
-                                            <!-- Customer -->
-                                            <div class=" project-head">
-                                                <div class="project-title">
-                                                    <div class="project-info" style="height: 6em;!important; -webkit-line-clamp: 3;!important;">
-                                                        <h6 class="title" style="margin-bottom: 0.7em;">مشتری (خریدار/مستاجر) مربوطه:</h6>
-                                                        {% if trade.type == 'sale' %}
-                                                            <a href="{{ trade.buyer.get_absolute_url }}">
-                                                                <span class="sub-text" style="font-size: 0.85em;">{{ trade.buyer.name }} | {{ trade.buyer.code }}</span>
-                                                            </a>
-                                                        {% elif trade.type == 'rent' %}
-                                                            <a href="{{ trade.renter.get_absolute_url }}">
-                                                                <span class="sub-text" style="font-size: 0.85em;">{{ trade.renter.name }} | {{ trade.renter.code }}</span>
-                                                            </a>
-                                                        {% endif %}
-                                                    </div>
-                                                </div>
-                                            </div>
-        
-                                            <!-- Description -->
-                                            <div  class="project-details">
-                                                <h6 class="title" style="margin-bottom: 0.7em;">توضیحات</h6>
-                                                <p style="height: 8em;!important; -webkit-line-clamp: 4;!important;">{{ trade.description|farsi_number|linebreaksbr }}</p>
-                                            </div>
-        
-                                            <!-- Edit - Delete -->
-                                            {% if request.user.title == 'bs' or request.user.sub_district == trade.sale_file.sub_district or request.user.sub_district == trade.rent_file.sub_district %}
-                                                <div class="project-meta">
-                                                    <a href="{% url 'trade_update' trade.pk trade.code %}" class="btn btn-primary justify-center" style="margin-top: 1em;"><em class="icon ni ni-edit"></em><span>تغییر</span></a>
-                                                    <a href="{% url 'trade_detail' trade.pk trade.code %}" class="btn btn-primary justify-center" style="margin-top: 1em;"><em class="icon ni ni-delete"></em><span>مشاهده</span></a>
-                                                </div>
-                                            {% endif %}
-        
-                                            <!-- FC_Code -->
-                                            <div class="project-meta">
-                                                <button class="btn btn-primary justify-center" style="margin-top: 1em; width: 100%"><em class="icon ni ni-edit-alt-fill"></em>کد رهگیری ثبت شده است</button>
-                                            </div>
-        
-                                        </div>
-                                    </div>
-                                </div>
-                            {% elif trade.followup_code_status == 'ntk' %}
-                                <div class="card h-100" style="background-color: #FFCDD2">
-                                    <div class="card-inner">
-                                        <div class="project">
-        
-                                            <!-- Up -->
-                                            <div class="project-head"  style="margin-bottom: 3em;">
-                                                <div class="project-title">
-                                                    <div class="project-info">
-                                                        <h6 class="title" style="margin-bottom: 0.85em;">معامله در تاریخ: "{{ trade.date }}"</h6>
-                                                        <div style="margin-bottom: 0.6em;">
-                                                            <span style="font-size: 0.9em;">کد معامله: {{ trade.code }}</span>
-                                                        </div>
-                                                        <div style="margin-bottom: 0.6em;">
-                                                            <span style="font-size: 0.9em;">نوع معامله: "{{ trade.get_type_display }}"</span>
-                                                        </div>
-                                                        <div style="margin-bottom: 0.6em;">
-                                                            {% if trade.followup_code %}
-                                                                <span style="font-size: 0.9em;">کد رهگیری: "{{ trade.followup_code }}"</span>
-                                                            {% else %}
-                                                                <span style="font-size: 0.9em;">کد رهگیری: "{{ trade.get_followup_code_status_display }}"</span>
-                                                            {% endif %}
-                                                        </div>
-                                                        <div style="margin-bottom: 0.6em;">
-                                                            <span style="font-size: 0.9em;">مشاور: "{{ trade.session.agent }}"</span>
-                                                        </div>
-                                                        <div style="margin-bottom: 0.6em;">
-                                                            <span style="font-size: 0.9em;">زیرمحله: "{{ trade.session.agent.sub_district }}"</span>
-                                                        </div>
-                                                        <div style="margin-bottom: 0.6em;">
-                                                            <span style="font-size: 0.9em;">کد جلسه مربوطه: {{ trade.session_code }}</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-        
-                                            <!-- File -->
-                                            <div class="project-head">
-                                                <div class="project-title">
-                                                    <div class="project-info" style="height: 6em;!important; -webkit-line-clamp: 3;!important;">
-                                                        <h6 class="title" style="margin-bottom: 0.7em;">فایل مربوطه:</h6>
-                                                        {% if trade.type == 'sale' %}
-                                                            <a href="{{ trade.sale_file.get_absolute_url }}">
-                                                                <span class="sub-text" style="font-size: 0.85em;">{{ trade.sale_file.title|farsi_number }} | {{ trade.sale_file.code }}</span>
-                                                            </a>
-                                                        {% elif trade.type == 'rent' %}
-                                                            <a href="{{ trade.rent_file.get_absolute_url }}">
-                                                                <span class="sub-text" style="font-size: 0.85em;">{{ trade.rent_file.title|farsi_number }} | {{ trade.rent_file.code }}</span>
-                                                            </a>
-                                                        {% endif %}
-                                                    </div>
-                                                </div>
-                                            </div>
-        
-                                            <!-- Customer -->
-                                            <div class="project-head">
-                                                <div class="project-title">
-                                                    <div class="project-info" style="height: 6em;!important; -webkit-line-clamp: 3;!important;">
-                                                        <h6 class="title" style="margin-bottom: 0.7em;">مشتری (خریدار/مستاجر) مربوطه:</h6>
-                                                        {% if trade.type == 'sale' %}
-                                                            <a href="{{ trade.buyer.get_absolute_url }}">
-                                                                <span class="sub-text" style="font-size: 0.85em;">{{ trade.buyer.name }} | {{ trade.buyer.code }}</span>
-                                                            </a>
-                                                        {% elif trade.type == 'rent' %}
-                                                            <a href="{{ trade.renter.get_absolute_url }}">
-                                                                <span class="sub-text" style="font-size: 0.85em;">{{ trade.renter.name }} | {{ trade.renter.code }}</span>
-                                                            </a>
-                                                        {% endif %}
-                                                    </div>
-                                                </div>
-                                            </div>
-        
-                                            <!-- Description -->
-                                            <div class="project-details">
-                                                <h6 class="title" style="margin-bottom: 0.7em;">توضیحات</h6>
-                                                <p style="height: 8em;!important; -webkit-line-clamp: 4;!important;">{{ trade.description|farsi_number|linebreaksbr }}</p>
-                                            </div>
-        
-                                            <!-- Edit - Delete -->
-                                            {% if request.user.title == 'bs' or request.user.sub_district == trade.sale_file.sub_district or request.user.sub_district == trade.rent_file.sub_district %}
-                                                <div class="project-meta">
-                                                    <a href="{% url 'trade_update' trade.pk trade.code %}" class="btn btn-primary justify-center" style="margin-top: 1em;"><em class="icon ni ni-edit"></em><span>تغییر</span></a>
-                                                    <a href="{% url 'trade_detail' trade.pk trade.code %}" class="btn btn-primary justify-center" style="margin-top: 1em;"><em class="icon ni ni-delete"></em><span>مشاهده</span></a>
-                                                </div>
-                                            {% endif %}
-        
-                                            <!-- FC_Code -->
-                                            <div class="project-meta">
-                                                <a href="{% url 'trade_code' trade.pk trade.code %}" class="btn btn-primary justify-center" style="margin-top: 1em; width: 100%"><em class="icon ni ni-edit-alt-fill"></em>ثبت کد رهگیری</a>
-                                            </div>
-        
-                                        </div>
-                                    </div>
-                                </div>
-                            {% endif %}
-        
+                        <!-- Title -->
+                        <div class="nk-block-head-content">
+                            <h5 class="nk-block-title page-title">معاملات</h5>
                         </div>
-                    {% endfor %}
+
+                        <!-- Buttons -->
+                        <div class="nk-block-head-content">
+                            <ul class="nk-block-tools g-1">
+                                <li class="d-lg-none">
+                                    <div class="dropdown">
+                                        <a href="{% url 'trade_create' %}" class="btn btn-primary"><em class="icon ni ni-plus"></em></a>
+                                    </div>
+                                </li>
+                                <li class="d-lg-none">
+                                    <div class="dropdown">
+                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#filterModal">
+                                            <em class="icon ni ni-filter"></em>
+                                        </button>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+
+                    </div>
                 </div>
+                <!-- end: Upper + Mobile -->
+
+                <!-- Filter (Modal) -->
+                <div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+
+                            <!-- Upper -->
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="filterModalLabel">فیلتر معاملات</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <!-- end: Upper -->
+
+                            <!-- Form -->
+                            <div class="modal-body">
+                                <div class="card h-100">
+                                    <div class="card-inner">
+                                        <form id="filter-form" method="get" action="{% url 'trade_list' %}" enctype="multipart/form-data">
+                                            {% csrf_token %}
+
+                                            <!-- type -->
+                                            <div class="form-group">
+                                                <label class="form-label" for="{{ filter_form.type.id_for_label }}">نوع معامله</label>
+                                                {% render_field filter_form.type type="text" id="type" class="form-control" %}
+                                            </div>
+                                            {% if filter_form.type.errors %}
+                                                {% for error in filter_form.type.errors %}
+                                                    <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                                {% endfor %}
+                                            {% endif %}
+
+                                            <!-- followup_code_status -->
+                                            <div class="form-group">
+                                                <label class="form-label" for="{{ filter_form.followup_code_status.id_for_label }}">کد رهگیری</label>
+                                                {% render_field filter_form.followup_code_status type="text" id="followup_code_status" class="form-control" %}
+                                            </div>
+                                            {% if filter_form.followup_code_status.errors %}
+                                                {% for error in filter_form.followup_code_status.errors %}
+                                                    <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                                {% endfor %}
+                                            {% endif %}
+
+                                            <!-- button -->
+                                            <div class="form-group" style="width: 100%;!important;">
+                                                <button type="submit" onclick="submitFormAndRefresh()" class="btn btn-primary justify-center" style="width: 100%;!important;">اعمال</button>
+                                                <a href="{% url 'trade_list' %}" class="btn btn-danger justify-center" style="width: 100%;!important; margin-top: 10px;">حذف</a>
+                                            </div>
+
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- end: Form -->
+
+                        </div>
+                    </div>
+                </div>
+                <!-- end: Filter (Modal) -->
+
+                <!-- Filter (JS)-->
+                <script>
+                    function submitFormAndRefresh() {
+                        document.getElementById('filter-form').submit();
+                        location.reload();
+                    }
+                </script>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const province = document.getElementById('province').value;
+                        const city = document.getElementById('city').value;
+
+                        if (province) {
+                            updateCities(province);
+                        }
+                        if (city) {
+                            updateDistricts(city);
+                        }
+                    });
+
+                    function updateCities(provinceId) {
+                        const url = `/get-cities/?province_id=${provinceId}`;
+                        fetch(url)
+                            .then(response => response.json())
+                            .then(data => {
+                                const citySelect = document.getElementById('city');
+                                citySelect.innerHTML = '<option value="">Select City</option>';
+                                data.cities.forEach(city => {
+                                    citySelect.innerHTML += `<option value="${city.id}">${city.name}</option>`;
+                                });
+
+                                const selectedCity = '{{ request.GET.city }}';
+                                if (selectedCity) {
+                                    citySelect.value = selectedCity;
+                                }
+                            });
+                    }
+
+                    function updateDistricts(cityId) {
+                        const url = `/get-districts/?city_id=${cityId}`;
+                        fetch(url)
+                            .then(response => response.json())
+                            .then(data => {
+                                const districtSelect = document.getElementById('district');
+                                districtSelect.innerHTML = '<option value="">Select District</option>';
+                                data.districts.forEach(district => {
+                                    districtSelect.innerHTML += `<option value="${district.id}">${district.name}</option>`;
+                                });
+
+                                const selectedDistrict = '{{ request.GET.district }}';
+                                if (selectedDistrict) {
+                                    districtSelect.value = selectedDistrict;
+                                }
+                            });
+                    }
+
+                    function submitFormAndRefresh() {
+                        document.getElementById('filter-form').submit();
+                        location.reload();
+                    }
+                </script>
+                <!-- end: Filter (JS)-->
+
+                <!-- Trades -->
+                <div class="nk-fmg-quick-list nk-block">
+                    <div class="toggle-expand-content expanded" data-content="quick-access">
+                        <div class="nk-files nk-files-view-grid">
+                            <div class="nk-files-list">
+
+                                <!-- Loop -->
+                                {% for trade in trades %}
+                                    <div class="col-sm-12 col-lg-6 col-xxl-4" style="padding: 5px;">
+                                        <div class="card h-100" style="box-shadow: rgba(0, 0, 0, 0.10) 0 5px 15px;">
+                                            <div class="card-inner">
+                                                <div class="project">
+
+                                                    <!-- Up -->
+                                                    <div class="project-head"  style="margin-bottom: 3em;">
+                                                        <div class="project-title">
+                                                            <div class="project-info">
+                                                                <h6 class="title" style="margin-bottom: 0.85em;">معامله در تاریخ: "{{ trade.date }}"</h6>
+                                                                <div style="margin-bottom: 0.6em;">
+                                                                    <span style="font-size: 0.9em;">کد معامله: {{ trade.code }}</span>
+                                                                </div>
+                                                                <div style="margin-bottom: 0.6em;">
+                                                                    <span style="font-size: 0.9em;">نوع معامله: "{{ trade.get_type_display }}"</span>
+                                                                </div>
+                                                                <div style="margin-bottom: 0.6em;">
+                                                                    {% if trade.followup_code_status == 'tkn' %}
+                                                                        <span style="font-size: 0.9em; color: #00A65C">کد رهگیری: "{{ trade.followup_code }}"</span>
+                                                                    {% else %}
+                                                                        <span style="font-size: 0.9em; color: #F44336">کد رهگیری: "{{ trade.get_followup_code_status_display }}"</span>
+                                                                    {% endif %}
+                                                                </div>
+                                                                <div style="margin-bottom: 0.6em;">
+                                                                    <span style="font-size: 0.9em;">مشاور: "{{ trade.session.agent }}"</span>
+                                                                </div>
+                                                                <div style="margin-bottom: 0.6em;">
+                                                                    <span style="font-size: 0.9em;">زیرمحله: "{{ trade.session.agent.sub_district }}"</span>
+                                                                </div>
+                                                                <div style="margin-bottom: 0.6em;">
+                                                                    <span style="font-size: 0.9em;">کد جلسه مربوطه: {{ trade.session_code }}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- File -->
+                                                    <div class=" project-head">
+                                                        <div class="project-title">
+                                                            <div class="project-info" style="height: 6em;!important; -webkit-line-clamp: 3;!important;">
+                                                                <h6 class="title" style="margin-bottom: 0.7em;">فایل مربوطه:</h6>
+                                                                {% if trade.type == 'sale' %}
+                                                                    <a href="{{ trade.sale_file.get_absolute_url }}">
+                                                                        <span class="sub-text" style="font-size: 0.85em;">{{ trade.sale_file.title|farsi_number }} | {{ trade.sale_file.code }}</span>
+                                                                    </a>
+                                                                {% elif trade.type == 'rent' %}
+                                                                    <a href="{{ trade.rent_file.get_absolute_url }}">
+                                                                        <span class="sub-text" style="font-size: 0.85em;">{{ trade.rent_file.title|farsi_number }} | {{ trade.rent_file.code }}</span>
+                                                                    </a>
+                                                                {% endif %}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Customer -->
+                                                    <div class=" project-head">
+                                                        <div class="project-title">
+                                                            <div class="project-info" style="height: 6em;!important; -webkit-line-clamp: 3;!important;">
+                                                                <h6 class="title" style="margin-bottom: 0.7em;">مشتری (خریدار/مستاجر) مربوطه:</h6>
+                                                                {% if trade.type == 'sale' %}
+                                                                    <a href="{{ trade.buyer.get_absolute_url }}">
+                                                                        <span class="sub-text" style="font-size: 0.85em;">{{ trade.buyer.name }} | {{ trade.buyer.code }}</span>
+                                                                    </a>
+                                                                {% elif trade.type == 'rent' %}
+                                                                    <a href="{{ trade.renter.get_absolute_url }}">
+                                                                        <span class="sub-text" style="font-size: 0.85em;">{{ trade.renter.name }} | {{ trade.renter.code }}</span>
+                                                                    </a>
+                                                                {% endif %}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Description -->
+                                                    <div  class="project-details">
+                                                        <h6 class="title" style="margin-bottom: 0.7em;">توضیحات</h6>
+                                                        <p style="height: 8em;!important; -webkit-line-clamp: 4;!important;">{{ trade.description|farsi_number|linebreaksbr }}</p>
+                                                    </div>
+
+                                                    <!-- Edit - Delete -->
+                                                    {% if request.user.title == 'bs' or request.user.sub_district == trade.sale_file.sub_district or request.user.sub_district == trade.rent_file.sub_district %}
+                                                        <div class="project-meta">
+                                                            <a href="{% url 'trade_update' trade.pk trade.code %}" class="btn btn-primary justify-center" style="margin-top: 1em;"><em class="icon ni ni-edit"></em><span>تغییر</span></a>
+                                                            <a href="{% url 'trade_detail' trade.pk trade.code %}" class="btn btn-primary justify-center" style="margin-top: 1em;"><em class="icon ni ni-delete"></em><span>مشاهده</span></a>
+                                                        </div>
+                                                    {% endif %}
+
+                                                    <!-- FC_Code -->
+                                                    <div class="project-meta">
+                                                        {% if trade.followup_code_status == 'tkn' %}
+                                                            <button class="btn btn-primary justify-center" style="margin-top: 1em; width: 100%"><em class="icon ni ni-edit-alt-fill"></em>کد رهگیری ثبت شده است</button>
+                                                        {% else %}
+                                                            <a href="{% url 'trade_code' trade.pk trade.code %}" target="_blank" class="btn btn-primary justify-center" style="margin-top: 1em; width: 100%"><em class="icon ni ni-edit-alt-fill"></em>ثبت کد رهگیری</a>
+                                                        {% endif %}
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                                <!-- end: Loop -->
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- end: Trades -->
+
+                <!-- Pagination -->
+                {% pagination page_obj request 'trade_list' %}
+                <!-- end: Pagination -->
+
             </div>
-            <!-- end: List -->
-        
         </div>
-        <!-- end: Trades -->
-    
     </div>
     <!-- end: Main -->
-    
-    <!-- Pagination -->
-    {% pagination page_obj request 'trade_list' %}
-    <!-- end: Pagination -->
 
 {% endblock %}
 

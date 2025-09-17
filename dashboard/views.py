@@ -3302,13 +3302,6 @@ class TradeCreateView(PermissionRequiredMixin, CreateView):
         kwargs['user'] = self.request.user
         return kwargs
 
-    def post(self, request, *args, **kwargs):
-        form = self.get_form()
-        if form.is_valid():
-            return self.form_valid(form)
-        else:
-            return self.form_invalid(form)
-
     def form_valid(self, form):
         messages.success(self.request, "نشست جدید در سامانه ثبت شد.")
         return super().form_valid(form)
@@ -3360,6 +3353,9 @@ class TradeCodeView(PermissionRequiredMixin, UpdateView):
     permission_action = 'update'
 
     def form_valid(self, form):
+        trade = form.save(commit=False)
+        trade.followup_code_status = 'tkn'
+        trade.save()
         messages.success(self.request, "تغییرات شما در سامانه ثبت شد (و توسط مدیر مشاهده خواهد شد).")
         return super().form_valid(form)
 
