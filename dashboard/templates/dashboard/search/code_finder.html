@@ -1,0 +1,490 @@
+{% extends '_base_dashboard.html' %}
+
+{% load static %}
+{% load i18n %}
+{% load jalali_tags %}
+{% load jalali_date_converter %}
+{% load number_converter %}
+{% load price_converter %}
+{% load humanize %}
+{% load widget_tweaks %}
+{% load pagination %}
+
+
+{% block title %}
+    جستجو با کد
+{% endblock %}
+
+
+{% block content %}
+
+    <!-- Main -->
+    <div class="nk-fmg" style="padding-right: 0;!important;">
+        <div class="nk-fmg-body">
+            <div class="nk-fmg-body-content">
+            
+                <!-- Title -->
+                <div class="nk-block-head-content" style="margin-bottom: 1em;">
+                    <h5 class="nk-block-title page-title">جستجو با کد</h5>
+                </div>
+
+                <!-- Form-->
+                <div class="nk-block">
+                    <div class="nk-fmg-actions">
+                        <div class="modal-body">
+                            <div class="card h-100">
+                                <div class="card-inner">
+                                    <form id="search-form" class="row gy-4" method="get" enctype="multipart/form-data" novalidate>
+                                        {% csrf_token %}
+
+                                        <!-- type -->
+                                        <div class="col-lg-6 col-sm-6">
+                                            <div class="form-group">
+                                                <div class="form-control-wrap">
+                                                    <label class="form-label" for="{{ form.type.id_for_label }}">نوع آیتم</label>
+                                                    {% render_field form.type id="type" class="form-control form-control-xl form-control-outlined" %}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- code -->
+                                        <div class="col-lg-6 col-sm-6">
+                                            <div class="form-group">
+                                                <div class="form-control-wrap">
+                                                    <label class="form-label" for="{{ form.code.id_for_label }}">کد آیتم</label>
+                                                    {% render_field form.code id="code" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- button -->
+                                        <div class="form-group align-center" style="margin-top: 3em;">
+                                            <button type="submit" class="btn btn-primary justify-center" style="width: 49%; margin-left: 2%;">جستجو</button>
+                                            <a href="{% url 'code_finder' %}" class="btn btn-danger justify-center" style="width: 49%;!important;">بازنشانی</a>
+                                        </div>
+
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- end: Form -->
+
+                <!-- JS -->
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const typeField = document.getElementById('type');
+                        const codeField = document.getElementById('code');
+                        const searchForm = document.getElementById('search-form');
+                        const clearButton = document.getElementById('clear-form');
+
+                        // Update placeholder and validation based on selected type
+                        function updateCodeField() {
+                            const selectedType = typeField.value;
+                            const typeLabels = {
+                                'sf': 'فایل فروش',
+                                'rf': 'فایل اجاره',
+                                'by': 'خریدار',
+                                'rt': 'اجاره دهنده'
+                            };
+
+                            if (selectedType) {
+                                const label = typeLabels[selectedType] || 'آیتم';
+                                codeField.placeholder = `کد ${label} را وارد کنید`;
+                                codeField.disabled = false;
+                            } else {
+                                codeField.placeholder = 'ابتدا نوع آیتم را انتخاب کنید';
+                                codeField.disabled = true;
+                                codeField.value = '';
+                            }
+                        }
+
+                        // Validate code input (only digits, max 10 characters)
+                        function validateCodeInput(event) {
+                            const value = event.target.value;
+                            const cleanValue = value.replace(/[^0-9]/g, '').substring(0, 10);
+
+                            if (value !== cleanValue) {
+                                event.target.value = cleanValue;
+                            }
+                        }
+
+                        // Form validation before submission
+                        function validateForm(event) {
+                            const type = typeField.value;
+                            const code = codeField.value;
+
+                            if (!type) {
+                                event.preventDefault();
+                                alert('لطفا نوع آیتم را انتخاب کنید.');
+                                typeField.focus();
+                                return false;
+                            }
+
+                            if (!code) {
+                                event.preventDefault();
+                                alert('لطفا کد آیتم را وارد کنید.');
+                                codeField.focus();
+                                return false;
+                            }
+
+                            if (!/^[0-9]+$/.test(code)) {
+                                event.preventDefault();
+                                alert('کد فقط می‌تواند شامل اعداد باشد.');
+                                codeField.focus();
+                                codeField.select();
+                                return false;
+                            }
+
+                            return true;
+                        }
+
+                        // Clear form function
+                        function clearForm() {
+                            typeField.value = '';
+                            codeField.value = '';
+                            updateCodeField();
+
+                            // Remove any existing messages
+                            const messages = document.querySelectorAll('.alert');
+                            messages.forEach(msg => msg.remove());
+
+                            // Hide results if visible
+                            const resultsSection = document.querySelector('.nk-block.mt-4');
+                            if (resultsSection) {
+                                resultsSection.style.display = 'none';
+                            }
+                        }
+
+                        // Event listeners
+                        typeField.addEventListener('change', updateCodeField);
+                        codeField.addEventListener('input', validateCodeInput);
+                        searchForm.addEventListener('submit', validateForm);
+                        clearButton.addEventListener('click', clearForm);
+
+                        // Initialize form state
+                        updateCodeField();
+
+                        // Auto-focus on code field when type is selected
+                        typeField.addEventListener('change', function() {
+                            if (this.value) {
+                                setTimeout(() => codeField.focus(), 100);
+                            }
+                        });
+
+                        // Allow Enter key to submit form when code field is focused
+                        codeField.addEventListener('keypress', function(event) {
+                            if (event.key === 'Enter' && this.value.trim() !== '') {
+                                searchForm.submit();
+                            }
+                        });
+
+                        // Real-time search feedback (optional)
+                        let searchTimeout;
+                        codeField.addEventListener('input', function() {
+                            clearTimeout(searchTimeout);
+
+                            if (this.value.trim() !== '' && typeField.value) {
+                                // Add a subtle visual indication that search is ready
+                                this.style.borderColor = '#28a745';
+                            } else {
+                                this.style.borderColor = '';
+                            }
+                        });
+                    });
+                </script>
+                <!-- end: JS -->
+
+                <!-- Items -->
+                <div class="nk-fmg-quick-list nk-block">
+                    <div class="toggle-expand-content expanded" data-content="quick-access">
+                        <div class="nk-files nk-files-view-grid">
+                            <div class="nk-files-list align-center center">
+
+                                {% if search_performed %}
+                                    {% if results %}
+                                        {% if result_type == 'sale_file' or result_type == 'rent_file' %}
+                            
+                                            <!-- Loop -->
+                                            {% for result in results %}
+                                                {% if result.status == 'acc' %}
+                                                    <div class="nk-file-item nk-file">
+                                                        <div class="nk-file-info">
+                                                            <div class="nk-file-title">
+
+                                                                <!-- Code -->
+                                                                <div class="nk-file-name">
+                                                                    <div class="nk-file-name-text" style="margin-bottom: 0.5em; height: 2em;!important; -webkit-line-clamp: 2;!important; font-size: 0.9em;">
+                                                                        <button style="border: none; background-color:transparent; margin-top: 0.8em; line-height: 10px; border-bottom: solid 1px #00a65c; color: #00a65c" onclick="copyCode(this)">
+                                                                           {{ result.code }}
+                                                                        </button>
+                                                                        <span class="feedback" id="feedback-{{ result.code }}" style="display: none; color: #00a65c">شد!</span>
+                                                                    </div>
+                                                                </div>
+                                                                <!-- Code (JS) -->
+                                                                <script>
+                                                                    function copyCode(element) {
+                                                                        // Get the code from the button's text content instead of parameter
+                                                                        const code = element.textContent.trim();
+
+                                                                        // Create a temporary input element to hold the text
+                                                                        const tempInput = document.createElement("input");
+                                                                        tempInput.value = code;
+                                                                        document.body.appendChild(tempInput);
+
+                                                                        // Select and copy the text
+                                                                        tempInput.select();
+                                                                        document.execCommand("copy");
+
+                                                                        // Remove the temporary input
+                                                                        document.body.removeChild(tempInput);
+
+                                                                        // Show feedback message
+                                                                        const feedback = document.getElementById(`feedback-${code}`);
+                                                                        feedback.style.display = 'inline';
+
+                                                                        // Hide feedback after 3 seconds
+                                                                        setTimeout(() => {
+                                                                            feedback.style.display = 'none';
+                                                                        }, 3000);
+                                                                    }
+                                                                </script>
+
+                                                                <!-- Agent -->
+                                                                <div class="nk-file-name">
+                                                                    <div class="nk-file-name-text" style="margin-bottom: 0.5em; height: 2em;!important; -webkit-line-clamp: 2;!important; font-size: 0.9em;">
+                                                                        {% if result.created_by.name_family %}
+                                                                            مشاور: {{ result.created_by.name_family }}
+                                                                        {% else %}
+                                                                            مشاور: {{ result.created_by }}
+                                                                        {% endif %}
+                                                                    </div>
+                                                                </div>
+
+                                                                <!-- Sub-district -->
+                                                                <div class="nk-file-name">
+                                                                    <div class="nk-file-name-text" style="margin-bottom: 0.5em; height: 3em;!important; -webkit-line-clamp: 2;!important;">
+                                                                        <span style="color: #00a65c; font-size: 1em;">{{ result.sub_district }}</span>
+                                                                    </div>
+                                                                </div>
+
+                                                                <!-- Date -->
+                                                                <div class="nk-file-name">
+                                                                    <div class="nk-file-name-text">
+                                                                        <span style="font-size: 0.8em;">{{ result.datetime_created|jalali_date_converter }}</span>
+                                                                    </div>
+                                                                </div>
+
+                                                                <!-- Cover -->
+                                                                {% if request.user.title == 'bs' or request.user.sub_district == result.sub_district %}
+                                                                    <a href="{{ result.get_absolute_url }}" class="nk-file-link">
+                                                                        <div class="nk-file-icon">
+                                                                            <figure class="product-image--holder" style="height: 12.3em;!important; -webkit-line-clamp: 12.3;!important;">
+                                                                                {% if result.image1 %}
+                                                                                    <img src="{{ result.image1.url }}" alt="File Cover" style="height: 12.3em;!important; -webkit-line-clamp: 12.3;!important;">
+                                                                                {% else %}
+                                                                                    <img src="{% static 'dashboard/images/blank_file.jpg' %}" alt="File Cover" style="height: 12.3em;!important; -webkit-line-clamp: 12.3;!important;">
+                                                                                {% endif %}
+                                                                            </figure>
+                                                                        </div>
+                                                                    </a>
+                                                                {% else %}
+                                                                     <div class="nk-file-link">
+                                                                        <div class="nk-file-icon">
+                                                                            <figure class="product-image--holder" style="height: 12.3em;!important; -webkit-line-clamp: 12.3;!important;">
+                                                                                {% if result.image1 %}
+                                                                                    <img src="{{ result.image1.url }}" alt="File Cover" style="height: 12.3em;!important; -webkit-line-clamp: 12.3;!important;">
+                                                                                {% else %}
+                                                                                    <img src="{% static 'dashboard/images/blank_file.jpg' %}" alt="File Cover" style="height: 12.3em;!important; -webkit-line-clamp: 12.3;!important;">
+                                                                                {% endif %}
+                                                                            </figure>
+                                                                        </div>
+                                                                     </div>
+                                                                {% endif %}
+
+                                                                <!-- Title -->
+                                                                <div class="nk-file-name">
+                                                                    <div class="nk-file-name-text" style="height: 4em;!important; -webkit-line-clamp: 2;!important;">
+                                                                        <span class="title" style="font-size: 0.9em;">{{ result.title|linebreaksbr|farsi_number }}</span>
+                                                                    </div>
+                                                                </div>
+
+                                                                <!-- Price -->
+                                                                {% if result_type == 'sale_file' %}
+                                                                    <div class="nk-file-name">
+                                                                        <span class="title" style="font-size: 0.8em; color: green;">قیمت: {{ result.price_announced|price_converter|intcomma:False|farsi_number }} تومان</span>
+                                                                    </div>
+                                                                {% elif result_type == 'rent_file' %}
+                                                                    <div class="nk-file-name">
+                                                                        <span class="title" style="font-size: 0.8em; color: green;">ودیعه: {{ result.deposit_announced|price_converter|intcomma:False|farsi_number }} تومان</span>
+                                                                    </div>
+                                                                    <div class="nk-file-name">
+                                                                        <span class="title" style="font-size: 0.8em; color: green;">رهن: {{ result.rent_announced|price_converter|intcomma:False|farsi_number }} تومان</span>
+                                                                    </div>
+                                                                {% endif %}
+
+                                                                <!-- More -->
+                                                                {% if request.user.title == 'bs' or request.user.sub_district == result.sub_district %}
+                                                                    <a href="{{ result.get_absolute_url }}" class="btn btn-primary" style="margin-top: 1em;"><em class="icon ni ni-eye"></em><span>مشاهده</span></a>
+                                                                {% endif %}
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {% endif %}
+                                            {% endfor %}
+                                            <!-- end: Loop -->
+
+                                        {% elif result_type == 'buyer' or result_type == 'renter' %}
+
+                                            <!-- Loop -->
+                                            {% for result in results %}
+                                                {% if result.status == 'acc' %}
+                                                    <div class="col-sm-12 col-lg-6 col-xxl-6" style="padding: 5px;">
+                                                        <div class="card h-100" style="box-shadow: rgba(0, 0, 0, 0.10) 0 5px 15px;">
+                                                            <div class="card-inner">
+                                                                <div class="project">
+
+                                                                    <!-- Name & Code-->
+                                                                    <div class="project-head">
+                                                                        <div class="project-title">
+                                                                            <div class="project-info">
+                                                                                <h5 class="title" style="font-size: 1.1em;">{{ result.name }} |
+                                                                                    <!-- Code -->
+                                                                                    <button style="border: none; background-color:transparent; margin-top: 0.8em; line-height: 10px; border-bottom: solid 1px #00a65c; color: #00a65c" onclick="copyCode(this)">
+                                                                                       {{ result.code }}
+                                                                                    </button>
+                                                                                    <span class="feedback" id="feedback-{{ result.code }}" style="display: none; color: #00a65c">شد!</span>
+                                                                                    <!-- Code (JS) -->
+                                                                                    <script>
+                                                                                        function copyCode(element) {
+                                                                                            // Get the code from the button's text content instead of parameter
+                                                                                            const code = element.textContent.trim();
+
+                                                                                            // Create a temporary input element to hold the text
+                                                                                            const tempInput = document.createElement("input");
+                                                                                            tempInput.value = code;
+                                                                                            document.body.appendChild(tempInput);
+
+                                                                                            // Select and copy the text
+                                                                                            tempInput.select();
+                                                                                            document.execCommand("copy");
+
+                                                                                            // Remove the temporary input
+                                                                                            document.body.removeChild(tempInput);
+
+                                                                                            // Show feedback message
+                                                                                            const feedback = document.getElementById(`feedback-${code}`);
+                                                                                            feedback.style.display = 'inline';
+
+                                                                                            // Hide feedback after 3 seconds
+                                                                                            setTimeout(() => {
+                                                                                                feedback.style.display = 'none';
+                                                                                            }, 3000);
+                                                                                        }
+                                                                                    </script>
+                                                                                    <!-- Duplicated -->
+                                                                                    {% if result.phone_number in duplicate_phone_numbers %}
+                                                                                        <span style="color: red; font-size: 0.6em;">( مستاجر تکراری )</span>
+                                                                                    {% endif %}
+                                                                                </h5>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <!-- Location -->
+                                                                    <div style="height: 4em;!important; -webkit-line-clamp: 2;!important;">
+                                                                        <div class="project-head" style="margin-bottom: 0.5em;!important;">
+                                                                            <div class="project-title">
+                                                                                <div class="project-info">
+                                                                                    <span class="sub-text" style="font-size: 0.9em; line-height: 25px; font-weight: bolder">
+                                                                                        {% if result.created_by.name_family %}
+                                                                                            مشاور: {{ result.created_by.name_family }}
+                                                                                        {% else %}
+                                                                                            مشاور: {{ result.created_by }}
+                                                                                        {% endif %}
+                                                                                    </span>
+                                                                                    <span class="sub-text" style="font-size: 0.75em; line-height: 25px;">
+                                                                                        {% for sub_district in result.sub_districts.all %}
+                                                                                            {{ sub_district.name }} |
+                                                                                        {% empty %}
+                                                                                            <span>هیچ زیرمحله‌ای انتخاب نشده است</span>
+                                                                                        {% endfor %}
+                                                                                    </span>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <!-- Prices -->
+                                                                    {% if result_type == 'renter' %}
+                                                                        <div style="height: 2em;!important; -webkit-line-clamp: 2;!important;">
+                                                                            <div class="project-head">
+                                                                                <div class="project-title">
+                                                                                    <div class="project-info">
+                                                                                        <h6 class="sub-text" style="font-size: 0.9em; line-height: 15px;">ودیعه: {{ result.deposit_announced|price_converter|intcomma:False|farsi_number }} تومان</h6>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div style="height: 2em;!important; -webkit-line-clamp: 2;!important;">
+                                                                            <div class="project-head" style="margin-bottom: 0.5em;!important;">
+                                                                                <div class="project-title">
+                                                                                    <div class="project-info">
+                                                                                        <h6 class="sub-text" style="font-size: 0.9em; line-height: 15px;">اجاره: {{ result.rent_announced|price_converter|intcomma:False|farsi_number }} تومان</h6>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    {% elif result_type == 'buyer' %}
+                                                                        <div style="height: 2em;!important; -webkit-line-clamp: 2;!important;">
+                                                                            <div class="project-head">
+                                                                                <div class="project-title">
+                                                                                    <div class="project-info">
+                                                                                        <h6 class="sub-text" style="font-size: 0.9em; line-height: 15px;">قیمت: {{ result.price_announced|price_converter|intcomma:False|farsi_number }} تومان</h6>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    {% endif %}
+
+                                                                    <!-- More -->
+                                                                    <div class="project-meta" style="float: left;">
+                                                                        {% if request.user.sub_district == result.created_by.sub_district or request.user.title == 'bs' %}
+                                                                            <a href="{{ result.get_absolute_url }}" class="btn btn-primary" style="margin-top: 1em;"><em class="icon ni ni-eye"></em><span>مشاهده</span></a>
+                                                                        {% else %}
+                                                                            <a class="btn btn-gray" style="margin-top: 1em;"><em class="icon ni ni-eye"></em><span>غیر مجاز</span></a>
+                                                                        {% endif %}
+                                                                    </div>
+
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {% endif %}
+                                            {% endfor %}
+                                            <!-- end: Loop -->
+
+                                        {% endif %}
+                                    {% else %}
+                                        <h6 class="nk-block-title" style="margin-top: 5em; font-size: 1.3em">جستجو نتیجه‌ای در پی نداشت!</h6>
+                                    {% endif %}
+                                {% endif %}
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- end: Items -->
+            
+            </div>
+        </div>
+    </div>
+    <!-- end: Main -->
+    
+{% endblock %}
+
+
+
+

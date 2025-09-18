@@ -77,6 +77,7 @@ urlpatterns = [
     path('quick-search/rent_files/', views.RentFileSearchView.as_view(), name='search_rent_files'),
     path('quick-search/customer-buyers/', views.BuyerSearchView.as_view(), name='search_buyers'),
     path('quick-search/customer-renters/', views.RenterSearchView.as_view(), name='search_renters'),
+    path('quick-search/code-finder/', views.CodeFinderView.as_view(), name='code_finder'),
     # marks
     path('marks/sale-files', views.SaleFileMarksListView.as_view(), name='sale_file_marks'),
     path('marks/rent-files', views.RentFileMarksListView.as_view(), name='rent_file_marks'),
@@ -126,6 +127,5 @@ urlpatterns = [
     re_path(r'tasks/boss/approve/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/', views.TaskBossApproveView.as_view(), name='boss_task_approve'),
     re_path(r'tasks/boss/delete/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/', views.TaskBossDeleteView.as_view(), name='boss_task_delete'),
 ]
-
 
 

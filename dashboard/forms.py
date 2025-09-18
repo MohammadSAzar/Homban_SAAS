@@ -759,6 +759,29 @@ class MarkCreateForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
 
+# -------------------------------- Searches --------------------------------
+class CodeFinderForm(forms.Form):
+    type = forms.ChoiceField(
+        choices=choices.code_finder_types,
+        required=True,
+        widget=forms.Select(attrs={
+            'class': 'form-control form-control-xl form-control-outlined',
+            'id': 'type'
+        })
+    )
+
+    code = forms.CharField(
+        max_length=10,
+        required=True,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control form-control-xl form-control-outlined',
+            'id': 'code',
+            'placeholder': 'کد را وارد کنید',
+            'pattern': '[0-9]',
+        })
+    )
+
+
 # --------------------------------- Locations ---------------------------------
 class ProvinceCreateForm(forms.ModelForm):
     class Meta:

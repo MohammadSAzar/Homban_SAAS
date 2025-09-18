@@ -16,7 +16,7 @@ from django.contrib import messages
 from jalali_date import datetime2jalali
 from django.utils import timezone
 
-from . import models, forms, functions
+from . import models, forms, functions, choices
 from .permissions import PermissionRequiredMixin, ReadOnlyPermissionMixin
 
 
@@ -2111,6 +2111,67 @@ class RenterSearchView(ReadOnlyPermissionMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'] = forms.RenterFilterForm(self.request.GET or None)
+        return context
+
+
+class CodeFinderView(ReadOnlyPermissionMixin, ListView):
+    template_name = 'dashboard/search/code_finder.html'
+    context_object_name = 'results'
+    permission_model = 'SaleFile'
+    paginate_by = None
+
+    def get_queryset(self):
+        queryset = None
+        form = forms.CodeFinderForm(self.request.GET)
+        if form.is_valid():
+            search_type = form.cleaned_data.get('type')
+            search_code = form.cleaned_data.get('code')
+
+            if search_type and search_code:
+                model_mapping = {
+                    'sf': models.SaleFile,
+                    'rf': models.RentFile,
+                    'by': models.Buyer,
+                    'rt': models.Renter,
+                }
+
+                target_model = model_mapping.get(search_type)
+                if target_model:
+                    try:
+                        found_object = target_model.objects.get(code=search_code)
+                        queryset = target_model.objects.filter(id=found_object.id)
+                    except target_model.DoesNotExist:
+                        queryset = target_model.objects.none()
+                    except Exception as e:
+                        queryset = target_model.objects.none()
+                else:
+                    queryset = models.SaleFile.objects.none()
+            else:
+                queryset = models.SaleFile.objects.none()
+        else:
+            queryset = models.SaleFile.objects.none()
+            if self.request.GET:
+                messages.error(self.request, 'ورودی نامعتبر است.')
+
+        return queryset or models.SaleFile.objects.none()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = forms.CodeFinderForm(self.request.GET)
+        context['search_performed'] = bool(self.request.GET.get('type') and self.request.GET.get('code'))
+        context['search_type'] = self.request.GET.get('type', '')
+        context['search_code'] = self.request.GET.get('code', '')
+
+        if context['search_performed'] and context['results']:
+            search_type = context['search_type']
+            type_mapping = {
+                'sf': 'sale_file',
+                'rf': 'rent_file',
+                'by': 'buyer',
+                'rt': 'renter',
+            }
+            context['result_type'] = type_mapping.get(search_type, 'unknown')
+
         return context
 
 
