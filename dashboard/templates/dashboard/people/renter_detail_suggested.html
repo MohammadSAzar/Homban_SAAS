@@ -44,18 +44,69 @@
                                     <div class="nk-file-info">
                                         <div class="nk-file-title">
 
-                                            <!-- Code / Sub-district -->
+                                            <!-- Code -->
                                             <div class="nk-file-name">
-                                                <div class="nk-file-name-text" style="margin-bottom: 0.5em; height: 3em;!important; -webkit-line-clamp: 2;!important;">
-                                                    <span style="font-size: 0.8em;">کد: {{ file.code }} / <span style="color: green; font-size: 1.1em;">{{ file.sub_district }}</span></span>
+                                                <div class="nk-file-name-text" style="margin-bottom: 0.5em; height: 2em;!important; -webkit-line-clamp: 2;!important; font-size: 0.9em;">
+                                                    <button style="border: none; background-color:transparent; margin-top: 0.8em; line-height: 10px; border-bottom: solid 1px #00a65c; color: #00a65c" onclick="copyCode(this)">
+                                                       {{ file.code }}
+                                                    </button>
+                                                    <span class="feedback" id="feedback-{{ file.code }}" style="display: none; color: #00a65c">شد!</span>
                                                 </div>
                                             </div>
+                                            <!-- Code (JS) -->
+                                            <script>
+                                                function copyCode(element) {
+                                                    // Get the code from the button's text content instead of parameter
+                                                    const code = element.textContent.trim();
+
+                                                    // Create a temporary input element to hold the text
+                                                    const tempInput = document.createElement("input");
+                                                    tempInput.value = code;
+                                                    document.body.appendChild(tempInput);
+
+                                                    // Select and copy the text
+                                                    tempInput.select();
+                                                    document.execCommand("copy");
+
+                                                    // Remove the temporary input
+                                                    document.body.removeChild(tempInput);
+
+                                                    // Show feedback message
+                                                    const feedback = document.getElementById(`feedback-${code}`);
+                                                    feedback.style.display = 'inline';
+
+                                                    // Hide feedback after 3 seconds
+                                                    setTimeout(() => {
+                                                        feedback.style.display = 'none';
+                                                    }, 3000);
+                                                }
+                                            </script>
+
+                                            <!-- Agent -->
+                                            <div class="nk-file-name">
+                                                <div class="nk-file-name-text" style="margin-bottom: 0.5em; height: 2em;!important; -webkit-line-clamp: 2;!important; font-size: 0.9em;">
+                                                    {% if file.created_by.name_family %}
+                                                        مشاور: {{ file.created_by.name_family }}
+                                                    {% else %}
+                                                        مشاور: {{ file.created_by }}
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+
+                                            <!-- Sub-district -->
+                                            <div class="nk-file-name">
+                                                <div class="nk-file-name-text" style="margin-bottom: 0.5em; height: 3em;!important; -webkit-line-clamp: 2;!important;">
+                                                    <span style="color: #00a65c; font-size: 1em;">{{ file.sub_district }}</span>
+                                                </div>
+                                            </div>
+
+                                            <!-- Date -->
                                             <div class="nk-file-name">
                                                 <div class="nk-file-name-text">
                                                     <span style="font-size: 0.8em;">{{ file.datetime_created|jalali_date_converter }}</span>
                                                 </div>
                                             </div>
-
+                                        
                                             <!-- Cover -->
                                             <a href="{{ file.get_absolute_url }}" class="nk-file-link">
                                                 <div class="nk-file-icon">

@@ -99,6 +99,13 @@
                                                             <div class="project-head" style="margin-bottom: 0.5em;!important;">
                                                                 <div class="project-title">
                                                                     <div class="project-info">
+                                                                        <span class="sub-text" style="font-size: 0.9em; line-height: 25px; font-weight: bolder">
+                                                                            {% if buyer.created_by.name_family %}
+                                                                                مشاور: {{ buyer.created_by.name_family }}
+                                                                            {% else %}
+                                                                                مشاور: {{ buyer.created_by }}
+                                                                            {% endif %}
+                                                                        </span>
                                                                         <span class="sub-text" style="font-size: 0.75em; line-height: 25px;">
                                                                             {% for sub_district in buyer.sub_districts.all %}
                                                                                 {{ sub_district.name }} |

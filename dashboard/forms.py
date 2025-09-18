@@ -537,6 +537,8 @@ class BuyerFilterForm(forms.Form):
     district = forms.ModelChoiceField(queryset=models.District.objects.all(), required=False, label=_('District'))
     min_budget = forms.IntegerField(required=False, label=_('Min Budget'))
     max_budget = forms.IntegerField(required=False, label=_('Max Budget'))
+    min_area = forms.IntegerField(required=False, label=_('Min Area'))
+    max_area = forms.IntegerField(required=False, label=_('Max Area'))
     budget_status = forms.ChoiceField(choices=[('', '---------')] + choices.budgets, required=False, label=_('Budget Status'))
     document = forms.ChoiceField(choices=[('', '---------')] + choices.booleans, required=False, label=_('Document'))
     parking = forms.ChoiceField(choices=[('', '---------')] + choices.booleans, required=False, label=_('Parking'))
@@ -547,12 +549,20 @@ class BuyerFilterForm(forms.Form):
         cleaned_data = super().clean()
         min_budget = cleaned_data.get('min_budget')
         max_budget = cleaned_data.get('max_budget')
+        min_area = cleaned_data.get('min_area')
+        max_area = cleaned_data.get('max_area')
 
         if min_budget and not checkers.file_price_checker(min_budget):
             self.add_error('min_budget', 'بودجه مشتری باید بین 1 تا 1000 میلیارد تومان باشد')
 
         if max_budget and not checkers.file_price_checker(max_budget):
             self.add_error('max_budget', 'بودجه مشتری باید بین 1 تا 1000 میلیارد تومان باشد')
+
+        if min_area and not checkers.area_checker(min_area):
+            self.add_error('min_area', 'متراژ فایل باید بین 20 تا 10000 متر باشد.')
+
+        if max_area and not checkers.area_checker(max_area):
+            self.add_error('max_area', 'متراژ فایل باید بین 20 تا 10000 متر باشد.')
 
         return cleaned_data
 
@@ -663,6 +673,8 @@ class RenterFilterForm(forms.Form):
     max_deposit = forms.IntegerField(required=False, label=_('Max Deposit'))
     min_rent = forms.IntegerField(required=False, label=_('Min Rent'))
     max_rent = forms.IntegerField(required=False, label=_('Max Rent'))
+    min_area = forms.IntegerField(required=False, label=_('Min Area'))
+    max_area = forms.IntegerField(required=False, label=_('Max Area'))
     budget_status = forms.ChoiceField(choices=[('', '---------')] + choices.budgets, required=False, label=_('Budget Status'))
     convertable = forms.ChoiceField(choices=[('', '---------')] + choices.beings, required=False, label=_('Convertable'))
     document = forms.ChoiceField(choices=[('', '---------')] + choices.booleans, required=False, label=_('Document'))
@@ -676,6 +688,8 @@ class RenterFilterForm(forms.Form):
         max_deposit = cleaned_data.get('max_deposit')
         min_rent = cleaned_data.get('min_rent')
         max_rent = cleaned_data.get('max_rent')
+        min_area = cleaned_data.get('min_area')
+        max_area = cleaned_data.get('max_area')
 
         if min_deposit and not checkers.rent_file_deposit_price_checker(min_deposit):
             self.add_error('min_deposit', 'بودجه رهن باید بین 0 تا 100 میلیارد تومان باشد')
@@ -688,6 +702,12 @@ class RenterFilterForm(forms.Form):
 
         if max_rent and not checkers.rent_file_rent_price_checker(max_rent):
             self.add_error('max_rent', 'بودجه اجاره باید بین 0 تا 10 میلیارد تومان باشد')
+
+        if min_area and not checkers.area_checker(min_area):
+            self.add_error('min_area', 'متراژ فایل باید بین 20 تا 10000 متر باشد.')
+
+        if max_area and not checkers.area_checker(max_area):
+            self.add_error('max_area', 'متراژ فایل باید بین 20 تا 10000 متر باشد.')
 
         return cleaned_data
 

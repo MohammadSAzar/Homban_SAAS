@@ -1367,6 +1367,12 @@ class BuyerListView(ReadOnlyPermissionMixin, ListView):
                     queryset_filtered = [obj for obj in queryset_filtered if
                                          obj.budget_announced and obj.budget_announced <= form.cleaned_data[
                                              'max_budget']]
+                if form.cleaned_data['min_area']:
+                    queryset_filtered = [obj for obj in queryset_filtered if
+                                         obj.area >= form.cleaned_data['min_area']]
+                if form.cleaned_data['max_area']:
+                    queryset_filtered = [obj for obj in queryset_filtered if
+                                         obj.area <= form.cleaned_data['max_area']]
 
                 return queryset_filtered
             return queryset_default
@@ -1409,6 +1415,12 @@ class BuyerListView(ReadOnlyPermissionMixin, ListView):
                     queryset_filtered = [obj for obj in queryset_filtered if
                                          obj.budget_announced and obj.budget_announced <= form.cleaned_data[
                                              'max_budget']]
+                if form.cleaned_data['min_area']:
+                    queryset_filtered = [obj for obj in queryset_filtered if
+                                         obj.area >= form.cleaned_data['min_area']]
+                if form.cleaned_data['max_area']:
+                    queryset_filtered = [obj for obj in queryset_filtered if
+                                         obj.area <= form.cleaned_data['max_area']]
 
                 return queryset_filtered
             return queryset_default
@@ -1659,6 +1671,12 @@ class RenterListView(ReadOnlyPermissionMixin, ListView):
                 if form.cleaned_data['max_rent']:
                     queryset_filtered = [obj for obj in queryset_filtered if
                                          obj.rent_announced and obj.rent_announced <= form.cleaned_data['max_rent']]
+                if form.cleaned_data['min_area']:
+                    queryset_filtered = [obj for obj in queryset_filtered if
+                                         obj.area >= form.cleaned_data['min_area']]
+                if form.cleaned_data['max_area']:
+                    queryset_filtered = [obj for obj in queryset_filtered if
+                                         obj.area <= form.cleaned_data['max_area']]
 
                 return queryset_filtered
             return queryset_default
@@ -1709,6 +1727,12 @@ class RenterListView(ReadOnlyPermissionMixin, ListView):
                 if form.cleaned_data['max_rent']:
                     queryset_filtered = [obj for obj in queryset_filtered if
                                          obj.rent_announced and obj.rent_announced <= form.cleaned_data['max_rent']]
+                if form.cleaned_data['min_area']:
+                    queryset_filtered = [obj for obj in queryset_filtered if
+                                         obj.area >= form.cleaned_data['min_area']]
+                if form.cleaned_data['max_area']:
+                    queryset_filtered = [obj for obj in queryset_filtered if
+                                         obj.area <= form.cleaned_data['max_area']]
 
                 return queryset_filtered
             return queryset_default
@@ -1998,6 +2022,95 @@ class RentFileSearchView(ReadOnlyPermissionMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'] = forms.RentFileFilterForm(self.request.GET or None)
+        return context
+
+
+class BuyerSearchView(ReadOnlyPermissionMixin, ListView):
+    model = models.Buyer
+    template_name = 'dashboard/search/buyer_search.html'
+    context_object_name = 'buyers'
+    paginate_by = 12
+    permission_model = 'Buyer'
+
+    def get_queryset(self):
+        user = self.request.user
+        queryset = models.Buyer.objects.none()
+
+        form = forms.BuyerFilterForm(self.request.GET or None)
+        if form.is_bound and form.is_valid():
+            min_budget = form.cleaned_data.get('min_budget')
+            max_budget = form.cleaned_data.get('max_budget')
+            min_area = form.cleaned_data.get('min_area')
+            max_area = form.cleaned_data.get('max_area')
+
+            if any([min_budget, max_budget, min_area, max_area]):
+                if user.title != 'cp':
+                    queryset = (models.Buyer.objects.select_related('province', 'city', 'district', 'created_by')
+                                .prefetch_related('sub_districts').all().exclude(delete_request='Yes'))
+                else:
+                    queryset = (models.Buyer.objects.select_related('province', 'city', 'district', 'created_by')
+                                .prefetch_related('sub_districts').filter(created_by=user).all().exclude(delete_request='Yes'))
+                if min_budget is not None:
+                    queryset = queryset.filter(budget_announced__gte=min_budget)
+                if max_budget is not None:
+                    queryset = queryset.filter(budget_announced__lte=max_budget)
+                if min_area is not None:
+                    queryset = queryset.filter(area__gte=min_area)
+                if max_area is not None:
+                    queryset = queryset.filter(area__lte=max_area)
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = forms.BuyerFilterForm(self.request.GET or None)
+        return context
+
+
+class RenterSearchView(ReadOnlyPermissionMixin, ListView):
+    model = models.Renter
+    template_name = 'dashboard/search/renter_search.html'
+    context_object_name = 'renters'
+    paginate_by = 12
+    permission_model = 'Renter'
+
+    def get_queryset(self):
+        user = self.request.user
+        queryset = models.Renter.objects.none()
+
+        form = forms.RenterFilterForm(self.request.GET or None)
+        if form.is_bound and form.is_valid():
+            min_deposit = form.cleaned_data.get('min_deposit')
+            max_deposit = form.cleaned_data.get('max_deposit')
+            min_rent = form.cleaned_data.get('min_rent')
+            max_rent = form.cleaned_data.get('max_rent')
+            min_area = form.cleaned_data.get('min_area')
+            max_area = form.cleaned_data.get('max_area')
+
+            if any([min_deposit, max_deposit, min_rent, max_rent, min_area, max_area]):
+                if user.title != 'cp':
+                    queryset = (models.Renter.objects.select_related('province', 'city', 'district', 'created_by')
+                                .prefetch_related('sub_districts').all().exclude(delete_request='Yes'))
+                else:
+                    queryset = (models.Renter.objects.select_related('province', 'city', 'district', 'created_by')
+                                .prefetch_related('sub_districts').filter(created_by=user).all().exclude(
+                        delete_request='Yes'))
+                if min_deposit is not None:
+                    queryset = queryset.filter(deposit_announced__gte=min_deposit)
+                if max_deposit is not None:
+                    queryset = queryset.filter(deposit_announced__lte=max_deposit)
+                if min_rent is not None:
+                    queryset = queryset.filter(rent_announced__gte=min_rent)
+                if max_rent is not None:
+                    queryset = queryset.filter(rent_announced__lte=max_rent)
+                if min_area is not None:
+                    queryset = queryset.filter(area__gte=min_area)
+                if max_area is not None:
+                    queryset = queryset.filter(area__lte=max_area)
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = forms.RenterFilterForm(self.request.GET or None)
         return context
 
 

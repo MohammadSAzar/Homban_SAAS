@@ -312,7 +312,7 @@
                                     <div class="card-inner">
                                         <div class="row g-gs">
                                             {% for file in suggested_files %}
-                                                <div class="col-lg-4">
+                                                <div class="col-lg-6">
                                                     <div class="card">
                                                         <!-- Code -->
                                                         <div class="card-header border-bottom">
@@ -323,6 +323,11 @@
                                                         <div class="card-inner" style="background-color: #FAFAFA">
                                                             <!-- Info -->
                                                             <p class="card-text" style="color: #00a65c;">{{ file.sub_district }}</p>
+                                                            {% if file.created_by.name_family %}
+                                                                <p class="card-text">مشاور: {{ file.created_by.name_family }}</p>
+                                                            {% else %}
+                                                                <p class="card-text">مشاور: {{ file.created_by }}</p>
+                                                            {% endif %}
                                                             <p class="card-text">رهن: {{ file.deposit_announced|intcomma:False|farsi_number }}</p>
                                                             <p class="card-text">اجاره: {{ file.rent_announced|intcomma:False|farsi_number }}</p>
                                                             <p class="card-text">متراژ: {{ file.area }}</p>

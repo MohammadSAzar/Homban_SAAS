@@ -12,7 +12,7 @@
 
 
 {% block title %}
-    مستاجران پیشنهادی
+    جستجوی سریع خریداران
 {% endblock %}
 
 
@@ -22,26 +22,104 @@
     <div class="nk-fmg" style="padding-right: 0;!important;">
         <div class="nk-fmg-body">
             <div class="nk-fmg-body-content">
-
+            
                 <!-- Title -->
-                <div class="nk-block-head nk-block-head-sm" style="margin-bottom: 1.2em; margin-top: 1.2em;">
-                    <div class="nk-block-between position-relative">
-                        <div class="nk-block-head-content">
-                            <h5 class="nk-block-title" style="font-weight: bolder; font-size: 1.3em;">مستاجران پیشنهادی برای "{{ rent_file.title }}"</h5>
+                <div class="nk-block-head-content" style="margin-bottom: 1em;">
+                    <h5 class="nk-block-title page-title">جستجوی سریع خریداران</h5>
+                </div>
+
+                <!-- Form-->
+                <div class="nk-block" >
+                    <div class="nk-fmg-actions">
+                        <div class="modal-body">
+                            <div class="card h-100">
+                                <div class="card-inner">
+                                    <form id="search-form" class="row gy-4" method="get" action="{% url 'search_buyers' %}" enctype="multipart/form-data">
+                                        {% csrf_token %}
+
+                                        <!-- min_budget -->
+                                        <div class="col-lg-6 col-sm-6">
+                                            <div class="form-group">
+                                                <div class="form-control-wrap">
+                                                    <label class="form-label" for="{{ form.min_budget.id_for_label }}">حداقل بودجه</label>
+                                                    {% render_field form.min_budget id="min_budget" type="number" class="form-control form-control-xl form-control-outlined" %}
+                                                </div>
+                                                {% if form.min_budget.errors %}
+                                                    {% for error in form.min_budget.errors %}
+                                                        <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </div>
+                                        </div>
+
+                                        <!-- max_budget -->
+                                        <div class="col-lg-6 col-sm-6">
+                                            <div class="form-group">
+                                                <div class="form-control-wrap">
+                                                    <label class="form-label" for="{{ form.max_budget.id_for_label }}">حداکثر بودجه</label>
+                                                    {% render_field form.max_budget id="max_budget" type="number" class="form-control form-control-xl form-control-outlined" %}
+                                                </div>
+                                                {% if form.max_budget.errors %}
+                                                    {% for error in form.max_budget.errors %}
+                                                        <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </div>
+                                        </div>
+
+                                        <!-- min_area -->
+                                        <div class="col-lg-6 col-sm-6">
+                                            <div class="form-group">
+                                                <div class="form-control-wrap">
+                                                    <label class="form-label" for="{{ form.min_area.id_for_label }}">حداقل متراژ</label>
+                                                    {% render_field form.min_area id="min_area" type="number" class="form-control form-control-xl form-control-outlined" %}
+                                                </div>
+                                                {% if form.min_area.errors %}
+                                                    {% for error in form.min_area.errors %}
+                                                        <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </div>
+                                        </div>
+
+                                        <!-- max_area -->
+                                        <div class="col-lg-6 col-sm-6">
+                                            <div class="form-group">
+                                                <div class="form-control-wrap">
+                                                    <label class="form-label" for="{{ form.max_area.id_for_label }}">حداکثر متراژ</label>
+                                                    {% render_field form.max_area id="max_area" type="number" class="form-control form-control-xl form-control-outlined" %}
+                                                </div>
+                                                {% if form.max_area.errors %}
+                                                    {% for error in form.max_area.errors %}
+                                                        <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </div>
+                                        </div>
+
+                                        <!-- button -->
+                                        <div class="form-group align-center">
+                                            <button type="submit" onclick="submitFormAndRefresh()" class="btn btn-primary justify-center" style="width: 49%;!important; margin-left: 2%;">جستجو</button>
+                                            <a href="{% url 'search_buyers' %}" class="btn btn-danger justify-center" style="width: 49%;!important;">بازنشانی</a>
+                                        </div>
+
+                                    </form>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <!-- end: Title -->
+                <!-- end: Form -->
 
-                <!-- Renters -->
+                <!-- Buyers -->
                 <div class="nk-fmg-quick-list nk-block">
                     <div class="toggle-expand-content expanded" data-content="quick-access">
                         <div class="nk-files nk-files-view-grid">
                             <div class="nk-files-list">
-
+                            
                                 <!-- Loop -->
-                                {% for renter in suggested_renters %}
-                                    {% if renter.status == 'acc' %}
+                                {% for buyer in buyers %}
+                                    {% if buyer.status == 'acc' %}
                                         <div class="col-sm-12 col-lg-6 col-xxl-6" style="padding: 5px;">
                                             <div class="card h-100" style="box-shadow: rgba(0, 0, 0, 0.10) 0 5px 15px;">
                                                 <div class="card-inner">
@@ -51,12 +129,12 @@
                                                         <div class="project-head">
                                                             <div class="project-title">
                                                                 <div class="project-info">
-                                                                    <h5 class="title" style="font-size: 1.1em;">{{ renter.name }} |
+                                                                    <h5 class="title" style="font-size: 1.1em;">{{ buyer.name }} |
                                                                         <!-- Code -->
                                                                         <button style="border: none; background-color:transparent; margin-top: 0.8em; line-height: 10px; border-bottom: solid 1px #00a65c; color: #00a65c" onclick="copyCode(this)">
-                                                                           {{ renter.code }}
+                                                                           {{ buyer.code }}
                                                                         </button>
-                                                                        <span class="feedback" id="feedback-{{ renter.code }}" style="display: none; color: #00a65c">شد!</span>
+                                                                        <span class="feedback" id="feedback-{{ buyer.code }}" style="display: none; color: #00a65c">شد!</span>
                                                                         <!-- Code (JS) -->
                                                                         <script>
                                                                             function copyCode(element) {
@@ -86,8 +164,8 @@
                                                                             }
                                                                         </script>
                                                                         <!-- Duplicated -->
-                                                                        {% if renter.phone_number in duplicate_phone_numbers %}
-                                                                            <span style="color: red; font-size: 0.6em;">( مستاجر تکراری )</span>
+                                                                        {% if buyer.phone_number in duplicate_phone_numbers %}
+                                                                            <span style="color: red; font-size: 0.6em;">( خریدار تکراری )</span>
                                                                         {% endif %}
                                                                     </h5>
                                                                 </div>
@@ -100,14 +178,14 @@
                                                                 <div class="project-title">
                                                                     <div class="project-info">
                                                                         <span class="sub-text" style="font-size: 0.9em; line-height: 25px; font-weight: bolder">
-                                                                            {% if renter.created_by.name_family %}
-                                                                                مشاور: {{ renter.created_by.name_family }}
+                                                                            {% if buyer.created_by.name_family %}
+                                                                                مشاور: {{ buyer.created_by.name_family }}
                                                                             {% else %}
-                                                                                مشاور: {{ renter.created_by }}
+                                                                                مشاور: {{ buyer.created_by }}
                                                                             {% endif %}
                                                                         </span>
                                                                         <span class="sub-text" style="font-size: 0.75em; line-height: 25px;">
-                                                                            {% for sub_district in renter.sub_districts.all %}
+                                                                            {% for sub_district in buyer.sub_districts.all %}
                                                                                 {{ sub_district.name }} |
                                                                             {% empty %}
                                                                                 <span>هیچ زیرمحله‌ای انتخاب نشده است</span>
@@ -118,21 +196,12 @@
                                                             </div>
                                                         </div>
 
-                                                        <!-- Prices -->
-                                                        <div style="height: 2em;!important; -webkit-line-clamp: 2;!important;">
-                                                            <div class="project-head">
-                                                                <div class="project-title">
-                                                                    <div class="project-info">
-                                                                        <h6 class="sub-text" style="font-size: 0.9em; line-height: 15px;">ودیعه: {{ renter.deposit_announced|price_converter|intcomma:False|farsi_number }} تومان</h6>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div style="height: 2em;!important; -webkit-line-clamp: 2;!important;">
+                                                        <!-- Info -->
+                                                        <div style="height: 4em;!important; -webkit-line-clamp: 2;!important;">
                                                             <div class="project-head" style="margin-bottom: 0.5em;!important;">
                                                                 <div class="project-title">
                                                                     <div class="project-info">
-                                                                        <h6 class="sub-text" style="font-size: 0.9em; line-height: 15px;">اجاره: {{ renter.rent_announced|price_converter|intcomma:False|farsi_number }} تومان</h6>
+                                                                        <h6 class="sub-text" style="font-size: 0.9em; line-height: 25px;">بودجه: {{ buyer.budget_announced|price_converter|intcomma:False|farsi_number }} تومان</h6>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -140,8 +209,8 @@
 
                                                         <!-- More -->
                                                         <div class="project-meta" style="float: left;">
-                                                            {% if request.user.sub_district == renter.created_by.sub_district or request.user.title == 'bs' %}
-                                                                <a href="{{ renter.get_absolute_url }}" class="btn btn-primary" style="margin-top: 1em;"><em class="icon ni ni-eye"></em><span>مشاهده</span></a>
+                                                            {% if request.user.sub_district == buyer.created_by.sub_district or request.user.title == 'bs' %}
+                                                                <a href="{{ buyer.get_absolute_url }}" class="btn btn-primary" style="margin-top: 1em;"><em class="icon ni ni-eye"></em><span>مشاهده</span></a>
                                                             {% else %}
                                                                 <a class="btn btn-gray" style="margin-top: 1em;"><em class="icon ni ni-eye"></em><span>غیر مجاز</span></a>
                                                             {% endif %}
@@ -159,19 +228,17 @@
                         </div>
                     </div>
                 </div>
-                <!-- end: Renters -->
+                <!-- end: Buyers -->
 
                 <!-- Pagination -->
-                {% if is_paginated %}
-                    {% pagination page_obj request 'rent_file_suggested_renters' rent_file.pk rent_file.unique_url_id %}
-                {% endif %}
+                {% pagination page_obj request 'search_buyers' %}
                 <!-- end: Pagination -->
-
+            
             </div>
         </div>
     </div>
     <!-- end: Main -->
-
+    
 {% endblock %}
 
 

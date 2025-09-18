@@ -90,7 +90,7 @@
 
                     </div>
                 </div>
-                <!-- end: Upper + Mobile -->
+                <!-- end: Add / Filter (Mobile) -->
 
                 <!-- Filter (Modal) -->
                 <div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
@@ -226,6 +226,28 @@
                                             </div>
                                             {% if filter_form.convertable.errors %}
                                                 {% for error in filter_form.convertable.errors %}
+                                                    <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                                {% endfor %}
+                                            {% endif %}
+                                        
+                                            <!-- max_area -->
+                                            <div class="form-group">
+                                                <label class="form-label" for="{{ filter_form.max_area.id_for_label }}">حداکثر متراژ</label>
+                                                {% render_field filter_form.max_area type="number" id="max_area" class="form-control" %}
+                                            </div>
+                                            {% if filter_form.max_area.errors %}
+                                                {% for error in filter_form.max_area.errors %}
+                                                    <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                                {% endfor %}
+                                            {% endif %}
+
+                                            <!-- min_area -->
+                                            <div class="form-group">
+                                                <label class="form-label" for="{{ filter_form.min_area.id_for_label }}">حداقل متراژ</label>
+                                                {% render_field filter_form.min_area type="number" id="min_area" class="form-control" %}
+                                            </div>
+                                            {% if filter_form.min_area.errors %}
+                                                {% for error in filter_form.min_area.errors %}
                                                     <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
                                                 {% endfor %}
                                             {% endif %}
@@ -441,6 +463,13 @@
                                                             <div class="project-head" style="margin-bottom: 0.5em;!important;">
                                                                 <div class="project-title">
                                                                     <div class="project-info">
+                                                                        <span class="sub-text" style="font-size: 0.9em; line-height: 25px; font-weight: bolder">
+                                                                            {% if renter.created_by.name_family %}
+                                                                                مشاور: {{ renter.created_by.name_family }}
+                                                                            {% else %}
+                                                                                مشاور: {{ renter.created_by }}
+                                                                            {% endif %}
+                                                                        </span>
                                                                         <span class="sub-text" style="font-size: 0.75em; line-height: 25px;">
                                                                             {% for sub_district in renter.sub_districts.all %}
                                                                                 {{ sub_district.name }} |
