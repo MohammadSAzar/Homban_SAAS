@@ -31,14 +31,6 @@ def area_checker(area):
         return True
 
 
-# def phone_checker(phone):
-#     try:
-#         if len(phone) == 11 and int(phone) and phone[0:2] == '09' and phone[2] in ['0', '1', '2', '3', '9']:
-#             return True
-#     except ValueError:
-#         return False
-
-
 def phone_checker(phone):
     try:
         if len(phone) == 11 and int(phone) and phone[0:2] == '09':

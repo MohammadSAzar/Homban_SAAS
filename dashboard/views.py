@@ -1312,11 +1312,8 @@ class BuyerListView(ReadOnlyPermissionMixin, ListView):
             return queryset_default
 
         else:
-            queryset_default = ((
-                                    models.Buyer.objects.select_related('province', 'city',
-                                                                        'district').prefetch_related('sub_districts')
-                                    .filter(sub_districts__name__contains=self.request.user.sub_district.name))
-                                .exclude(delete_request='Yes').filter(status='acc').distinct())
+            queryset_default = ((models.Buyer.objects.select_related('province', 'city', 'district').prefetch_related('sub_districts'))
+                                .exclude(delete_request='Yes').filter(status='acc').filter(created_by=self.request.user).distinct())
 
             form = forms.BuyerFilterForm(self.request.GET)
             if form.is_valid():
@@ -1606,9 +1603,8 @@ class RenterListView(ReadOnlyPermissionMixin, ListView):
                 return queryset_filtered
             return queryset_default
         else:
-            queryset_default = (models.Renter.objects.select_related('province', 'city', 'district').prefetch_related(
-                'sub_districts').filter(sub_districts__name__contains=self.request.user.sub_district.name)
-                                .exclude(delete_request='Yes').filter(status='acc').distinct())
+            queryset_default = ((models.Renter.objects.select_related('province', 'city', 'district').prefetch_related('sub_districts'))
+                                .exclude(delete_request='Yes').filter(status='acc').filter(created_by=self.request.user).distinct())
             form = forms.RenterFilterForm(self.request.GET)
 
             if form.is_valid():
@@ -3517,5 +3513,6 @@ def dated_task_list_view(request):
         'tasks': tasks,
     }
     return render(request, 'dashboard/tasks/dated_task_list.html', context=context)
+
 
 
