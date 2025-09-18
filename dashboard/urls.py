@@ -22,6 +22,7 @@ urlpatterns = [
     re_path(r'sale-file/delete-request/(?P<pk>[-\w]+)/(?P<unique_url_id>[-\w]+)/', views.SaleFileDeleteRequestView.as_view(), name='sale_file_delete_request'),
     re_path(r'sale-file/recover/(?P<pk>[-\w]+)/(?P<unique_url_id>[-\w]+)/', views.SaleFileRecoverView.as_view(), name='sale_file_recover'),
     re_path(r'sale-file/(?P<pk>[-\w]+)/(?P<unique_url_id>[-\w]+)/', views.SaleFileDetailView.as_view(), name='sale_file_detail'),
+    re_path(r'sale-file/(?P<pk>[-\w]+)/(?P<unique_url_id>[-\w]+)/suggested-buyers/', views.SaleFileDetailView.as_view(), name='sale_file_suggested_buyers'),
     re_path(r'sale-file/create/', views.SaleFileCreateView.as_view(), name='sale_file_create'),
     # rent_file
     path('rent-files/', views.RentFileListView.as_view(), name='rent_file_list'),
@@ -30,6 +31,7 @@ urlpatterns = [
     re_path(r'rent-file/delete-request/(?P<pk>[-\w]+)/(?P<unique_url_id>[-\w]+)/', views.RentFileDeleteRequestView.as_view(), name='rent_file_delete_request'),
     re_path(r'rent-file/recover/(?P<pk>[-\w]+)/(?P<unique_url_id>[-\w]+)/', views.RentFileRecoverView.as_view(), name='rent_file_recover'),
     re_path(r'rent-file/(?P<pk>[-\w]+)/(?P<unique_url_id>[-\w]+)/', views.RentFileDetailView.as_view(), name='rent_file_detail'),
+    re_path(r'rent-file/(?P<pk>[-\w]+)/(?P<unique_url_id>[-\w]+)/suggested-renters/', views.RentFileDetailView.as_view(), name='rent_file_suggested_renters'),
     re_path(r'rent-file/create/', views.RentFileCreateView.as_view(), name='rent_file_create'),
     # locations
     path('locations/', views.LocationListView.as_view(), name='location_list'),

@@ -1,0 +1,171 @@
+{% extends '_base_dashboard.html' %}
+
+{% load static %}
+{% load i18n %}
+{% load jalali_tags %}
+{% load jalali_date_converter %}
+{% load number_converter %}
+{% load price_converter %}
+{% load humanize %}
+{% load widget_tweaks %}
+{% load pagination %}
+
+
+{% block title %}
+    مستاجران پیشنهادی
+{% endblock %}
+
+
+{% block content %}
+
+    <!-- Main -->
+    <div class="nk-fmg" style="padding-right: 0;!important;">
+        <div class="nk-fmg-body">
+            <div class="nk-fmg-body-content">
+
+                <!-- Title -->
+                <div class="nk-block-head nk-block-head-sm" style="margin-bottom: 1.2em; margin-top: 1.2em;">
+                    <div class="nk-block-between position-relative">
+                        <div class="nk-block-head-content">
+                            <h5 class="nk-block-title" style="font-weight: bolder; font-size: 1.3em;">مستاجران پیشنهادی برای "{{ rent_file.title }}"</h5>
+                        </div>
+                    </div>
+                </div>
+                <!-- end: Title -->
+
+                <!-- Renters -->
+                <div class="nk-fmg-quick-list nk-block">
+                    <div class="toggle-expand-content expanded" data-content="quick-access">
+                        <div class="nk-files nk-files-view-grid">
+                            <div class="nk-files-list">
+
+                                <!-- Loop -->
+                                {% for renter in suggested_renters %}
+                                    {% if renter.status == 'acc' %}
+                                        <div class="col-sm-12 col-lg-6 col-xxl-6" style="padding: 5px;">
+                                            <div class="card h-100" style="box-shadow: rgba(0, 0, 0, 0.10) 0 5px 15px;">
+                                                <div class="card-inner">
+                                                    <div class="project">
+
+                                                        <!-- Name & Code-->
+                                                        <div class="project-head">
+                                                            <div class="project-title">
+                                                                <div class="project-info">
+                                                                    <h5 class="title" style="font-size: 1.1em;">{{ renter.name }} |
+                                                                        <!-- Code -->
+                                                                        <button style="border: none; background-color:transparent; margin-top: 0.8em; line-height: 10px; border-bottom: solid 1px #00a65c; color: #00a65c" onclick="copyCode(this)">
+                                                                           {{ renter.code }}
+                                                                        </button>
+                                                                        <span class="feedback" id="feedback-{{ renter.code }}" style="display: none; color: #00a65c">شد!</span>
+                                                                        <!-- Code (JS) -->
+                                                                        <script>
+                                                                            function copyCode(element) {
+                                                                                // Get the code from the button's text content instead of parameter
+                                                                                const code = element.textContent.trim();
+
+                                                                                // Create a temporary input element to hold the text
+                                                                                const tempInput = document.createElement("input");
+                                                                                tempInput.value = code;
+                                                                                document.body.appendChild(tempInput);
+
+                                                                                // Select and copy the text
+                                                                                tempInput.select();
+                                                                                document.execCommand("copy");
+
+                                                                                // Remove the temporary input
+                                                                                document.body.removeChild(tempInput);
+
+                                                                                // Show feedback message
+                                                                                const feedback = document.getElementById(`feedback-${code}`);
+                                                                                feedback.style.display = 'inline';
+
+                                                                                // Hide feedback after 3 seconds
+                                                                                setTimeout(() => {
+                                                                                    feedback.style.display = 'none';
+                                                                                }, 3000);
+                                                                            }
+                                                                        </script>
+                                                                        <!-- Duplicated -->
+                                                                        {% if renter.phone_number in duplicate_phone_numbers %}
+                                                                            <span style="color: red; font-size: 0.6em;">( مستاجر تکراری )</span>
+                                                                        {% endif %}
+                                                                    </h5>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- Location -->
+                                                        <div style="height: 4em;!important; -webkit-line-clamp: 2;!important;">
+                                                            <div class="project-head" style="margin-bottom: 0.5em;!important;">
+                                                                <div class="project-title">
+                                                                    <div class="project-info">
+                                                                        <span class="sub-text" style="font-size: 0.75em; line-height: 25px;">
+                                                                            {% for sub_district in renter.sub_districts.all %}
+                                                                                {{ sub_district.name }} |
+                                                                            {% empty %}
+                                                                                <span>هیچ زیرمحله‌ای انتخاب نشده است</span>
+                                                                            {% endfor %}
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- Prices -->
+                                                        <div style="height: 2em;!important; -webkit-line-clamp: 2;!important;">
+                                                            <div class="project-head">
+                                                                <div class="project-title">
+                                                                    <div class="project-info">
+                                                                        <h6 class="sub-text" style="font-size: 0.9em; line-height: 15px;">ودیعه: {{ renter.deposit_announced|price_converter|intcomma:False|farsi_number }} تومان</h6>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div style="height: 2em;!important; -webkit-line-clamp: 2;!important;">
+                                                            <div class="project-head" style="margin-bottom: 0.5em;!important;">
+                                                                <div class="project-title">
+                                                                    <div class="project-info">
+                                                                        <h6 class="sub-text" style="font-size: 0.9em; line-height: 15px;">اجاره: {{ renter.rent_announced|price_converter|intcomma:False|farsi_number }} تومان</h6>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- More -->
+                                                        <div class="project-meta" style="float: left;">
+                                                            {% if request.user.sub_district == renter.created_by.sub_district or request.user.title == 'bs' %}
+                                                                <a href="{{ renter.get_absolute_url }}" class="btn btn-primary" style="margin-top: 1em;"><em class="icon ni ni-eye"></em><span>مشاهده</span></a>
+                                                            {% else %}
+                                                                <a class="btn btn-gray" style="margin-top: 1em;"><em class="icon ni ni-eye"></em><span>غیر مجاز</span></a>
+                                                            {% endif %}
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                                <!-- end: Loop -->
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- end: Renters -->
+
+                <!-- Pagination -->
+                {% if is_paginated %}
+                    {% pagination page_obj request 'rent_file_suggested_renters' rent_file.pk rent_file.unique_url_id %}
+                {% endif %}
+                <!-- end: Pagination -->
+
+            </div>
+        </div>
+    </div>
+    <!-- end: Main -->
+
+{% endblock %}
+
+
+

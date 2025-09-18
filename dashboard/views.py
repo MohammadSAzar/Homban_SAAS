@@ -13,7 +13,6 @@ from django.core.paginator import Paginator
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 
-
 from jalali_date import datetime2jalali
 from django.utils import timezone
 
@@ -583,8 +582,13 @@ class SaleFileListView(ReadOnlyPermissionMixin, ListView):
 class SaleFileDetailView(ReadOnlyPermissionMixin, DetailView):
     model = models.SaleFile
     context_object_name = 'sale_file'
-    template_name = 'dashboard/files/sale_file_detail.html'
     permission_model = 'SaleFile'
+
+    def get_template_names(self):
+        if 'suggested' in self.request.path:
+            return 'dashboard/files/sale_file_detail_suggested.html'
+        else:
+            return 'dashboard/files/sale_file_detail.html'
 
     def dispatch(self, request, *args, **kwargs):
         sale_file = self.get_object()
@@ -595,7 +599,24 @@ class SaleFileDetailView(ReadOnlyPermissionMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
         sale_file = self.get_object()
+        suggested_buyers_queryset = (models.Buyer.objects.filter(status='acc')
+                                     .filter(budget_announced__gt=0.9 * sale_file.price_announced)
+                                     .filter(budget_announced__lt=1.1 * sale_file.price_announced)
+                                     .filter(area_min__gt=0.8 * sale_file.area)
+                                     .filter(area_max__lt=1.2 * sale_file.area)
+                                     .exclude(delete_request='Yes'))
+
+        paginator = Paginator(suggested_buyers_queryset, 6)
+        page_number = self.request.GET.get('page', 1)
+        page_obj = paginator.get_page(page_number)
+
+        context['suggested_buyers'] = page_obj.object_list
+        context['page_obj'] = page_obj
+        context['is_paginated'] = page_obj.has_other_pages()
+
+        # Marking
         is_marked = False
         if self.request.user.is_authenticated:
             is_marked = models.Mark.objects.filter(
@@ -996,8 +1017,13 @@ class RentFileListView(ReadOnlyPermissionMixin, ListView):
 class RentFileDetailView(ReadOnlyPermissionMixin, DetailView):
     model = models.RentFile
     context_object_name = 'rent_file'
-    template_name = 'dashboard/files/rent_file_detail.html'
     permission_model = 'RentFile'
+
+    def get_template_names(self):
+        if 'suggested' in self.request.path:
+            return 'dashboard/files/rent_file_detail_suggested.html'
+        else:
+            return 'dashboard/files/rent_file_detail.html'
 
     def dispatch(self, request, *args, **kwargs):
         rent_file = self.get_object()
@@ -1009,6 +1035,40 @@ class RentFileDetailView(ReadOnlyPermissionMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         rent_file = self.get_object()
+        base_queryset = models.Renter.objects.annotate(
+            deposit_total_calc=Cast(F('deposit_announced') + (100 * F('rent_announced') / 3),
+                                    PositiveBigIntegerField()))
+
+        non_convertable_suggested_renters_queryset = (models.Renter.objects
+                                                      .filter(status='acc')
+                                                      .filter(convertable='isnt').exclude(delete_request='Yes')
+                                                      .filter(deposit_announced__gt=0.8 * rent_file.deposit_announced)
+                                                      .filter(deposit_announced__lt=1.2 * rent_file.deposit_announced)
+                                                      .filter(rent_announced__gt=0.8 * rent_file.rent_announced)
+                                                      .filter(rent_announced__lt=1.2 * rent_file.rent_announced)
+                                                      .filter(area_min__gt=0.8 * rent_file.area)
+                                                      .filter(area_max__lt=1.2 * rent_file.area))
+
+        convertable_suggested_renters_queryset = (base_queryset
+                                                  .filter(status='acc')
+                                                  .filter(convertable='is').exclude(delete_request='Yes')
+                                                  .filter(deposit_total_calc__gt=0.8 * (rent_file.deposit_announced + 100 * (rent_file.rent_announced / 3)))
+                                                  .filter(deposit_total_calc__lt=1.2 * (rent_file.deposit_announced + 100 * (rent_file.rent_announced / 3)))
+                                                  .filter(area_min__gt=0.8 * rent_file.area)
+                                                  .filter(area_max__lt=1.2 * rent_file.area))
+
+        suggested_renters_queryset = (
+                non_convertable_suggested_renters_queryset | convertable_suggested_renters_queryset).distinct()
+
+        paginator = Paginator(suggested_renters_queryset, 6)
+        page_number = self.request.GET.get('page', 1)
+        page_obj = paginator.get_page(page_number)
+
+        context['suggested_renters'] = page_obj.object_list
+        context['page_obj'] = page_obj
+        context['is_paginated'] = page_obj.has_other_pages()
+
+        # Marking
         is_marked = False
         if self.request.user.is_authenticated:
             is_marked = models.Mark.objects.filter(
@@ -1312,8 +1372,9 @@ class BuyerListView(ReadOnlyPermissionMixin, ListView):
             return queryset_default
 
         else:
-            queryset_default = ((models.Buyer.objects.select_related('province', 'city', 'district').prefetch_related('sub_districts'))
-                                .exclude(delete_request='Yes').filter(status='acc').filter(created_by=self.request.user).distinct())
+            queryset_default = (
+                (models.Buyer.objects.select_related('province', 'city', 'district').prefetch_related('sub_districts'))
+                .exclude(delete_request='Yes').filter(status='acc').filter(created_by=self.request.user).distinct())
 
             form = forms.BuyerFilterForm(self.request.GET)
             if form.is_valid():
@@ -1386,7 +1447,6 @@ class BuyerListView(ReadOnlyPermissionMixin, ListView):
 class BuyerDetailView(ReadOnlyPermissionMixin, DetailView):
     model = models.Buyer
     context_object_name = 'buyer'
-    template_name = 'dashboard/people/buyer_detail.html'
     permission_model = 'Buyer'
 
     def get_template_names(self):
@@ -1419,13 +1479,13 @@ class BuyerDetailView(ReadOnlyPermissionMixin, DetailView):
                                     .filter(price_announced__gt=0.9 * buyer.budget_announced)
                                     .filter(price_announced__lt=1.1 * buyer.budget_announced)
                                     .filter(area__gt=0.8 * buyer.area_min)
-                                    .filter(area__lt=1.2 * buyer.area_max))
-        if self.request.user.title != 'bs':  # Fixed: added .title
+                                    .filter(area__lt=1.2 * buyer.area_max).exclude(delete_request='Yes'))
+        if self.request.user.title != 'bs':
             similar_sub_districts = buyer.sub_districts.all()
             suggested_files_queryset = suggested_files_queryset.filter(sub_district__in=similar_sub_districts)
 
-        paginator = Paginator(suggested_files_queryset, 1)
-        page_number = self.request.GET.get('page', 6)
+        paginator = Paginator(suggested_files_queryset, 6)
+        page_number = self.request.GET.get('page', 1)
         page_obj = paginator.get_page(page_number)
 
         context['suggested_files'] = page_obj.object_list
@@ -1603,8 +1663,9 @@ class RenterListView(ReadOnlyPermissionMixin, ListView):
                 return queryset_filtered
             return queryset_default
         else:
-            queryset_default = ((models.Renter.objects.select_related('province', 'city', 'district').prefetch_related('sub_districts'))
-                                .exclude(delete_request='Yes').filter(status='acc').filter(created_by=self.request.user).distinct())
+            queryset_default = (
+                (models.Renter.objects.select_related('province', 'city', 'district').prefetch_related('sub_districts'))
+                .exclude(delete_request='Yes').filter(status='acc').filter(created_by=self.request.user).distinct())
             form = forms.RenterFilterForm(self.request.GET)
 
             if form.is_valid():
@@ -1714,7 +1775,8 @@ class RenterDetailView(ReadOnlyPermissionMixin, DetailView):
 
         renter = self.get_object()
         base_queryset = models.RentFile.objects.annotate(
-            deposit_total_calc=Cast(F('deposit_announced') + (100 * F('rent_announced') / 3), PositiveBigIntegerField()))
+            deposit_total_calc=Cast(F('deposit_announced') + (100 * F('rent_announced') / 3),
+                                    PositiveBigIntegerField()))
         non_convertable_suggested_files_queryset = (models.RentFile.objects
                                                     .filter(status='acc')
                                                     .filter(convertable='isnt')
@@ -1730,10 +1792,10 @@ class RenterDetailView(ReadOnlyPermissionMixin, DetailView):
                                                 .filter(deposit_total_calc__gt=0.8 * (renter.deposit_announced + 100 * (renter.rent_announced / 3)))
                                                 .filter(deposit_total_calc__lt=1.2 * (renter.deposit_announced + 100 * (renter.rent_announced / 3)))
                                                 .filter(area__gt=0.8 * renter.area_min)
-                                                .filter(area__lt=1.2 * renter.area_max))
+                                                .filter(area__lt=1.2 * renter.area_max).exclude(delete_request='Yes'))
 
         suggested_files_queryset = (
-                    non_convertable_suggested_files_queryset | convertable_suggested_files_queryset).distinct()
+                non_convertable_suggested_files_queryset | convertable_suggested_files_queryset).distinct()
         if self.request.user.title != 'bs':
             suggested_files_queryset = suggested_files_queryset.filter(sub_district__in=renter.sub_districts.all())
 
@@ -1878,7 +1940,8 @@ class SaleFileSearchView(ReadOnlyPermissionMixin, ListView):
 
             if any([min_price, max_price, min_area, max_area]):
                 queryset = models.SaleFile.objects.select_related('province', 'city', 'district', 'sub_district',
-                                                                  'person', 'created_by').all().exclude(delete_request='Yes')
+                                                                  'person', 'created_by').all().exclude(
+                    delete_request='Yes')
                 if min_price is not None:
                     queryset = queryset.filter(price_announced__gte=min_price)
                 if max_price is not None:
@@ -1916,7 +1979,8 @@ class RentFileSearchView(ReadOnlyPermissionMixin, ListView):
 
             if any([min_deposit, max_deposit, min_rent, max_rent, min_area, max_area]):
                 queryset = models.RentFile.objects.select_related('province', 'city', 'district', 'sub_district',
-                                                                  'person', 'created_by').all().exclude(delete_request='Yes')
+                                                                  'person', 'created_by').all().exclude(
+                    delete_request='Yes')
                 if min_deposit is not None:
                     queryset = queryset.filter(deposit_announced__gte=min_deposit)
                 if max_deposit is not None:
@@ -3513,6 +3577,5 @@ def dated_task_list_view(request):
         'tasks': tasks,
     }
     return render(request, 'dashboard/tasks/dated_task_list.html', context=context)
-
 
 
