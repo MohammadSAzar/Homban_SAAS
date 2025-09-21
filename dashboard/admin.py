@@ -69,7 +69,7 @@ class PersonAdmin(admin.ModelAdmin):
 class SaleFileAdmin(admin.ModelAdmin):
     list_display = (
         'title', 'created_by', 'code', 'source', 'status', 'sub_district', 'price_announced', 'price_per_meter', 'room',
-        'area', 'age', 'zip_file_admin', 'datetime_created')
+        'area', 'age', 'datetime_created')
     ordering = ('-datetime_created',)
     list_filter = ('status', 'sub_district',)
     readonly_fields = ('code', 'datetime_created',)

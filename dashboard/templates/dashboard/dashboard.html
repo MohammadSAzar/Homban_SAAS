@@ -87,6 +87,28 @@
         </div>
     </div>
 
+    <!-- Managing -->
+    {% if request.user.title == 'bs' %}
+        <div class="card">
+            <div class="card-aside-wrap">
+                <div class="card-inner card-inner-lg">
+
+                    <!-- Title -->
+                    <div class="nk-block-head nk-block-head-lg">
+                        <div class="nk-block-between">
+                            <div class="nk-block-head-content">
+                                <h5 class="nk-block-title">داشبورد مدیریت</h5>
+                            </div>
+                        </div>
+                    </div>
+
+                    
+                    
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
 {% endblock %}
 
 

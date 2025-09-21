@@ -1,22 +1,26 @@
-from itertools import chain
-from operator import attrgetter
+import os
+import urllib.parse
 
-from django.http import JsonResponse
+
+from django.http import JsonResponse, HttpResponse, Http404, FileResponse
+from django.urls import reverse, reverse_lazy
 from django.views import View
 from django.views.generic import DetailView, CreateView, ListView, UpdateView, DeleteView, TemplateView
-from django.shortcuts import get_object_or_404, render, redirect
+from django.views.decorators.http import require_GET
 from django.db.models import Prefetch, Count, F, PositiveBigIntegerField
 from django.db.models.functions import Cast
-from django.urls import reverse, reverse_lazy
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, render, redirect
+from operator import attrgetter
 from django.contrib import messages
 
 from jalali_date import datetime2jalali
 from django.utils import timezone
 
-from . import models, forms, functions, choices
+from . import models, forms, functions
 from .permissions import PermissionRequiredMixin, ReadOnlyPermissionMixin
 
 
@@ -25,12 +29,16 @@ def home_view(request):
     return render(request, 'dashboard/home.html')
 
 
-def dashboard_view(request):
-    user = request.user
-    context = {
-        'user': user,
-    }
-    return render(request, 'dashboard/dashboard.html', context)
+class DashboardView(ReadOnlyPermissionMixin, TemplateView):
+    template_name = 'dashboard/dashboard.html'
+    permission_model = 'Location'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.user.title == 'bs':
+            sub_districts = models.SubDistrict.objects.select_related('district', 'district__city', 'district__city__province').all()
+            context['sub_districts'] = sub_districts
+        return context
 
 
 # --------------------------------- Locations --------------------------------
@@ -624,7 +632,95 @@ class SaleFileDetailView(ReadOnlyPermissionMixin, DetailView):
                 sale_file=sale_file
             ).exists()
         context['is_marked'] = is_marked
+
+        # WhatsApp share URLs
+        context['whatsapp_share_url'] = self.get_whatsapp_share_url(sale_file)
         return context
+
+    def get_whatsapp_share_url(self, sale_file):
+        message_parts = [
+            f"🏠 فایل فروش شماره {sale_file.id}",
+            f"💰 قیمت: {sale_file.price_announced:,} تومان" if hasattr(sale_file, 'price_announced') else "",
+            f"📐 متراژ: {sale_file.area} متر مربع" if hasattr(sale_file, 'area') else "",
+            f"📐 تعداد اتاق: {sale_file.room}" if hasattr(sale_file, 'room') else "",
+        ]
+        message = "\n".join(filter(None, message_parts))
+        encoded_message = urllib.parse.quote(message)
+        return f"https://wa.me/?text={encoded_message}"
+
+
+@login_required
+@require_GET
+def download_sale_file_media(request, pk, unique_url_id):
+    try:
+        sale_file = get_object_or_404(models.SaleFile, pk=pk, unique_url_id=unique_url_id)
+    except:
+        try:
+            sale_file = get_object_or_404(models.SaleFile, pk=pk)
+        except:
+            raise Http404("Sale file not found")
+
+    # Check permissions
+    user = request.user
+    if hasattr(user, 'title') and user.title != 'bs' and getattr(sale_file, 'delete_request', None) == 'Yes':
+        raise PermissionDenied("Access denied")
+
+    # Get file type
+    file_type = request.GET.get('file', '').strip()
+    if not file_type:
+        raise Http404("No file type specified")
+
+    # Get the file field
+    file_field = None
+    if file_type == 'video':
+        file_field = getattr(sale_file, 'video', None)
+        print(f"Video field: {file_field}")
+        if file_field:
+            print(f"Video file name: {file_field.name}")
+    elif file_type.startswith('image') and len(file_type) > 5:
+        image_num = file_type[5:]
+        if image_num.isdigit() and 1 <= int(image_num) <= 9:
+            file_field = getattr(sale_file, f'image{image_num}', None)
+            if file_field:
+                print(f"Image{image_num} file name: {file_field.name}")
+
+    if not file_field or not file_field.name:
+        raise Http404("File not found")
+
+    # Get file path and serve it
+    try:
+        file_path = file_field.path
+        if not os.path.exists(file_path):
+            raise Http404("File does not exist")
+        file_size = os.path.getsize(file_path)
+
+        # Read the file
+        with open(file_path, 'rb') as f:
+            file_data = f.read()
+        filename = os.path.basename(file_field.name)
+        extension = os.path.splitext(filename)[1].lower()
+
+        # Set content type based on extension
+        content_type_mapping = {
+            '.jpg': 'image/jpeg',
+            '.jpeg': 'image/jpeg',
+            '.png': 'image/png',
+            '.gif': 'image/gif',
+            '.mp4': 'video/mp4',
+            '.avi': 'video/avi',
+            '.mov': 'video/quicktime',
+            '.webm': 'video/webm',
+        }
+        content_type = content_type_mapping.get(extension, 'application/octet-stream')
+        print(f"Content type: {content_type}")
+
+        # Create response
+        response = HttpResponse(file_data, content_type=content_type)
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        response['Content-Length'] = str(len(file_data))
+        return response
+    except Exception as e:
+        raise Http404(f"Error serving file: {str(e)}")
 
 
 class SaleFileGalleryView(DetailView):
@@ -1076,7 +1172,96 @@ class RentFileDetailView(ReadOnlyPermissionMixin, DetailView):
                 rent_file=rent_file
             ).exists()
         context['is_marked'] = is_marked
+
+        # WhatsApp share URLs
+        context['whatsapp_share_url'] = self.get_whatsapp_share_url(rent_file)
         return context
+
+    def get_whatsapp_share_url(self, rent_file):
+        message_parts = [
+            f"🏠 فایل فروش شماره {rent_file.id}",
+            f"💰 ودیعه: {rent_file.deposit_announced:,} تومان" if hasattr(rent_file, 'deposit_announced') else "",
+            f"💰 اجاره: {rent_file.rent_announced:,} تومان" if hasattr(rent_file, 'rent_announced') else "",
+            f"📐 متراژ: {rent_file.area} متر مربع" if hasattr(rent_file, 'area') else "",
+            f"📐 تعداد اتاق: {rent_file.room}" if hasattr(rent_file, 'room') else "",
+        ]
+        message = "\n".join(filter(None, message_parts))
+        encoded_message = urllib.parse.quote(message)
+        return f"https://wa.me/?text={encoded_message}"
+
+
+@login_required
+@require_GET
+def download_rent_file_media(request, pk, unique_url_id):
+    try:
+        rent_file = get_object_or_404(models.RentFile, pk=pk, unique_url_id=unique_url_id)
+    except:
+        try:
+            rent_file = get_object_or_404(models.RentFile, pk=pk)
+        except:
+            raise Http404("Rent file not found")
+
+    # Check permissions
+    user = request.user
+    if hasattr(user, 'title') and user.title != 'bs' and getattr(rent_file, 'delete_request', None) == 'Yes':
+        raise PermissionDenied("Access denied")
+
+    # Get file type
+    file_type = request.GET.get('file', '').strip()
+    if not file_type:
+        raise Http404("No file type specified")
+
+    # Get the file field
+    file_field = None
+    if file_type == 'video':
+        file_field = getattr(rent_file, 'video', None)
+        print(f"Video field: {file_field}")
+        if file_field:
+            print(f"Video file name: {file_field.name}")
+    elif file_type.startswith('image') and len(file_type) > 5:
+        image_num = file_type[5:]
+        if image_num.isdigit() and 1 <= int(image_num) <= 9:
+            file_field = getattr(rent_file, f'image{image_num}', None)
+            if file_field:
+                print(f"Image{image_num} file name: {file_field.name}")
+
+    if not file_field or not file_field.name:
+        raise Http404("File not found")
+
+    # Get file path and serve it
+    try:
+        file_path = file_field.path
+        if not os.path.exists(file_path):
+            raise Http404("File does not exist")
+        file_size = os.path.getsize(file_path)
+
+        # Read the file
+        with open(file_path, 'rb') as f:
+            file_data = f.read()
+        filename = os.path.basename(file_field.name)
+        extension = os.path.splitext(filename)[1].lower()
+
+        # Set content type based on extension
+        content_type_mapping = {
+            '.jpg': 'image/jpeg',
+            '.jpeg': 'image/jpeg',
+            '.png': 'image/png',
+            '.gif': 'image/gif',
+            '.mp4': 'video/mp4',
+            '.avi': 'video/avi',
+            '.mov': 'video/quicktime',
+            '.webm': 'video/webm',
+        }
+        content_type = content_type_mapping.get(extension, 'application/octet-stream')
+        print(f"Content type: {content_type}")
+
+        # Create response
+        response = HttpResponse(file_data, content_type=content_type)
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        response['Content-Length'] = str(len(file_data))
+        return response
+    except Exception as e:
+        raise Http404(f"Error serving file: {str(e)}")
 
 
 class RentFileGalleryView(DetailView):
@@ -3751,5 +3936,6 @@ def dated_task_list_view(request):
         'tasks': tasks,
     }
     return render(request, 'dashboard/tasks/dated_task_list.html', context=context)
+
 
 

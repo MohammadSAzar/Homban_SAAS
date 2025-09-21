@@ -7,7 +7,7 @@ urlpatterns = [
     # main
     path('', views.home_view, name='home'),
     path('home/', views.home_view, name='home'),
-    path('dashboard/', views.dashboard_view, name='dashboard'),
+    path('dashboard/', views.DashboardView.as_view(), name='dashboard'),
     # calendar
     path('calendar/current/', views.calendar_current_month_view, name='current_month'),
     path('calendar/previous/', views.calendar_previous_month_view, name='previous_month'),
@@ -21,6 +21,7 @@ urlpatterns = [
     re_path(r'sale-file/delete/(?P<pk>[-\w]+)/(?P<unique_url_id>[-\w]+)/', views.SaleFileDeleteView.as_view(), name='sale_file_delete'),
     re_path(r'sale-file/delete-request/(?P<pk>[-\w]+)/(?P<unique_url_id>[-\w]+)/', views.SaleFileDeleteRequestView.as_view(), name='sale_file_delete_request'),
     re_path(r'sale-file/recover/(?P<pk>[-\w]+)/(?P<unique_url_id>[-\w]+)/', views.SaleFileRecoverView.as_view(), name='sale_file_recover'),
+    path('sale-file/<int:pk>/<str:unique_url_id>/download-media/', views.download_sale_file_media, name='sale_file_download'),
     re_path(r'sale-file/(?P<pk>[-\w]+)/(?P<unique_url_id>[-\w]+)/', views.SaleFileDetailView.as_view(), name='sale_file_detail'),
     re_path(r'sale-file/(?P<pk>[-\w]+)/(?P<unique_url_id>[-\w]+)/suggested-buyers/', views.SaleFileDetailView.as_view(), name='sale_file_suggested_buyers'),
     re_path(r'sale-file/create/', views.SaleFileCreateView.as_view(), name='sale_file_create'),
@@ -30,6 +31,7 @@ urlpatterns = [
     re_path(r'rent-file/delete/(?P<pk>[-\w]+)/(?P<unique_url_id>[-\w]+)/', views.RentFileDeleteView.as_view(), name='rent_file_delete'),
     re_path(r'rent-file/delete-request/(?P<pk>[-\w]+)/(?P<unique_url_id>[-\w]+)/', views.RentFileDeleteRequestView.as_view(), name='rent_file_delete_request'),
     re_path(r'rent-file/recover/(?P<pk>[-\w]+)/(?P<unique_url_id>[-\w]+)/', views.RentFileRecoverView.as_view(), name='rent_file_recover'),
+    path('rent-file/<int:pk>/<str:unique_url_id>/download-media/', views.download_rent_file_media, name='rent_file_download'),
     re_path(r'rent-file/(?P<pk>[-\w]+)/(?P<unique_url_id>[-\w]+)/', views.RentFileDetailView.as_view(), name='rent_file_detail'),
     re_path(r'rent-file/(?P<pk>[-\w]+)/(?P<unique_url_id>[-\w]+)/suggested-renters/', views.RentFileDetailView.as_view(), name='rent_file_suggested_renters'),
     re_path(r'rent-file/create/', views.RentFileCreateView.as_view(), name='rent_file_create'),
