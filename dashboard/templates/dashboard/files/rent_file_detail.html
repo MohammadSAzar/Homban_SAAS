@@ -47,8 +47,15 @@
                 <div class="card">
                     <div class="card-inner-group" >
 
-                        <!-- Title -->
+                        <!-- Upper -->
                         <div class="card-inner">
+                        
+                            <!-- Title -->
+                            <div class="card-header justify-center">
+                                <h5>معرفی فایل</h5>
+                            </div>
+                        
+                            <!-- Main Info -->
                             <div class="user-card user-card-s2">
                                 <div class="user-info">
                                 
@@ -114,6 +121,7 @@
                                 
                                 </div>
                             </div>
+                        
                         </div>
 
                         <!-- Locations -->
@@ -624,281 +632,401 @@
 
                         <!-- ُShare -->
                         <div class="row text-center">
-                            <div>
+                            <div class="container">
+                                <div class="row justify-content-center">
+                                    <div class="col-md-8" style="width: 100%">
+                                        <div class="card">
 
-                                <!-- Download -->
-                                {% if rent_file.has_images or rent_file.has_video %}
-                                    <button type="button"
-                                       class="btn btn-primary"
-                                       id="download-all-btn"
-                                       onclick="downloadAllMedia({{ rent_file.pk }}, '{{ rent_file.unique_url_id }}')"
-                                    >دانلود یکجای محتوا</button>
-                                {% else %}
-                                    <button class="btn btn-danger">محتوایی موجود نیست</button>
-                                {% endif %}
-                                <script>
-                                    function downloadAllMedia(rentFileId, uniqueUrlId) {
-                                        const downloadBtn = document.getElementById('download-all-btn');
-                                        const originalText = downloadBtn.innerHTML;
-                                        
-                                        // Disable button and show loading state
-                                        downloadBtn.disabled = true;
-                                        downloadBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> در حال دانلود...';
-                                        
-                                        let downloadCount = 0;
-                                        let totalFiles = 0;
-                                        let filesToDownload = [];
-                                        
-                                        // Function to create and trigger download
-                                        function triggerDownload(url, delay = 0) {
-                                            setTimeout(() => {
-                                                const link = document.createElement('a');
-                                                link.href = url;
-                                                link.style.display = 'none';
-                                                document.body.appendChild(link);
-                                                link.click();
-                                                document.body.removeChild(link);
-                                                
-                                                downloadCount++;
-                                                
-                                                // Update button text with progress
-                                                downloadBtn.innerHTML = `<i class="fa fa-download"></i> دانلود شده: ${downloadCount}/${totalFiles}`;
-                                                
-                                                // Re-enable button when all downloads are complete
-                                                if (downloadCount === totalFiles) {
-                                                    setTimeout(() => {
-                                                        downloadBtn.disabled = false;
-                                                        downloadBtn.innerHTML = originalText;
-                                                    }, 3000);
-                                                }
-                                            }, delay);
-                                        }
-                                        
-                                        const baseUrl = `/rent-file/${rentFileId}/${uniqueUrlId}/download-media/`;
-                                        
-                                        console.log(`Base URL: ${baseUrl}`);
-                                        
-                                        // Test the first URL construction
-                                        const testUrl = `${baseUrl}?file=image1`;
-                                        console.log(`Test URL: ${testUrl}`);
-                                        
-                                        // Remove the test fetch - it was causing issues
-                                        
-                                        // More reliable approach: Check what's actually rendered in the template
-                                        // This way we only try to download files that actually exist
-                                        
-                                        // Check each image by looking at the carousel items
-                                        // Each carousel-item represents an existing image
-                                        const carouselItems = document.querySelectorAll('#carouselExConInd .carousel-item');
-                                        
-                                        console.log(`Found ${carouselItems.length} carousel items`);
-                                        
-                                        // Create a mapping of which images actually exist
-                                        let imageMapping = [];
-                                        
-                                        // Look through the template structure to see which images are rendered
-                                        // Since Django only renders carousel items for existing images, we can map them
-                                        carouselItems.forEach((item, index) => {
-                                            const img = item.querySelector('img');
-                                            if (img && img.src && !img.src.includes('placeholder') && !img.src.includes('default')) {
-                                                // Try to determine which image this is from the src URL
-                                                let imageNumber = null;
-                                                
-                                                // Check the img src to see if it contains any hints about which image it is
-                                                for (let i = 1; i <= 9; i++) {
-                                                    if (img.src.includes(`image${i}`) || img.src.includes(`_${i}.`) || img.src.includes(`-${i}.`)) {
-                                                        imageNumber = i;
-                                                        break;
+                                            <!-- Title -->
+                                            <div class="card-header justify-center">
+                                                <h6>اشتراک گذاری با مشتری</h6>
+                                            </div>
+
+                                            <!-- Buttons -->
+                                            <div class="card-body">
+
+                                                <!-- WA -->
+                                                <a href="{{ whatsapp_share_url }}"
+                                                   target="_blank"
+                                                   class="btn btn-primary me-2 mb-2"
+                                                   id="whatsapp-direct-btn">
+                                                    <i class="fab fa-whatsapp"></i>
+                                                    ارسال متن
+                                                </a>
+
+                                                <!-- Copy -->
+                                                <button type="button"
+                                                        class="btn btn-primary me-2 mb-2"
+                                                        id="copy-text-btn"
+                                                        data-sale-file-text="">
+                                                    <i class="fas fa-copy"></i>
+                                                    کپی متن
+                                                </button>
+
+                                                <!-- Download -->
+                                                {% if sale_file.has_images or sale_file.has_video %}
+                                                    <button type="button"
+                                                       class="btn btn-primary me-2 mb-2"
+                                                       id="download-all-btn"
+                                                       onclick="downloadAllMedia({{ sale_file.pk }}, '{{ sale_file.unique_url_id }}')"
+                                                    >دانلود یکجا</button>
+                                                {% else %}
+                                                    <button class="btn btn-danger me-2 mb-2">بدون محتوا</button>
+                                                {% endif %}
+
+                                                <!-- Loading Messages -->
+                                                <div id="whatsapp-loading" class="d-none">
+                                                    <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                                                    در حال آماده سازی...
+                                                </div>
+
+                                                <!-- Status Message -->
+                                                <div id="copy-status" class="mt-2 small d-none"></div>
+                                                <div id="whatsapp-info" class="mt-2 text-muted small">
+                                                    <span id="images-count"></span>
+                                                </div>
+
+                                                <!-- JS (Copy - WA) -->
+                                                <script>
+                                                    document.addEventListener('DOMContentLoaded', function() {
+                                                        // Sample data - this would come from your Django template
+                                                        const saleFileData = {
+                                                            id: 123,
+                                                            price_announced: 2500000000,
+                                                            area: 120,
+                                                            room: 3
+                                                        };
+
+                                                        // Generate the text message (same logic as your Django view)
+                                                        function generateWhatsAppText(saleFile) {
+                                                            const messageParts = [
+                                                                `🏠 فایل فروش شماره ${saleFile.id}`,
+                                                                saleFile.price_announced ? `💰 قیمت: ${saleFile.price_announced.toLocaleString('fa-IR')} تومان` : "",
+                                                                saleFile.area ? `📐 متراژ: ${saleFile.area} متر مربع` : "",
+                                                                saleFile.room ? `📐 تعداد اتاق: ${saleFile.room}` : ""
+                                                            ];
+                                                            return messageParts.filter(part => part !== "").join("\n");
+                                                        }
+
+                                                        // Set the text data for the copy button
+                                                        const copyBtn = document.getElementById('copy-text-btn');
+                                                        const textToCopy = generateWhatsAppText(saleFileData);
+                                                        copyBtn.setAttribute('data-sale-file-text', textToCopy);
+
+                                                        // Copy to clipboard functionality
+                                                        copyBtn.addEventListener('click', function() {
+                                                            const textToCopy = this.getAttribute('data-sale-file-text');
+                                                            const statusDiv = document.getElementById('copy-status');
+
+                                                            // Use the Clipboard API if available
+                                                            if (navigator.clipboard && window.isSecureContext) {
+                                                                navigator.clipboard.writeText(textToCopy).then(function() {
+                                                                    showCopyStatus('متن با موفقیت کپی شد!', 'success');
+                                                                }).catch(function(err) {
+                                                                    console.error('Failed to copy text: ', err);
+                                                                    fallbackCopyTextToClipboard(textToCopy);
+                                                                });
+                                                            } else {
+                                                                // Fallback for older browsers or non-HTTPS
+                                                                fallbackCopyTextToClipboard(textToCopy);
+                                                            }
+                                                        });
+
+                                                        // Fallback copy method for older browsers
+                                                        function fallbackCopyTextToClipboard(text) {
+                                                            const textArea = document.createElement("textarea");
+                                                            textArea.value = text;
+                                                            textArea.style.top = "0";
+                                                            textArea.style.left = "0";
+                                                            textArea.style.position = "fixed";
+                                                            textArea.style.opacity = "0";
+
+                                                            document.body.appendChild(textArea);
+                                                            textArea.focus();
+                                                            textArea.select();
+
+                                                            try {
+                                                                const successful = document.execCommand('copy');
+                                                                if (successful) {
+                                                                    showCopyStatus('متن با موفقیت کپی شد!', 'success');
+                                                                } else {
+                                                                    showCopyStatus('خطا در کپی کردن متن', 'error');
+                                                                }
+                                                            } catch (err) {
+                                                                console.error('Fallback: Oops, unable to copy', err);
+                                                                showCopyStatus('خطا در کپی کردن متن', 'error');
+                                                            }
+
+                                                            document.body.removeChild(textArea);
+                                                        }
+
+                                                        // Show copy status message
+                                                        function showCopyStatus(message, type) {
+                                                            const statusDiv = document.getElementById('copy-status');
+                                                            statusDiv.className = `mt-2 small alert alert-${type === 'success' ? 'success' : 'danger'}`;
+                                                            statusDiv.textContent = message;
+                                                            statusDiv.classList.remove('d-none');
+
+                                                            // Hide the message after 3 seconds
+                                                            setTimeout(function() {
+                                                                statusDiv.classList.add('d-none');
+                                                            }, 3000);
+                                                        }
+
+                                                        // Original AJAX functionality (keeping your existing code)
+                                                        const ajaxBtn = document.getElementById('whatsapp-ajax-btn');
+                                                        const loadingDiv = document.getElementById('whatsapp-loading');
+
+                                                        if (ajaxBtn) {
+                                                            ajaxBtn.addEventListener('click', function() {
+                                                                const saleFileId = this.getAttribute('data-sale-file-id');
+
+                                                                // Show loading
+                                                                this.style.display = 'none';
+                                                                loadingDiv.classList.remove('d-none');
+
+                                                                // Make AJAX request
+                                                                fetch(`/sale-file/${saleFileId}/whatsapp-share/`, {
+                                                                    method: 'GET',
+                                                                    headers: {
+                                                                        'X-Requested-With': 'XMLHttpRequest',
+                                                                        'Content-Type': 'application/json',
+                                                                    }
+                                                                })
+                                                                .then(response => response.json())
+                                                                .then(data => {
+                                                                    if (data.error) {
+                                                                        alert('خطا: ' + data.error);
+                                                                    } else {
+                                                                        // Open WhatsApp
+                                                                        window.open(data.whatsapp_url, '_blank');
+                                                                    }
+                                                                })
+                                                                .catch(error => {
+                                                                    console.error('Error:', error);
+                                                                    alert('خطایی در ارسال درخواست رخ داد');
+                                                                })
+                                                                .finally(() => {
+                                                                    // Hide loading
+                                                                    loadingDiv.classList.add('d-none');
+                                                                    ajaxBtn.style.display = 'inline-block';
+                                                                });
+                                                            });
+                                                        }
+                                                    });
+                                                </script>
+
+                                                <!-- JS (Download)  -->
+                                                <script>
+                                                    function downloadAllMedia(saleFileId, uniqueUrlId) {
+                                                        const downloadBtn = document.getElementById('download-all-btn');
+                                                        const originalText = downloadBtn.innerHTML;
+
+                                                        // Disable button and show loading state
+                                                        downloadBtn.disabled = true;
+                                                        downloadBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> در حال دانلود...';
+
+                                                        let downloadCount = 0;
+                                                        let totalFiles = 0;
+                                                        let filesToDownload = [];
+
+                                                        // Function to create and trigger download
+                                                        function triggerDownload(url, delay = 0) {
+                                                            setTimeout(() => {
+                                                                const link = document.createElement('a');
+                                                                link.href = url;
+                                                                link.style.display = 'none';
+                                                                document.body.appendChild(link);
+                                                                link.click();
+                                                                document.body.removeChild(link);
+
+                                                                downloadCount++;
+
+                                                                // Update button text with progress
+                                                                downloadBtn.innerHTML = `<i class="fa fa-download"></i> دانلود شده: ${downloadCount}/${totalFiles}`;
+
+                                                                // Re-enable button when all downloads are complete
+                                                                if (downloadCount === totalFiles) {
+                                                                    setTimeout(() => {
+                                                                        downloadBtn.disabled = false;
+                                                                        downloadBtn.innerHTML = originalText;
+                                                                    }, 3000);
+                                                                }
+                                                            }, delay);
+                                                        }
+
+                                                        const baseUrl = `/sale-file/${saleFileId}/${uniqueUrlId}/download-media/`;
+
+                                                        console.log(`Base URL: ${baseUrl}`);
+
+                                                        // Test the first URL construction
+                                                        const testUrl = `${baseUrl}?file=image1`;
+                                                        console.log(`Test URL: ${testUrl}`);
+
+                                                        // Remove the test fetch - it was causing issues
+
+                                                        // More reliable approach: Check what's actually rendered in the template
+                                                        // This way we only try to download files that actually exist
+
+                                                        // Check each image by looking at the carousel items
+                                                        // Each carousel-item represents an existing image
+                                                        const carouselItems = document.querySelectorAll('#carouselExConInd .carousel-item');
+
+                                                        console.log(`Found ${carouselItems.length} carousel items`);
+
+                                                        // Create a mapping of which images actually exist
+                                                        let imageMapping = [];
+
+                                                        // Look through the template structure to see which images are rendered
+                                                        // Since Django only renders carousel items for existing images, we can map them
+                                                        carouselItems.forEach((item, index) => {
+                                                            const img = item.querySelector('img');
+                                                            if (img && img.src && !img.src.includes('placeholder') && !img.src.includes('default')) {
+                                                                // Try to determine which image this is from the src URL
+                                                                let imageNumber = null;
+
+                                                                // Check the img src to see if it contains any hints about which image it is
+                                                                for (let i = 1; i <= 9; i++) {
+                                                                    if (img.src.includes(`image${i}`) || img.src.includes(`_${i}.`) || img.src.includes(`-${i}.`)) {
+                                                                        imageNumber = i;
+                                                                        break;
+                                                                    }
+                                                                }
+
+                                                                // If we can't determine from URL, we need a different approach
+                                                                // Let's use the template knowledge: check the carousel HTML structure
+                                                                if (!imageNumber) {
+                                                                    // Get the HTML of the carousel item to check which Django template block it came from
+                                                                    const itemHTML = item.outerHTML;
+                                                                    for (let i = 1; i <= 9; i++) {
+                                                                        // Since we can't see the template logic in the rendered HTML,
+                                                                        // we'll have to rely on the order they appear and make educated guesses
+
+                                                                        // For now, let's just use the index + 1 as a fallback
+                                                                        // But this is not reliable if images are missing in between
+                                                                        imageNumber = index + 1;
+                                                                        break;
+                                                                    }
+                                                                }
+
+                                                                if (imageNumber && imageNumber <= 9) {
+                                                                    imageMapping.push(imageNumber);
+                                                                    filesToDownload.push(`image${imageNumber}`);
+                                                                }
+                                                            }
+                                                        });
+
+                                                        // Alternative approach: Try to download each image and let the backend handle missing ones
+                                                        // This is more reliable - we attempt all images and the backend will return 404 for missing ones
+                                                        if (filesToDownload.length === 0) {
+                                                            console.log('Fallback: Checking all possible images');
+
+                                                            // Since we have carousel items, we know some images exist
+                                                            // Let's try a different approach: attempt to download in order and let backend handle it
+                                                            const imageElements = document.querySelectorAll('#carouselExConInd .carousel-item img');
+
+                                                            imageElements.forEach((img, index) => {
+                                                                if (img && img.src && !img.src.includes('placeholder')) {
+                                                                    // Just use sequential numbering based on appearance
+                                                                    filesToDownload.push(`image${index + 1}`);
+                                                                }
+                                                            });
+                                                        }
+
+                                                        // Check for video
+                                                        const videoElement = document.querySelector('video');
+                                                        if (videoElement) {
+                                                            // Check if video has content (either src or source child)
+                                                            const videoSrc = videoElement.src || (videoElement.querySelector('source') && videoElement.querySelector('source').src);
+
+                                                            if (videoSrc && !videoSrc.includes('placeholder')) {
+                                                                filesToDownload.push('video');
+                                                            } else if (videoElement.querySelector('source')) {
+                                                                // Video element exists with source, assume it's valid
+                                                                filesToDownload.push('video');
+                                                            }
+                                                        }
+
+                                                        // Remove duplicates
+                                                        filesToDownload = [...new Set(filesToDownload)];
+
+                                                        totalFiles = filesToDownload.length;
+
+                                                        console.log('Files to download:', filesToDownload);
+                                                        console.log('Total files:', totalFiles);
+
+                                                        if (totalFiles === 0) {
+                                                            alert('هیچ فایل رسانه‌ای برای دانلود یافت نشد!');
+                                                            downloadBtn.disabled = false;
+                                                            downloadBtn.innerHTML = originalText;
+                                                            return;
+                                                        }
+
+                                                        // Download all found files with improved handling
+                                                        let delay = 0;
+
+                                                        filesToDownload.forEach((file, index) => {
+                                                            const downloadUrl = `${baseUrl}?file=${file}`;
+
+                                                            setTimeout(() => {
+                                                                console.log(`Attempting to download: ${file}`);
+
+                                                                // Special handling for video files to avoid conflicts
+                                                                if (file === 'video') {
+                                                                    // Pause the video element to avoid conflicts
+                                                                    const videoEl = document.querySelector('video');
+                                                                    if (videoEl) {
+                                                                        videoEl.pause();
+                                                                        // Small delay to ensure video is fully paused
+                                                                        setTimeout(() => {
+                                                                            triggerFileDownload(downloadUrl, file);
+                                                                        }, 200);
+                                                                    } else {
+                                                                        triggerFileDownload(downloadUrl, file);
+                                                                    }
+                                                                } else {
+                                                                    triggerFileDownload(downloadUrl, file);
+                                                                }
+
+                                                            }, delay);
+
+                                                            delay += 2000; // 2 seconds between downloads for better stability
+                                                        });
+
+                                                        function triggerFileDownload(url, fileName) {
+                                                            console.log(`Downloading: ${fileName} from ${url}`);
+
+                                                            // Use simple link approach instead of fetch - fetch was causing the HTML download issue
+                                                            const link = document.createElement('a');
+                                                            link.href = url;
+                                                            link.download = ''; // Let browser determine filename from server
+                                                            link.style.display = 'none';
+
+                                                            document.body.appendChild(link);
+                                                            link.click();
+                                                            document.body.removeChild(link);
+
+                                                            downloadCount++;
+                                                            downloadBtn.innerHTML = `<i class="fa fa-download"></i> دانلود شده: ${downloadCount}/${totalFiles}`;
+
+                                                            console.log(`Triggered download for: ${fileName}`);
+
+                                                            if (downloadCount === totalFiles) {
+                                                                setTimeout(() => {
+                                                                    downloadBtn.disabled = false;
+                                                                    downloadBtn.innerHTML = originalText;
+                                                                    console.log('All downloads completed');
+                                                                }, 2000);
+                                                            }
+                                                        }
                                                     }
-                                                }
-                                                
-                                                // If we can't determine from URL, we need a different approach
-                                                // Let's use the template knowledge: check the carousel HTML structure
-                                                if (!imageNumber) {
-                                                    // Get the HTML of the carousel item to check which Django template block it came from
-                                                    const itemHTML = item.outerHTML;
-                                                    for (let i = 1; i <= 9; i++) {
-                                                        // Since we can't see the template logic in the rendered HTML,
-                                                        // we'll have to rely on the order they appear and make educated guesses
-                                                        
-                                                        // For now, let's just use the index + 1 as a fallback
-                                                        // But this is not reliable if images are missing in between
-                                                        imageNumber = index + 1;
-                                                        break;
-                                                    }
-                                                }
-                                                
-                                                if (imageNumber && imageNumber <= 9) {
-                                                    imageMapping.push(imageNumber);
-                                                    filesToDownload.push(`image${imageNumber}`);
-                                                }
-                                            }
-                                        });
-                                        
-                                        // Alternative approach: Try to download each image and let the backend handle missing ones
-                                        // This is more reliable - we attempt all images and the backend will return 404 for missing ones
-                                        if (filesToDownload.length === 0) {
-                                            console.log('Fallback: Checking all possible images');
-                                            
-                                            // Since we have carousel items, we know some images exist
-                                            // Let's try a different approach: attempt to download in order and let backend handle it
-                                            const imageElements = document.querySelectorAll('#carouselExConInd .carousel-item img');
-                                            
-                                            imageElements.forEach((img, index) => {
-                                                if (img && img.src && !img.src.includes('placeholder')) {
-                                                    // Just use sequential numbering based on appearance
-                                                    filesToDownload.push(`image${index + 1}`);
-                                                }
-                                            });
-                                        }
-                                        
-                                        // Check for video
-                                        const videoElement = document.querySelector('video');
-                                        if (videoElement) {
-                                            // Check if video has content (either src or source child)
-                                            const videoSrc = videoElement.src || (videoElement.querySelector('source') && videoElement.querySelector('source').src);
-                                            
-                                            if (videoSrc && !videoSrc.includes('placeholder')) {
-                                                filesToDownload.push('video');
-                                            } else if (videoElement.querySelector('source')) {
-                                                // Video element exists with source, assume it's valid
-                                                filesToDownload.push('video');
-                                            }
-                                        }
-                                        
-                                        // Remove duplicates
-                                        filesToDownload = [...new Set(filesToDownload)];
-                                        
-                                        totalFiles = filesToDownload.length;
-                                        
-                                        console.log('Files to download:', filesToDownload);
-                                        console.log('Total files:', totalFiles);
-                                        
-                                        if (totalFiles === 0) {
-                                            alert('هیچ فایل رسانه‌ای برای دانلود یافت نشد!');
-                                            downloadBtn.disabled = false;
-                                            downloadBtn.innerHTML = originalText;
-                                            return;
-                                        }
-                                        
-                                        // Download all found files with improved handling
-                                        let delay = 0;
-                                        
-                                        filesToDownload.forEach((file, index) => {
-                                            const downloadUrl = `${baseUrl}?file=${file}`;
-                                            
-                                            setTimeout(() => {
-                                                console.log(`Attempting to download: ${file}`);
-                                                
-                                                // Special handling for video files to avoid conflicts
-                                                if (file === 'video') {
-                                                    // Pause the video element to avoid conflicts
-                                                    const videoEl = document.querySelector('video');
-                                                    if (videoEl) {
-                                                        videoEl.pause();
-                                                        // Small delay to ensure video is fully paused
-                                                        setTimeout(() => {
-                                                            triggerFileDownload(downloadUrl, file);
-                                                        }, 200);
-                                                    } else {
-                                                        triggerFileDownload(downloadUrl, file);
-                                                    }
-                                                } else {
-                                                    triggerFileDownload(downloadUrl, file);
-                                                }
-                                                
-                                            }, delay);
-                                            
-                                            delay += 2000; // 2 seconds between downloads for better stability
-                                        });
-                                        
-                                        function triggerFileDownload(url, fileName) {
-                                            console.log(`Downloading: ${fileName} from ${url}`);
-                                            
-                                            // Use simple link approach instead of fetch - fetch was causing the HTML download issue
-                                            const link = document.createElement('a');
-                                            link.href = url;
-                                            link.download = ''; // Let browser determine filename from server
-                                            link.style.display = 'none';
-                                            
-                                            document.body.appendChild(link);
-                                            link.click();
-                                            document.body.removeChild(link);
-                                            
-                                            downloadCount++;
-                                            downloadBtn.innerHTML = `<i class="fa fa-download"></i> دانلود شده: ${downloadCount}/${totalFiles}`;
-                                            
-                                            console.log(`Triggered download for: ${fileName}`);
-                                            
-                                            if (downloadCount === totalFiles) {
-                                                setTimeout(() => {
-                                                    downloadBtn.disabled = false;
-                                                    downloadBtn.innerHTML = originalText;
-                                                    console.log('All downloads completed');
-                                                }, 2000);
-                                            }
-                                        }
-                                    }
-                                </script>    
-                            
-                                <!-- Text -->
-                                <a href="{{ whatsapp_share_url }}"
-                                   target="_blank"
-                                   class="btn btn-primary"
-                                   id="whatsapp-direct-btn">
-                                    <i class="fab fa-whatsapp"></i>
-                                    ارسال متن برای مشتری
-                                </a>
-                                <div id="whatsapp-loading" class="d-none">
-                                    <div class="spinner-border spinner-border-sm me-2" role="status"></div>
-                                    در حال آماده سازی...
+                                                </script>
+
+                                            </div>
+
+                                        </div>
+                                    </div>
                                 </div>
-                                <div id="whatsapp-info" class="mt-2 text-muted small">
-                                    <span id="images-count"></span>
-                                </div>
-                                <script>
-                                    document.addEventListener('DOMContentLoaded', function() {
-                                    const ajaxBtn = document.getElementById('whatsapp-ajax-btn');
-                                    const loadingDiv = document.getElementById('whatsapp-loading');
-                                    const infoDiv = document.getElementById('whatsapp-info');
-
-                                    ajaxBtn.addEventListener('click', function() {
-                                        const rentFileId = this.getAttribute('data-rent-file-id');
-
-                                        // Show loading
-                                        this.style.display = 'none';
-                                        loadingDiv.classList.remove('d-none');
-
-                                        // Make AJAX request
-                                        fetch(`/rent-file/${rentFileId}/whatsapp-share/`, {
-                                            method: 'GET',
-                                            headers: {
-                                                'X-Requested-With': 'XMLHttpRequest',
-                                                'Content-Type': 'application/json',
-                                            }
-                                        })
-                                        .then(response => response.json())
-                                        .then(data => {
-                                            if (data.error) {
-                                                alert('خطا: ' + data.error);
-                                            } else {
-                                                // Open WhatsApp
-                                                window.open(data.whatsapp_url, '_blank');
-                                            }
-                                        })
-                                        .catch(error => {
-                                            console.error('Error:', error);
-                                            alert('خطایی در ارسال درخواست رخ داد');
-                                        })
-                                        .finally(() => {
-                                            // Hide loading
-                                            loadingDiv.classList.add('d-none');
-                                            ajaxBtn.style.display = 'inline-block';
-                                        });
-                                    });
-                                    });
-                                </script>
-
                             </div>
                         </div>
                         <!-- end: Share -->
@@ -906,13 +1034,9 @@
                         <!-- Gallery -->
                         <div class="nk-block"  style="margin-top: 2em;">
 
-                            <!-- Title (images) -->
-                            <div class="nk-block-head nk-block-head-sm">
-                                <div class="nk-block-between g-3">
-                                    <div class="nk-block-head-content">
-                                        <h5 class="nk-block-title">گالری تصویر</h5>
-                                    </div>
-                                </div>
+                            <!-- Title (Images) -->
+                            <div class="card-header justify-center">
+                                <h6>گالری تصاویر</h6>
                             </div>
 
                             <!-- Media (images) -->
@@ -924,51 +1048,50 @@
 
                                                 <!-- Carousel -->
                                                 <div class="carousel-inner">
-                                                    {% if rent_file.image1 %}
+                                                    {% if sale_file.image1 %}
                                                         <div class="carousel-item active">
-                                                            <img src="{{ rent_file.image1.url }}" class="d-block w-100">
-                                                            <a href="{{ rent_file.image1.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
+                                                            <img src="{{ sale_file.image1.url }}" class="d-block w-100">
                                                         </div>
                                                     {% endif %}
-                                                    {% if rent_file.image2 %}
+                                                    {% if sale_file.image2 %}
                                                         <div class="carousel-item">
-                                                            <img src="{{ rent_file.image2.url }}" class="d-block w-100">
+                                                            <img src="{{ sale_file.image2.url }}" class="d-block w-100">
                                                         </div>
                                                     {% endif %}
-                                                    {% if rent_file.image3 %}
+                                                    {% if sale_file.image3 %}
                                                         <div class="carousel-item">
-                                                            <img src="{{ rent_file.image3.url }}" class="d-block w-100">
+                                                            <img src="{{ sale_file.image3.url }}" class="d-block w-100">
                                                         </div>
                                                     {% endif %}
-                                                    {% if rent_file.image4 %}
+                                                    {% if sale_file.image4 %}
                                                         <div class="carousel-item active">
-                                                            <img src="{{ rent_file.image4.url }}" class="d-block w-100">
+                                                            <img src="{{ sale_file.image4.url }}" class="d-block w-100">
                                                         </div>
                                                     {% endif %}
-                                                    {% if rent_file.image5 %}
+                                                    {% if sale_file.image5 %}
                                                         <div class="carousel-item">
-                                                            <img src="{{ rent_file.image5.url }}" class="d-block w-100">
+                                                            <img src="{{ sale_file.image5.url }}" class="d-block w-100">
                                                         </div>
                                                     {% endif %}
-                                                    {% if rent_file.image6 %}
+                                                    {% if sale_file.image6 %}
                                                         <div class="carousel-item">
-                                                            <img src="{{ rent_file.image6.url }}" class="d-block w-100">
-                                                                <a href="{{ rent_file.image1.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
+                                                            <img src="{{ sale_file.image6.url }}" class="d-block w-100">
+                                                                <a href="{{ sale_file.image1.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
                                                         </div>
                                                     {% endif %}
-                                                    {% if rent_file.image7 %}
+                                                    {% if sale_file.image7 %}
                                                         <div class="carousel-item active">
-                                                            <img src="{{ rent_file.image7.url }}" class="d-block w-100">
+                                                            <img src="{{ sale_file.image7.url }}" class="d-block w-100">
                                                         </div>
                                                     {% endif %}
-                                                    {% if rent_file.image8 %}
+                                                    {% if sale_file.image8 %}
                                                         <div class="carousel-item">
-                                                            <img src="{{ rent_file.image8.url }}" class="d-block w-100">
+                                                            <img src="{{ sale_file.image8.url }}" class="d-block w-100">
                                                         </div>
                                                     {% endif %}
-                                                    {% if rent_file.image9 %}
+                                                    {% if sale_file.image9 %}
                                                         <div class="carousel-item">
-                                                            <img src="{{ rent_file.image9.url }}" class="d-block w-100">
+                                                            <img src="{{ sale_file.image9.url }}" class="d-block w-100">
                                                         </div>
                                                     {% endif %}
                                                 </div>
@@ -989,25 +1112,21 @@
                                 </div>
                             </div>
 
-                            <!-- Title (video) -->
-                            <div class="nk-block-head nk-block-head-sm" style="margin-top: 2em;">
-                                <div class="nk-block-between g-3">
-                                    <div class="nk-block-head-content">
-                                        <h5 class="nk-block-title">ویدئو معرفی</h5>
-                                    </div>
-                                </div>
+                            <!-- Title (Video) -->
+                            <div class="card-header justify-center mt-5">
+                                <h6>ویدئو معرفی</h6>
                             </div>
 
                             <!-- Media (video) -->
                             <div class="row g-gs">
                                 <!-- video -->
-                                {% if rent_file.video %}
+                                {% if sale_file.video %}
                                     <div class="col-sm-6 col-lg-4 col-xxl-4">
                                         <div class="gallery card">
-                                            {% if rent_file.video %}
+                                            {% if sale_file.video %}
                                                 <a class="gallery-image popup-image" href="#">
                                                     <video controls loop muted width="100%">
-                                                        <source src="{{ rent_file.video.url }}" type="video/mp4">
+                                                        <source src="{{ sale_file.video.url }}" type="video/mp4">
                                                     </video>
                                                 </a>
                                             {% endif %}
@@ -1027,13 +1146,9 @@
                         <div class="nk-block"  style="margin-top: 3em;">
                             <div class="row">
 
-                                <!-- Title (other) -->
-                                <div class="nk-block-head nk-block-head-sm">
-                                    <div class="nk-block-between g-3">
-                                        <div class="nk-block-head-content">
-                                            <h5 class="nk-block-title">سایر مشخصات</h5>
-                                        </div>
-                                    </div>
+                                <!-- Title -->
+                                <div class="card-header justify-center">
+                                    <h6>سایر مشخصات</h6>
                                 </div>
 
                                 <!-- Source -->
@@ -1447,6 +1562,5 @@
     </div>
 
 {% endblock %}
-
 
 

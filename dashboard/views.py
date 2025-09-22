@@ -723,12 +723,6 @@ def download_sale_file_media(request, pk, unique_url_id):
         raise Http404(f"Error serving file: {str(e)}")
 
 
-class SaleFileGalleryView(DetailView):
-    model = models.SaleFile
-    context_object_name = 'sale_file'
-    template_name = 'dashboard/files/sale_file_gallery.html'
-
-
 class SaleFileCreateView(PermissionRequiredMixin, CreateView):
     model = models.SaleFile
     form_class = forms.SaleFileCreateForm
@@ -1262,12 +1256,6 @@ def download_rent_file_media(request, pk, unique_url_id):
         return response
     except Exception as e:
         raise Http404(f"Error serving file: {str(e)}")
-
-
-class RentFileGalleryView(DetailView):
-    model = models.RentFile
-    context_object_name = 'rent_file'
-    template_name = 'dashboard/files/rent_file_gallery.html'
 
 
 class RentFileCreateView(PermissionRequiredMixin, CreateView):
@@ -3936,6 +3924,5 @@ def dated_task_list_view(request):
         'tasks': tasks,
     }
     return render(request, 'dashboard/tasks/dated_task_list.html', context=context)
-
 
 
