@@ -18,13 +18,15 @@ from operator import attrgetter
 from django.contrib import messages
 
 from jalali_date import datetime2jalali
+from datetime import datetime, timedelta
 from django.utils import timezone
+
 
 from . import models, forms, functions
 from .permissions import PermissionRequiredMixin, ReadOnlyPermissionMixin
 
 
-# ----------------------------------- Bases -----------------------------------
+# ---------------------------------- Dashboard ----------------------------------
 def home_view(request):
     return render(request, 'dashboard/home.html')
 
@@ -38,6 +40,154 @@ class DashboardView(ReadOnlyPermissionMixin, TemplateView):
         if self.request.user.title == 'bs':
             sub_districts = models.SubDistrict.objects.select_related('district', 'district__city', 'district__city__province').all()
             context['sub_districts'] = sub_districts
+            context['count'] = sub_districts.count()
+        else:
+            agent = self.request.user
+            context['subdi'] = self.request.user.sub_district
+
+            sale_files = models.SaleFile.objects.filter(status='acc').filter(created_by=agent).all().exclude(delete_request='Yes')
+            rent_files = models.RentFile.objects.filter(status='acc').filter(created_by=agent).all().exclude(delete_request='Yes')
+            buyers = models.Buyer.objects.filter(status='acc').filter(created_by=agent).all().exclude(delete_request='Yes')
+            renters = models.Renter.objects.filter(status='acc').filter(created_by=agent).all().exclude(delete_request='Yes')
+            context['sale_files'] = sale_files.count()
+            context['rent_files'] = rent_files.count()
+            context['buyers'] = buyers.count()
+            context['renters'] = renters.count()
+
+            # visits
+            today = datetime.today()
+            all_agent_visits = models.Visit.objects.filter(agent=agent)
+            thirty_days_ago = today - timedelta(days=30)
+            recent_30_visits = []
+            for visit in all_agent_visits:
+                try:
+                    visit_date = datetime.strptime(visit.date, '%Y/%m/%d')
+                    if visit_date.date() >= thirty_days_ago.date():
+                        recent_30_visits.append(visit.id)
+                except (ValueError, TypeError):
+                    continue
+            visits_last_30_days = models.Visit.objects.filter(id__in=recent_30_visits)
+
+            seven_days_ago = today - timedelta(days=7)
+            recent_7_visits = []
+            for visit in all_agent_visits:
+                try:
+                    visit_date = datetime.strptime(visit.date, '%Y/%m/%d')
+                    if visit_date.date() >= seven_days_ago.date():
+                        recent_7_visits.append(visit.id)
+                except (ValueError, TypeError):
+                    continue
+            visits_last_7_days = models.Visit.objects.filter(id__in=recent_7_visits)
+
+            # sessions
+            all_agent_sessions = models.Session.objects.filter(agent=agent)
+            thirty_days_ago = today - timedelta(days=30)
+            recent_30_sessions = []
+            for session in all_agent_sessions:
+                try:
+                    session_date = datetime.strptime(session.date, '%Y/%m/%d')
+                    if session_date.date() >= thirty_days_ago.date():
+                        recent_30_sessions.append(session.id)
+                except (ValueError, TypeError):
+                    continue
+            sessions_last_30_days = models.Session.objects.filter(id__in=recent_30_sessions)
+
+            seven_days_ago = today - timedelta(days=7)
+            recent_7_sessions = []
+            for session in all_agent_sessions:
+                try:
+                    session_date = datetime.strptime(session.date, '%Y/%m/%d')
+                    if session_date.date() >= seven_days_ago.date():
+                        recent_7_sessions.append(session.id)
+                except (ValueError, TypeError):
+                    continue
+            sessions_last_7_days = models.Session.objects.filter(id__in=recent_7_sessions)
+
+            context['visits_last_30_days'] = visits_last_30_days.count()
+            context['visits_last_7_days'] = visits_last_7_days.count()
+            context['sessions_last_30_days'] = sessions_last_30_days.count()
+            context['sessions_last_7_days'] = sessions_last_7_days.count()
+        return context
+
+
+class AgentDetailView(DetailView):
+    model = models.CustomUserModel
+    template_name = 'dashboard/teams/agent_detail.html'
+    context_object_name = 'agent'
+    # permission_model = 'agents'
+
+    def dispatch(self, request, *args, **kwargs):
+        agent = self.get_object()
+        if request.user.title != 'bs':
+            raise PermissionDenied("شما اجازه مشاهده این محتوا را ندارید")
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        agent = self.get_object()
+
+        sale_files = models.SaleFile.objects.filter(status='acc').filter(created_by=agent).all().exclude(delete_request='Yes')
+        rent_files = models.RentFile.objects.filter(status='acc').filter(created_by=agent).all().exclude(delete_request='Yes')
+        buyers = models.Buyer.objects.filter(status='acc').filter(created_by=agent).all().exclude(delete_request='Yes')
+        renters = models.Renter.objects.filter(status='acc').filter(created_by=agent).all().exclude(delete_request='Yes')
+
+        # visits
+        today = datetime.today()
+        all_agent_visits = models.Visit.objects.filter(agent=agent)
+        thirty_days_ago = today - timedelta(days=30)
+        recent_30_visits = []
+        for visit in all_agent_visits:
+            try:
+                visit_date = datetime.strptime(visit.date, '%Y/%m/%d')
+                if visit_date.date() >= thirty_days_ago.date():
+                    recent_30_visits.append(visit.id)
+            except (ValueError, TypeError):
+                continue
+        visits_last_30_days = models.Visit.objects.filter(id__in=recent_30_visits)
+
+        seven_days_ago = today - timedelta(days=7)
+        recent_7_visits = []
+        for visit in all_agent_visits:
+            try:
+                visit_date = datetime.strptime(visit.date, '%Y/%m/%d')
+                if visit_date.date() >= seven_days_ago.date():
+                    recent_7_visits.append(visit.id)
+            except (ValueError, TypeError):
+                continue
+        visits_last_7_days = models.Visit.objects.filter(id__in=recent_7_visits)
+
+        # sessions
+        all_agent_sessions = models.Session.objects.filter(agent=agent)
+        thirty_days_ago = today - timedelta(days=30)
+        recent_30_sessions = []
+        for session in all_agent_sessions:
+            try:
+                session_date = datetime.strptime(session.date, '%Y/%m/%d')
+                if session_date.date() >= thirty_days_ago.date():
+                    recent_30_sessions.append(session.id)
+            except (ValueError, TypeError):
+                continue
+        sessions_last_30_days = models.Session.objects.filter(id__in=recent_30_sessions)
+
+        seven_days_ago = today - timedelta(days=7)
+        recent_7_sessions = []
+        for session in all_agent_sessions:
+            try:
+                session_date = datetime.strptime(session.date, '%Y/%m/%d')
+                if session_date.date() >= seven_days_ago.date():
+                    recent_7_sessions.append(session.id)
+            except (ValueError, TypeError):
+                continue
+        sessions_last_7_days = models.Session.objects.filter(id__in=recent_7_sessions)
+
+        context['sale_files'] = sale_files.count()
+        context['rent_files'] = rent_files.count()
+        context['buyers'] = buyers.count()
+        context['renters'] = renters.count()
+        context['visits_last_30_days'] = visits_last_30_days.count()
+        context['visits_last_7_days'] = visits_last_7_days.count()
+        context['sessions_last_30_days'] = sessions_last_30_days.count()
+        context['sessions_last_7_days'] = sessions_last_7_days.count()
         return context
 
 
@@ -1173,7 +1323,7 @@ class RentFileDetailView(ReadOnlyPermissionMixin, DetailView):
 
     def get_whatsapp_share_url(self, rent_file):
         message_parts = [
-            f"🏠 فایل فروش شماره {rent_file.id}",
+            f"🏠 فایل اجاره شماره {rent_file.id}",
             f"💰 ودیعه: {rent_file.deposit_announced:,} تومان" if hasattr(rent_file, 'deposit_announced') else "",
             f"💰 اجاره: {rent_file.rent_announced:,} تومان" if hasattr(rent_file, 'rent_announced') else "",
             f"📐 متراژ: {rent_file.area} متر مربع" if hasattr(rent_file, 'area') else "",
@@ -2013,6 +2163,7 @@ class RenterDetailView(ReadOnlyPermissionMixin, DetailView):
             ).exists()
         context['is_marked'] = is_marked
         return context
+
 
 
 class RenterCreateView(PermissionRequiredMixin, CreateView):
@@ -3924,5 +4075,7 @@ def dated_task_list_view(request):
         'tasks': tasks,
     }
     return render(request, 'dashboard/tasks/dated_task_list.html', context=context)
+
+
 
 

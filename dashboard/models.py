@@ -3,13 +3,12 @@ import zipfile
 
 import random
 import string
-from jdatetime import date, timedelta, datetime
+from jdatetime import timedelta, datetime
 
 from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.shortcuts import reverse
-from django.utils.html import format_html
 from django.utils.text import slugify
 from django.utils import timezone
 from django.utils.translation import gettext as _
@@ -17,7 +16,7 @@ from django.utils.translation import gettext as _
 from . import choices
 
 
-# -------------------------------- CODES ---------------------------------
+# -------------------------------- CODEs ---------------------------------
 def generate_unique_id():
     return ''.join(random.choices(string.ascii_letters + string.digits, k=20))
 
@@ -30,7 +29,7 @@ def generate_unique_code_longer():
     return ''.join(random.choices(string.digits + string.digits, k=10))
 
 
-# -------------------------------- TIMES ---------------------------------
+# -------------------------------- TIMEs ---------------------------------
 def next_week_shamsi():
     days = []
     today = datetime.today()
@@ -213,8 +212,11 @@ class CustomUserModel(AbstractUser):
         else:
             return choices.beings[1]
 
+    def get_absolute_url(self):
+        return reverse('agent_detail', kwargs={'pk': self.pk, 'title': self.title, 'username': self.username})
 
-# --------------------------------- FILE -----------------------------------
+
+# --------------------------------- FILEs -----------------------------------
 class Person(models.Model):
     name = models.CharField(max_length=100, verbose_name=_('Name'))
     phone_number = models.CharField(max_length=11, verbose_name=_('Phone Number'))
@@ -303,7 +305,7 @@ class SaleFile(models.Model):
     datetime_expired = models.DateTimeField(blank=True, null=True)
     delete_request = models.CharField(max_length=3, choices=choices.yes_or_no, blank=True, null=True, default='No',
                                       verbose_name=_('Delete Request'))
-    created_by = models.ForeignKey(CustomUserModel, on_delete=models.SET_NULL, null=True, blank=True,
+    created_by = models.ForeignKey(CustomUserModel, on_delete=models.SET_NULL, null=True, blank=True, related_name='sale_files',
                                    verbose_name='ایجاد شده توسط')
 
     @property
@@ -414,7 +416,7 @@ class RentFile(models.Model):
     datetime_expired = models.DateTimeField(blank=True, null=True)
     delete_request = models.CharField(max_length=3, choices=choices.yes_or_no, blank=True, null=True, default='No',
                                       verbose_name=_('Delete Request'))
-    created_by = models.ForeignKey(CustomUserModel, on_delete=models.SET_NULL, null=True, blank=True,
+    created_by = models.ForeignKey(CustomUserModel, on_delete=models.SET_NULL, null=True, blank=True, related_name='rent_files',
                                    verbose_name='ایجاد شده توسط')
 
     @property
@@ -514,7 +516,7 @@ class Buyer(models.Model):
     datetime_created = models.DateTimeField(default=timezone.now, verbose_name=_('Date and Time of Creation'))
     delete_request = models.CharField(max_length=3, choices=choices.yes_or_no, blank=True, null=True, default='No',
                                       verbose_name=_('Delete Request'))
-    created_by = models.ForeignKey(CustomUserModel, on_delete=models.SET_NULL, null=True, blank=True,
+    created_by = models.ForeignKey(CustomUserModel, on_delete=models.SET_NULL, null=True, blank=True, related_name='buyers',
                                    verbose_name='ایجاد شده توسط')
 
     def save(self, *args, **kwargs):
@@ -571,7 +573,7 @@ class Renter(models.Model):
     datetime_created = models.DateTimeField(default=timezone.now, verbose_name=_('Date and Time of Creation'))
     delete_request = models.CharField(max_length=3, choices=choices.yes_or_no, blank=True, null=True, default='No',
                                       verbose_name=_('Delete Request'))
-    created_by = models.ForeignKey(CustomUserModel, on_delete=models.SET_NULL, null=True, blank=True,
+    created_by = models.ForeignKey(CustomUserModel, on_delete=models.SET_NULL, null=True, blank=True, related_name='renters',
                                    verbose_name='ایجاد شده توسط')
 
     def save(self, *args, **kwargs):
@@ -790,7 +792,7 @@ class Trade(models.Model):
         return reverse('trade_detail', args=[self.pk, self.code])
 
 
-# --------------------------------- USERS ---------------------------------
+# --------------------------------- USERs ---------------------------------
 class Task(models.Model):
     title = models.CharField(max_length=200, verbose_name=_('Title'))
     deadline = models.CharField(max_length=200, verbose_name=_('Deadline'))

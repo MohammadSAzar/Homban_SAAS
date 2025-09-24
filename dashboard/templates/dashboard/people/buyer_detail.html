@@ -297,7 +297,9 @@
                                                         </div>
                                                         <div class="card-inner" style="background-color: #FAFAFA">
                                                             <!-- Info -->
-                                                            <p class="card-text" style="color: #00a65c;">{{ file.sub_district }}</p>
+                                                            <p class="card-text" style="color: #00a65c; height: 3em;!important; -webkit-line-clamp: 2;!important;">
+                                                                {{ file.sub_district }}
+                                                            </p>
                                                             {% if file.created_by.name_family %}
                                                                 <p class="card-text">مشاور: {{ file.created_by.name_family }}</p>
                                                             {% else %}
@@ -307,33 +309,12 @@
                                                             <p class="card-text">متراژ: {{ file.area }}</p>
                                                             <p class="card-text">اتاق: {{ file.room }}</p>
                                                             <!-- Link -->
-                                                            <a href="{% url 'sale_file_gallery' file.pk file.unique_url_id %}"
+                                                            <a href="{% url 'sale_file_detail' file.pk file.unique_url_id %}"
                                                                class="btn btn-primary"
                                                                style="font-size: 0.75em; width:100%; text-align: center; justify-content: center;"
-                                                               onclick="copyToClipboard(event, this)">
-                                                               کپی لینک
+                                                               target="_blank">
+                                                               مشاهده
                                                             </a>
-                                                            <!-- Message -->
-                                                            <span id="copy-message" style="display:none; color:green; margin-right:10px; margin-top: 5px;">شد!</span>
-                                                            <!-- JS -->
-                                                            <script>
-                                                                function copyToClipboard(event, element) {
-                                                                    event.preventDefault();
-                                                                    const baseUrl = window.location.origin;
-                                                                    const relativeUrl = element.getAttribute('href');
-                                                                    const fullUrl = baseUrl + relativeUrl;
-                                                                    navigator.clipboard.writeText(fullUrl).then(() => {
-                                                                        const message = document.getElementById("copy-message");
-                                                                        message.style.display = "inline";
-                                                                        setTimeout(() => {
-                                                                            message.style.display = "none";
-                                                                        }, 2000);
-                                                                    }).catch(err => {
-                                                                        console.error("Failed to copy: ", err);
-                                                                    });
-                                                                }
-                                                            </script>
-
                                                         </div>
                                                     </div>
                                                 </div>

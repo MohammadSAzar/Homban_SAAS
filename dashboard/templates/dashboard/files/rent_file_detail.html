@@ -588,7 +588,7 @@
                                                                 </div>
                                                                 <!-- Info -->
                                                                 <div class="card-inner" style="background-color: #FAFAFA">
-                                                                    <p class="card-text" style="color: #00a65c;">
+                                                                    <p class="card-text" style="color: #00a65c; height: 3em;!important; -webkit-line-clamp: 2;!important;">
                                                                         {% for sub_district in renter.sub_districts.all %}
                                                                             {{ sub_district.name }} |
                                                                         {% endfor %}
@@ -658,17 +658,17 @@
                                                 <button type="button"
                                                         class="btn btn-primary me-2 mb-2"
                                                         id="copy-text-btn"
-                                                        data-sale-file-text="">
+                                                        data-rent-file-text="">
                                                     <i class="fas fa-copy"></i>
                                                     کپی متن
                                                 </button>
 
                                                 <!-- Download -->
-                                                {% if sale_file.has_images or sale_file.has_video %}
+                                                {% if rent_file.has_images or rent_file.has_video %}
                                                     <button type="button"
                                                        class="btn btn-primary me-2 mb-2"
                                                        id="download-all-btn"
-                                                       onclick="downloadAllMedia({{ sale_file.pk }}, '{{ sale_file.unique_url_id }}')"
+                                                       onclick="downloadAllMedia({{ rent_file.pk }}, '{{ rent_file.unique_url_id }}')"
                                                     >دانلود یکجا</button>
                                                 {% else %}
                                                     <button class="btn btn-danger me-2 mb-2">بدون محتوا</button>
@@ -690,32 +690,34 @@
                                                 <script>
                                                     document.addEventListener('DOMContentLoaded', function() {
                                                         // Sample data - this would come from your Django template
-                                                        const saleFileData = {
+                                                        const rentFileData = {
                                                             id: 123,
-                                                            price_announced: 2500000000,
+                                                            deposit_announced: 100000000,
+                                                            rent_announced: 50000000,
                                                             area: 120,
                                                             room: 3
                                                         };
 
                                                         // Generate the text message (same logic as your Django view)
-                                                        function generateWhatsAppText(saleFile) {
+                                                        function generateWhatsAppText(rentFile) {
                                                             const messageParts = [
-                                                                `🏠 فایل فروش شماره ${saleFile.id}`,
-                                                                saleFile.price_announced ? `💰 قیمت: ${saleFile.price_announced.toLocaleString('fa-IR')} تومان` : "",
-                                                                saleFile.area ? `📐 متراژ: ${saleFile.area} متر مربع` : "",
-                                                                saleFile.room ? `📐 تعداد اتاق: ${saleFile.room}` : ""
+                                                                `🏠 فایل اجاره شماره ${rentFile.id}`,
+                                                                rentFile.deposit_announced ? `💰 ودیعه: ${rentFile.deposit_announced.toLocaleString('fa-IR')} تومان` : "",
+                                                                rentFile.rent_announced ? `💰 رهن: ${rentFile.rent_announced.toLocaleString('fa-IR')} تومان` : "",
+                                                                rentFile.area ? `📐 متراژ: ${rentFile.area} متر مربع` : "",
+                                                                rentFile.room ? `📐 تعداد اتاق: ${rentFile.room}` : ""
                                                             ];
                                                             return messageParts.filter(part => part !== "").join("\n");
                                                         }
 
                                                         // Set the text data for the copy button
                                                         const copyBtn = document.getElementById('copy-text-btn');
-                                                        const textToCopy = generateWhatsAppText(saleFileData);
-                                                        copyBtn.setAttribute('data-sale-file-text', textToCopy);
+                                                        const textToCopy = generateWhatsAppText(rentFileData);
+                                                        copyBtn.setAttribute('data-rent-file-text', textToCopy);
 
                                                         // Copy to clipboard functionality
                                                         copyBtn.addEventListener('click', function() {
-                                                            const textToCopy = this.getAttribute('data-sale-file-text');
+                                                            const textToCopy = this.getAttribute('data-rent-file-text');
                                                             const statusDiv = document.getElementById('copy-status');
 
                                                             // Use the Clipboard API if available
@@ -779,14 +781,14 @@
 
                                                         if (ajaxBtn) {
                                                             ajaxBtn.addEventListener('click', function() {
-                                                                const saleFileId = this.getAttribute('data-sale-file-id');
+                                                                const rentFileId = this.getAttribute('data-rent-file-id');
 
                                                                 // Show loading
                                                                 this.style.display = 'none';
                                                                 loadingDiv.classList.remove('d-none');
 
                                                                 // Make AJAX request
-                                                                fetch(`/sale-file/${saleFileId}/whatsapp-share/`, {
+                                                                fetch(`/rent-file/${rentFileId}/whatsapp-share/`, {
                                                                     method: 'GET',
                                                                     headers: {
                                                                         'X-Requested-With': 'XMLHttpRequest',
@@ -818,7 +820,7 @@
 
                                                 <!-- JS (Download)  -->
                                                 <script>
-                                                    function downloadAllMedia(saleFileId, uniqueUrlId) {
+                                                    function downloadAllMedia(rentFileId, uniqueUrlId) {
                                                         const downloadBtn = document.getElementById('download-all-btn');
                                                         const originalText = downloadBtn.innerHTML;
 
@@ -855,7 +857,7 @@
                                                             }, delay);
                                                         }
 
-                                                        const baseUrl = `/sale-file/${saleFileId}/${uniqueUrlId}/download-media/`;
+                                                        const baseUrl = `/rent-file/${rentFileId}/${uniqueUrlId}/download-media/`;
 
                                                         console.log(`Base URL: ${baseUrl}`);
 
@@ -1048,50 +1050,50 @@
 
                                                 <!-- Carousel -->
                                                 <div class="carousel-inner">
-                                                    {% if sale_file.image1 %}
+                                                    {% if rent_file.image1 %}
                                                         <div class="carousel-item active">
-                                                            <img src="{{ sale_file.image1.url }}" class="d-block w-100">
+                                                            <img src="{{ rent_file.image1.url }}" class="d-block w-100">
                                                         </div>
                                                     {% endif %}
-                                                    {% if sale_file.image2 %}
+                                                    {% if rent_file.image2 %}
                                                         <div class="carousel-item">
-                                                            <img src="{{ sale_file.image2.url }}" class="d-block w-100">
+                                                            <img src="{{ rent_file.image2.url }}" class="d-block w-100">
                                                         </div>
                                                     {% endif %}
-                                                    {% if sale_file.image3 %}
+                                                    {% if rent_file.image3 %}
                                                         <div class="carousel-item">
-                                                            <img src="{{ sale_file.image3.url }}" class="d-block w-100">
+                                                            <img src="{{ rent_file.image3.url }}" class="d-block w-100">
                                                         </div>
                                                     {% endif %}
-                                                    {% if sale_file.image4 %}
+                                                    {% if rent_file.image4 %}
                                                         <div class="carousel-item active">
-                                                            <img src="{{ sale_file.image4.url }}" class="d-block w-100">
+                                                            <img src="{{ rent_file.image4.url }}" class="d-block w-100">
                                                         </div>
                                                     {% endif %}
-                                                    {% if sale_file.image5 %}
+                                                    {% if rent_file.image5 %}
                                                         <div class="carousel-item">
-                                                            <img src="{{ sale_file.image5.url }}" class="d-block w-100">
+                                                            <img src="{{ rent_file.image5.url }}" class="d-block w-100">
                                                         </div>
                                                     {% endif %}
-                                                    {% if sale_file.image6 %}
+                                                    {% if rent_file.image6 %}
                                                         <div class="carousel-item">
-                                                            <img src="{{ sale_file.image6.url }}" class="d-block w-100">
-                                                                <a href="{{ sale_file.image1.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
+                                                            <img src="{{ rent_file.image6.url }}" class="d-block w-100">
+                                                                <a href="{{ rent_file.image1.url }}" download><em class="icon ni ni-download" style="line-height: 25px; font-size: larger; color: black;"></em></a>
                                                         </div>
                                                     {% endif %}
-                                                    {% if sale_file.image7 %}
+                                                    {% if rent_file.image7 %}
                                                         <div class="carousel-item active">
-                                                            <img src="{{ sale_file.image7.url }}" class="d-block w-100">
+                                                            <img src="{{ rent_file.image7.url }}" class="d-block w-100">
                                                         </div>
                                                     {% endif %}
-                                                    {% if sale_file.image8 %}
+                                                    {% if rent_file.image8 %}
                                                         <div class="carousel-item">
-                                                            <img src="{{ sale_file.image8.url }}" class="d-block w-100">
+                                                            <img src="{{ rent_file.image8.url }}" class="d-block w-100">
                                                         </div>
                                                     {% endif %}
-                                                    {% if sale_file.image9 %}
+                                                    {% if rent_file.image9 %}
                                                         <div class="carousel-item">
-                                                            <img src="{{ sale_file.image9.url }}" class="d-block w-100">
+                                                            <img src="{{ rent_file.image9.url }}" class="d-block w-100">
                                                         </div>
                                                     {% endif %}
                                                 </div>
@@ -1120,13 +1122,13 @@
                             <!-- Media (video) -->
                             <div class="row g-gs">
                                 <!-- video -->
-                                {% if sale_file.video %}
+                                {% if rent_file.video %}
                                     <div class="col-sm-6 col-lg-4 col-xxl-4">
                                         <div class="gallery card">
-                                            {% if sale_file.video %}
+                                            {% if rent_file.video %}
                                                 <a class="gallery-image popup-image" href="#">
                                                     <video controls loop muted width="100%">
-                                                        <source src="{{ sale_file.video.url }}" type="video/mp4">
+                                                        <source src="{{ rent_file.video.url }}" type="video/mp4">
                                                     </video>
                                                 </a>
                                             {% endif %}

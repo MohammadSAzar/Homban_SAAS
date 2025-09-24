@@ -8,6 +8,7 @@ urlpatterns = [
     path('', views.home_view, name='home'),
     path('home/', views.home_view, name='home'),
     path('dashboard/', views.DashboardView.as_view(), name='dashboard'),
+    path('agent-detail/<str:pk>/<str:title>/<str:username>/', views.AgentDetailView.as_view(), name='agent_detail'),
     # calendar
     path('calendar/current/', views.calendar_current_month_view, name='current_month'),
     path('calendar/previous/', views.calendar_previous_month_view, name='previous_month'),
