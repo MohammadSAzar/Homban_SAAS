@@ -6,7 +6,7 @@ from django.http import JsonResponse, HttpResponse, Http404, FileResponse
 from django.urls import reverse, reverse_lazy
 from django.views import View
 from django.views.generic import DetailView, CreateView, ListView, UpdateView, DeleteView, TemplateView
-from django.views.decorators.http import require_GET
+from django.views.decorators.http import require_GET, require_POST
 from django.db.models import Prefetch, Count, F, PositiveBigIntegerField
 from django.db.models.functions import Cast
 from django.core.exceptions import PermissionDenied
@@ -2165,7 +2165,6 @@ class RenterDetailView(ReadOnlyPermissionMixin, DetailView):
         return context
 
 
-
 class RenterCreateView(PermissionRequiredMixin, CreateView):
     model = models.Renter
     form_class = forms.RenterCreateForm
@@ -2636,62 +2635,205 @@ class RenterMarkDeleteView(LoginRequiredMixin, DeleteView):
         return super().delete(request, *args, **kwargs)
 
 
-class MarkCreateView(LoginRequiredMixin, CreateView):
-    model = models.Mark
-    form_class = forms.MarkCreateForm
 
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs['request'] = self.request
-        return kwargs
+@login_required
+@require_POST
+def toggle_mark_sale_file(request, object_type, object_id):
+    if object_type != 'sale_file':
+        return JsonResponse({
+            'success': False,
+            'message': 'نوع نامعتبر است'
+        })
 
-    def form_valid(self, form):
-        # Get the object type and ID from URL parameters
-        object_type = self.kwargs.get('object_type')
-        object_id = self.kwargs.get('object_id')
+    try:
+        sale_file = get_object_or_404(models.SaleFile, id=object_id)
 
-        # Set the mark instance attributes based on object type
-        mark = form.save(commit=False)
-        mark.agent = self.request.user
+        existing_mark = models.Mark.objects.filter(
+            agent=request.user,
+            sale_file=sale_file
+        ).first()
 
-        if object_type == 'sale_file':
-            mark.sale_file = get_object_or_404(models.SaleFile, id=object_id)
-        elif object_type == 'rent_file':
-            mark.rent_file = get_object_or_404(models.RentFile, id=object_id)
-        elif object_type == 'buyer':
-            mark.buyer = get_object_or_404(models.Buyer, id=object_id)
-        elif object_type == 'renter':
-            mark.renter = get_object_or_404(models.Renter, id=object_id)
-        mark.save()
-
-        # Return JSON response for AJAX requests
-        if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        if existing_mark:
+            existing_mark.delete()
             return JsonResponse({
                 'success': True,
-                'message': 'با موفقیت نشان شد',
-                'mark_code': mark.code
+                'action': 'deleted',
+                'message': 'نشان حذف شد',
+                'is_marked': False
             })
-        if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        else:
+            mark = models.Mark.objects.create(
+                agent=request.user,
+                sale_file=sale_file
+            )
             return JsonResponse({
                 'success': True,
-                'message': 'با موفقیت نشان شد',
-                'mark_id': mark.id,  # Add mark ID to response
-                'mark_code': mark.code
+                'action': 'created',
+                'message': 'نشان ایجاد شد',
+                'is_marked': True,
+                'mark_id': mark.id
             })
-        return super().form_valid(form)
 
-    def form_invalid(self, form):
-        if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
+    except models.SaleFile.DoesNotExist:
+        return JsonResponse({
+            'success': False,
+            'message': 'فایل فروش یافت نشد'
+        })
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'message': 'خطا در پردازش درخواست'
+        })
+
+
+@login_required
+@require_POST
+def toggle_mark_rent_file(request, object_type, object_id):
+    if object_type != 'rent_file':
+        return JsonResponse({
+            'success': False,
+            'message': 'نوع نامعتبر است'
+        })
+
+    try:
+        rent_file = get_object_or_404(models.RentFile, id=object_id)
+
+        existing_mark = models.Mark.objects.filter(
+            agent=request.user,
+            rent_file=rent_file
+        ).first()
+
+        if existing_mark:
+            existing_mark.delete()
             return JsonResponse({
-                'success': False,
-                'message': 'خطا در ایجاد نشان'
+                'success': True,
+                'action': 'deleted',
+                'message': 'نشان حذف شد',
+                'is_marked': False
             })
-        return super().form_invalid(form)
+        else:
+            mark = models.Mark.objects.create(
+                agent=request.user,
+                rent_file=rent_file
+            )
+            return JsonResponse({
+                'success': True,
+                'action': 'created',
+                'message': 'نشان ایجاد شد',
+                'is_marked': True,
+                'mark_id': mark.id
+            })
 
-    def get_success_url(self):
-        # Redirect to the same page where the button was clicked
-        referer = self.request.META.get('HTTP_REFERER', '/')
-        return referer
+    except models.RentFile.DoesNotExist:
+        return JsonResponse({
+            'success': False,
+            'message': 'فایل اجاره یافت نشد'
+        })
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'message': 'خطا در پردازش درخواست'
+        })
+
+
+@login_required
+@require_POST
+def toggle_mark_buyer(request, object_type, object_id):
+    if object_type != 'buyer':
+        return JsonResponse({
+            'success': False,
+            'message': 'نوع نامعتبر است'
+        })
+
+    try:
+        buyer = get_object_or_404(models.Buyer, id=object_id)
+
+        existing_mark = models.Mark.objects.filter(
+            agent=request.user,
+            buyer=buyer
+        ).first()
+
+        if existing_mark:
+            existing_mark.delete()
+            return JsonResponse({
+                'success': True,
+                'action': 'deleted',
+                'message': 'نشان حذف شد',
+                'is_marked': False
+            })
+        else:
+            mark = models.Mark.objects.create(
+                agent=request.user,
+                buyer=buyer
+            )
+            return JsonResponse({
+                'success': True,
+                'action': 'created',
+                'message': 'نشان ایجاد شد',
+                'is_marked': True,
+                'mark_id': mark.id
+            })
+
+    except models.Buyer.DoesNotExist:
+        return JsonResponse({
+            'success': False,
+            'message': 'خریدار یافت نشد'
+        })
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'message': 'خطا در پردازش درخواست'
+        })
+
+
+@login_required
+@require_POST
+def toggle_mark_renter(request, object_type, object_id):
+    if object_type != 'renter':
+        return JsonResponse({
+            'success': False,
+            'message': 'نوع نامعتبر است'
+        })
+
+    try:
+        renter = get_object_or_404(models.Renter, id=object_id)
+
+        existing_mark = models.Mark.objects.filter(
+            agent=request.user,
+            renter=renter
+        ).first()
+
+        if existing_mark:
+            existing_mark.delete()
+            return JsonResponse({
+                'success': True,
+                'action': 'deleted',
+                'message': 'نشان حذف شد',
+                'is_marked': False
+            })
+        else:
+            mark = models.Mark.objects.create(
+                agent=request.user,
+                renter=renter
+            )
+            return JsonResponse({
+                'success': True,
+                'action': 'created',
+                'message': 'نشان ایجاد شد',
+                'is_marked': True,
+                'mark_id': mark.id
+            })
+
+    except models.Renter.DoesNotExist:
+        return JsonResponse({
+            'success': False,
+            'message': 'مستاجر یافت نشد'
+        })
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'message': 'خطا در پردازش درخواست'
+        })
 
 
 # ---------------------------------- Tasks ---------------------------------
@@ -4075,7 +4217,5 @@ def dated_task_list_view(request):
         'tasks': tasks,
     }
     return render(request, 'dashboard/tasks/dated_task_list.html', context=context)
-
-
 
 

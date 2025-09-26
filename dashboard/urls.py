@@ -81,19 +81,21 @@ urlpatterns = [
     path('quick-search/customer-buyers/', views.BuyerSearchView.as_view(), name='search_buyers'),
     path('quick-search/customer-renters/', views.RenterSearchView.as_view(), name='search_renters'),
     path('quick-search/code-finder/', views.CodeFinderView.as_view(), name='code_finder'),
-    # marks
+    # marks (list)
     path('marks/sale-files', views.SaleFileMarksListView.as_view(), name='sale_file_marks'),
     path('marks/rent-files', views.RentFileMarksListView.as_view(), name='rent_file_marks'),
     path('marks/buyers', views.BuyerMarksListView.as_view(), name='buyer_marks'),
     path('marks/renters', views.RenterMarksListView.as_view(), name='renter_marks'),
+    # marks (toggle)
+    path('toggle-mark/<str:object_type>/<int:object_id>/sale-file/', views.toggle_mark_sale_file, name='toggle_mark_sale_file'),
+    path('toggle-mark/<str:object_type>/<int:object_id>/rent-file/', views.toggle_mark_rent_file, name='toggle_mark_rent_file'),
+    path('marking-toggle/<str:object_type>/<int:object_id>/', views.toggle_mark_buyer, name='toggle_mark_buyer'),
+    path('toggling-mark/<str:object_type>/<int:object_id>/', views.toggle_mark_renter, name='toggle_mark_renter'),
+    # marks (delete)
     path('marked-sale-file-delete/<int:pk>/', views.SaleFileMarkDeleteView.as_view(), name='sale_file_mark_delete'),
     path('marked-rent-file-delete/<int:pk>/', views.RentFileMarkDeleteView.as_view(), name='rent_file_mark_delete'),
     path('marked-buyer-delete/<int:pk>/', views.BuyerMarkDeleteView.as_view(), name='buyer_mark_delete'),
     path('marked-renter-delete/<int:pk>/', views.RenterMarkDeleteView.as_view(), name='renter_mark_delete'),
-    path('mark-sale_file-create/<str:object_type>/<int:object_id>/', views.MarkCreateView.as_view(), name='mark_sale_file_create'),
-    path('mark-rent_file-create/<str:object_type>/<int:object_id>/', views.MarkCreateView.as_view(), name='mark_rent_file_create'),
-    path('mark-buyer-create/<str:object_type>/<int:object_id>/', views.MarkCreateView.as_view(), name='mark_buyer_create'),
-    path('mark-renter-create/<str:object_type>/<int:object_id>/', views.MarkCreateView.as_view(), name='mark_renter_create'),
     # tasks
     path('tasks/for-files/', views.TaskFPListView.as_view(), name='task_fp_list'),
     path('tasks/for-customers/', views.TaskCPListView.as_view(), name='task_cp_list'),
