@@ -1,13 +1,12 @@
 import os
 import urllib.parse
 
-
 from django.http import JsonResponse, HttpResponse, Http404, FileResponse
 from django.urls import reverse, reverse_lazy
 from django.views import View
 from django.views.generic import DetailView, CreateView, ListView, UpdateView, DeleteView, TemplateView
 from django.views.decorators.http import require_GET, require_POST
-from django.db.models import Prefetch, Count, F, PositiveBigIntegerField
+from django.db.models import Prefetch, Count, Q, F, PositiveBigIntegerField
 from django.db.models.functions import Cast
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
@@ -16,11 +15,12 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render, redirect
 from operator import attrgetter
 from django.contrib import messages
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
 
 from jalali_date import datetime2jalali
 from datetime import datetime, timedelta
 from django.utils import timezone
-
 
 from . import models, forms, functions
 from .permissions import PermissionRequiredMixin, ReadOnlyPermissionMixin
@@ -38,75 +38,105 @@ class DashboardView(ReadOnlyPermissionMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         if self.request.user.title == 'bs':
-            sub_districts = models.SubDistrict.objects.select_related('district', 'district__city', 'district__city__province').all()
+            sub_districts = models.SubDistrict.objects.select_related(
+                'district',
+                'district__city',
+                'district__city__province'
+            ).prefetch_related(
+                Prefetch('agents',
+                         queryset=models.CustomUserModel.objects.select_related('sub_district')),
+                Prefetch('agents__sale_files',
+                         queryset=models.SaleFile.objects.filter(status='acc').exclude(delete_request='Yes')),
+                Prefetch('agents__rent_files',
+                         queryset=models.RentFile.objects.filter(status='acc').exclude(delete_request='Yes')),
+                Prefetch('agents__buyers',
+                         queryset=models.Buyer.objects.filter(status='acc').exclude(delete_request='Yes')),
+                Prefetch('agents__renters',
+                         queryset=models.Renter.objects.filter(status='acc').exclude(delete_request='Yes')),
+                Prefetch('sale_files',
+                         queryset=models.SaleFile.objects.filter(status='acc').exclude(delete_request='Yes')),
+                Prefetch('rent_files',
+                         queryset=models.RentFile.objects.filter(status='acc').exclude(delete_request='Yes')),
+                'buyers', 'renters'
+            ).all()
             context['sub_districts'] = sub_districts
             context['count'] = sub_districts.count()
         else:
             agent = self.request.user
-            context['subdi'] = self.request.user.sub_district
+            context['subdi'] = agent.sub_district
 
-            sale_files = models.SaleFile.objects.filter(status='acc').filter(created_by=agent).all().exclude(delete_request='Yes')
-            rent_files = models.RentFile.objects.filter(status='acc').filter(created_by=agent).all().exclude(delete_request='Yes')
-            buyers = models.Buyer.objects.filter(status='acc').filter(created_by=agent).all().exclude(delete_request='Yes')
-            renters = models.Renter.objects.filter(status='acc').filter(created_by=agent).all().exclude(delete_request='Yes')
+            sale_files = models.SaleFile.objects.select_related(
+                'agent', 'sub_district', 'person'
+            ).filter(
+                status='acc',
+                created_by=agent
+            ).exclude(delete_request='Yes')
+
+            rent_files = models.RentFile.objects.select_related(
+                'agent', 'sub_district', 'person'
+            ).filter(
+                status='acc',
+                created_by=agent
+            ).exclude(delete_request='Yes')
+
+            buyers = models.Buyer.objects.select_related(
+                'agent', 'sub_district'
+            ).filter(
+                status='acc',
+                created_by=agent
+            ).exclude(delete_request='Yes')
+
+            renters = models.Renter.objects.select_related(
+                'agent', 'sub_district'
+            ).filter(
+                status='acc',
+                created_by=agent
+            ).exclude(delete_request='Yes')
+
             context['sale_files'] = sale_files.count()
             context['rent_files'] = rent_files.count()
             context['buyers'] = buyers.count()
             context['renters'] = renters.count()
 
-            # visits
             today = datetime.today()
-            all_agent_visits = models.Visit.objects.filter(agent=agent)
             thirty_days_ago = today - timedelta(days=30)
-            recent_30_visits = []
-            for visit in all_agent_visits:
-                try:
-                    visit_date = datetime.strptime(visit.date, '%Y/%m/%d')
-                    if visit_date.date() >= thirty_days_ago.date():
-                        recent_30_visits.append(visit.id)
-                except (ValueError, TypeError):
-                    continue
-            visits_last_30_days = models.Visit.objects.filter(id__in=recent_30_visits)
-
             seven_days_ago = today - timedelta(days=7)
-            recent_7_visits = []
-            for visit in all_agent_visits:
-                try:
-                    visit_date = datetime.strptime(visit.date, '%Y/%m/%d')
-                    if visit_date.date() >= seven_days_ago.date():
-                        recent_7_visits.append(visit.id)
-                except (ValueError, TypeError):
-                    continue
-            visits_last_7_days = models.Visit.objects.filter(id__in=recent_7_visits)
 
-            # sessions
-            all_agent_sessions = models.Session.objects.filter(agent=agent)
-            thirty_days_ago = today - timedelta(days=30)
-            recent_30_sessions = []
-            for session in all_agent_sessions:
-                try:
-                    session_date = datetime.strptime(session.date, '%Y/%m/%d')
-                    if session_date.date() >= thirty_days_ago.date():
-                        recent_30_sessions.append(session.id)
-                except (ValueError, TypeError):
-                    continue
-            sessions_last_30_days = models.Session.objects.filter(id__in=recent_30_sessions)
+            thirty_days_ago_str = thirty_days_ago.strftime('%Y/%m/%d')
+            seven_days_ago_str = seven_days_ago.strftime('%Y/%m/%d')
 
-            seven_days_ago = today - timedelta(days=7)
-            recent_7_sessions = []
-            for session in all_agent_sessions:
-                try:
-                    session_date = datetime.strptime(session.date, '%Y/%m/%d')
-                    if session_date.date() >= seven_days_ago.date():
-                        recent_7_sessions.append(session.id)
-                except (ValueError, TypeError):
-                    continue
-            sessions_last_7_days = models.Session.objects.filter(id__in=recent_7_sessions)
+            visits_last_30_days = models.Visit.objects.select_related(
+                'agent', 'sale_file', 'rent_file', 'buyer', 'renter'
+            ).filter(
+                agent=agent,
+                date__gte=thirty_days_ago_str
+            ).count()
 
-            context['visits_last_30_days'] = visits_last_30_days.count()
-            context['visits_last_7_days'] = visits_last_7_days.count()
-            context['sessions_last_30_days'] = sessions_last_30_days.count()
-            context['sessions_last_7_days'] = sessions_last_7_days.count()
+            visits_last_7_days = models.Visit.objects.select_related(
+                'agent', 'sale_file', 'rent_file', 'buyer', 'renter'
+            ).filter(
+                agent=agent,
+                date__gte=seven_days_ago_str
+            ).count()
+
+            sessions_last_30_days = models.Session.objects.select_related(
+                'agent', 'sale_file', 'rent_file', 'buyer', 'renter'
+            ).filter(
+                agent=agent,
+                date__gte=thirty_days_ago_str
+            ).count()
+
+            sessions_last_7_days = models.Session.objects.select_related(
+                'agent', 'sale_file', 'rent_file', 'buyer', 'renter'
+            ).filter(
+                agent=agent,
+                date__gte=seven_days_ago_str
+            ).count()
+
+            context['visits_last_30_days'] = visits_last_30_days
+            context['visits_last_7_days'] = visits_last_7_days
+            context['sessions_last_30_days'] = sessions_last_30_days
+            context['sessions_last_7_days'] = sessions_last_7_days
         return context
 
 
@@ -114,80 +144,59 @@ class AgentDetailView(DetailView):
     model = models.CustomUserModel
     template_name = 'dashboard/teams/agent_detail.html'
     context_object_name = 'agent'
-    # permission_model = 'agents'
+
+    def get_queryset(self):
+        return models.CustomUserModel.objects.select_related(
+            'sub_district',
+            'sub_district__district',
+            'sub_district__district__city',
+            'sub_district__district__city__province'
+        )
 
     def dispatch(self, request, *args, **kwargs):
-        agent = self.get_object()
         if request.user.title != 'bs':
             raise PermissionDenied("شما اجازه مشاهده این محتوا را ندارید")
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        agent = self.get_object()
+        agent = self.object
 
-        sale_files = models.SaleFile.objects.filter(status='acc').filter(created_by=agent).all().exclude(delete_request='Yes')
-        rent_files = models.RentFile.objects.filter(status='acc').filter(created_by=agent).all().exclude(delete_request='Yes')
-        buyers = models.Buyer.objects.filter(status='acc').filter(created_by=agent).all().exclude(delete_request='Yes')
-        renters = models.Renter.objects.filter(status='acc').filter(created_by=agent).all().exclude(delete_request='Yes')
+        base_filter = Q(created_by=agent, status='acc') & ~Q(delete_request='Yes')
 
-        # visits
-        today = datetime.today()
-        all_agent_visits = models.Visit.objects.filter(agent=agent)
+        counts_data = dict()
+        counts_data['sale_files_count'] = models.SaleFile.objects.filter(base_filter).count()
+        counts_data['rent_files_count'] = models.RentFile.objects.filter(base_filter).count()
+        counts_data['buyers_count'] = models.Buyer.objects.filter(base_filter).count()
+        counts_data['renters_count'] = models.Renter.objects.filter(base_filter).count()
+
+        today = timezone.now().date()
         thirty_days_ago = today - timedelta(days=30)
-        recent_30_visits = []
-        for visit in all_agent_visits:
-            try:
-                visit_date = datetime.strptime(visit.date, '%Y/%m/%d')
-                if visit_date.date() >= thirty_days_ago.date():
-                    recent_30_visits.append(visit.id)
-            except (ValueError, TypeError):
-                continue
-        visits_last_30_days = models.Visit.objects.filter(id__in=recent_30_visits)
-
         seven_days_ago = today - timedelta(days=7)
-        recent_7_visits = []
-        for visit in all_agent_visits:
-            try:
-                visit_date = datetime.strptime(visit.date, '%Y/%m/%d')
-                if visit_date.date() >= seven_days_ago.date():
-                    recent_7_visits.append(visit.id)
-            except (ValueError, TypeError):
-                continue
-        visits_last_7_days = models.Visit.objects.filter(id__in=recent_7_visits)
 
-        # sessions
-        all_agent_sessions = models.Session.objects.filter(agent=agent)
-        thirty_days_ago = today - timedelta(days=30)
-        recent_30_sessions = []
-        for session in all_agent_sessions:
-            try:
-                session_date = datetime.strptime(session.date, '%Y/%m/%d')
-                if session_date.date() >= thirty_days_ago.date():
-                    recent_30_sessions.append(session.id)
-            except (ValueError, TypeError):
-                continue
-        sessions_last_30_days = models.Session.objects.filter(id__in=recent_30_sessions)
+        visits_counts = models.Visit.objects.filter(
+            agent=agent
+        ).aggregate(
+            visits_30_days=Count('id', filter=Q(date__gte=thirty_days_ago)),
+            visits_7_days=Count('id', filter=Q(date__gte=seven_days_ago))
+        )
+        sessions_counts = models.Session.objects.filter(
+            agent=agent
+        ).aggregate(
+            sessions_30_days=Count('id', filter=Q(date__gte=thirty_days_ago)),
+            sessions_7_days=Count('id', filter=Q(date__gte=seven_days_ago))
+        )
+        context.update({
+            'sale_files': counts_data['sale_files_count'],
+            'rent_files': counts_data['rent_files_count'],
+            'buyers': counts_data['buyers_count'],
+            'renters': counts_data['renters_count'],
+            'visits_last_30_days': visits_counts['visits_30_days'],
+            'visits_last_7_days': visits_counts['visits_7_days'],
+            'sessions_last_30_days': sessions_counts['sessions_30_days'],
+            'sessions_last_7_days': sessions_counts['sessions_7_days'],
+        })
 
-        seven_days_ago = today - timedelta(days=7)
-        recent_7_sessions = []
-        for session in all_agent_sessions:
-            try:
-                session_date = datetime.strptime(session.date, '%Y/%m/%d')
-                if session_date.date() >= seven_days_ago.date():
-                    recent_7_sessions.append(session.id)
-            except (ValueError, TypeError):
-                continue
-        sessions_last_7_days = models.Session.objects.filter(id__in=recent_7_sessions)
-
-        context['sale_files'] = sale_files.count()
-        context['rent_files'] = rent_files.count()
-        context['buyers'] = buyers.count()
-        context['renters'] = renters.count()
-        context['visits_last_30_days'] = visits_last_30_days.count()
-        context['visits_last_7_days'] = visits_last_7_days.count()
-        context['sessions_last_30_days'] = sessions_last_30_days.count()
-        context['sessions_last_7_days'] = sessions_last_7_days.count()
         return context
 
 
@@ -494,7 +503,7 @@ class SaleFileListView(ReadOnlyPermissionMixin, ListView):
         if self.request.user.title != 'bs':
             sub_district = self.request.user.sub_district
             queryset_default = (
-                models.SaleFile.objects.select_related('province', 'city', 'district', 'sub_district', 'person')
+                models.SaleFile.objects.select_related('province', 'city', 'district', 'sub_district', 'person', 'created_by')
                 .filter(sub_district=sub_district)).filter(status='acc').exclude(delete_request='Yes')
             form = forms.SaleFileAgentFilterForm(self.request.GET)
 
@@ -600,7 +609,7 @@ class SaleFileListView(ReadOnlyPermissionMixin, ListView):
 
         else:
             queryset_default = (
-                models.SaleFile.objects.select_related('province', 'city', 'district', 'sub_district', 'person')
+                models.SaleFile.objects.select_related('province', 'city', 'district', 'sub_district', 'person', 'created_by')
                 .filter(status='acc').exclude(delete_request='Yes'))
             form = forms.SaleFileFilterForm(self.request.GET)
 
@@ -742,6 +751,22 @@ class SaleFileDetailView(ReadOnlyPermissionMixin, DetailView):
     context_object_name = 'sale_file'
     permission_model = 'SaleFile'
 
+    def get_queryset(self):
+        return models.SaleFile.objects.select_related(
+            'created_by', 'created_by__sub_district', 'created_by__sub_district__district',
+            'created_by__sub_district__district__city', 'created_by__sub_district__district__city__province',
+            'sub_district', 'sub_district__district', 'sub_district__district__city',
+            'sub_district__district__city__province', 'person'
+        )
+
+    def get_object(self, queryset=None):
+        # Cache the object to avoid duplicate queries
+        if not hasattr(self, '_cached_object'):
+            if queryset is None:
+                queryset = self.get_queryset()
+            self._cached_object = super().get_object(queryset=queryset)
+        return self._cached_object
+
     def get_template_names(self):
         if 'suggested' in self.request.path:
             return 'dashboard/files/sale_file_detail_suggested.html'
@@ -749,22 +774,28 @@ class SaleFileDetailView(ReadOnlyPermissionMixin, DetailView):
             return 'dashboard/files/sale_file_detail.html'
 
     def dispatch(self, request, *args, **kwargs):
-        sale_file = self.get_object()
         user = request.user
-        if user.title != 'bs' and sale_file.delete_request == 'Yes':
-            raise PermissionDenied("شما اجازه مشاهده این محتوا را ندارید")
+        if user.title != 'bs':
+            sale_file = self.get_object()
+            if sale_file.delete_request == 'Yes':
+                raise PermissionDenied("شما اجازه مشاهده این محتوا را ندارید")
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
         sale_file = self.get_object()
-        suggested_buyers_queryset = (models.Buyer.objects.filter(status='acc')
-                                     .filter(budget_announced__gt=0.9 * sale_file.price_announced)
-                                     .filter(budget_announced__lt=1.1 * sale_file.price_announced)
-                                     .filter(area_min__gt=0.8 * sale_file.area)
-                                     .filter(area_max__lt=1.2 * sale_file.area)
-                                     .exclude(delete_request='Yes'))
+
+        suggested_buyers_queryset = models.Buyer.objects.select_related(
+            'created_by', 'province', 'city', 'district'
+        ).prefetch_related(
+            'sub_districts'
+        ).filter(
+            status='acc',
+            budget_announced__gt=0.9 * sale_file.price_announced,
+            budget_announced__lt=1.1 * sale_file.price_announced,
+            area_min__gt=0.8 * sale_file.area,
+            area_max__lt=1.2 * sale_file.area
+        ).exclude(delete_request='Yes')
 
         paginator = Paginator(suggested_buyers_queryset, 6)
         page_number = self.request.GET.get('page', 1)
@@ -774,7 +805,7 @@ class SaleFileDetailView(ReadOnlyPermissionMixin, DetailView):
         context['page_obj'] = page_obj
         context['is_paginated'] = page_obj.has_other_pages()
 
-        # Marking
+        # Mark
         is_marked = False
         if self.request.user.is_authenticated:
             is_marked = models.Mark.objects.filter(
@@ -783,16 +814,16 @@ class SaleFileDetailView(ReadOnlyPermissionMixin, DetailView):
             ).exists()
         context['is_marked'] = is_marked
 
-        # WhatsApp share URLs
+        # WA Link
         context['whatsapp_share_url'] = self.get_whatsapp_share_url(sale_file)
         return context
 
     def get_whatsapp_share_url(self, sale_file):
         message_parts = [
             f"🏠 فایل فروش شماره {sale_file.id}",
-            f"💰 قیمت: {sale_file.price_announced:,} تومان" if hasattr(sale_file, 'price_announced') else "",
-            f"📐 متراژ: {sale_file.area} متر مربع" if hasattr(sale_file, 'area') else "",
-            f"📐 تعداد اتاق: {sale_file.room}" if hasattr(sale_file, 'room') else "",
+            f"💰 قیمت: {sale_file.price_announced:,} تومان" if sale_file.price_announced else "",
+            f"📐 متراژ: {sale_file.area} متر مربع" if sale_file.area else "",
+            f"📐 تعداد اتاق: {sale_file.room}" if sale_file.room else "",
         ]
         message = "\n".join(filter(None, message_parts))
         encoded_message = urllib.parse.quote(message)
@@ -994,7 +1025,7 @@ class RentFileListView(ReadOnlyPermissionMixin, ListView):
         if self.request.user.title != 'bs':
             sub_district = self.request.user.sub_district
             queryset_default = (
-                models.RentFile.objects.select_related('province', 'city', 'district', 'sub_district', 'person')
+                models.RentFile.objects.select_related('province', 'city', 'district', 'sub_district', 'person', 'created_by')
                 .filter(sub_district=sub_district)).filter(status='acc').exclude(delete_request='Yes')
             form = forms.RentFileAgentFilterForm(self.request.GET)
             if form.is_valid():
@@ -1107,7 +1138,7 @@ class RentFileListView(ReadOnlyPermissionMixin, ListView):
             return queryset_default
         else:
             queryset_default = (
-                models.RentFile.objects.select_related('province', 'city', 'district', 'sub_district', 'person')
+                models.RentFile.objects.select_related('province', 'city', 'district', 'sub_district', 'person', 'created_by')
                 .filter(status='acc')).exclude(delete_request='Yes')
             form = forms.RentFileFilterForm(self.request.GET)
 
@@ -1259,6 +1290,21 @@ class RentFileDetailView(ReadOnlyPermissionMixin, DetailView):
     context_object_name = 'rent_file'
     permission_model = 'RentFile'
 
+    def get_queryset(self):
+        return models.RentFile.objects.select_related(
+            'created_by', 'created_by__sub_district', 'created_by__sub_district__district',
+            'created_by__sub_district__district__city', 'created_by__sub_district__district__city__province',
+            'sub_district', 'sub_district__district', 'sub_district__district__city',
+            'sub_district__district__city__province', 'person'
+        )
+
+    def get_object(self, queryset=None):
+        if not hasattr(self, '_cached_object'):
+            if queryset is None:
+                queryset = self.get_queryset()
+            self._cached_object = super().get_object(queryset=queryset)
+        return self._cached_object
+
     def get_template_names(self):
         if 'suggested' in self.request.path:
             return 'dashboard/files/rent_file_detail_suggested.html'
@@ -1266,36 +1312,51 @@ class RentFileDetailView(ReadOnlyPermissionMixin, DetailView):
             return 'dashboard/files/rent_file_detail.html'
 
     def dispatch(self, request, *args, **kwargs):
-        rent_file = self.get_object()
         user = request.user
-        if user.title != 'bs' and rent_file.delete_request == 'Yes':
-            raise PermissionDenied("شما اجازه مشاهده این محتوا را ندارید")
+        if user.title != 'bs':
+            rent_file = self.get_object()
+            if rent_file.delete_request == 'Yes':
+                raise PermissionDenied("شما اجازه مشاهده این محتوا را ندارید")
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         rent_file = self.get_object()
-        base_queryset = models.Renter.objects.annotate(
+
+        base_queryset = models.Renter.objects.select_related(
+            'created_by', 'province', 'city', 'district'
+        ).prefetch_related(
+            'sub_districts'
+        ).annotate(
             deposit_total_calc=Cast(F('deposit_announced') + (100 * F('rent_announced') / 3),
                                     PositiveBigIntegerField()))
 
-        non_convertable_suggested_renters_queryset = (models.Renter.objects
-                                                      .filter(status='acc')
-                                                      .filter(convertable='isnt').exclude(delete_request='Yes')
-                                                      .filter(deposit_announced__gt=0.8 * rent_file.deposit_announced)
-                                                      .filter(deposit_announced__lt=1.2 * rent_file.deposit_announced)
-                                                      .filter(rent_announced__gt=0.8 * rent_file.rent_announced)
-                                                      .filter(rent_announced__lt=1.2 * rent_file.rent_announced)
-                                                      .filter(area_min__gt=0.8 * rent_file.area)
-                                                      .filter(area_max__lt=1.2 * rent_file.area))
+        non_convertable_suggested_renters_queryset = models.Renter.objects.select_related(
+            'created_by', 'province', 'city', 'district'
+        ).prefetch_related(
+            'sub_districts'
+        ).filter(
+            status='acc',
+            convertable='isnt',
+            deposit_announced__gt=0.8 * rent_file.deposit_announced,
+            deposit_announced__lt=1.2 * rent_file.deposit_announced,
+            rent_announced__gt=0.8 * rent_file.rent_announced,
+            rent_announced__lt=1.2 * rent_file.rent_announced,
+            area_min__gt=0.8 * rent_file.area,
+            area_max__lt=1.2 * rent_file.area
+        ).exclude(delete_request='Yes')
 
-        convertable_suggested_renters_queryset = (base_queryset
-                                                  .filter(status='acc')
-                                                  .filter(convertable='is').exclude(delete_request='Yes')
-                                                  .filter(deposit_total_calc__gt=0.8 * (rent_file.deposit_announced + 100 * (rent_file.rent_announced / 3)))
-                                                  .filter(deposit_total_calc__lt=1.2 * (rent_file.deposit_announced + 100 * (rent_file.rent_announced / 3)))
-                                                  .filter(area_min__gt=0.8 * rent_file.area)
-                                                  .filter(area_max__lt=1.2 * rent_file.area))
+        rent_total_min = 0.8 * (rent_file.deposit_announced + 100 * (rent_file.rent_announced / 3))
+        rent_total_max = 1.2 * (rent_file.deposit_announced + 100 * (rent_file.rent_announced / 3))
+
+        convertable_suggested_renters_queryset = base_queryset.filter(
+            status='acc',
+            convertable='is',
+            deposit_total_calc__gt=rent_total_min,
+            deposit_total_calc__lt=rent_total_max,
+            area_min__gt=0.8 * rent_file.area,
+            area_max__lt=1.2 * rent_file.area
+        ).exclude(delete_request='Yes')
 
         suggested_renters_queryset = (
                 non_convertable_suggested_renters_queryset | convertable_suggested_renters_queryset).distinct()
@@ -1308,7 +1369,7 @@ class RentFileDetailView(ReadOnlyPermissionMixin, DetailView):
         context['page_obj'] = page_obj
         context['is_paginated'] = page_obj.has_other_pages()
 
-        # Marking
+        # Mark
         is_marked = False
         if self.request.user.is_authenticated:
             is_marked = models.Mark.objects.filter(
@@ -1317,17 +1378,17 @@ class RentFileDetailView(ReadOnlyPermissionMixin, DetailView):
             ).exists()
         context['is_marked'] = is_marked
 
-        # WhatsApp share URLs
+        # WA Link
         context['whatsapp_share_url'] = self.get_whatsapp_share_url(rent_file)
         return context
 
     def get_whatsapp_share_url(self, rent_file):
         message_parts = [
             f"🏠 فایل اجاره شماره {rent_file.id}",
-            f"💰 ودیعه: {rent_file.deposit_announced:,} تومان" if hasattr(rent_file, 'deposit_announced') else "",
-            f"💰 اجاره: {rent_file.rent_announced:,} تومان" if hasattr(rent_file, 'rent_announced') else "",
-            f"📐 متراژ: {rent_file.area} متر مربع" if hasattr(rent_file, 'area') else "",
-            f"📐 تعداد اتاق: {rent_file.room}" if hasattr(rent_file, 'room') else "",
+            f"💰 ودیعه: {rent_file.deposit_announced:,} تومان" if rent_file.deposit_announced else "",
+            f"💰 اجاره: {rent_file.rent_announced:,} تومان" if rent_file.rent_announced else "",
+            f"📐 متراژ: {rent_file.area} متر مربع" if rent_file.area else "",
+            f"📐 تعداد اتاق: {rent_file.room}" if rent_file.room else "",
         ]
         message = "\n".join(filter(None, message_parts))
         encoded_message = urllib.parse.quote(message)
@@ -1655,7 +1716,7 @@ class BuyerListView(ReadOnlyPermissionMixin, ListView):
 
     def get_queryset(self):
         if self.request.user.title == 'bs':
-            queryset_default = models.Buyer.objects.select_related('province', 'city', 'district').prefetch_related(
+            queryset_default = models.Buyer.objects.select_related('province', 'city', 'district', 'created_by').prefetch_related(
                 'sub_districts').exclude(delete_request='Yes').filter(status='acc')
 
             form = forms.BuyerFilterForm(self.request.GET)
@@ -1702,7 +1763,7 @@ class BuyerListView(ReadOnlyPermissionMixin, ListView):
 
         else:
             queryset_default = (
-                (models.Buyer.objects.select_related('province', 'city', 'district').prefetch_related('sub_districts'))
+                (models.Buyer.objects.select_related('province', 'city', 'district', 'created_by').prefetch_related('sub_districts'))
                 .exclude(delete_request='Yes').filter(status='acc').filter(created_by=self.request.user).distinct())
 
             form = forms.BuyerFilterForm(self.request.GET)
@@ -1784,6 +1845,23 @@ class BuyerDetailView(ReadOnlyPermissionMixin, DetailView):
     context_object_name = 'buyer'
     permission_model = 'Buyer'
 
+    def get_queryset(self):
+        return models.Buyer.objects.select_related(
+            'created_by', 'created_by__sub_district', 'created_by__sub_district__district',
+            'created_by__sub_district__district__city', 'created_by__sub_district__district__city__province',
+            'province', 'city', 'district'
+        ).prefetch_related(
+            'sub_districts', 'sub_districts__district', 'sub_districts__district__city',
+            'sub_districts__district__city__province'
+        )
+
+    def get_object(self, queryset=None):
+        if not hasattr(self, '_cached_object'):
+            if queryset is None:
+                queryset = self.get_queryset()
+            self._cached_object = super().get_object(queryset=queryset)
+        return self._cached_object
+
     def get_template_names(self):
         if 'suggested' in self.request.path:
             return 'dashboard/people/buyer_detail_suggested.html'
@@ -1791,30 +1869,45 @@ class BuyerDetailView(ReadOnlyPermissionMixin, DetailView):
             return 'dashboard/people/buyer_detail.html'
 
     def dispatch(self, request, *args, **kwargs):
-        buyer = self.get_object()
         user = request.user
-        if user.title != 'bs' and buyer.delete_request == 'Yes':
-            raise PermissionDenied("شما اجازه مشاهده این محتوا را ندارید")
+        if user.title != 'bs':
+            buyer = self.get_object()
+            if buyer.delete_request == 'Yes':
+                raise PermissionDenied("شما اجازه مشاهده این محتوا را ندارید")
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        duplicate_phone_numbers = (models.Buyer.objects
-                                   .filter(status='acc')
-                                   .exclude(delete_request='Yes')
-                                   .values('phone_number')
-                                   .annotate(count=Count('phone_number'))
-                                   .filter(count__gt=1)
-                                   .values_list('phone_number', flat=True))
+
+        duplicate_phone_numbers = models.Buyer.objects.filter(
+            status='acc'
+        ).exclude(
+            delete_request='Yes'
+        ).values('phone_number').annotate(
+            count=Count('phone_number')
+        ).filter(
+            count__gt=1
+        ).values_list('phone_number', flat=True)
         context['duplicate_phone_numbers'] = list(duplicate_phone_numbers)
 
         buyer = self.get_object()
-        suggested_files_queryset = (models.SaleFile.objects
-                                    .filter(status='acc')
-                                    .filter(price_announced__gt=0.9 * buyer.budget_announced)
-                                    .filter(price_announced__lt=1.1 * buyer.budget_announced)
-                                    .filter(area__gt=0.8 * buyer.area_min)
-                                    .filter(area__lt=1.2 * buyer.area_max).exclude(delete_request='Yes'))
+        price_min = 0.9 * buyer.budget_announced
+        price_max = 1.1 * buyer.budget_announced
+        area_min = 0.8 * buyer.area_min
+        area_max = 1.2 * buyer.area_max
+
+        suggested_files_queryset = models.SaleFile.objects.select_related(
+            'created_by', 'sub_district', 'sub_district__district',
+            'sub_district__district__city', 'sub_district__district__city__province',
+            'person'
+        ).filter(
+            status='acc',
+            price_announced__gt=price_min,
+            price_announced__lt=price_max,
+            area__gt=area_min,
+            area__lt=area_max
+        ).exclude(delete_request='Yes')
+
         if self.request.user.title != 'bs':
             similar_sub_districts = buyer.sub_districts.all()
             suggested_files_queryset = suggested_files_queryset.filter(sub_district__in=similar_sub_districts)
@@ -1827,7 +1920,7 @@ class BuyerDetailView(ReadOnlyPermissionMixin, DetailView):
         context['page_obj'] = page_obj
         context['is_paginated'] = page_obj.has_other_pages()
 
-        # Marking
+        # Mark
         is_marked = False
         if self.request.user.is_authenticated:
             is_marked = models.Mark.objects.filter(
@@ -1950,7 +2043,7 @@ class RenterListView(ReadOnlyPermissionMixin, ListView):
 
     def get_queryset(self):
         if self.request.user.title == 'bs':
-            queryset_default = models.Renter.objects.select_related('province', 'city', 'district').prefetch_related(
+            queryset_default = models.Renter.objects.select_related('province', 'city', 'district', 'created_by').prefetch_related(
                 'sub_districts').exclude(delete_request='Yes').filter(status='acc')
 
             form = forms.RenterFilterForm(self.request.GET)
@@ -2005,7 +2098,7 @@ class RenterListView(ReadOnlyPermissionMixin, ListView):
             return queryset_default
         else:
             queryset_default = (
-                (models.Renter.objects.select_related('province', 'city', 'district').prefetch_related('sub_districts'))
+                (models.Renter.objects.select_related('province', 'city', 'district', 'created_by').prefetch_related('sub_districts'))
                 .exclude(delete_request='Yes').filter(status='acc').filter(created_by=self.request.user).distinct())
             form = forms.RenterFilterForm(self.request.GET)
 
@@ -2096,6 +2189,23 @@ class RenterDetailView(ReadOnlyPermissionMixin, DetailView):
     context_object_name = 'renter'
     permission_model = 'Renter'
 
+    def get_queryset(self):
+        return models.Renter.objects.select_related(
+            'created_by', 'created_by__sub_district', 'created_by__sub_district__district',
+            'created_by__sub_district__district__city', 'created_by__sub_district__district__city__province',
+            'province', 'city', 'district'
+        ).prefetch_related(
+            'sub_districts', 'sub_districts__district', 'sub_districts__district__city',
+            'sub_districts__district__city__province'
+        )
+
+    def get_object(self, queryset=None):
+        if not hasattr(self, '_cached_object'):
+            if queryset is None:
+                queryset = self.get_queryset()
+            self._cached_object = super().get_object(queryset=queryset)
+        return self._cached_object
+
     def get_template_names(self):
         if 'suggested' in self.request.path:
             return 'dashboard/people/renter_detail_suggested.html'
@@ -2103,43 +2213,68 @@ class RenterDetailView(ReadOnlyPermissionMixin, DetailView):
             return 'dashboard/people/renter_detail.html'
 
     def dispatch(self, request, *args, **kwargs):
-        renter = self.get_object()
         user = request.user
-        if user.title != 'bs' and renter.delete_request == 'Yes':
-            raise PermissionDenied("شما اجازه مشاهده این محتوا را ندارید")
+        if user.title != 'bs':
+            renter = self.get_object()
+            if renter.delete_request == 'Yes':
+                raise PermissionDenied("شما اجازه مشاهده این محتوا را ندارید")
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        duplicate_phone_numbers = (models.Renter.objects
-                                   .filter(status='acc')
-                                   .exclude(delete_request='Yes')
-                                   .values('phone_number')
-                                   .annotate(count=Count('phone_number'))
-                                   .filter(count__gt=1)
-                                   .values_list('phone_number', flat=True))
+
+        duplicate_phone_numbers = models.Renter.objects.filter(
+            status='acc'
+        ).exclude(
+            delete_request='Yes'
+        ).values('phone_number').annotate(
+            count=Count('phone_number')
+        ).filter(
+            count__gt=1
+        ).values_list('phone_number', flat=True)
         context['duplicate_phone_numbers'] = list(duplicate_phone_numbers)
 
         renter = self.get_object()
-        base_queryset = models.RentFile.objects.annotate(
+        deposit_min = 0.8 * renter.deposit_announced
+        deposit_max = 1.2 * renter.deposit_announced
+        rent_min = 0.8 * renter.rent_announced
+        rent_max = 1.2 * renter.rent_announced
+        area_min = 0.8 * renter.area_min
+        area_max = 1.2 * renter.area_max
+        renter_total_min = 0.8 * (renter.deposit_announced + 100 * (renter.rent_announced / 3))
+        renter_total_max = 1.2 * (renter.deposit_announced + 100 * (renter.rent_announced / 3))
+
+        base_queryset = models.RentFile.objects.select_related(
+            'created_by', 'sub_district', 'sub_district__district',
+            'sub_district__district__city', 'sub_district__district__city__province',
+            'person'
+        ).annotate(
             deposit_total_calc=Cast(F('deposit_announced') + (100 * F('rent_announced') / 3),
                                     PositiveBigIntegerField()))
-        non_convertable_suggested_files_queryset = (models.RentFile.objects
-                                                    .filter(status='acc')
-                                                    .filter(convertable='isnt')
-                                                    .filter(deposit_announced__gt=0.8 * renter.deposit_announced)
-                                                    .filter(deposit_announced__lt=1.2 * renter.deposit_announced)
-                                                    .filter(rent_announced__gt=0.8 * renter.rent_announced)
-                                                    .filter(rent_announced__lt=1.2 * renter.rent_announced)
-                                                    .filter(area__gt=0.8 * renter.area_min)
-                                                    .filter(area__lt=1.2 * renter.area_max))
-        convertable_suggested_files_queryset = (base_queryset
-                                                .filter(status='acc')
-                                                .filter(convertable='is')
-                                                .filter(deposit_total_calc__gt=0.8 * (renter.deposit_announced + 100 * (renter.rent_announced / 3)))
-                                                .filter(deposit_total_calc__lt=1.2 * (renter.deposit_announced + 100 * (renter.rent_announced / 3)))
-                                                .filter(area__gt=0.8 * renter.area_min)
-                                                .filter(area__lt=1.2 * renter.area_max).exclude(delete_request='Yes'))
+
+        non_convertable_suggested_files_queryset = models.RentFile.objects.select_related(
+            'created_by', 'sub_district', 'sub_district__district',
+            'sub_district__district__city', 'sub_district__district__city__province',
+            'person'
+        ).filter(
+            status='acc',
+            convertable='isnt',
+            deposit_announced__gt=deposit_min,
+            deposit_announced__lt=deposit_max,
+            rent_announced__gt=rent_min,
+            rent_announced__lt=rent_max,
+            area__gt=area_min,
+            area__lt=area_max
+        ).exclude(delete_request='Yes')
+
+        convertable_suggested_files_queryset = base_queryset.filter(
+            status='acc',
+            convertable='is',
+            deposit_total_calc__gt=renter_total_min,
+            deposit_total_calc__lt=renter_total_max,
+            area__gt=area_min,
+            area__lt=area_max
+        ).exclude(delete_request='Yes')
 
         suggested_files_queryset = (
                 non_convertable_suggested_files_queryset | convertable_suggested_files_queryset).distinct()
@@ -2154,7 +2289,7 @@ class RenterDetailView(ReadOnlyPermissionMixin, DetailView):
         context['page_obj'] = page_obj
         context['is_paginated'] = page_obj.has_other_pages()
 
-        # Marking
+        # Mark
         is_marked = False
         if self.request.user.is_authenticated:
             is_marked = models.Mark.objects.filter(
@@ -2443,7 +2578,14 @@ class CodeFinderView(ReadOnlyPermissionMixin, ListView):
     permission_model = 'SaleFile'
     paginate_by = None
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._cached_queryset = None
+
     def get_queryset(self):
+        if self._cached_queryset is not None:
+            return self._cached_queryset
+
         queryset = None
         form = forms.CodeFinderForm(self.request.GET)
         if form.is_valid():
@@ -2461,10 +2603,9 @@ class CodeFinderView(ReadOnlyPermissionMixin, ListView):
                 target_model = model_mapping.get(search_type)
                 if target_model:
                     try:
-                        found_object = target_model.objects.get(code=search_code)
-                        queryset = target_model.objects.filter(id=found_object.id)
-                    except target_model.DoesNotExist:
-                        queryset = target_model.objects.none()
+                        queryset = self.get_optimized_queryset(target_model, search_type).filter(code=search_code)
+                        if not queryset.exists():
+                            queryset = target_model.objects.none()
                     except Exception as e:
                         queryset = target_model.objects.none()
                 else:
@@ -2476,7 +2617,28 @@ class CodeFinderView(ReadOnlyPermissionMixin, ListView):
             if self.request.GET:
                 messages.error(self.request, 'ورودی نامعتبر است.')
 
-        return queryset or models.SaleFile.objects.none()
+        self._cached_queryset = queryset or models.SaleFile.objects.none()
+        return self._cached_queryset
+
+    def get_optimized_queryset(self, target_model, search_type):
+        if search_type == 'sf':
+            return target_model.objects.select_related(
+                'created_by', 'sub_district', 'person'
+            )
+        elif search_type == 'rf':
+            return target_model.objects.select_related(
+                'created_by', 'sub_district', 'person'
+            )
+        elif search_type == 'by':
+            return target_model.objects.select_related(
+                'created_by', 'province', 'city', 'district'
+            )
+        elif search_type == 'rt':
+            return target_model.objects.select_related(
+                'created_by', 'province', 'city', 'district'
+            )
+        else:
+            return target_model.objects.all()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -2508,7 +2670,13 @@ class SaleFileMarksListView(ReadOnlyPermissionMixin, ListView):
 
     def get_queryset(self):
         agent = self.request.user
-        queryset = models.Mark.objects.select_related('sale_file').filter(agent=agent).filter(type='sf')
+        queryset = models.Mark.objects.select_related(
+            'agent',
+            'sale_file',
+            'sale_file__created_by',
+            'sale_file__sub_district',
+            'sale_file__person'
+        ).filter(agent=agent, type='sf')
         return queryset
 
 
@@ -2542,7 +2710,13 @@ class RentFileMarksListView(ReadOnlyPermissionMixin, ListView):
 
     def get_queryset(self):
         agent = self.request.user
-        queryset = models.Mark.objects.select_related('rent_file').filter(agent=agent).filter(type='rf')
+        queryset = models.Mark.objects.select_related(
+            'agent',
+            'rent_file',
+            'rent_file__created_by',
+            'rent_file__sub_district',
+            'rent_file__person'
+        ).filter(agent=agent, type='rf')
         return queryset
 
 
@@ -2576,7 +2750,16 @@ class BuyerMarksListView(ReadOnlyPermissionMixin, ListView):
 
     def get_queryset(self):
         agent = self.request.user
-        queryset = models.Mark.objects.select_related('buyer').filter(agent=agent).filter(type='by')
+        queryset = models.Mark.objects.select_related(
+            'agent',
+            'buyer',
+            'buyer__created_by',
+            'buyer__province',
+            'buyer__city',
+            'buyer__district'
+        ).prefetch_related(
+            'buyer__sub_districts'
+        ).filter(agent=agent, type='by')
         return queryset
 
 
@@ -2610,7 +2793,16 @@ class RenterMarksListView(ReadOnlyPermissionMixin, ListView):
 
     def get_queryset(self):
         agent = self.request.user
-        queryset = models.Mark.objects.select_related('renter').filter(agent=agent).filter(type='rt')
+        queryset = models.Mark.objects.select_related(
+            'agent',
+            'renter',
+            'renter__created_by',
+            'renter__province',
+            'renter__city',
+            'renter__district'
+        ).prefetch_related(
+            'renter__sub_districts'
+        ).filter(agent=agent, type='rt')
         return queryset
 
 
@@ -2633,7 +2825,6 @@ class RenterMarkDeleteView(LoginRequiredMixin, DeleteView):
                 'message': 'حذف شد!'
             })
         return super().delete(request, *args, **kwargs)
-
 
 
 @login_required
@@ -3157,23 +3348,66 @@ class TaskBossListView(ListView):
     paginate_by = 12
 
     def get_queryset(self):
-        queryset = (models.TaskBoss.objects.select_related('new_sale_file', 'new_rent_file', 'new_buyer', 'new_renter',
-                                                           'new_person', 'new_visit', 'new_session', 'ur_task')
-                    .filter(condition='op').all())
+        queryset = models.TaskBoss.objects.select_related(
+            'ur_task',
+
+            'new_sale_file',
+            'new_sale_file__created_by',
+            'new_sale_file__sub_district',
+            'new_sale_file__person',
+
+            'new_rent_file',
+            'new_rent_file__created_by',
+            'new_rent_file__sub_district',
+            'new_rent_file__person',
+
+            'new_buyer',
+            'new_buyer__created_by',
+            'new_buyer__province',
+            'new_buyer__city',
+            'new_buyer__district',
+
+            'new_renter',
+            'new_renter__created_by',
+            'new_renter__province',
+            'new_renter__city',
+            'new_renter__district',
+
+            'new_person',
+            'new_person__created_by',
+
+            'new_visit',
+            'new_visit__agent',
+            'new_visit__sale_file',
+            'new_visit__rent_file',
+            'new_visit__buyer',
+            'new_visit__renter',
+
+            'new_session',
+            'new_session__agent',
+            'new_session__sale_file',
+            'new_session__rent_file',
+            'new_session__buyer',
+            'new_session__renter',
+
+            'result_visit',
+            'result_visit__agent',
+            'result_session',
+            'result_session__agent'
+        ).prefetch_related(
+            'new_buyer__sub_districts',
+            'new_renter__sub_districts'
+        ).filter(condition='op')
+
         form = forms.TaskBossFilterForm(self.request.GET)
-        if form.is_valid():
-            queryset_filtered = queryset
-            if form.cleaned_data['type']:
-                queryset_filtered = queryset_filtered.filter(type=form.cleaned_data['type'])
-            queryset_filtered = list(queryset_filtered)
-            return queryset_filtered
+        if form.is_valid() and form.cleaned_data.get('type'):
+            queryset = queryset.filter(type=form.cleaned_data['type'])
+
         return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        form = forms.TaskBossFilterForm(self.request.GET)
-
-        context['filter_form'] = form
+        context['filter_form'] = forms.TaskBossFilterForm(self.request.GET)
         return context
 
 
@@ -3489,7 +3723,8 @@ class VisitListView(ReadOnlyPermissionMixin, ListView):
 
     def get_queryset(self):
         if self.request.user.title == 'bs':
-            queryset = models.Visit.objects.select_related('agent', 'agent__sub_district').all()
+            queryset = (models.Visit.objects
+                        .select_related('agent', 'agent__sub_district', 'sale_file', 'rent_file', 'buyer', 'renter').all())
             form = forms.ServiceFilterForm(self.request.GET)
             if form.is_valid():
                 queryset_filtered = queryset
@@ -3534,7 +3769,6 @@ class VisitListView(ReadOnlyPermissionMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         form = forms.ServiceFilterForm(self.request.GET)
-
         context['filter_form'] = form
         return context
 
@@ -3719,7 +3953,8 @@ class SessionListView(ReadOnlyPermissionMixin, ListView):
 
     def get_queryset(self):
         if self.request.user.title == 'bs':
-            queryset = models.Session.objects.select_related('agent', 'agent__sub_district').all()
+            queryset = (models.Session.objects
+                        .select_related('agent', 'agent__sub_district', 'sale_file', 'rent_file', 'buyer', 'renter').all())
             form = forms.ServiceFilterForm(self.request.GET)
             if form.is_valid():
                 queryset_filtered = queryset
@@ -3764,7 +3999,6 @@ class SessionListView(ReadOnlyPermissionMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         form = forms.ServiceFilterForm(self.request.GET)
-
         context['filter_form'] = form
         return context
 
@@ -3985,7 +4219,6 @@ class TradeListView(ReadOnlyPermissionMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         form = forms.TradeFilterForm(self.request.GET)
-
         context['filter_form'] = form
         return context
 
@@ -4208,9 +4441,10 @@ def dated_task_list_view(request):
     tasks = models.Task.objects.filter(agent=user)
     if date:
         if user.title != 'bs':
-            tasks = models.Task.objects.filter(agent=user).filter(deadline=date)
+            tasks = (models.Task.objects.select_related('agent', 'sale_file', 'rent_file', 'buyer', 'renter')
+                     .filter(agent=user).filter(deadline=date))
         else:
-            tasks = models.Task.objects.filter(deadline=date)
+            tasks = models.Task.objects.select_related('agent', 'sale_file', 'rent_file', 'buyer', 'renter').filter(deadline=date)
     context = {
         'user': user,
         'date': date,
