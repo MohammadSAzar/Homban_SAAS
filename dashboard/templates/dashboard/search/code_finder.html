@@ -329,6 +329,57 @@
                                                                     <a href="{{ result.get_absolute_url }}" class="btn btn-primary" style="margin-top: 1em;"><em class="icon ni ni-eye"></em><span>مشاهده</span></a>
                                                                 {% endif %}
 
+                                                                <!-- Mark -->
+                                                                {% if result_type == 'sale_file' %}
+                                                                    {% if request.user.title == 'bs' or request.user.sub_district == result.sub_district %}
+                                                                        <form method="post"
+                                                                              action="{% url 'toggle_mark_sale_file' 'sale_file' result.id %}"
+                                                                              class="mark-form"
+                                                                              data-file-id="{{ result.id }}">
+                                                                           {% csrf_token %}
+                                                                            {% if result.id not in marked_sale_file_ids %}
+                                                                                <button type="submit"
+                                                                                        class="btn btn-gray mark-btn"
+                                                                                        style="margin-top: 1em; font-size: 0.7em; line-height: 0.7em;"
+                                                                                        title="افزودن نشان">
+                                                                                    <em class="icon ni ni-bookmark"></em>
+                                                                                </button>
+                                                                            {% else %}
+                                                                                <button type="submit"
+                                                                                        class="btn btn-warning mark-btn marked"
+                                                                                        style="margin-top: 1em; margin-left: 5px; font-size: 0.7em; line-height: 0.7em;"
+                                                                                        title="حذف نشان">
+                                                                                    <em class="icon ni ni-check"></em>
+                                                                                </button>
+                                                                            {% endif %}
+                                                                        </form>
+                                                                    {% endif %}
+                                                                {% elif result_type == 'rent_file' %}
+                                                                    {% if request.user.title == 'bs' or request.user.sub_district == result.sub_district %}
+                                                                        <form method="post"
+                                                                              action="{% url 'toggle_mark_rent_file' 'rent_file' result.id %}"
+                                                                              class="mark-form"
+                                                                              data-file-id="{{ result.id }}">
+                                                                           {% csrf_token %}
+                                                                            {% if result.id not in marked_rent_file_ids %}
+                                                                                <button type="submit"
+                                                                                        class="btn btn-gray mark-btn"
+                                                                                        style="margin-top: 1em; font-size: 0.7em; line-height: 0.7em;"
+                                                                                        title="افزودن نشان">
+                                                                                    <em class="icon ni ni-bookmark"></em>
+                                                                                </button>
+                                                                            {% else %}
+                                                                                <button type="submit"
+                                                                                        class="btn btn-warning mark-btn marked"
+                                                                                        style="margin-top: 1em; margin-left: 5px; font-size: 0.7em; line-height: 0.7em;"
+                                                                                        title="حذف نشان">
+                                                                                    <em class="icon ni ni-check"></em>
+                                                                                </button>
+                                                                            {% endif %}
+                                                                        </form>
+                                                                    {% endif %}
+                                                                {% endif %}
+
                                                             </div>
                                                         </div>
                                                     </div>
@@ -345,6 +396,69 @@
                                                         <div class="card h-100" style="box-shadow: rgba(0, 0, 0, 0.10) 0 5px 15px;">
                                                             <div class="card-inner">
                                                                 <div class="project">
+
+                                                                    <!-- Mark-->
+                                                                    {% if result_type == 'buyer' %}
+                                                                        <div class="project-head" style="margin-bottom: 2em;">
+                                                                            <div class="project-title">
+                                                                                <div class="project-info">
+                                                                                    <div class="title" style="font-size: 1.1em;">
+                                                                                        <form method="post"
+                                                                                              action="{% url 'toggle_mark_buyer' 'buyer' result.id %}"
+                                                                                              class="mark-form"
+                                                                                              data-file-id="{{ result.id }}">
+                                                                                           {% csrf_token %}
+                                                                                            {% if result.id not in marked_buyer_ids %}
+                                                                                                <button type="submit"
+                                                                                                        class="btn btn-gray mark-btn"
+                                                                                                        style="margin-top: 1em; font-size: 0.7em; line-height: 0.7em;"
+                                                                                                        title="افزودن نشان">
+                                                                                                    <em class="icon ni ni-bookmark"></em>
+                                                                                                </button>
+                                                                                            {% else %}
+                                                                                                <button type="submit"
+                                                                                                        class="btn btn-warning mark-btn marked"
+                                                                                                        style="margin-top: 1em; margin-left: 5px; font-size: 0.7em; line-height: 0.7em;"
+                                                                                                        title="حذف نشان">
+                                                                                                    <em class="icon ni ni-check"></em>
+                                                                                                </button>
+                                                                                            {% endif %}
+                                                                                        </form>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    {% elif result_type == 'renter' %}
+                                                                        <div class="project-head" style="margin-bottom: 2em;">
+                                                                            <div class="project-title">
+                                                                                <div class="project-info">
+                                                                                    <div class="title" style="font-size: 1.1em;">
+                                                                                        <form method="post"
+                                                                                              action="{% url 'toggle_mark_renter' 'renter' result.id %}"
+                                                                                              class="mark-form"
+                                                                                              data-file-id="{{ result.id }}">
+                                                                                           {% csrf_token %}
+                                                                                            {% if result.id not in marked_renter_ids %}
+                                                                                                <button type="submit"
+                                                                                                        class="btn btn-gray mark-btn"
+                                                                                                        style="margin-top: 1em; font-size: 0.7em; line-height: 0.7em;"
+                                                                                                        title="افزودن نشان">
+                                                                                                    <em class="icon ni ni-bookmark"></em>
+                                                                                                </button>
+                                                                                            {% else %}
+                                                                                                <button type="submit"
+                                                                                                        class="btn btn-warning mark-btn marked"
+                                                                                                        style="margin-top: 1em; margin-left: 5px; font-size: 0.7em; line-height: 0.7em;"
+                                                                                                        title="حذف نشان">
+                                                                                                    <em class="icon ni ni-check"></em>
+                                                                                                </button>
+                                                                                            {% endif %}
+                                                                                        </form>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    {% endif %}
 
                                                                     <!-- Name & Code-->
                                                                     <div class="project-head">
@@ -484,7 +598,5 @@
     <!-- end: Main -->
     
 {% endblock %}
-
-
 
 

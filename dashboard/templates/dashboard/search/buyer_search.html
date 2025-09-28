@@ -125,6 +125,37 @@
                                                 <div class="card-inner">
                                                     <div class="project">
 
+                                                        <!-- Mark -->
+                                                        <div class="project-head" style="margin-bottom: 2em;">
+                                                            <div class="project-title">
+                                                                <div class="project-info">
+                                                                    <div class="title" style="font-size: 1.1em;">
+                                                                        <form method="post"
+                                                                              action="{% url 'toggle_mark_buyer' 'buyer' buyer.id %}"
+                                                                              class="mark-form"
+                                                                              data-file-id="{{ buyer.id }}">
+                                                                           {% csrf_token %}
+                                                                            {% if buyer.id not in marked_buyer_ids %}
+                                                                                <button type="submit"
+                                                                                        class="btn btn-gray mark-btn"
+                                                                                        style="margin-top: 1em; font-size: 0.7em; line-height: 0.7em;"
+                                                                                        title="افزودن نشان">
+                                                                                    <em class="icon ni ni-bookmark"></em>
+                                                                                </button>
+                                                                            {% else %}
+                                                                                <button type="submit"
+                                                                                        class="btn btn-warning mark-btn marked"
+                                                                                        style="margin-top: 1em; margin-left: 5px; font-size: 0.7em; line-height: 0.7em;"
+                                                                                        title="حذف نشان">
+                                                                                    <em class="icon ni ni-check"></em>
+                                                                                </button>
+                                                                            {% endif %}
+                                                                        </form>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
                                                         <!-- Name & Code-->
                                                         <div class="project-head">
                                                             <div class="project-title">
@@ -240,6 +271,5 @@
     <!-- end: Main -->
     
 {% endblock %}
-
 
 

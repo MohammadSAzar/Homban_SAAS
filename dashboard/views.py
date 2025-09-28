@@ -2437,6 +2437,17 @@ class SaleFileSearchView(ReadOnlyPermissionMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'] = forms.SaleFileFilterForm(self.request.GET or None)
+
+        # Marking
+        marked_sale_file_ids = set()
+        if self.request.user.is_authenticated:
+            marked_sale_file_ids = set(
+                models.Mark.objects.filter(
+                    agent=self.request.user,
+                    sale_file__isnull=False
+                ).values_list('sale_file_id', flat=True)
+            )
+        context['marked_sale_file_ids'] = marked_sale_file_ids
         return context
 
 
@@ -2480,6 +2491,17 @@ class RentFileSearchView(ReadOnlyPermissionMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'] = forms.RentFileFilterForm(self.request.GET or None)
+
+        # Marking
+        marked_rent_file_ids = set()
+        if self.request.user.is_authenticated:
+            marked_rent_file_ids = set(
+                models.Mark.objects.filter(
+                    agent=self.request.user,
+                    rent_file__isnull=False
+                ).values_list('rent_file_id', flat=True)
+            )
+        context['marked_rent_file_ids'] = marked_rent_file_ids
         return context
 
 
@@ -2521,6 +2543,17 @@ class BuyerSearchView(ReadOnlyPermissionMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'] = forms.BuyerFilterForm(self.request.GET or None)
+
+        # Marking
+        marked_buyer_ids = set()
+        if self.request.user.is_authenticated:
+            marked_buyer_ids = set(
+                models.Mark.objects.filter(
+                    agent=self.request.user,
+                    buyer__isnull=False
+                ).values_list('buyer_id', flat=True)
+            )
+        context['marked_buyer_ids'] = marked_buyer_ids
         return context
 
 
@@ -2569,6 +2602,17 @@ class RenterSearchView(ReadOnlyPermissionMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'] = forms.RenterFilterForm(self.request.GET or None)
+
+        # Marking
+        marked_renter_ids = set()
+        if self.request.user.is_authenticated:
+            marked_renter_ids = set(
+                models.Mark.objects.filter(
+                    agent=self.request.user,
+                    renter__isnull=False
+                ).values_list('renter_id', flat=True)
+            )
+        context['marked_renter_ids'] = marked_renter_ids
         return context
 
 
@@ -2656,6 +2700,47 @@ class CodeFinderView(ReadOnlyPermissionMixin, ListView):
                 'rt': 'renter',
             }
             context['result_type'] = type_mapping.get(search_type, 'unknown')
+
+        # Marking
+        marked_sale_file_ids = set()
+        if self.request.user.is_authenticated:
+            marked_sale_file_ids = set(
+                models.Mark.objects.filter(
+                    agent=self.request.user,
+                    sale_file__isnull=False
+                ).values_list('sale_file_id', flat=True)
+            )
+        context['marked_sale_file_ids'] = marked_sale_file_ids
+
+        marked_rent_file_ids = set()
+        if self.request.user.is_authenticated:
+            marked_rent_file_ids = set(
+                models.Mark.objects.filter(
+                    agent=self.request.user,
+                    rent_file__isnull=False
+                ).values_list('rent_file_id', flat=True)
+            )
+        context['marked_rent_file_ids'] = marked_rent_file_ids
+
+        marked_buyer_ids = set()
+        if self.request.user.is_authenticated:
+            marked_buyer_ids = set(
+                models.Mark.objects.filter(
+                    agent=self.request.user,
+                    buyer__isnull=False
+                ).values_list('buyer_id', flat=True)
+            )
+        context['marked_buyer_ids'] = marked_buyer_ids
+
+        marked_renter_ids = set()
+        if self.request.user.is_authenticated:
+            marked_renter_ids = set(
+                models.Mark.objects.filter(
+                    agent=self.request.user,
+                    renter__isnull=False
+                ).values_list('renter_id', flat=True)
+            )
+        context['marked_renter_ids'] = marked_renter_ids
 
         return context
 
@@ -4451,5 +4536,6 @@ def dated_task_list_view(request):
         'tasks': tasks,
     }
     return render(request, 'dashboard/tasks/dated_task_list.html', context=context)
+
 
 

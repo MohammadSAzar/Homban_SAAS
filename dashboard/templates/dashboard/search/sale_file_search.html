@@ -233,18 +233,27 @@
 
                                                     <!-- Mark -->
                                                     {% if request.user.title == 'bs' or request.user.sub_district == file.sub_district %}
-                                                        {% if file.id not in marked_sale_file_ids %}
-                                                            <form method="post" action="{% url 'mark_sale_file_create' 'sale_file' file.id %}">
-                                                               {% csrf_token %}
-                                                                <button type="submit" class="btn btn-gray" style="margin-top: 1em; font-size: 0.7em; line-height: 0.7em;">
+                                                        <form method="post" 
+                                                              action="{% url 'toggle_mark_sale_file' 'sale_file' file.id %}" 
+                                                              class="mark-form"
+                                                              data-file-id="{{ file.id }}">
+                                                           {% csrf_token %}
+                                                            {% if file.id not in marked_sale_file_ids %}
+                                                                <button type="submit" 
+                                                                        class="btn btn-gray mark-btn" 
+                                                                        style="margin-top: 1em; font-size: 0.7em; line-height: 0.7em;"
+                                                                        title="افزودن نشان">
                                                                     <em class="icon ni ni-bookmark"></em>
                                                                 </button>
-                                                            </form>
-                                                        {% else %}
-                                                            <span class="btn btn-warning" style="margin-top: 1em; margin-left: 5px; font-size: 0.7em; line-height: 0.7em;" title="نشان‌شده">
-                                                                <em class="icon ni ni-check"></em>
-                                                            </span>
-                                                        {% endif %}
+                                                            {% else %}
+                                                                <button type="submit" 
+                                                                        class="btn btn-warning mark-btn marked" 
+                                                                        style="margin-top: 1em; margin-left: 5px; font-size: 0.7em; line-height: 0.7em;" 
+                                                                        title="حذف نشان">
+                                                                    <em class="icon ni ni-check"></em>
+                                                                </button>
+                                                            {% endif %}
+                                                        </form>
                                                     {% endif %}
                                                 
                                                 </div>
@@ -270,4 +279,5 @@
     <!-- end: Main -->
     
 {% endblock %}
+
 
