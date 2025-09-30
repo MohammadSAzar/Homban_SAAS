@@ -64,7 +64,7 @@
                             <div class="col-lg-5 col-sm-5">
                                 <div class="form-group">
                                     <div class="form-control-wrap">
-                                        <label class="form-label" for="{{ form.person.id_for_label }}">شخص آگهی‌دهنده (اگر منبع شخص بوده)</label>
+                                        <label class="form-label" for="{{ form.person.id_for_label }}">فرد آگهی‌دهنده</label>
                                         {% render_field form.person id="person" type="text" class="form-control form-control-xl form-control-outlined" %}
                                     </div>
                                     {% if form.person.errors %}
@@ -106,7 +106,7 @@
                             </div>
 
                             <!-- province -->
-                            <div class="col-lg-3 col-sm-3">
+                            <div class="col-lg-4 col-sm-4">
                                 <div class="form-group">
                                     <div class="form-control-wrap">
                                         <label class="form-label" for="{{ form.province.id_for_label }}">استان</label>
@@ -121,7 +121,7 @@
                             </div>
 
                             <!-- city -->
-                            <div class="col-lg-3 col-sm-3">
+                            <div class="col-lg-4 col-sm-4">
                                 <div class="form-group">
                                     <div class="form-control-wrap">
                                         <label class="form-label" for="{{ form.city.id_for_label }}">شهر</label>
@@ -136,7 +136,7 @@
                             </div>
 
                             <!-- district -->
-                            <div class="col-lg-3 col-sm-3">
+                            <div class="col-lg-4 col-sm-4">
                                 <div class="form-group">
                                     <div class="form-control-wrap">
                                         <label class="form-label" for="{{ form.district.id_for_label }}">منطقه (محله)</label>
@@ -149,9 +149,9 @@
                                     {% endif %}
                                 </div>
                             </div>
-
+                        
                             <!-- sub_district -->
-                            <div class="col-lg-3 col-sm-3">
+                            <div class="col-lg-6 col-sm-6">
                                 <div class="form-group">
                                     <div class="form-control-wrap">
                                         <label class="form-label" for="{{ form.sub_district.id_for_label }}">زیرمحله</label>
@@ -164,7 +164,22 @@
                                     {% endif %}
                                 </div>
                             </div>
-
+    
+                            <!-- street -->
+                            <div class="col-lg-6 col-sm-6">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.street.id_for_label }}">خیابان اصلی</label>
+                                        {% render_field form.street id="street" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.street.errors %}
+                                        {% for error in form.street.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        
                             <!-- area -->
                             <div class="col-lg-3 col-sm-3">
                                 <div class="form-group">

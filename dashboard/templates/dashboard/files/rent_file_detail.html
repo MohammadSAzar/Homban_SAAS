@@ -52,7 +52,11 @@
                         
                             <!-- Title -->
                             <div class="card-header justify-center">
-                                <h5>معرفی فایل</h5>
+                                {% if rent_file.street %}
+                                    <h5 style="font-size: 1.1em;">فایل در {{ rent_file.sub_district }} - {{ rent_file.street }}</h5>
+                                {% else %}
+                                    <h5 style="font-size: 1.1em;">فایل در {{ rent_file.sub_district }}</h5>
+                                {% endif %}
                             </div>
                         
                             <!-- Main Info -->
