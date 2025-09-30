@@ -68,8 +68,8 @@ class PersonAdmin(admin.ModelAdmin):
 @admin.register(models.SaleFile)
 class SaleFileAdmin(admin.ModelAdmin):
     list_display = (
-        'title', 'created_by', 'code', 'source', 'status', 'sub_district', 'price_announced', 'price_per_meter', 'room',
-        'area', 'age', 'datetime_created')
+        'title', 'created_by', 'code', 'source', 'status', 'sub_district', 'street', 'price_announced', 'price_per_meter',
+        'room', 'area', 'age', 'datetime_created')
     ordering = ('-datetime_created',)
     list_filter = ('status', 'sub_district',)
     readonly_fields = ('code', 'datetime_created',)
@@ -79,7 +79,7 @@ class SaleFileAdmin(admin.ModelAdmin):
 @admin.register(models.RentFile)
 class RentFileAdmin(admin.ModelAdmin):
     list_display = (
-        'title', 'created_by', 'code', 'source', 'status', 'sub_district', 'deposit_announced', 'rent_announced',
+        'title', 'created_by', 'code', 'source', 'status', 'sub_district', 'street', 'deposit_announced', 'rent_announced',
         'convertable', 'room', 'area', 'age', 'datetime_created')
     ordering = ('-datetime_created',)
     list_filter = ('status', 'sub_district',)

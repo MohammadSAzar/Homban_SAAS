@@ -26,14 +26,14 @@ class LoginForm(forms.ModelForm):
 
 
 # --------------------------------- Sale Files ---------------------------------
-create_sale_file_fields = ['province', 'city', 'district', 'sub_district', 'address', 'price_announced', 'price_min', 'room', 'area',
-                           'age', 'document', 'level', 'parking', 'elevator', 'warehouse', 'title', 'description', 'source', 'person',
-                           'image1', 'image2', 'image3', 'image4', 'image5', 'image6', 'image7', 'image8', 'image9', 'video',
+create_sale_file_fields = ['province', 'city', 'district', 'sub_district', 'address', 'street', 'price_announced', 'price_min', 'room',
+                           'area', 'age', 'document', 'level', 'parking', 'elevator', 'warehouse', 'title', 'description', 'source',
+                           'person', 'image1', 'image2', 'image3', 'image4', 'image5', 'image6', 'image7', 'image8', 'image9', 'video',
                            'direction', 'file_levels', 'apartments_per_level', 'restoration', 'bench_stove', 'balcony',
                            'toilet', 'hot_water', 'cooling', 'heating', 'floor']
 
 
-sale_file_required_fields = ['province', 'city', 'district', 'sub_district', 'address', 'price_announced', 'room', 'area',
+sale_file_required_fields = ['province', 'city', 'district', 'sub_district', 'address', 'street', 'price_announced', 'room', 'area',
                              'age', 'document', 'level', 'parking', 'elevator', 'warehouse', 'title', 'description', 'source',]
 
 
@@ -202,7 +202,7 @@ class SaleFileRecoverForm(forms.ModelForm):
 
 
 # --------------------------------- Files ---------------------------------
-create_rent_file_fields = ['province', 'city', 'district', 'sub_district', 'address', 'deposit_announced', 'deposit_min',
+create_rent_file_fields = ['province', 'city', 'district', 'sub_district', 'address', 'street', 'deposit_announced', 'deposit_min',
                            'rent_announced', 'rent_min', 'convertable', 'room', 'area', 'age', 'document', 'level',
                            'parking', 'elevator', 'warehouse', 'title', 'description', 'source', 'person',
                            'image1', 'image2', 'image3', 'image4', 'image5', 'image6', 'image7', 'image8', 'image9', 'video',
@@ -210,7 +210,7 @@ create_rent_file_fields = ['province', 'city', 'district', 'sub_district', 'addr
                            'toilet', 'hot_water', 'cooling', 'heating', 'floor']
 
 
-rent_file_required_fields = ['province', 'city', 'district', 'sub_district', 'address', 'deposit_announced', 'rent_announced',
+rent_file_required_fields = ['province', 'city', 'district', 'sub_district', 'address', 'street', 'deposit_announced', 'rent_announced',
                              'convertable', 'room', 'area', 'age', 'document', 'level', 'parking', 'elevator', 'warehouse', 'title',
                              'description', 'source',]
 
@@ -411,6 +411,7 @@ class RentFileRecoverForm(forms.ModelForm):
 buyer_required_fields = ['name', 'phone_number', 'description', 'province', 'city', 'district', 'sub_districts',
                          'budget_announced', 'budget_status', 'room_max', 'room_min', 'area_max', 'area_min',
                          'age_max', 'age_min', 'document', 'parking', 'elevator', 'warehouse']
+
 
 renter_required_fields = ['name', 'phone_number', 'description', 'province', 'city', 'district', 'sub_districts',
                           'deposit_announced', 'rent_announced', 'budget_status', 'convertable', 'room_max', 'room_min',
@@ -2084,5 +2085,4 @@ class CombinedSessionResultForm(forms.Form):
     def save(self):
         self.boss_form.save()
         self.result_session_form.save()
-
 

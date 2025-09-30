@@ -147,7 +147,7 @@
                             </div>
 
                             <!-- province -->
-                            <div class="col-lg-3 col-sm-3">
+                            <div class="col-lg-4 col-sm-4">
                                 <div class="form-group">
                                     <div class="form-control-wrap">
                                         <label class="form-label" for="{{ form.province.id_for_label }}">استان</label>
@@ -162,7 +162,7 @@
                             </div>
 
                             <!-- city -->
-                            <div class="col-lg-3 col-sm-3">
+                            <div class="col-lg-4 col-sm-4">
                                 <div class="form-group">
                                     <div class="form-control-wrap">
                                         <label class="form-label" for="{{ form.city.id_for_label }}">شهر</label>
@@ -177,7 +177,7 @@
                             </div>
 
                             <!-- district -->
-                            <div class="col-lg-3 col-sm-3">
+                            <div class="col-lg-4 col-sm-4">
                                 <div class="form-group">
                                     <div class="form-control-wrap">
                                         <label class="form-label" for="{{ form.district.id_for_label }}">منطقه (محله)</label>
@@ -192,7 +192,7 @@
                             </div>
 
                             <!-- sub_district -->
-                            <div class="col-lg-3 col-sm-3">
+                            <div class="col-lg-6 col-sm-6">
                                 <div class="form-group">
                                     <div class="form-control-wrap">
                                         <label class="form-label" for="{{ form.sub_district.id_for_label }}">زیرمحله</label>
@@ -206,6 +206,21 @@
                                 </div>
                             </div>
 
+                            <!-- room -->
+                            <div class="col-lg-6 col-sm-6">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.street.id_for_label }}">خیابان اصلی</label>
+                                        {% render_field form.street id="street" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.street.errors %}
+                                        {% for error in form.street.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        
                             <!-- convertable -->
                             <div class="col-lg-4 col-sm-4">
                                 <div class="form-group">

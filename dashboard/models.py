@@ -251,6 +251,7 @@ class SaleFile(models.Model):
     sub_district = models.ForeignKey(SubDistrict, on_delete=models.SET_NULL, null=True, blank=True,
                                      related_name='sale_files', verbose_name=_('Sub-District'))
     address = models.TextField(max_length=1000, blank=True, null=True, verbose_name=_('Address'))
+    street = models.CharField(max_length=15, blank=True, null=True, verbose_name='خیابان اصلی')
     # general characteristics
     price_announced = models.PositiveBigIntegerField(blank=True, null=True, verbose_name=_('Announced Price'))
     price_min = models.PositiveBigIntegerField(blank=True, null=True, verbose_name=_('Min Price'))
@@ -359,6 +360,7 @@ class RentFile(models.Model):
     sub_district = models.ForeignKey(SubDistrict, on_delete=models.SET_NULL, null=True, blank=True,
                                      related_name='rent_files', verbose_name=_('Sub-District'))
     address = models.TextField(max_length=1000, blank=True, null=True, verbose_name=_('Address'))
+    street = models.CharField(max_length=15, blank=True, null=True, verbose_name='خیابان اصلی')
     # general characteristics
     deposit_announced = models.PositiveBigIntegerField(blank=True, null=True, verbose_name=_('Announced Deposit'))
     deposit_min = models.PositiveBigIntegerField(blank=True, null=True, verbose_name=_('Min Deposit'))
