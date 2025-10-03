@@ -136,6 +136,13 @@
                             </div>
                         
                         </div>
+                    
+                        <!-- Agent -->
+                        <div class="card-inner card-inner-sm">
+                            <ul class="btn-toolbar justify-center gx-1">
+                                <li><h6 class="title" style="font-size: 0.9em;">مشاور: "{{ rent_file.created_by.name_family|default:rent_file.created_by.username }}"</h6></li>
+                            </ul>
+                        </div>
 
                         <!-- Locations -->
                         <div class="card-inner card-inner-sm">

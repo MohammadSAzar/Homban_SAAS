@@ -4729,10 +4729,29 @@ def calendar_previous_month_view(request):
     next_month = functions.next_month_finder(today.month)
     next_2_month = functions.next_2_month_finder(today.month)
 
+    # Reports
+    user_reports = models.DailyReport.objects.filter(
+        agent=user
+    ).values_list('date', flat=True)
+    report_dates = set(user_reports)
+    days_data = []
+    today_str = today.strftime('%Y/%m/%d')
+    for day in month:
+        day_info = {
+            'date': day,
+            'weekday': None,
+            'is_today': day == today_str,
+            'is_past': day < today_str,
+            'is_future': day > today_str,
+            'has_report': day in report_dates,
+        }
+        days_data.append(day_info)
+
     context = {
         'user': user,
-        'today': today.strftime('%Y/%m/%d'),
+        'today': today_str,
         'month': month,
+        'days_data': days_data,
         'current_month': current_month,
         'previous_month': previous_month,
         'previous_2_month': previous_2_month,
@@ -4744,82 +4763,120 @@ def calendar_previous_month_view(request):
 
 def calendar_previous_2_month_view(request):
     user = request.user
-
     now = timezone.now()
     today = datetime2jalali(now)
     month = functions.previous_2_month()
-
     current_month = functions.current_month_finder(today.month)
     previous_month = functions.previous_month_finder(today.month)
     previous_2_month = functions.previous_2_month_finder(today.month)
     next_month = functions.next_month_finder(today.month)
     next_2_month = functions.next_2_month_finder(today.month)
 
+    # Reports
+    user_reports = models.DailyReport.objects.filter(
+        agent=user
+    ).values_list('date', flat=True)
+    report_dates = set(user_reports)
+    days_data = []
+    today_str = today.strftime('%Y/%m/%d')
+    for day in month:
+        day_info = {
+            'date': day,
+            'weekday': None,
+            'is_today': day == today_str,
+            'is_past': day < today_str,
+            'is_future': day > today_str,
+            'has_report': day in report_dates,
+        }
+        days_data.append(day_info)
+
     context = {
         'user': user,
-        'today': today.strftime('%Y/%m/%d'),
+        'today': today_str,
         'month': month,
+        'days_data': days_data,
         'current_month': current_month,
         'previous_month': previous_month,
         'previous_2_month': previous_2_month,
         'next_month': next_month,
         'next_2_month': next_2_month,
     }
-
     return render(request, 'dashboard/calendar/2previous.html', context=context)
 
 
 def calendar_next_month_view(request):
     user = request.user
-
     now = timezone.now()
     today = datetime2jalali(now)
     month = functions.next_month()
-
     current_month = functions.current_month_finder(today.month)
     previous_month = functions.previous_month_finder(today.month)
     previous_2_month = functions.previous_2_month_finder(today.month)
     next_month = functions.next_month_finder(today.month)
     next_2_month = functions.next_2_month_finder(today.month)
 
+    days_data = []
+    today_str = today.strftime('%Y/%m/%d')
+    for day in month:
+        day_info = {
+            'date': day,
+            'weekday': None,
+            'is_today': day == today_str,
+            'is_past': day < today_str,
+            'is_future': day > today_str,
+            'has_report': False,
+        }
+        days_data.append(day_info)
+
     context = {
         'user': user,
-        'today': today.strftime('%Y/%m/%d'),
+        'today': today_str,
         'month': month,
+        'days_data': days_data,
         'current_month': current_month,
         'previous_month': previous_month,
         'previous_2_month': previous_2_month,
         'next_month': next_month,
         'next_2_month': next_2_month,
     }
-
     return render(request, 'dashboard/calendar/next.html', context=context)
 
 
 def calendar_next_2_month_view(request):
     user = request.user
-
     now = timezone.now()
     today = datetime2jalali(now)
     month = functions.next_2_month()
-
     current_month = functions.current_month_finder(today.month)
     previous_month = functions.previous_month_finder(today.month)
     previous_2_month = functions.previous_2_month_finder(today.month)
     next_month = functions.next_month_finder(today.month)
     next_2_month = functions.next_2_month_finder(today.month)
 
+    days_data = []
+    today_str = today.strftime('%Y/%m/%d')
+    for day in month:
+        day_info = {
+            'date': day,
+            'weekday': None,
+            'is_today': day == today_str,
+            'is_past': day < today_str,
+            'is_future': day > today_str,
+            'has_report': False,
+        }
+        days_data.append(day_info)
+
     context = {
         'user': user,
-        'today': today.strftime('%Y/%m/%d'),
+        'today': today_str,
         'month': month,
+        'days_data': days_data,
         'current_month': current_month,
         'previous_month': previous_month,
         'previous_2_month': previous_2_month,
         'next_month': next_month,
         'next_2_month': next_2_month,
     }
-
     return render(request, 'dashboard/calendar/2next.html', context=context)
 
 
@@ -4839,5 +4896,6 @@ def dated_task_list_view(request):
         'tasks': tasks,
     }
     return render(request, 'dashboard/tasks/dated_task_list.html', context=context)
+
 
 

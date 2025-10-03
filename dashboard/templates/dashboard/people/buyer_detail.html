@@ -34,7 +34,7 @@
                             <div class="nk-block-des" style="margin-top: 1.2em;">
                                 <span>شماره تلفن: {{ buyer.phone_number }}</span>
                             </div>
-                            <div class="nk-block-des" style="margin-bottom: 1.2em;">
+                            <div class="nk-block-des">
                                 <span>کد:
                                     <!-- Code -->
                                     <button style="border: none; background-color:transparent; line-height: 10px; border-bottom: solid 1px #00a65c; color: #00a65c" onclick="copyCode(this)">
@@ -71,7 +71,12 @@
                                     </script>
                                 </span>
                             </div>
-                        
+
+                            <!-- Agent -->
+                            <div class="nk-block-des" style="margin-bottom: 1.2em; margin-top: 0.8em;">
+                                <h6 class="title" style="font-size: 0.9em;">مشاور: "{{ buyer.created_by.name_family|default:buyer.created_by.username }}"</h6>
+                            </div>
+
                             <!-- Mark -->
                             <form method="post" 
                                   action="{% url 'toggle_mark_buyer' 'buyer' buyer.id %}"

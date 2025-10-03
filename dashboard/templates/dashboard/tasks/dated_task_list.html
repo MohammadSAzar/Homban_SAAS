@@ -32,61 +32,19 @@
             });
         });
     </script>
-
-    <!-- Upper Navbar -->
-    {% if request.user == user %}
-        <div class="nk-fmg-body-head d-none d-lg-flex" >
-
-            <!-- Search -->
-            <div class="nk-fmg-search">
-                <em class="icon ni ni-search"></em>
-                <input type="text" class="form-control border-transparent form-focus-none" placeholder="جستجو در میان وظایف"/>
-            </div>
-
-        </div>
-    {% endif %}
-    <!-- end: Upper Navbar -->
     
     <!-- Main -->
     <div class="nk-block">
 
-        <!-- Upper + Mobile -->
-        {% if request.user == user %}
-            <div class="nk-block-head  nk-block-head-sm" style="margin-bottom: 1.2em;">
-                <div class="nk-block-between position-relative">
-
-                    <!-- Title -->
-                    <div class="nk-block-head-content" style="margin-top: 2em;">
-                        <h5 class="nk-block-title page-title">وظایف روز: {{ date }}</h5>
-                    </div>
-
-                    <!-- Mobile Navbar -->
-                    <div class="nk-block-head-content">
-                        <ul class="nk-block-tools g-1">
-
-                            <!-- Search -->
-                            <li class="d-lg-none">
-                                <a href="#" class="btn btn-trigger btn-icon search-toggle toggle-search" data-target="search"><em class="icon ni ni-search"></em></a>
-                            </li>
-
-                        </ul>
-                    </div>
-
-                    <!-- Mobile Search Box -->
-                    <div class="search-wrap px-2 d-lg-none" data-search="search">
-                        <div class="search-content">
-                            <a href="#" class="search-back btn btn-icon toggle-search" data-target="search"><em class="icon ni ni-arrow-left"></em></a>
-                            <input type="text" class="form-control border-transparent form-focus-none" placeholder="جستجو در میان وظایف"/>
-                            <button class="search-submit btn btn-icon">
-                                <em class="icon ni ni-search"></em>
-                            </button>
-                        </div>
-                    </div>
-
+        <!-- Title -->
+        <div class="nk-block-head  nk-block-head-sm" style="margin-bottom: 1.2em;">
+            <div class="nk-block-between position-relative">
+                <div class="nk-block-head-content">
+                    <h5 class="nk-block-title page-title">وظایف روز: {{ date }}</h5>
                 </div>
             </div>
-        {% endif %}
-        <!-- end: Upper + Mobile -->
+        </div>
+        <!-- end: Title -->
 
         <!-- Tasks -->
         <div class="row g-gs">
@@ -95,7 +53,7 @@
             <div class="col-lg-12">
                 <div class="row g-gs">
                     {% for task in tasks %}
-                        <div class="col-sm-4 col-lg-4 col-xxl-4">
+                        <div class="col-sm-12 col-lg-6 col-xxl-6">
                             {% if task.status == 'CL' %}
                                 <div class="card h-100" style="background-color: #C8E6C9">
                                     <div class="card-inner">
@@ -106,6 +64,7 @@
                                                 <div class="project-title">
                                                     <div class="project-info">
                                                         <h6 class="title">{{ task.title }} | {{ task.code }}</h6>
+                                                        <span class="sub-text" style="font-size: 0.95em; margin-top: 0.7em;">{{ task.agent.name_family|default:task.agent }} | {{ task.agent.sub_district }}</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -207,6 +166,7 @@
                                                 <div class="project-title">
                                                     <div class="project-info">
                                                         <h6 class="title">{{ task.title }} | {{ task.code }}</h6>
+                                                        <span class="sub-text" style="font-size: 0.95em; margin-top: 0.7em;">{{ task.agent.name_family|default:task.agent }} | {{ task.agent.sub_district }}</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -308,6 +268,7 @@
                                                 <div class="project-title">
                                                     <div class="project-info">
                                                         <h6 class="title">{{ task.title }} | {{ task.code }}</h6>
+                                                        <span class="sub-text" style="font-size: 0.95em; margin-top: 0.7em;">{{ task.agent.name_family|default:task.agent }} | {{ task.agent.sub_district }}</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -541,6 +502,5 @@
     <!-- end: Pagination -->
 
 {% endblock %}
-
 
 

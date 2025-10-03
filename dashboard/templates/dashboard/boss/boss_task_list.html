@@ -115,17 +115,17 @@
                                                     <!-- agent -->
                                                     <div style="margin-bottom: 0.6em;">
                                                         {% if boss_task.type == 'ts' %}
-                                                            <span style="font-size: 0.9em;">مشاور: {{ boss_task.ur_task.agent }}</span>
+                                                            <span style="font-size: 0.9em;">مشاور: {{ boss_task.ur_task.agent.name_family|default:boss_task.ur_task.agent }}</span>
                                                         {% elif boss_task.type == 'rs' %}
-                                                            <span style="font-size: 0.9em;">مشاور: {{ boss_task.result_session.agent }}</span>
+                                                            <span style="font-size: 0.9em;">مشاور: {{ boss_task.result_session.agent.name_family|default:boss_task.result_session.agent }}</span>
                                                         {% elif boss_task.type == 'ss' %}
-                                                            <span style="font-size: 0.9em;">مشاور: {{ boss_task.new_session.agent }}</span>
+                                                            <span style="font-size: 0.9em;">مشاور: {{ boss_task.new_session.agent.name_family|default:boss_task.new_session.agent }}</span>
                                                         {% elif boss_task.type == 'rv' %}
-                                                            <span style="font-size: 0.9em;">مشاور: {{ boss_task.result_visit.agent }}</span>
+                                                            <span style="font-size: 0.9em;">مشاور: {{ boss_task.result_visit.agent.name_family|default:boss_task.result_visit.agent }}</span>
                                                         {% elif boss_task.type == 'vs' %}
-                                                            <span style="font-size: 0.9em;">مشاور: {{ boss_task.new_visit.agent }}</span>
+                                                            <span style="font-size: 0.9em;">مشاور: {{ boss_task.new_visit.agent.name_family|default:boss_task.new_visit.agent }}</span>
                                                         {% else %}
-                                                            <span style="font-size: 0.9em;">مشاور: {{ boss_task.agent }}</span>
+                                                            <span style="font-size: 0.9em;">مشاور: {{ boss_task.agent.name_family|default:boss_task.agent }}</span>
                                                         {% endif %}
                                                     </div>
                                                 </div>
