@@ -3952,6 +3952,13 @@ class DailyReportCreateView(PermissionRequiredMixin, CreateView):
         self.object = None
         return self.render_to_response(self.get_context_data(form=form))
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        now = timezone.now()
+        today = datetime2jalali(now)
+        context['date'] = today.strftime('%Y/%m/%d')
+        return context
+
     def get_success_url(self):
         return reverse('current_month')
 
