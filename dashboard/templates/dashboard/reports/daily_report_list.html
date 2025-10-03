@@ -1,0 +1,202 @@
+{% extends '_base_dashboard.html' %}
+
+{% load static %}
+{% load i18n %}
+{% load jalali_tags %}
+{% load number_converter %}
+{% load widget_tweaks %}
+{% load humanize %}
+{% load pagination %}
+
+
+{% block title %}گزارش‌های روزانه{% endblock %}
+
+
+{% block content %}
+
+    <!-- Message -->
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <h4 class="modal-title" style="padding: 20px 20px 10px 0;!important;">عملیات با موفقیت انجام شد (اطلاعات مربوطه توسط مدیر بررسی خواهد شد).</h4>
+            <button class="modal-my-button">بستن پیام</button>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function() {
+            var messages = "{% for message in messages %}{{ message }}{% if not forloop.last %}\\n{% endif %}{% endfor %}";
+            if (messages) {
+                $('#modal-message').text(messages);
+                $('#successModal').show();
+            }
+            $('.modal-my-button').on('click', function() {
+                $('#successModal').hide();
+            });
+        });
+    </script>
+    
+    <!-- List -->
+    <div class="container-fluid">
+        <div class="nk-content-inner">
+            <div class="nk-content-body">
+
+                <!-- Upper -->
+                <div class="nk-block-head nk-block-head-sm">
+                    <div class="nk-block-between">
+
+                        <!-- Main -->
+                        <div class="nk-block-head-content">
+                            <h5 class="nk-block-title page-title" style="font-size: 1.4em;">گزارش‌های روزانه {{ date }}</h5>
+                            <div class="nk-block-des text-soft" style="margin-top: 1em;">
+                                <p>تعداد کل گزارش‌ها: {{ total_reports }}</p>
+                            </div>
+                            <div class="nk-block-des text-soft" style="margin-top: 1em;">
+                                <button type="button"
+                                        class="alert alert-danger"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#missingReportsModal"
+                                        style="line-height: 15px; font-size: 0.9em;">
+                                    <em class="icon ni ni-alert-circle"></em>
+                                    <span>مشاوران بدون گزارش: ({{ missing_reports_count }})</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- end: Upper -->
+
+                <!-- Modal -->
+                <div class="modal fade" id="missingReportsModal" tabindex="-1" aria-labelledby="missingReportsModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="missingReportsModalLabel">مشاوران بدون گزارش - {{ date }}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                {% if agents_without_reports %}
+                                    <div class="alert alert-warning">
+                                        <em class="icon ni ni-alert-circle"></em>
+                                        <strong>تعداد: {{ missing_reports_count }} مشاور</strong>
+                                    </div>
+
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-striped">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th width="5%">#</th>
+                                                    <th width="50%">نام مشاور</th>
+                                                    <th width="45%">سمت</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for agent in agents_without_reports %}
+                                                    <tr>
+                                                        <td>{{ forloop.counter }}</td>
+                                                        <td>{{ agent.display_name }}</td>
+                                                        <td>{{ agent.title }}</td>
+                                                    </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                {% else %}
+                                    <div class="alert alert-success">
+                                        <em class="icon ni ni-check-circle"></em>
+                                        همه مشاوران گزارش روزانه خود را ثبت کرده‌اند!
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- end: Modal -->
+
+                {% if reports_by_sub_district %}
+                    {% for sub_district_name, reports in reports_by_sub_district.items %}
+
+                        <!-- Sub_districts -->
+                        <div class="nk-block">
+                            <div class="card card-bordered">
+                                <div class="card-inner-group">
+
+                                    <!-- Upper -->
+                                    <div class="card-inner">
+                                        <div class="card-title-group">
+                                            <div class="card-title">
+                                                <h6 class="title" style="font-size: 1.1em;">زیرمحله: {{ sub_district_name }}</h6>
+                                            </div>
+                                            <div class="card-tools">
+                                                <span class="badge badge-dim bg-primary">{{ reports|length }} گزارش</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- end: Upper -->
+
+                                    <!-- List -->
+                                    <div class="card-inner p-0">
+                                        <div class="row g-0">
+                                            {% for daily_report in reports %}
+                                                <div class="col-sm-6 col-lg-4 col-xxl-4" style=" padding: 10px;">
+                                                    <div class="card h-100" style="box-shadow: rgba(0, 0, 0, 0.10) 0 5px 15px;">
+                                                        <div class="card-inner">
+                                                            <div class="project">
+
+                                                                <!-- Info -->
+                                                                <div class="project-head">
+                                                                    <div class="project-title">
+                                                                        <div class="project-info">
+                                                                            <h6 class="title" style="font-size: 0.9em;">مشاور: "{{ daily_report.agent.name_family|default:daily_report.agent.username }}"</h6>
+                                                                            <span class="sub-text" style="margin-top: 15px;">نقش: {{ daily_report.agent.get_title_display }}</span>
+                                                                            <span class="sub-text" style="margin-top: 15px;">وضعیت: {{ daily_report.get_status_display }}</span>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+                                                                <!-- More -->
+                                                                <div class="project-meta">
+                                                                    <a href="{% url 'daily_report_detail' daily_report.agent.pk daily_report.date %}"
+                                                                       class="btn btn-primary"
+                                                                       style="margin-top: 1em;"
+                                                                       target="_blank">
+                                                                        <span>مشاهده جزئیات</span>
+                                                                    </a>
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    <!-- end: List -->
+
+                                </div>
+                            </div>
+                        </div>
+                        <!-- end: Sub_districts -->
+
+                    {% endfor %}
+                {% else %}
+                    <!-- No Reports -->
+                    <div class="nk-block">
+                        <div class="card card-bordered">
+                            <div class="card-inner">
+                                <div class="alert alert-info">
+                                    <em class="icon ni ni-alert-circle"></em>
+                                    <h6>هیچ گزارش روزانه‌ای برای تاریخ {{ date }} یافت نشد.</h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- end: No Reports -->
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+    <!-- end: List -->
+
+{% endblock %}
+
+

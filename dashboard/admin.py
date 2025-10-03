@@ -156,6 +156,16 @@ class TaskBossAdmin(admin.ModelAdmin):
     list_per_page = getattr(settings, 'DJANGO_ADMIN_PER_PAGE', 20)
 
 
+@admin.register(models.DailyReport)
+class DailyReportAdmin(admin.ModelAdmin):
+    list_display = ('agent', 'date', 'status',)
+    ordering = ('-date',)
+    list_filter = ['agent', 'date', 'status',]
+    search_fields = ['agent']
+    readonly_fields = ('date',)
+    list_per_page = getattr(settings, 'DJANGO_ADMIN_PER_PAGE', 20)
+
+
 @admin.register(models.Mark)
 class MarkAdmin(admin.ModelAdmin):
     list_display = ('agent', 'type', 'code', 'sale_file', 'rent_file', 'buyer', 'renter', 'datetime_created')

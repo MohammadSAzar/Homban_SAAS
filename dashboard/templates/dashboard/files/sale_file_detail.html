@@ -413,9 +413,9 @@
                                                 <h6>اشتراک گذاری با مشتری</h6>
                                             </div>
 
-                                            <!-- Buttons -->
+                                            <!-- Buttons -->    
                                             <div class="card-body">
-
+                                            
                                                 <!-- WA -->
                                                 <a href="{{ whatsapp_share_url }}"
                                                    target="_blank"
@@ -424,16 +424,16 @@
                                                     <i class="fab fa-whatsapp"></i>
                                                     ارسال متن
                                                 </a>
-
+                                            
                                                 <!-- Copy -->
                                                 <button type="button"
                                                         class="btn btn-primary me-2 mb-2"
                                                         id="copy-text-btn"
-                                                        data-sale-file-text="">
+                                                        data-sale-file-text="{{ sale_file_text }}">
                                                     <i class="fas fa-copy"></i>
                                                     کپی متن
                                                 </button>
-
+                                            
                                                 <!-- Download -->
                                                 {% if sale_file.has_images or sale_file.has_video %}
                                                     <button type="button"
@@ -444,51 +444,29 @@
                                                 {% else %}
                                                     <button class="btn btn-danger me-2 mb-2">بدون محتوا</button>
                                                 {% endif %}
-
+                                            
                                                 <!-- Loading Messages -->
                                                 <div id="whatsapp-loading" class="d-none">
                                                     <div class="spinner-border spinner-border-sm me-2" role="status"></div>
                                                     در حال آماده سازی...
                                                 </div>
-
+                                            
                                                 <!-- Status Message -->
                                                 <div id="copy-status" class="mt-2 small d-none"></div>
                                                 <div id="whatsapp-info" class="mt-2 text-muted small">
                                                     <span id="images-count"></span>
                                                 </div>
-
+                                            
                                                 <!-- JS (Copy - WA) -->
                                                 <script>
                                                     document.addEventListener('DOMContentLoaded', function() {
-                                                        // Sample data - this would come from your Django template
-                                                        const saleFileData = {
-                                                            id: 123,
-                                                            price_announced: 2500000000,
-                                                            area: 120,
-                                                            room: 3
-                                                        };
-
-                                                        // Generate the text message (same logic as your Django view)
-                                                        function generateWhatsAppText(saleFile) {
-                                                            const messageParts = [
-                                                                `🏠 فایل فروش شماره ${saleFile.id}`,
-                                                                saleFile.price_announced ? `💰 قیمت: ${saleFile.price_announced.toLocaleString('fa-IR')} تومان` : "",
-                                                                saleFile.area ? `📐 متراژ: ${saleFile.area} متر مربع` : "",
-                                                                saleFile.room ? `📐 تعداد اتاق: ${saleFile.room}` : ""
-                                                            ];
-                                                            return messageParts.filter(part => part !== "").join("\n");
-                                                        }
-
-                                                        // Set the text data for the copy button
-                                                        const copyBtn = document.getElementById('copy-text-btn');
-                                                        const textToCopy = generateWhatsAppText(saleFileData);
-                                                        copyBtn.setAttribute('data-sale-file-text', textToCopy);
-
                                                         // Copy to clipboard functionality
+                                                        const copyBtn = document.getElementById('copy-text-btn');
+                                                        
                                                         copyBtn.addEventListener('click', function() {
                                                             const textToCopy = this.getAttribute('data-sale-file-text');
                                                             const statusDiv = document.getElementById('copy-status');
-
+                                            
                                                             // Use the Clipboard API if available
                                                             if (navigator.clipboard && window.isSecureContext) {
                                                                 navigator.clipboard.writeText(textToCopy).then(function() {
@@ -502,7 +480,7 @@
                                                                 fallbackCopyTextToClipboard(textToCopy);
                                                             }
                                                         });
-
+                                            
                                                         // Fallback copy method for older browsers
                                                         function fallbackCopyTextToClipboard(text) {
                                                             const textArea = document.createElement("textarea");
@@ -511,11 +489,11 @@
                                                             textArea.style.left = "0";
                                                             textArea.style.position = "fixed";
                                                             textArea.style.opacity = "0";
-
+                                            
                                                             document.body.appendChild(textArea);
                                                             textArea.focus();
                                                             textArea.select();
-
+                                            
                                                             try {
                                                                 const successful = document.execCommand('copy');
                                                                 if (successful) {
@@ -527,35 +505,35 @@
                                                                 console.error('Fallback: Oops, unable to copy', err);
                                                                 showCopyStatus('خطا در کپی کردن متن', 'error');
                                                             }
-
+                                            
                                                             document.body.removeChild(textArea);
                                                         }
-
+                                            
                                                         // Show copy status message
                                                         function showCopyStatus(message, type) {
                                                             const statusDiv = document.getElementById('copy-status');
                                                             statusDiv.className = `mt-2 small alert alert-${type === 'success' ? 'success' : 'danger'}`;
                                                             statusDiv.textContent = message;
                                                             statusDiv.classList.remove('d-none');
-
+                                            
                                                             // Hide the message after 3 seconds
                                                             setTimeout(function() {
                                                                 statusDiv.classList.add('d-none');
                                                             }, 3000);
                                                         }
-
+                                            
                                                         // Original AJAX functionality (keeping your existing code)
                                                         const ajaxBtn = document.getElementById('whatsapp-ajax-btn');
                                                         const loadingDiv = document.getElementById('whatsapp-loading');
-
+                                            
                                                         if (ajaxBtn) {
                                                             ajaxBtn.addEventListener('click', function() {
                                                                 const saleFileId = this.getAttribute('data-sale-file-id');
-
+                                            
                                                                 // Show loading
                                                                 this.style.display = 'none';
                                                                 loadingDiv.classList.remove('d-none');
-
+                                            
                                                                 // Make AJAX request
                                                                 fetch(`/sale-file/${saleFileId}/whatsapp-share/`, {
                                                                     method: 'GET',
@@ -586,21 +564,21 @@
                                                         }
                                                     });
                                                 </script>
-
+                                            
                                                 <!-- JS (Download)  -->
                                                 <script>
                                                     function downloadAllMedia(saleFileId, uniqueUrlId) {
                                                         const downloadBtn = document.getElementById('download-all-btn');
                                                         const originalText = downloadBtn.innerHTML;
-
+                                            
                                                         // Disable button and show loading state
                                                         downloadBtn.disabled = true;
                                                         downloadBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> در حال دانلود...';
-
+                                            
                                                         let downloadCount = 0;
                                                         let totalFiles = 0;
                                                         let filesToDownload = [];
-
+                                            
                                                         // Function to create and trigger download
                                                         function triggerDownload(url, delay = 0) {
                                                             setTimeout(() => {
@@ -610,12 +588,12 @@
                                                                 document.body.appendChild(link);
                                                                 link.click();
                                                                 document.body.removeChild(link);
-
+                                            
                                                                 downloadCount++;
-
+                                            
                                                                 // Update button text with progress
                                                                 downloadBtn.innerHTML = `<i class="fa fa-download"></i> دانلود شده: ${downloadCount}/${totalFiles}`;
-
+                                            
                                                                 // Re-enable button when all downloads are complete
                                                                 if (downloadCount === totalFiles) {
                                                                     setTimeout(() => {
@@ -625,29 +603,29 @@
                                                                 }
                                                             }, delay);
                                                         }
-
+                                            
                                                         const baseUrl = `/sale-file/${saleFileId}/${uniqueUrlId}/download-media/`;
-
+                                            
                                                         console.log(`Base URL: ${baseUrl}`);
-
+                                            
                                                         // Test the first URL construction
                                                         const testUrl = `${baseUrl}?file=image1`;
                                                         console.log(`Test URL: ${testUrl}`);
-
+                                            
                                                         // Remove the test fetch - it was causing issues
-
+                                            
                                                         // More reliable approach: Check what's actually rendered in the template
                                                         // This way we only try to download files that actually exist
-
+                                            
                                                         // Check each image by looking at the carousel items
                                                         // Each carousel-item represents an existing image
                                                         const carouselItems = document.querySelectorAll('#carouselExConInd .carousel-item');
-
+                                            
                                                         console.log(`Found ${carouselItems.length} carousel items`);
-
+                                            
                                                         // Create a mapping of which images actually exist
                                                         let imageMapping = [];
-
+                                            
                                                         // Look through the template structure to see which images are rendered
                                                         // Since Django only renders carousel items for existing images, we can map them
                                                         carouselItems.forEach((item, index) => {
@@ -655,7 +633,7 @@
                                                             if (img && img.src && !img.src.includes('placeholder') && !img.src.includes('default')) {
                                                                 // Try to determine which image this is from the src URL
                                                                 let imageNumber = null;
-
+                                            
                                                                 // Check the img src to see if it contains any hints about which image it is
                                                                 for (let i = 1; i <= 9; i++) {
                                                                     if (img.src.includes(`image${i}`) || img.src.includes(`_${i}.`) || img.src.includes(`-${i}.`)) {
@@ -663,7 +641,7 @@
                                                                         break;
                                                                     }
                                                                 }
-
+                                            
                                                                 // If we can't determine from URL, we need a different approach
                                                                 // Let's use the template knowledge: check the carousel HTML structure
                                                                 if (!imageNumber) {
@@ -672,30 +650,30 @@
                                                                     for (let i = 1; i <= 9; i++) {
                                                                         // Since we can't see the template logic in the rendered HTML,
                                                                         // we'll have to rely on the order they appear and make educated guesses
-
+                                            
                                                                         // For now, let's just use the index + 1 as a fallback
                                                                         // But this is not reliable if images are missing in between
                                                                         imageNumber = index + 1;
                                                                         break;
                                                                     }
                                                                 }
-
+                                            
                                                                 if (imageNumber && imageNumber <= 9) {
                                                                     imageMapping.push(imageNumber);
                                                                     filesToDownload.push(`image${imageNumber}`);
                                                                 }
                                                             }
                                                         });
-
+                                            
                                                         // Alternative approach: Try to download each image and let the backend handle missing ones
                                                         // This is more reliable - we attempt all images and the backend will return 404 for missing ones
                                                         if (filesToDownload.length === 0) {
                                                             console.log('Fallback: Checking all possible images');
-
+                                            
                                                             // Since we have carousel items, we know some images exist
                                                             // Let's try a different approach: attempt to download in order and let backend handle it
                                                             const imageElements = document.querySelectorAll('#carouselExConInd .carousel-item img');
-
+                                            
                                                             imageElements.forEach((img, index) => {
                                                                 if (img && img.src && !img.src.includes('placeholder')) {
                                                                     // Just use sequential numbering based on appearance
@@ -703,13 +681,13 @@
                                                                 }
                                                             });
                                                         }
-
+                                            
                                                         // Check for video
                                                         const videoElement = document.querySelector('video');
                                                         if (videoElement) {
                                                             // Check if video has content (either src or source child)
                                                             const videoSrc = videoElement.src || (videoElement.querySelector('source') && videoElement.querySelector('source').src);
-
+                                            
                                                             if (videoSrc && !videoSrc.includes('placeholder')) {
                                                                 filesToDownload.push('video');
                                                             } else if (videoElement.querySelector('source')) {
@@ -717,31 +695,31 @@
                                                                 filesToDownload.push('video');
                                                             }
                                                         }
-
+                                            
                                                         // Remove duplicates
                                                         filesToDownload = [...new Set(filesToDownload)];
-
+                                            
                                                         totalFiles = filesToDownload.length;
-
+                                            
                                                         console.log('Files to download:', filesToDownload);
                                                         console.log('Total files:', totalFiles);
-
+                                            
                                                         if (totalFiles === 0) {
                                                             alert('هیچ فایل رسانه‌ای برای دانلود یافت نشد!');
                                                             downloadBtn.disabled = false;
                                                             downloadBtn.innerHTML = originalText;
                                                             return;
                                                         }
-
+                                            
                                                         // Download all found files with improved handling
                                                         let delay = 0;
-
+                                            
                                                         filesToDownload.forEach((file, index) => {
                                                             const downloadUrl = `${baseUrl}?file=${file}`;
-
+                                            
                                                             setTimeout(() => {
                                                                 console.log(`Attempting to download: ${file}`);
-
+                                            
                                                                 // Special handling for video files to avoid conflicts
                                                                 if (file === 'video') {
                                                                     // Pause the video element to avoid conflicts
@@ -758,30 +736,30 @@
                                                                 } else {
                                                                     triggerFileDownload(downloadUrl, file);
                                                                 }
-
+                                            
                                                             }, delay);
-
+                                            
                                                             delay += 2000; // 2 seconds between downloads for better stability
                                                         });
-
+                                            
                                                         function triggerFileDownload(url, fileName) {
                                                             console.log(`Downloading: ${fileName} from ${url}`);
-
+                                            
                                                             // Use simple link approach instead of fetch - fetch was causing the HTML download issue
                                                             const link = document.createElement('a');
                                                             link.href = url;
                                                             link.download = ''; // Let browser determine filename from server
                                                             link.style.display = 'none';
-
+                                            
                                                             document.body.appendChild(link);
                                                             link.click();
                                                             document.body.removeChild(link);
-
+                                            
                                                             downloadCount++;
                                                             downloadBtn.innerHTML = `<i class="fa fa-download"></i> دانلود شده: ${downloadCount}/${totalFiles}`;
-
+                                            
                                                             console.log(`Triggered download for: ${fileName}`);
-
+                                            
                                                             if (downloadCount === totalFiles) {
                                                                 setTimeout(() => {
                                                                     downloadBtn.disabled = false;
@@ -792,9 +770,9 @@
                                                         }
                                                     }
                                                 </script>
-
+                                            
                                             </div>
-
+                                        
                                         </div>
                                     </div>
                                 </div>

@@ -671,7 +671,7 @@
                                                 <button type="button"
                                                         class="btn btn-primary me-2 mb-2"
                                                         id="copy-text-btn"
-                                                        data-rent-file-text="">
+                                                        data-rent-file-text="{{ rent_file_text }}">
                                                     <i class="fas fa-copy"></i>
                                                     کپی متن
                                                 </button>
@@ -702,33 +702,9 @@
                                                 <!-- JS (Copy - WA) -->
                                                 <script>
                                                     document.addEventListener('DOMContentLoaded', function() {
-                                                        // Sample data - this would come from your Django template
-                                                        const rentFileData = {
-                                                            id: 123,
-                                                            deposit_announced: 100000000,
-                                                            rent_announced: 50000000,
-                                                            area: 120,
-                                                            room: 3
-                                                        };
-
-                                                        // Generate the text message (same logic as your Django view)
-                                                        function generateWhatsAppText(rentFile) {
-                                                            const messageParts = [
-                                                                `🏠 فایل اجاره شماره ${rentFile.id}`,
-                                                                rentFile.deposit_announced ? `💰 ودیعه: ${rentFile.deposit_announced.toLocaleString('fa-IR')} تومان` : "",
-                                                                rentFile.rent_announced ? `💰 رهن: ${rentFile.rent_announced.toLocaleString('fa-IR')} تومان` : "",
-                                                                rentFile.area ? `📐 متراژ: ${rentFile.area} متر مربع` : "",
-                                                                rentFile.room ? `📐 تعداد اتاق: ${rentFile.room}` : ""
-                                                            ];
-                                                            return messageParts.filter(part => part !== "").join("\n");
-                                                        }
-
-                                                        // Set the text data for the copy button
-                                                        const copyBtn = document.getElementById('copy-text-btn');
-                                                        const textToCopy = generateWhatsAppText(rentFileData);
-                                                        copyBtn.setAttribute('data-rent-file-text', textToCopy);
-
                                                         // Copy to clipboard functionality
+                                                        const copyBtn = document.getElementById('copy-text-btn');
+
                                                         copyBtn.addEventListener('click', function() {
                                                             const textToCopy = this.getAttribute('data-rent-file-text');
                                                             const statusDiv = document.getElementById('copy-status');
@@ -1577,5 +1553,6 @@
     </div>
 
 {% endblock %}
+
 
 

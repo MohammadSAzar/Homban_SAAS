@@ -1,0 +1,208 @@
+{% extends '_base_dashboard.html' %}
+
+{% load static %}
+{% load i18n %}
+{% load jalali_tags %}
+{% load number_converter %}
+{% load humanize %}
+{% load widget_tweaks %}
+
+
+{% block title %}
+    {% if daily_report.agent.name_family %}
+        گزارش روزانه {{ daily_report.agent.name_family }} | {{ daily_report.date }}
+    {% else %}
+        گزارش روزانه {{ daily_report.agent }} | {{ daily_report.date }}
+    {% endif %}
+{% endblock %}
+
+
+{% block content %}
+    
+    <!-- Messages1 -->
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <h4 class="modal-title" style="padding: 20px 20px 10px 0;!important;">عملیات با موفقیت انجام شد.</h4>
+            <button class="modal-my-button">بستن پیام</button>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function() {
+            var messages = "{% for message in messages %}{{ message }}{% if not forloop.last %}\\n{% endif %}{% endfor %}";
+            if (messages) {
+                $('#modal-message').text(messages);
+                $('#successModal').show();
+            }
+            $('.modal-my-button').on('click', function() {
+                $('#successModal').hide();
+            });
+        });
+    </script>
+
+    <!-- Main -->
+    <div class="components-preview wide-md mx-auto">
+        <div class="nk-block nk-block-lg">
+            <div class="card card-bordered card-preview">
+                <div class="card-inner" >
+                    <div class="preview-block" >
+
+                        <!-- Title -->
+                        <div class="nk-block-head nk-block-head-lg">
+                            <div class="nk-block-head-content">
+                                <h6 class="nk-block-title page-title" style="line-height: 55px; font-size: 1.3em">
+                                    {% if daily_report.agent.name_family %}
+                                        گزارش روزانه {{ daily_report.agent.name_family }} | {{ daily_report.date }}
+                                    {% else %}
+                                        گزارش روزانه {{ daily_report.agent }} | {{ daily_report.date }}
+                                    {% endif %}
+                                </h6>
+                            </div>
+                        </div>
+                        <!-- end: Title -->
+
+                        <!-- agent -->
+                        <div class="col-lg-4 col-sm-4">
+                            <div class="form-group">
+                                <div class="form-control-wrap">
+                                    <label class="form-label" style="color: #00a65c; font-weight: bold">مشاور:</label>
+                                    {% if daily_report.agent.name_family %}
+                                        <span>{{ daily_report.agent.name_family }}</span>
+                                    {% else %}
+                                        <span>{{ daily_report.agent }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- date -->
+                        <div class="col-lg-4 col-sm-4">
+                            <div class="form-group">
+                                <div class="form-control-wrap">
+                                    <label class="form-label" style="color: #00a65c; font-weight: bold">تاریخ:</label>
+                                        <span>{{ daily_report.date }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- date -->
+                        <div class="col-lg-4 col-sm-4">
+                            <div class="form-group">
+                                <div class="form-control-wrap">
+                                    <label class="form-label" style="color: #00a65c; font-weight: bold">وضعیت:</label>
+                                        <span>{{ daily_report.get_status_display }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- space -->
+                        <div class="col-lg-12 col-sm-12">
+                            <div class="form-group">
+                                <div class="form-control-wrap">
+                                    <span>-----------------------------------------</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- evaluation -->
+                        <div class="col-lg-6 col-sm-6">
+                            <div class="form-group">
+                                <div class="form-control-wrap">
+                                    <label class="form-label" style="color: #00a65c; font-weight: bold">گزارش کارشناسی:</label>
+                                    <span>{{ daily_report.evaluation|safe|linebreaksbr }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- service -->
+                        <div class="col-lg-6 col-sm-6">
+                            <div class="form-group">
+                                <div class="form-control-wrap">
+                                    <label class="form-label" style="color: #00a65c; font-weight: bold">گزارش سرویس:</label>
+                                    <span>{{ daily_report.service|safe|linebreaksbr }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- discount -->
+                        <div class="col-lg-6 col-sm-6">
+                            <div class="form-group">
+                                <div class="form-control-wrap">
+                                    <label class="form-label" style="color: #00a65c; font-weight: bold">گزارش اخذ تخفیف:</label>
+                                    <span>{{ daily_report.discount|safe|linebreaksbr }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ads -->
+                        <div class="col-lg-6 col-sm-6">
+                            <div class="form-group">
+                                <div class="form-control-wrap">
+                                    <label class="form-label" style="color: #00a65c; font-weight: bold">گزارش آگهی:</label>
+                                    <span>{{ daily_report.ads|safe|linebreaksbr }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- space -->
+                        <div class="col-lg-12 col-sm-12">
+                            <div class="form-group">
+                                <div class="form-control-wrap">
+                                    <span>-----------------------------------------</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- description -->
+                        <div class="col-lg-12 col-sm-12">
+                            <div class="form-group">
+                                <div class="form-control-wrap">
+                                    <label class="form-label" style="color: #00a65c; font-weight: bold">توضیحات مشاور:</label>
+                                    <span>{{ daily_report.description|safe|linebreaksbr }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- boss_note -->
+                        <div class="col-lg-12 col-sm-12">
+                            <div class="form-group">
+                                <div class="form-control-wrap">
+                                    <label class="form-label" style="color: #00a65c; font-weight: bold">توضیحات مدیر:</label>
+                                    <span>{{ daily_report.boss_note|safe|linebreaksbr }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Edit -->
+                        {% if daily_report.agent == request.user and daily_report.status == 'wfb' %}
+                            <div class="nk-fmg-actions" style="margin-top: 3em;">
+                                <a href="{% url 'daily_report_update' daily_report.agent.pk daily_report.date %}" class="btn btn-primary" target="_blank" style="line-height: 30px;">ویرایش</a>
+                            </div>
+                        {% endif %}
+                        <!-- end: Edit -->
+                    
+                        <!-- Note / Close -->
+                        {% if request.user.title == 'bs' and daily_report.status == 'wfb' %}
+                            <div class="nk-fmg-actions" style="margin-top: 3em;">
+                                <a href="{% url 'daily_report_note' daily_report.agent.pk daily_report.date %}" class="btn btn-primary" target="_blank" style="line-height: 30px;">ثبت نظر / بستن</a>
+                            </div>
+                        {% endif %}
+                        <!-- end: Note / Close -->
+                    
+                        <!-- Close -->
+                        {% if daily_report.agent == request.user and daily_report.status == 'wfr' %}
+                            <div class="nk-fmg-actions" style="margin-top: 3em;">
+                                <a href="{% url 'daily_report_close' daily_report.agent.pk daily_report.date %}" class="btn btn-primary" target="_blank" style="line-height: 30px;">بستن</a>
+                            </div>
+                        {% endif %}
+                        <!-- end: Close -->
+                    
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+
+

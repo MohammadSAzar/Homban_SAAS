@@ -12,10 +12,10 @@ from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from django.shortcuts import get_object_or_404, render, redirect
 from operator import attrgetter
-from django.contrib import messages
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from collections import defaultdict
 
 
 from jalali_date import datetime2jalali
@@ -610,7 +610,7 @@ class SaleFileListView(ReadOnlyPermissionMixin, ListView):
         else:
             queryset_default = (
                 models.SaleFile.objects.select_related('province', 'city', 'district', 'sub_district', 'person', 'created_by')
-                .filter(status='acc').exclude(delete_request='Yes'))
+                .filter(status='acc')).exclude(delete_request='Yes')
             form = forms.SaleFileFilterForm(self.request.GET)
 
             if form.is_valid():
@@ -814,20 +814,42 @@ class SaleFileDetailView(ReadOnlyPermissionMixin, DetailView):
             ).exists()
         context['is_marked'] = is_marked
 
-        # WA Link
+        # WA Link - Text
         context['whatsapp_share_url'] = self.get_whatsapp_share_url(sale_file)
+        context['sale_file_text'] = self.get_sale_file_text(sale_file)
         return context
 
     def get_whatsapp_share_url(self, sale_file):
         message_parts = [
-            f"🏠 فایل فروش شماره {sale_file.id}",
-            f"💰 قیمت: {sale_file.price_announced:,} تومان" if sale_file.price_announced else "",
-            f"📐 متراژ: {sale_file.area} متر مربع" if sale_file.area else "",
-            f"📐 تعداد اتاق: {sale_file.room}" if sale_file.room else "",
+            f"🏠 فایل فروش: {sale_file.title}",
+            "",
+            f"قیمت: {sale_file.price_announced:,} تومان" if sale_file.price_announced else "",
+            "",
+            f"متراژ: {sale_file.area} متر مربع" if sale_file.area else "",
+            f" تعداد اتاق: {sale_file.room}" if sale_file.room else "",
+            "",
+            f"  پارکینگ: {' دارد' if sale_file.parking == 'has' else ' ندارد'}",
+            f" آسانسور: {' دارد' if sale_file.elevator == 'has' else ' ندارد'}",
+            f"  انباری: {' دارد' if sale_file.warehouse == 'has' else ' ندارد'}",
         ]
         message = "\n".join(filter(None, message_parts))
         encoded_message = urllib.parse.quote(message)
         return f"https://wa.me/?text={encoded_message}"
+
+    def get_sale_file_text(self, sale_file):
+        message_parts = [
+            f"🏠 فایل فروش: {sale_file.title}",
+            "",
+            f"قیمت: {sale_file.price_announced:,} تومان" if sale_file.price_announced else "",
+            "",
+            f"متراژ: {sale_file.area} متر مربع" if sale_file.area else "",
+            f" تعداد اتاق: {sale_file.room}" if sale_file.room else "",
+            "",
+            f"  پارکینگ: {' دارد' if sale_file.parking == 'has' else ' ندارد'}",
+            f" آسانسور: {' دارد' if sale_file.elevator == 'has' else ' ندارد'}",
+            f"  انباری: {' دارد' if sale_file.warehouse == 'has' else ' ندارد'}",
+        ]
+        return "\n".join(filter(None, message_parts))
 
 
 @login_required
@@ -1378,21 +1400,44 @@ class RentFileDetailView(ReadOnlyPermissionMixin, DetailView):
             ).exists()
         context['is_marked'] = is_marked
 
-        # WA Link
+        # WA Link - Text
         context['whatsapp_share_url'] = self.get_whatsapp_share_url(rent_file)
+        context['rent_file_text'] = self.get_rent_file_text(rent_file)
         return context
 
     def get_whatsapp_share_url(self, rent_file):
         message_parts = [
-            f"🏠 فایل اجاره شماره {rent_file.id}",
-            f"💰 ودیعه: {rent_file.deposit_announced:,} تومان" if rent_file.deposit_announced else "",
-            f"💰 اجاره: {rent_file.rent_announced:,} تومان" if rent_file.rent_announced else "",
-            f"📐 متراژ: {rent_file.area} متر مربع" if rent_file.area else "",
-            f"📐 تعداد اتاق: {rent_file.room}" if rent_file.room else "",
+            f"🏠 فایل اجاره: {rent_file.title}",
+            "",
+            f"ودیعه: {rent_file.deposit_announced:,} تومان" if rent_file.deposit_announced else "",
+            f"اجاره: {rent_file.rent_announced:,} تومان" if rent_file.rent_announced else "",
+            "",
+            f"متراژ: {rent_file.area} متر مربع" if rent_file.area else "",
+            f" تعداد اتاق: {rent_file.room}" if rent_file.room else "",
+            "",
+            f"  پارکینگ: {' دارد' if rent_file.parking == 'has' else ' ندارد'}",
+            f" آسانسور: {' دارد' if rent_file.elevator == 'has' else ' ندارد'}",
+            f"  انباری: {' دارد' if rent_file.warehouse == 'has' else ' ندارد'}",
         ]
         message = "\n".join(filter(None, message_parts))
         encoded_message = urllib.parse.quote(message)
         return f"https://wa.me/?text={encoded_message}"
+
+    def get_rent_file_text(self, rent_file):
+        message_parts = [
+            f"🏠 فایل اجاره: {rent_file.title}",
+            "",
+            f"ودیعه: {rent_file.deposit_announced:,} تومان" if rent_file.deposit_announced else "",
+            f"اجاره: {rent_file.rent_announced:,} تومان" if rent_file.rent_announced else "",
+            "",
+            f"متراژ: {rent_file.area} متر مربع" if rent_file.area else "",
+            f" تعداد اتاق: {rent_file.room}" if rent_file.room else "",
+            "",
+            f"  پارکینگ: {' دارد' if rent_file.parking == 'has' else ' ندارد'}",
+            f" آسانسور: {' دارد' if rent_file.elevator == 'has' else ' ندارد'}",
+            f"  انباری: {' دارد' if rent_file.warehouse == 'has' else ' ندارد'}",
+        ]
+        return "\n".join(filter(None, message_parts))
 
 
 @login_required
@@ -3798,6 +3843,251 @@ def delete_request_list_view(request):
     return render(request, 'dashboard/boss/delete_item_list.html', context)
 
 
+# --------------------------------- Reports --------------------------------
+class BossDailyReportsListView(ReadOnlyPermissionMixin, ListView):
+    model = models.DailyReport
+    template_name = 'dashboard/reports/daily_report_list.html'
+    context_object_name = 'daily_reports'
+    permission_model = 'DailyReport'
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.title != 'bs':
+            raise PermissionDenied("فقط مدیر اجازه دسترسی به این صفحه را دارد")
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        date = self.kwargs.get('date')
+        return models.DailyReport.objects.filter(
+            date=date
+        ).select_related(
+            'agent',
+            'agent__sub_district',
+            'agent__sub_district__district',
+            'agent__sub_district__district__city',
+            'agent__sub_district__district__city__province'
+        ).order_by('agent__sub_district', 'agent__name_family')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        date = self.kwargs.get('date')
+
+        reports_by_sub_district = defaultdict(list)
+        for report in self.object_list:
+            if report.agent and report.agent.sub_district:
+                sub_district_name = report.agent.sub_district.name
+                reports_by_sub_district[sub_district_name].append(report)
+            else:
+                reports_by_sub_district['بدون زیرمحله'].append(report)
+        reports_by_sub_district = dict(sorted(reports_by_sub_district.items()))
+
+        agents_with_reports = set(self.object_list.values_list('agent_id', flat=True))
+        all_agents = models.CustomUserModel.objects.filter(
+            is_active=True
+        ).exclude(
+            title='bs'
+        ).select_related('sub_district')
+
+        # Find agents without reports
+        agents_without_reports = []
+        for agent in all_agents:
+            if agent.id not in agents_with_reports:
+                display_name = agent.name_family if agent.name_family else agent.username
+                title_display = agent.get_title_display() if agent.title else 'نامشخص'
+                agents_without_reports.append({
+                    'id': agent.id,
+                    'display_name': display_name,
+                    'title': title_display,
+                    'full_info': f"{display_name} - {title_display}"
+                })
+
+        context['reports_by_sub_district'] = reports_by_sub_district
+        context['date'] = date
+        context['total_reports'] = self.object_list.count()
+        context['agents_without_reports'] = agents_without_reports
+        context['missing_reports_count'] = len(agents_without_reports)
+        return context
+
+
+class DailyReportDetailView(ReadOnlyPermissionMixin, DetailView):
+    model = models.DailyReport
+    context_object_name = 'daily_report'
+    template_name = 'dashboard/reports/daily_report_detail.html'
+    permission_model = 'DailyReport'
+
+    def get_queryset(self):
+        return models.DailyReport.objects.select_related('agent')
+
+    def get_object(self, queryset=None):
+        if queryset is None:
+            queryset = self.get_queryset()
+        agent_pk = self.kwargs.get('agent_pk')
+        date = self.kwargs.get('date')
+        try:
+            obj = queryset.get(agent__pk=agent_pk, date=date)
+        except models.DailyReport.DoesNotExist:
+            raise Http404("گزارش روزانه یافت نشد")
+        return obj
+
+
+class DailyReportCreateView(PermissionRequiredMixin, CreateView):
+    model = models.DailyReport
+    form_class = forms.DailyReportCreateForm
+    template_name = 'dashboard/reports/daily_report_create.html'
+    permission_model = 'DailyReport'
+    permission_action = 'create'
+
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+    def form_valid(self, form):
+        form.instance.save(user=self.request.user)
+        messages.success(self.request, "گزارش روزانه در سامانه ثبت شد.")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        self.object = None
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_success_url(self):
+        return reverse('current_month')
+
+
+class DailyReportUpdateView(PermissionRequiredMixin, UpdateView):
+    model = models.DailyReport
+    form_class = forms.DailyReportCreateForm
+    template_name = 'dashboard/reports/daily_report_update.html'
+    context_object_name = 'daily_report'
+    permission_model = 'DailyReport'
+    permission_action = 'update'
+
+    def get_queryset(self):
+        return models.DailyReport.objects.select_related('agent')
+
+    def get_object(self, queryset=None):
+        if queryset is None:
+            queryset = self.get_queryset()
+        agent_pk = self.kwargs.get('agent_pk')
+        date = self.kwargs.get('date')
+        try:
+            obj = queryset.get(agent__pk=agent_pk, date=date)
+        except models.DailyReport.DoesNotExist:
+            raise Http404("گزارش روزانه یافت نشد")
+        return obj
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form = self.get_form()
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+    def form_valid(self, form):
+        messages.success(self.request, "گزارش روزانه با موفقیت ویرایش شد.")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_success_url(self):
+        return reverse('daily_report_detail', kwargs={
+            'agent_pk': self.object.agent.pk,
+            'date': self.object.date
+        })
+
+
+class DailyReportNoteView(PermissionRequiredMixin, UpdateView):
+    model = models.DailyReport
+    form_class = forms.DailyReportBossNoteForm
+    template_name = 'dashboard/reports/daily_report_note.html'
+    context_object_name = 'daily_report'
+    permission_model = 'DailyReport'
+    permission_action = 'update'
+
+    def get_queryset(self):
+        return models.DailyReport.objects.select_related('agent')
+
+    def get_object(self, queryset=None):
+        if queryset is None:
+            queryset = self.get_queryset()
+        agent_pk = self.kwargs.get('agent_pk')
+        date = self.kwargs.get('date')
+        try:
+            obj = queryset.get(agent__pk=agent_pk, date=date)
+        except models.DailyReport.DoesNotExist:
+            raise Http404("گزارش روزانه یافت نشد")
+        return obj
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form = self.get_form()
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+    def form_valid(self, form):
+        messages.success(self.request, "نظر مدیر با موفقیت ثبت شد.")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_success_url(self):
+        return reverse('daily_report_detail', kwargs={
+            'agent_pk': self.object.agent.pk,
+            'date': self.object.date
+        })
+
+
+class DailyReportCloseView(PermissionRequiredMixin, UpdateView):
+    model = models.DailyReport
+    form_class = forms.DailyReportCloseForm
+    template_name = 'dashboard/reports/daily_report_close.html'
+    context_object_name = 'daily_report'
+    permission_model = 'DailyReport'
+    permission_action = 'update'
+
+    def get_queryset(self):
+        return models.DailyReport.objects.select_related('agent')
+
+    def get_object(self, queryset=None):
+        if queryset is None:
+            queryset = self.get_queryset()
+        agent_pk = self.kwargs.get('agent_pk')
+        date = self.kwargs.get('date')
+        try:
+            obj = queryset.get(agent__pk=agent_pk, date=date)
+        except models.DailyReport.DoesNotExist:
+            raise Http404("گزارش روزانه یافت نشد")
+        return obj
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form = self.get_form()
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+    def form_valid(self, form):
+        messages.success(self.request, "گزارش با موفقیت بسته شد.")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_success_url(self):
+        return reverse('daily_report_detail', kwargs={
+            'agent_pk': self.object.agent.pk,
+            'date': self.object.date
+        })
+
+
 # --------------------------------- Services --------------------------------
 class VisitListView(ReadOnlyPermissionMixin, ListView):
     model = models.Visit
@@ -4387,38 +4677,52 @@ class TradeCodeView(PermissionRequiredMixin, UpdateView):
 # -------------------------------- Calendar -------------------------------
 def calendar_current_month_view(request):
     user = request.user
-
     now = timezone.now()
     today = datetime2jalali(now)
     month = functions.current_month()
-
     current_month = functions.current_month_finder(today.month)
     previous_month = functions.previous_month_finder(today.month)
     previous_2_month = functions.previous_2_month_finder(today.month)
     next_month = functions.next_month_finder(today.month)
     next_2_month = functions.next_2_month_finder(today.month)
 
+    # Reports
+    user_reports = models.DailyReport.objects.filter(
+        agent=user
+    ).values_list('date', flat=True)
+    report_dates = set(user_reports)
+    days_data = []
+    today_str = today.strftime('%Y/%m/%d')
+    for day in month:
+        day_info = {
+            'date': day,
+            'weekday': None,
+            'is_today': day == today_str,
+            'is_past': day < today_str,
+            'is_future': day > today_str,
+            'has_report': day in report_dates,
+        }
+        days_data.append(day_info)
+
     context = {
         'user': user,
-        'today': today.strftime('%Y/%m/%d'),
+        'today': today_str,
         'month': month,
+        'days_data': days_data,
         'current_month': current_month,
         'previous_month': previous_month,
         'previous_2_month': previous_2_month,
         'next_month': next_month,
         'next_2_month': next_2_month,
     }
-
     return render(request, 'dashboard/calendar/current.html', context=context)
 
 
 def calendar_previous_month_view(request):
     user = request.user
-
     now = timezone.now()
     today = datetime2jalali(now)
     month = functions.previous_month()
-
     current_month = functions.current_month_finder(today.month)
     previous_month = functions.previous_month_finder(today.month)
     previous_2_month = functions.previous_2_month_finder(today.month)
@@ -4435,7 +4739,6 @@ def calendar_previous_month_view(request):
         'next_month': next_month,
         'next_2_month': next_2_month,
     }
-
     return render(request, 'dashboard/calendar/previous.html', context=context)
 
 
@@ -4536,6 +4839,5 @@ def dated_task_list_view(request):
         'tasks': tasks,
     }
     return render(request, 'dashboard/tasks/dated_task_list.html', context=context)
-
 
 

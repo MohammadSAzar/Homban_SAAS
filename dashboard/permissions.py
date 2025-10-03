@@ -17,6 +17,7 @@ ROLE_PERMISSIONS = {
         'Trade': ['create', 'read', 'update', 'delete'],
         'Task': ['create', 'read', 'update', 'delete'],
         'TaskBoss': ['create', 'read', 'update', 'delete'],
+        'DailyReport': ['create', 'read', 'update', 'delete'],
         'Mark': ['create', 'read', 'update', 'delete'],
     },
 
@@ -31,6 +32,7 @@ ROLE_PERMISSIONS = {
         'Session': ['create', 'read', 'update', 'delete'],
         'Trade': ['create', 'read', 'update', 'delete'],
         'Task': ['read', 'update', 'create'],
+        'DailyReport': ['create', 'read', 'update'],
         'Mark': ['create', 'read', 'update', 'delete'],
     },
 
@@ -45,6 +47,7 @@ ROLE_PERMISSIONS = {
         'Session': ['create', 'read', 'update', 'delete'],
         'Trade': ['create', 'read', 'update', 'delete'],
         'Task': ['read', 'update', 'create'],
+        'DailyReport': ['create', 'read', 'update'],
         'Mark': ['create', 'read', 'update', 'delete'],
     },
 
@@ -59,6 +62,7 @@ ROLE_PERMISSIONS = {
         'Session': ['create', 'read', 'update', 'delete'],
         'Trade': ['create', 'read', 'update', 'delete'],
         'Task': ['read', 'update', 'create'],
+        'DailyReport': ['create', 'read', 'update'],
         'Mark': ['create', 'read', 'update', 'delete'],
     },
 }
@@ -78,14 +82,11 @@ ROLE_PERMISSIONS['bt'] = bt_perms
 def user_has_permission(user, model_name: str, action: str) -> bool:
     if not user.is_authenticated:
         return False
-
     role = user.title
     if not role:
         return False
-
     if model_name in ['Province', 'City', 'District', 'SubDistrict']:
         model_name = 'Location'
-
     return action in ROLE_PERMISSIONS.get(role, {}).get(model_name, [])
 
 
@@ -102,5 +103,6 @@ class PermissionRequiredMixin:
 
 class ReadOnlyPermissionMixin(PermissionRequiredMixin):
     permission_action = 'read'
+
 
 

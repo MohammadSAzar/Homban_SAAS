@@ -108,6 +108,13 @@ urlpatterns = [
     re_path(r'task/detail/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/', views.TaskDetailView.as_view(), name='task_detail'),
     re_path(r'task/delete/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/', views.TaskDeleteView.as_view(), name='task_delete'),
     re_path(r'task/create/', views.TaskCreateView.as_view(), name='task_create'),
+    # reports
+    re_path(r'daily-report/create/', views.DailyReportCreateView.as_view(), name='daily_report_create'),
+    path('daily-report/<int:agent_pk>/<path:date>/', views.DailyReportDetailView.as_view(), name='daily_report_detail'),
+    path('daily-report/update/<int:agent_pk>/<path:date>/', views.DailyReportUpdateView.as_view(), name='daily_report_update'),
+    path('daily-report/note/<int:agent_pk>/<path:date>/', views.DailyReportNoteView.as_view(), name='daily_report_note'),
+    path('daily-report/close/<int:agent_pk>/<path:date>/', views.DailyReportCloseView.as_view(), name='daily_report_close'),
+    path('daily-report/list-for-boss/<path:date>/', views.BossDailyReportsListView.as_view(), name='daily_reports_list'),
     # services
     path('services/visits/', views.VisitListView.as_view(), name='visit_list'),
     re_path(r'visit/update/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/', views.VisitUpdateView.as_view(), name='visit_update'),

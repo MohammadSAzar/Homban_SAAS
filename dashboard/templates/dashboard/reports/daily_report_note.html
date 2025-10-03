@@ -1,0 +1,93 @@
+{% extends '_base_dashboard.html' %}
+
+{% load static %}
+{% load i18n %}
+{% load jalali_tags %}
+{% load number_converter %}
+{% load humanize %}
+{% load widget_tweaks %}
+
+
+{% block title %}
+    {% if daily_report.agent.name_family %}
+        نظر مدیر بر گزارش  {{ daily_report.agent.name_family }} | {{ daily_report.date }}
+    {% else %}
+        نظر مدیر بر گزارش  {{ daily_report.agent }} | {{ daily_report.date }}
+    {% endif %}
+{% endblock %}
+
+
+{% block content %}
+
+    <!-- Main -->
+    <div class="components-preview wide-md mx-auto">
+        <div class="nk-block nk-block-lg">
+            <div class="card card-bordered card-preview">
+                <div class="card-inner" >
+                    <div class="preview-block" >
+
+                        <!-- Title -->
+                        <div class="nk-block-head nk-block-head-lg wide-sm">
+                            <div class="nk-block-head-content">
+                                <h6 class="nk-block-title page-title" style="line-height: 45px; font-size: 1.3em">
+                                    {% if daily_report.agent.name_family %}
+                                        نظر مدیر بر گزارش  {{ daily_report.agent.name_family }} | {{ daily_report.date }}
+                                    {% else %}
+                                        نظر مدیر بر گزارش  {{ daily_report.agent }} | {{ daily_report.date }}
+                                    {% endif %}
+                                </h6>
+                            </div>
+                        </div>
+                        <!-- end: Title -->
+
+                        <!-- Form -->
+                        <form class="row gy-4" method="post" enctype="multipart/form-data" novalidate>
+                            {% csrf_token %}
+
+                            <!-- boss_note -->
+                            <div class="col-lg-12 col-sm-12">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.boss_note.id_for_label }}">نظر مدیر</label>
+                                        {% render_field form.boss_note id="boss_note" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.boss_note.errors %}
+                                        {% for error in form.boss_note.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- status -->
+                            <div class="col-lg-6 col-sm-6">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.status.id_for_label }}">وضعیت</label>
+                                        {% render_field form.status id="status" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.status.errors %}
+                                        {% for error in form.status.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        
+                            <!-- Submit -->
+                            <div class="nk-fmg-actions" style="margin-top: 3em;">
+                                <button type="submit" class="btn btn-primary" style="line-height: 30px;">ثبت نظر / بستن</button>
+                            </div>
+                        
+                        </form>
+                        <!-- end: Form -->    
+                    
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+

@@ -3,6 +3,7 @@ import zipfile
 
 import random
 import string
+import jdatetime
 from jdatetime import timedelta, datetime
 
 from django.conf import settings
@@ -954,5 +955,41 @@ class Mark(models.Model):
 
     def get_absolute_url(self):
         return reverse('mark_detail', args=[self.pk])
+
+
+class DailyReport(models.Model):
+    agent = models.ForeignKey(CustomUserModel, on_delete=models.SET_NULL, null=True, blank=True, related_name='reports',
+                              verbose_name='مشاور')
+    discount = models.TextField(max_length=500, blank=True, null=True, verbose_name='تخفیف')
+    service = models.TextField(max_length=500, blank=True, null=True, verbose_name='سرویس')
+    evaluation = models.TextField(max_length=500, blank=True, null=True, verbose_name='کارشناسی')
+    ads = models.TextField(max_length=500, blank=True, null=True, verbose_name='آگهی')
+    description = models.TextField(max_length=1000, blank=True, null=True, verbose_name='توضیحات')
+    boss_note = models.TextField(max_length=1000, blank=True, null=True, verbose_name='توضیحات مدیر')
+    status = models.CharField(max_length=10, choices=choices.report_statuses, default='wfb', verbose_name='وضعیت')
+    date = models.CharField(max_length=200, verbose_name='تاریخ')
+
+    def save(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        if not self.agent and user:
+            self.agent = user
+        if not self.date:
+            jalali_now = jdatetime.datetime.now()
+            self.date = jalali_now.strftime('%Y/%m/%d')
+        super().save(*args, **kwargs)
+
+    class Meta:
+        verbose_name = 'گزارش روزانه'
+        verbose_name_plural = 'گزارش‌های روزانه'
+        ordering = ['-date']
+
+    def __str__(self):
+        if self.agent.name_family:
+            return f"گزارش روزانه: {self.agent.name_family} - {self.date}"
+        else:
+            return f"گزارش روزانه: {self.agent} - {self.date}"
+
+    def get_absolute_url(self):
+        return reverse('daily_report_detail', args=[self.agent, self.date])
 
 

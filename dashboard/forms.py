@@ -1600,6 +1600,48 @@ class TaskFilterForm(forms.Form):
     status = forms.ChoiceField(choices=[('', '---------')] + choices.task_statuses, required=False, label='وضعیت وظیفه')
 
 
+# ---------------------------------- Reports ----------------------------------
+report_required_fields = ['discount', 'service', 'evaluation', 'ads']
+
+
+class DailyReportCreateForm(forms.ModelForm):
+    class Meta:
+        model = models.DailyReport
+        fields = ['discount', 'service', 'evaluation', 'ads', 'description']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in report_required_fields:
+            self.fields[field].required = True
+
+
+class DailyReportBossNoteForm(forms.ModelForm):
+    class Meta:
+        model = models.DailyReport
+        fields = ['boss_note', 'status']
+
+    def clean(self):
+        status = self.cleaned_data['status']
+        boss_note = self.cleaned_data['boss_note']
+        if boss_note:
+            if status != 'wfr':
+                self.add_error('status', 'برای ثبت نظر، باید وضعیت را به "منتظر مشاهده نظر مدیر" تغییر دهید')
+        else:
+            if status != 'cls':
+                self.add_error('status', 'در صورت عدم تمایل به ثبت نظر، باید وضعیت را به "بسته" تغییر دهید')
+
+
+class DailyReportCloseForm(forms.ModelForm):
+    class Meta:
+        model = models.DailyReport
+        fields = ['status']
+
+    def clean(self):
+        status = self.cleaned_data['status']
+        if status != 'cls':
+            self.add_error('status', 'برای بستن گزارش، باید وضعیت را به "بسته" تغییر دهید')
+
+
 # -------------------------------- BossTasks --------------------------------
 class TaskBossFilterForm(forms.Form):
     type = forms.ChoiceField(choices=[('', '---------')] + choices.boss_task_types, required=False, label='وضعیت وظیفه')
@@ -2085,4 +2127,5 @@ class CombinedSessionResultForm(forms.Form):
     def save(self):
         self.boss_form.save()
         self.result_session_form.save()
+
 
