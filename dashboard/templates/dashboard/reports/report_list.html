@@ -17,7 +17,7 @@
     <!-- Message -->
     <div id="successModal" class="modal">
         <div class="modal-content">
-            <h4 class="modal-title" style="padding: 20px 20px 10px 0;!important;">عملیات با موفقیت انجام شد (اطلاعات مربوطه توسط مدیر بررسی خواهد شد).</h4>
+            <h4 class="modal-title" style="padding: 20px 20px 10px 0;!important;">عملیات با موفقیت انجام شد.</h4>
             <button class="modal-my-button">بستن پیام</button>
         </div>
     </div>
@@ -42,8 +42,6 @@
                 <!-- Upper -->
                 <div class="nk-block-head nk-block-head-sm">
                     <div class="nk-block-between">
-
-                        <!-- Main -->
                         <div class="nk-block-head-content">
                             <h5 class="nk-block-title page-title" style="font-size: 1.4em;">گزارش‌های روزانه {{ date }}</h5>
                             <div class="nk-block-des text-soft" style="margin-top: 1em;">
@@ -112,6 +110,7 @@
                 <!-- end: Modal -->
 
                 {% if reports_by_sub_district %}
+                    <!-- Reports -->
                     {% for sub_district_name, reports in reports_by_sub_district.items %}
 
                         <!-- Sub_districts -->
@@ -135,7 +134,7 @@
                                     <!-- List -->
                                     <div class="card-inner p-0">
                                         <div class="row g-0">
-                                            {% for daily_report in reports %}
+                                            {% for report in reports %}
                                                 <div class="col-sm-6 col-lg-4 col-xxl-4" style=" padding: 10px;">
                                                     <div class="card h-100" style="box-shadow: rgba(0, 0, 0, 0.10) 0 5px 15px;">
                                                         <div class="card-inner">
@@ -145,16 +144,16 @@
                                                                 <div class="project-head">
                                                                     <div class="project-title">
                                                                         <div class="project-info">
-                                                                            <h6 class="title" style="font-size: 0.9em;">مشاور: "{{ daily_report.agent.name_family|default:daily_report.agent.username }}"</h6>
-                                                                            <span class="sub-text" style="margin-top: 15px;">نقش: {{ daily_report.agent.get_title_display }}</span>
-                                                                            <span class="sub-text" style="margin-top: 15px;">وضعیت: {{ daily_report.get_status_display }}</span>
+                                                                            <h6 class="title" style="font-size: 0.9em;">مشاور: "{{ report.agent.name_family|default:report.agent.username }}"</h6>
+                                                                            <span class="sub-text" style="margin-top: 15px;">نقش: {{ report.agent.get_title_display }}</span>
+                                                                            <span class="sub-text" style="margin-top: 15px;">وضعیت: {{ report.get_status_display }}</span>
                                                                         </div>
                                                                     </div>
                                                                 </div>
 
                                                                 <!-- More -->
                                                                 <div class="project-meta">
-                                                                    <a href="{% url 'daily_report_detail' daily_report.agent.pk daily_report.date %}"
+                                                                    <a href="{% url 'report_detail' report.agent.pk report.date %}"
                                                                        class="btn btn-primary"
                                                                        style="margin-top: 1em;"
                                                                        target="_blank">
@@ -177,6 +176,7 @@
                         <!-- end: Sub_districts -->
 
                     {% endfor %}
+                    <!-- end: Reports -->
                 {% else %}
                     <!-- No Reports -->
                     <div class="nk-block">

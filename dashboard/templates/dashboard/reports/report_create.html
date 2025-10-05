@@ -1,0 +1,336 @@
+{% extends '_base_dashboard.html' %}
+
+{% load static %}
+{% load i18n %}
+{% load jalali_tags %}
+{% load number_converter %}
+{% load humanize %}
+{% load widget_tweaks %}
+
+
+{% block title %}ایجاد گزارش روزانه{% endblock %}
+
+
+{% block content %}
+
+    <!-- Main -->
+    <div class="components-preview wide-md mx-auto">
+        <div class="nk-block nk-block-lg">
+            <div class="card card-bordered card-preview">
+                <div class="card-inner" >
+                    <div class="preview-block" >
+
+                        <!-- Title -->
+                        <div class="nk-block-head nk-block-head-lg wide-sm">
+                            <div class="nk-block-head-content">
+                                <h6 class="nk-block-title page-title" style="line-height: 45px; font-size: 1.2em;">ایجاد گزارش روزانه تاریخ "{{ today }}"</h6>
+                            </div>
+                        </div>
+                        <!-- end: Title -->
+                    
+                        <!-- Form -->
+                        <form class="row gy-4" method="post" enctype="multipart/form-data" novalidate id="reportForm">
+                            {% csrf_token %}
+                        
+                            <!-- Description -->
+                            <div class="col-lg-12 col-sm-12">
+                                <div class="form-group">
+                                    <div class="form-control-wrap">
+                                        <label class="form-label" for="{{ form.description.id_for_label }}">توضیحات گزارش</label>
+                                        {% render_field form.description id="description" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                    </div>
+                                    {% if form.description.errors %}
+                                        {% for error in form.description.errors %}
+                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        
+                            <!-- Formset -->
+                            {{ formset.management_form }}
+                        
+                            <!-- Items -->
+                            <div class="col-lg-12">
+                                <h5 style="margin-top: 2em; margin-bottom: 1em; color: #526484;">آیتم‌های گزارش</h5>
+                            
+                                <!-- Main -->
+                                <div id="formset-container">
+                                    {% for item_form in formset %}
+                                        <div class="item-form-wrapper" data-form-index="{{ forloop.counter0 }}" style="border: 1px solid #dbdfea; border-radius: 4px; padding: 20px; margin-bottom: 20px; background-color: #f5f6fa;">
+                                            
+                                            <!-- Item Header -->
+                                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #dbdfea;">
+                                                <span style="font-weight: bold; color: #364a63;">آیتم #<span class="item-number">{{ forloop.counter }}</span></span>
+                                                <button type="button" class="btn btn-sm btn-danger delete-item-btn" onclick="deleteForm(this)">حذف</button>
+                                            </div>
+                        
+                                            <!-- Items -->
+                                            <div class="row gy-4">
+                                            
+                                                <!-- Type -->
+                                                <div class="col-lg-6 col-sm-6">
+                                                    <div class="form-group">
+                                                        <div class="form-control-wrap">
+                                                            <label class="form-label" for="{{ item_form.type.id_for_label }}">نوع</label>
+                                                            {% render_field item_form.type class="form-control form-control-xl form-control-outlined item-type-select" %}
+                                                        </div>
+                                                        {% if item_form.type.errors %}
+                                                            {% for error in item_form.type.errors %}
+                                                                <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                                            {% endfor %}
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                        
+                                                <!-- File Code -->
+                                                <div class="col-lg-6 col-sm-6">
+                                                    <div class="form-group">
+                                                        <div class="form-control-wrap">
+                                                            <label class="form-label" for="{{ item_form.file_code.id_for_label }}">کد فایل</label>
+                                                            {% render_field item_form.file_code class="form-control form-control-xl form-control-outlined" placeholder="کد فایل" %}
+                                                        </div>
+                                                        {% if item_form.file_code.errors %}
+                                                            {% for error in item_form.file_code.errors %}
+                                                                <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                                            {% endfor %}
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                        
+                                                <!-- Customer Code (Dynamic) -->
+                                                <div class="col-lg-6 col-sm-6 customer-code-wrapper" style="display: none;">
+                                                    <div class="form-group">
+                                                        <div class="form-control-wrap">
+                                                            <label class="form-label" for="{{ item_form.customer_code.id_for_label }}">کد مشتری</label>
+                                                            {% render_field item_form.customer_code class="form-control form-control-xl form-control-outlined customer-code-field" placeholder="کد مشتری" %}
+                                                        </div>
+                                                        {% if item_form.customer_code.errors %}
+                                                            {% for error in item_form.customer_code.errors %}
+                                                                <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                                            {% endfor %}
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                        
+                                                <!-- Description -->
+                                                <div class="col-lg-12 col-sm-12">
+                                                    <div class="form-group">
+                                                        <div class="form-control-wrap">
+                                                            <label class="form-label" for="{{ item_form.description.id_for_label }}">توضیحات</label>
+                                                            {% render_field item_form.description class="form-control form-control-xl form-control-outlined" placeholder="توضیحات..." %}
+                                                        </div>
+                                                        {% if item_form.description.errors %}
+                                                            {% for error in item_form.description.errors %}
+                                                                <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
+                                                            {% endfor %}
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                        
+                                                <!-- Hidden Fields -->
+                                                <div style="display: none;">
+                                                    {{ item_form.DELETE }}
+                                                    {{ item_form.id }}
+                                                </div>
+                                            
+                                            </div>
+                                        
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                        
+                                <!-- Add -->
+                                <button type="button" class="btn btn-outline-primary" onclick="addForm()" style="width: 100%; margin-top: 10px;">
+                                    افزودن آیتم جدید +
+                                </button>
+                            
+                            </div>
+                        
+                            <!-- Submit -->
+                            <div class="nk-fmg-actions" style="margin-top: 3em;">
+                                <button type="submit" class="btn btn-primary" style="line-height: 30px;">ثبت گزارش</button>
+                            </div>
+                        
+                        </form>
+                        <!-- end: Form -->
+
+                        <!-- JS -->
+                        <script>
+
+                            // Dynamic customer code field visibility based on type selection
+                            function toggleCustomerCode(selectElement) {
+                                const itemWrapper = selectElement.closest('.item-form-wrapper');
+                                const customerCodeWrapper = itemWrapper.querySelector('.customer-code-wrapper');
+                                const customerCodeInput = customerCodeWrapper.querySelector('.customer-code-field');
+
+                                if (selectElement.value === 'ser') {
+                                    // Show customer code field for service type
+                                    customerCodeWrapper.style.display = 'block';
+                                    customerCodeInput.required = true;
+                                } else {
+                                    // Hide customer code field for other types
+                                    customerCodeWrapper.style.display = 'none';
+                                    customerCodeInput.required = false;
+                                    customerCodeInput.value = '';  // Clear value when hidden
+                                }
+                            }
+
+                            // Initialize all type selects on page load
+                            document.addEventListener('DOMContentLoaded', function() {
+                                const typeSelects = document.querySelectorAll('.item-type-select');
+                                typeSelects.forEach(select => {
+                                    // Initialize visibility based on current value
+                                    toggleCustomerCode(select);
+
+                                    // Add change event listener
+                                    select.addEventListener('change', function() {
+                                        toggleCustomerCode(this);
+                                    });
+                                });
+                            });
+
+                            // Delete form functionality
+                            function deleteForm(button) {
+                                const itemWrapper = button.closest('.item-form-wrapper');
+                                const deleteInput = itemWrapper.querySelector('input[name$="-DELETE"]');
+
+                                if (deleteInput) {
+                                    if (deleteInput.checked) {
+                                        // Undelete
+                                        deleteInput.checked = false;
+                                        itemWrapper.style.opacity = '1';
+                                        itemWrapper.style.backgroundColor = '#f5f6fa';
+                                        button.textContent = 'حذف';
+                                        button.classList.remove('btn-success');
+                                        button.classList.add('btn-danger');
+                                    } else {
+                                        // Delete
+                                        deleteInput.checked = true;
+                                        itemWrapper.style.opacity = '0.5';
+                                        itemWrapper.style.backgroundColor = '#ffe6e6';
+                                        button.textContent = 'بازگردانی';
+                                        button.classList.remove('btn-danger');
+                                        button.classList.add('btn-success');
+                                    }
+                                } else {
+                                    // For new forms, just hide
+                                    itemWrapper.style.display = 'none';
+                                }
+                            }
+
+                            // Add new form functionality
+                            function addForm() {
+                                const container = document.getElementById('formset-container');
+                                const totalForms = document.querySelector('input[name$="-TOTAL_FORMS"]');
+                                const currentFormCount = parseInt(totalForms.value);
+
+                                // Clone the first form as template
+                                const firstForm = container.querySelector('.item-form-wrapper');
+                                const newForm = firstForm.cloneNode(true);
+
+                                // Update form index in all fields
+                                const formIndex = currentFormCount;
+                                newForm.setAttribute('data-form-index', formIndex);
+
+                                // Update all input names and ids
+                                newForm.querySelectorAll('input, select, textarea').forEach(field => {
+                                    const name = field.getAttribute('name');
+                                    const id = field.getAttribute('id');
+
+                                    if (name) {
+                                        field.setAttribute('name', name.replace(/ads-\d+/, 'ads-' + formIndex));
+                                    }
+                                    if (id) {
+                                        field.setAttribute('id', id.replace(/id_ads-\d+/, 'id_ads-' + formIndex));
+                                    }
+
+                                    // Clear values
+                                    if (field.type !== 'hidden' && field.name && field.name.indexOf('DELETE') === -1) {
+                                        field.value = '';
+                                    }
+
+                                    // Remove DELETE checkbox checked state
+                                    if (field.name && field.name.indexOf('DELETE') !== -1) {
+                                        field.checked = false;
+                                    }
+                                });
+
+                                // Update item number
+                                const itemNumber = newForm.querySelector('.item-number');
+                                itemNumber.textContent = formIndex + 1;
+
+                                // Reset styles
+                                newForm.style.opacity = '1';
+                                newForm.style.backgroundColor = '#f5f6fa';
+
+                                // Reset delete button
+                                const deleteBtn = newForm.querySelector('.delete-item-btn');
+                                deleteBtn.textContent = 'حذف';
+                                deleteBtn.classList.remove('btn-success');
+                                deleteBtn.classList.add('btn-danger');
+
+                                // Hide customer code field by default (will be shown if type is service)
+                                const customerCodeWrapper = newForm.querySelector('.customer-code-wrapper');
+                                customerCodeWrapper.style.display = 'none';
+                                const customerCodeInput = customerCodeWrapper.querySelector('.customer-code-field');
+                                customerCodeInput.required = false;
+
+                                // Add event listener to new type select
+                                const typeSelect = newForm.querySelector('.item-type-select');
+                                typeSelect.addEventListener('change', function() {
+                                    toggleCustomerCode(this);
+                                });
+
+                                // Initialize the toggle based on default value
+                                toggleCustomerCode(typeSelect);
+
+                                // Append new form
+                                container.appendChild(newForm);
+
+                                // Increment total forms count
+                                totalForms.value = formIndex + 1;
+                            }
+
+                            // Form validation before submit
+                            document.getElementById('reportForm').addEventListener('submit', function(e) {
+                                const itemWrappers = document.querySelectorAll('.item-form-wrapper');
+                                let isValid = true;
+
+                                itemWrappers.forEach(wrapper => {
+                                    const deleteInput = wrapper.querySelector('input[name$="-DELETE"]');
+
+                                    // Skip validation for deleted forms
+                                    if (deleteInput && deleteInput.checked) {
+                                        return;
+                                    }
+
+                                    const typeSelect = wrapper.querySelector('.item-type-select');
+                                    if (typeSelect && typeSelect.value === 'service') {
+                                        const customerCode = wrapper.querySelector('.customer-code-field');
+                                        if (!customerCode.value.trim()) {
+                                            alert('لطفاً کد مشتری را برای آیتم‌های نوع خدمات وارد کنید.');
+                                            customerCode.focus();
+                                            isValid = false;
+                                            return false;
+                                        }
+                                    }
+                                });
+
+                                if (!isValid) {
+                                    e.preventDefault();
+                                }
+                            });
+
+                        </script>
+                        <!-- end: JS -->
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+

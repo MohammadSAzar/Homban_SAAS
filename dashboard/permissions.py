@@ -17,7 +17,8 @@ ROLE_PERMISSIONS = {
         'Trade': ['create', 'read', 'update', 'delete'],
         'Task': ['create', 'read', 'update', 'delete'],
         'TaskBoss': ['create', 'read', 'update', 'delete'],
-        'DailyReport': ['create', 'read', 'update', 'delete'],
+        'Report': ['create', 'read', 'update', 'delete'],
+        'ReportItem': ['create', 'read', 'update', 'delete'],
         'Mark': ['create', 'read', 'update', 'delete'],
     },
 
@@ -32,7 +33,8 @@ ROLE_PERMISSIONS = {
         'Session': ['create', 'read', 'update', 'delete'],
         'Trade': ['create', 'read', 'update', 'delete'],
         'Task': ['read', 'update', 'create'],
-        'DailyReport': ['create', 'read', 'update'],
+        'Report': ['create', 'read', 'update'],
+        'ReportItem': ['create', 'read', 'update', 'delete'],
         'Mark': ['create', 'read', 'update', 'delete'],
     },
 
@@ -47,7 +49,8 @@ ROLE_PERMISSIONS = {
         'Session': ['create', 'read', 'update', 'delete'],
         'Trade': ['create', 'read', 'update', 'delete'],
         'Task': ['read', 'update', 'create'],
-        'DailyReport': ['create', 'read', 'update'],
+        'Report': ['create', 'read', 'update'],
+        'ReportItem': ['create', 'read', 'update', 'delete'],
         'Mark': ['create', 'read', 'update', 'delete'],
     },
 
@@ -62,7 +65,8 @@ ROLE_PERMISSIONS = {
         'Session': ['create', 'read', 'update', 'delete'],
         'Trade': ['create', 'read', 'update', 'delete'],
         'Task': ['read', 'update', 'create'],
-        'DailyReport': ['create', 'read', 'update'],
+        'Report': ['create', 'read', 'update'],
+        'ReportItem': ['create', 'read', 'update', 'delete'],
         'Mark': ['create', 'read', 'update', 'delete'],
     },
 }
@@ -103,6 +107,5 @@ class PermissionRequiredMixin:
 
 class ReadOnlyPermissionMixin(PermissionRequiredMixin):
     permission_action = 'read'
-
 
 

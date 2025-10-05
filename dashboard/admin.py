@@ -58,13 +58,6 @@ class SubDistrictAdmin(admin.ModelAdmin):
 
 
 # --------------------------------- FILE ----------------------------------
-@admin.register(models.Person)
-class PersonAdmin(admin.ModelAdmin):
-    list_display = ('name', 'phone_number', 'datetime_created')
-    ordering = ('-datetime_created',)
-    list_per_page = getattr(settings, 'DJANGO_ADMIN_PER_PAGE', 20)
-
-
 @admin.register(models.SaleFile)
 class SaleFileAdmin(admin.ModelAdmin):
     list_display = (
@@ -88,6 +81,13 @@ class RentFileAdmin(admin.ModelAdmin):
 
 
 # --------------------------------- PPL ---------------------------------
+@admin.register(models.Person)
+class PersonAdmin(admin.ModelAdmin):
+    list_display = ('name', 'phone_number', 'datetime_created')
+    ordering = ('-datetime_created',)
+    list_per_page = getattr(settings, 'DJANGO_ADMIN_PER_PAGE', 20)
+
+
 @admin.register(models.Buyer)
 class BuyerAdmin(admin.ModelAdmin):
     list_display = ('name', 'created_by', 'phone_number', 'code', 'budget_announced', 'datetime_created')
@@ -156,13 +156,22 @@ class TaskBossAdmin(admin.ModelAdmin):
     list_per_page = getattr(settings, 'DJANGO_ADMIN_PER_PAGE', 20)
 
 
-@admin.register(models.DailyReport)
-class DailyReportAdmin(admin.ModelAdmin):
+@admin.register(models.Report)
+class ReportAdmin(admin.ModelAdmin):
     list_display = ('agent', 'date', 'status',)
     ordering = ('-date',)
     list_filter = ['agent', 'date', 'status',]
     search_fields = ['agent']
     readonly_fields = ('date',)
+    list_per_page = getattr(settings, 'DJANGO_ADMIN_PER_PAGE', 20)
+
+
+@admin.register(models.ReportItem)
+class ReportItemAdmin(admin.ModelAdmin):
+    list_display = ('type', 'report', 'file_code', 'customer_code', 'datetime_created',)
+    ordering = ('-datetime_created',)
+    list_filter = ['type',]
+    readonly_fields = ('datetime_created',)
     list_per_page = getattr(settings, 'DJANGO_ADMIN_PER_PAGE', 20)
 
 
@@ -173,6 +182,5 @@ class MarkAdmin(admin.ModelAdmin):
     list_filter = ['type', 'agent']
     readonly_fields = ('code', 'datetime_created',)
     list_per_page = getattr(settings, 'DJANGO_ADMIN_PER_PAGE', 20)
-
 
 

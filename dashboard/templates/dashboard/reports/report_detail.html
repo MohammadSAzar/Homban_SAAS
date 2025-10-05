@@ -1,0 +1,333 @@
+{% extends '_base_dashboard.html' %}
+
+{% load static %}
+{% load i18n %}
+{% load jalali_tags %}
+{% load number_converter %}
+{% load humanize %}
+{% load widget_tweaks %}
+
+
+{% block title %}
+    {% if report.agent.name_family %}
+        گزارش {{ report.agent.name_family }} | {{ report.date }}
+    {% else %}
+        گزارش {{ report.agent }} | {{ report.date }}
+    {% endif %}
+{% endblock %}
+
+
+{% block content %}
+
+    <!-- Messages1 -->
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <h4 class="modal-title" style="padding: 20px 20px 10px 0;!important;">عملیات با موفقیت انجام شد.</h4>
+            <button class="modal-my-button">بستن پیام</button>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function() {
+            var messages = "{% for message in messages %}{{ message }}{% if not forloop.last %}\\n{% endif %}{% endfor %}";
+            if (messages) {
+                $('#modal-message').text(messages);
+                $('#successModal').show();
+            }
+            $('.modal-my-button').on('click', function() {
+                $('#successModal').hide();
+            });
+        });
+    </script>
+
+    <!-- Main -->
+    <div class="nk-block">
+        <div class="row gy-4">
+
+            <!-- Upper -->
+            <div class="col-lg-12">
+                <div class="card card-bordered">
+                    <div class="card-inner">
+
+                        <!-- Title -->
+                        <div class="card-title-group align-start mb-3">
+                            <div class="card-title" style="margin-bottom: 1em;">
+                                <h5 class="title" style="font-size: 1.3em;">گزارش روزانه "{{ report.date }}"</h5>
+                            </div>
+                        </div>
+
+                        <!-- Info -->
+                        <div class="row gy-3">
+
+                            <!-- Agent -->
+                            <div class="col-lg-4 col-sm-4">
+                                <div class="form-group">
+                                    <label class="form-label">مشاور</label>
+                                    <div class="form-control-wrap">
+                                        {% if request.user.title == 'bs' %}
+                                            <a href="{% url 'agent_detail' report.agent.pk report.agent.title report.agent.username %}" target="_blank">
+                                                <div type="text" class="form-control form-control-xl form-control-outlined" style="background-color: #E0F2F1">
+                                                    {% if report.agent.name_family %}{{ report.agent.name_family }}{% else %}{{ report.agent }}{% endif %}
+                                                </div>
+                                            </a>
+                                        {% else %}
+                                            <div type="text" class="form-control form-control-xl form-control-outlined">
+                                                {% if report.agent.name_family %}{{ report.agent.name_family }}{% else %}{{ report.agent }}{% endif %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Date -->
+                            <div class="col-lg-4 col-sm-4">
+                                <div class="form-group">
+                                    <label class="form-label">مشاور</label>
+                                    <div class="form-control-wrap">
+                                        <div type="text" class="form-control form-control-xl form-control-outlined">
+                                            {{ report.date }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Status -->
+                            <div class="col-lg-4 col-sm-4">
+                                <div class="form-group">
+                                    <label class="form-label">وضعیت</label>
+                                    <div class="form-control-wrap">
+                                        <div type="text" class="form-control form-control-xl form-control-outlined">
+                                            {{ report.get_status_display }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Description -->
+                            {% if report.description %}
+                                <div class="col-lg-12 col-sm-12">
+                                    <div class="form-group">
+                                        <label class="form-label">توضیحات گزارش</label>
+                                        <div class="form-control-wrap">
+                                            <textarea class="form-control form-control-xl form-control-outlined"
+                                                      rows="3"
+                                                      readonly>{{ report.description|linebreaksbr|farsi_number|safe }}</textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <!-- end: Upper -->
+
+            <!-- Items (all) -->
+            <div class="col-lg-12">
+                <div class="card card-bordered">
+                    <div class="card-inner">
+                    
+                        <!-- Title -->
+                        <div class="card-title-group align-start mb-3">
+                            <div class="card-title">
+                                <h6 class="title">آیتم‌های گزارش ({{ report_items.count }})</h6>
+                            </div>
+                        </div>
+                        <!-- end: Title -->
+
+                        <!-- Item (each) -->
+                        {% if report_items %}
+                            {% for item in report_items %}
+                                <div style="border: 1px solid #dbdfea; border-radius: 4px; padding: 20px; margin-bottom: 20px; background-color: #f5f6fa;">
+    
+                                    <!-- Upper -->
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #dbdfea;">
+                                        <span style="font-weight: bold; color: #364a63;">آیتم #{{ forloop.counter }}</span>
+                                    </div>
+    
+                                    <!-- Info -->
+                                    <div class="row gy-3">
+                                        {% if item.type != 'ser' %}
+    
+                                            <!-- Type -->
+                                            <div class="col-lg-4 col-sm-4">
+                                                <div class="form-group">
+                                                    <label class="form-label">نوع</label>
+                                                    <div class="form-control-wrap">
+                                                        <div type="text" class="form-control form-control-xl form-control-outlined">
+                                                            {{ item.get_type_display }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- File Code -->
+                                            {% if item.file_code %}
+                                                <div class="col-lg-4 col-sm-4">
+                                                    <div class="form-group">
+                                                        <label class="form-label">کد فایل</label>
+                                                        <div class="form-control-wrap">
+                                                            <div type="text" class="form-control form-control-xl form-control-outlined">
+                                                                {{ item.file.code }}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            {% endif %}
+    
+                                            <!-- File -->
+                                            <div class="col-lg-4 col-sm-4">
+                                                <div class="form-group">
+                                                    <label class="form-label">فایل</label>
+                                                    <div class="form-control-wrap">
+                                                        <a href="{{ item.file.get_absolute_url }}" target="_blank">
+                                                            <div type="text" class="form-control form-control-xl form-control-outlined" style="background-color: #E0F2F1">
+                                                                {{ item.file.title|farsi_number }}
+                                                            </div>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Description -->
+                                            {% if item.description %}
+                                                <div class="col-lg-12 col-sm-12">
+                                                    <div class="form-group">
+                                                        <label class="form-label">توضیحات</label>
+                                                        <div class="form-control-wrap">
+                                                            <textarea class="form-control form-control-xl form-control-outlined"
+                                                                      rows="2"
+                                                                      readonly>{{ item.description|linebreaksbr|farsi_number|safe }}</textarea>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            {% endif %}
+                                            
+                                        {% else %}
+                                            
+                                            <!-- Type -->
+                                            <div class="col-lg-4 col-sm-4">
+                                                <div class="form-group">
+                                                    <label class="form-label">نوع</label>
+                                                    <div class="form-control-wrap">
+                                                        <div type="text" class="form-control form-control-xl form-control-outlined">
+                                                            {{ item.get_type_display }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- File Code -->
+                                            {% if item.file_code %}
+                                                <div class="col-lg-4 col-sm-4">
+                                                    <div class="form-group">
+                                                        <label class="form-label">کد فایل</label>
+                                                        <div class="form-control-wrap">
+                                                            <div type="text" class="form-control form-control-xl form-control-outlined">
+                                                                {{ item.file.code }}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            {% endif %}
+    
+                                            <!-- File -->
+                                            {% if item.file_code %}
+                                                <div class="col-lg-4 col-sm-4">
+                                                    <div class="form-group">
+                                                        <label class="form-label">فایل</label>
+                                                        <div class="form-control-wrap">
+                                                            <a href="{{ item.file.get_absolute_url }}" target="_blank">
+                                                                <div type="text" class="form-control form-control-xl form-control-outlined" style="background-color: #E0F2F1">
+                                                                    {{ item.file.title|farsi_number }}
+                                                                </div>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            {% endif %}
+                                            
+                                            <!-- Customer code -->
+                                            {% if item.customer_code %}
+                                                <div class="col-lg-6 col-sm-6">
+                                                    <div class="form-group">
+                                                        <label class="form-label">کد مشتری</label>
+                                                        <div class="form-control-wrap">
+                                                            <div type="text" class="form-control form-control-xl form-control-outlined">
+                                                                {{ item.customer.code }}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            {% endif %}
+                                            
+                                            <!-- Customer -->
+                                            {% if item.customer_code %}
+                                                <div class="col-lg-6 col-sm-6">
+                                                    <div class="form-group">
+                                                        <label class="form-label">فایل</label>
+                                                        <div class="form-control-wrap">
+                                                            <a href="{{ item.file.get_absolute_url }}" target="_blank">
+                                                                <div type="text" class="form-control form-control-xl form-control-outlined" style="background-color: #E0F2F1">
+                                                                    {{ item.customer.name|farsi_number }}
+                                                                </div>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            {% endif %}
+                                            
+                                            <!-- Description -->
+                                            {% if item.description %}
+                                                <div class="col-lg-12 col-sm-12">
+                                                    <div class="form-group">
+                                                        <label class="form-label">توضیحات</label>
+                                                        <div class="form-control-wrap">
+                                                            <textarea class="form-control form-control-xl form-control-outlined"
+                                                                      rows="2"
+                                                                      readonly>{{ item.description|linebreaksbr|farsi_number|safe }}</textarea>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            {% endif %}
+                                            
+                                        {% endif %}
+                                    </div>
+                                
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="alert alert-light">
+                                <div class="alert-cta flex-wrap flex-md-nowrap g-2">
+                                    <div class="alert-text has-icon">
+                                        <em class="icon ni ni-info"></em>
+                                        <p>هیچ آیتمی برای این گزارش ثبت نشده است.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                        <!-- end: Item (each) -->
+
+                    </div>
+                </div>
+            </div>
+            <!-- end: Items -->
+
+            <!-- Edit -->
+            <div class="col-lg-12">
+                <div class="nk-fmg-actions" style="margin-top: 2em;">
+                    {% if report.status == 'wfb' and request.user == report.agent %}
+                        <a href="{% url 'report_update' report.agent.pk report.date %}" class="btn btn-primary" style="line-height: 30px; margin-left: 10px;">ویرایش گزارش</a>
+                    {% endif %}
+                </div>
+            </div>
+            <!-- end: Edit -->
+
+        </div>
+    </div>
+    <!-- end: Main -->
+    
+{% endblock %}
+
+

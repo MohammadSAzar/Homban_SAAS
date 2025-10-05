@@ -6,6 +6,7 @@ from django.urls import reverse, reverse_lazy
 from django.views import View
 from django.views.generic import DetailView, CreateView, ListView, UpdateView, DeleteView, TemplateView
 from django.views.decorators.http import require_GET, require_POST
+from django.db import transaction
 from django.db.models import Prefetch, Count, Q, F, PositiveBigIntegerField
 from django.db.models.functions import Cast
 from django.core.exceptions import PermissionDenied
@@ -16,7 +17,6 @@ from django.contrib import messages
 from django.shortcuts import get_object_or_404, render, redirect
 from operator import attrgetter
 from collections import defaultdict
-
 
 from jalali_date import datetime2jalali
 from datetime import datetime, timedelta
@@ -3844,11 +3844,118 @@ def delete_request_list_view(request):
 
 
 # --------------------------------- Reports --------------------------------
-class BossDailyReportsListView(ReadOnlyPermissionMixin, ListView):
-    model = models.DailyReport
-    template_name = 'dashboard/reports/daily_report_list.html'
-    context_object_name = 'daily_reports'
-    permission_model = 'DailyReport'
+class ReportCreateView(LoginRequiredMixin, CreateView):
+    model = models.Report
+    form_class = forms.ReportForm
+    template_name = 'dashboard/reports/report_create.html'
+    success_url = reverse_lazy('current_month')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        if self.request.POST:
+            context['formset'] = forms.ReportItemFormSet(self.request.POST, instance=self.object)
+        else:
+            context['formset'] = forms.ReportItemFormSet(instance=self.object)
+
+        now = timezone.now()
+        today = datetime2jalali(now)
+        context['today'] = today.strftime('%Y/%m/%d')
+        context['page_title'] = 'ایجاد گزارش روزانه جدید'
+        context['submit_text'] = 'ثبت گزارش'
+        return context
+
+    def form_valid(self, form):
+        context = self.get_context_data()
+        formset = context['formset']
+
+        with transaction.atomic():
+            self.object = form.save(commit=False)
+            self.object.save(user=self.request.user)
+            if formset.is_valid():
+                formset.instance = self.object
+                formset.save()
+                messages.success(self.request, 'گزارش  با موفقیت ثبت شد.')
+                return redirect(self.success_url)
+            else:
+                return self.form_invalid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, 'لطفا خطاهای فرم را بررسی کنید.')
+        return super().form_invalid(form)
+
+
+class ReportUpdateView(LoginRequiredMixin, UpdateView):
+    model = models.Report
+    form_class = forms.ReportForm
+    template_name = 'dashboard/reports/report_create.html'
+
+    def get_object(self, queryset=None):
+        if queryset is None:
+            queryset = self.get_queryset()
+        agent_pk = self.kwargs.get('agent_pk')
+        date = self.kwargs.get('date')
+        try:
+            obj = queryset.get(agent__pk=agent_pk, date=date)
+        except models.Report.DoesNotExist:
+            raise Http404("گزارش روزانه یافت نشد")
+        return obj
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.POST:
+            context['formset'] = forms.ReportItemFormSet(self.request.POST, instance=self.object)
+        else:
+            context['formset'] = forms.ReportItemFormSet(instance=self.object)
+        context['page_title'] = 'ویرایش گزارش روزانه'
+        context['submit_text'] = 'بروزرسانی گزارش'
+        return context
+
+    def form_valid(self, form):
+        context = self.get_context_data()
+        formset = context['formset']
+
+        with transaction.atomic():
+            self.object = form.save()
+            if formset.is_valid():
+                formset.instance = self.object
+                formset.save()
+                messages.success(self.request, 'گزارش روزانه با موفقیت بروزرسانی شد.')
+                return redirect(self.get_success_url())
+            else:
+                return self.form_invalid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('report_detail', kwargs={'agent_pk': self.object.agent.pk, 'date': self.object.date})
+
+
+class ReportDetailView(LoginRequiredMixin, DetailView):
+    model = models.Report
+    template_name = 'dashboard/reports/report_detail.html'
+    context_object_name = 'report'
+
+    def get_object(self, queryset=None):
+        if queryset is None:
+            queryset = self.get_queryset()
+        agent_pk = self.kwargs.get('agent_pk')
+        date = self.kwargs.get('date')
+        try:
+            obj = queryset.get(agent__pk=agent_pk, date=date)
+        except models.Report.DoesNotExist:
+            raise Http404("گزارش روزانه یافت نشد")
+        return obj
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['report_items'] = self.object.ads.all()
+        return context
+
+
+class ReportListView(ReadOnlyPermissionMixin, ListView):
+    model = models.Report
+    template_name = 'dashboard/reports/report_list.html'
+    context_object_name = 'reports'
+    permission_model = 'Report'
 
     def dispatch(self, request, *args, **kwargs):
         if request.user.title != 'bs':
@@ -3857,7 +3964,7 @@ class BossDailyReportsListView(ReadOnlyPermissionMixin, ListView):
 
     def get_queryset(self):
         date = self.kwargs.get('date')
-        return models.DailyReport.objects.filter(
+        return models.Report.objects.filter(
             date=date
         ).select_related(
             'agent',
@@ -3906,193 +4013,6 @@ class BossDailyReportsListView(ReadOnlyPermissionMixin, ListView):
         context['agents_without_reports'] = agents_without_reports
         context['missing_reports_count'] = len(agents_without_reports)
         return context
-
-
-class DailyReportDetailView(ReadOnlyPermissionMixin, DetailView):
-    model = models.DailyReport
-    context_object_name = 'daily_report'
-    template_name = 'dashboard/reports/daily_report_detail.html'
-    permission_model = 'DailyReport'
-
-    def get_queryset(self):
-        return models.DailyReport.objects.select_related('agent')
-
-    def get_object(self, queryset=None):
-        if queryset is None:
-            queryset = self.get_queryset()
-        agent_pk = self.kwargs.get('agent_pk')
-        date = self.kwargs.get('date')
-        try:
-            obj = queryset.get(agent__pk=agent_pk, date=date)
-        except models.DailyReport.DoesNotExist:
-            raise Http404("گزارش روزانه یافت نشد")
-        return obj
-
-
-class DailyReportCreateView(PermissionRequiredMixin, CreateView):
-    model = models.DailyReport
-    form_class = forms.DailyReportCreateForm
-    template_name = 'dashboard/reports/daily_report_create.html'
-    permission_model = 'DailyReport'
-    permission_action = 'create'
-
-    def post(self, request, *args, **kwargs):
-        form = self.get_form()
-        if form.is_valid():
-            return self.form_valid(form)
-        else:
-            return self.form_invalid(form)
-
-    def form_valid(self, form):
-        form.instance.save(user=self.request.user)
-        messages.success(self.request, "گزارش روزانه در سامانه ثبت شد.")
-        return super().form_valid(form)
-
-    def form_invalid(self, form):
-        self.object = None
-        return self.render_to_response(self.get_context_data(form=form))
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        now = timezone.now()
-        today = datetime2jalali(now)
-        context['date'] = today.strftime('%Y/%m/%d')
-        return context
-
-    def get_success_url(self):
-        return reverse('current_month')
-
-
-class DailyReportUpdateView(PermissionRequiredMixin, UpdateView):
-    model = models.DailyReport
-    form_class = forms.DailyReportCreateForm
-    template_name = 'dashboard/reports/daily_report_update.html'
-    context_object_name = 'daily_report'
-    permission_model = 'DailyReport'
-    permission_action = 'update'
-
-    def get_queryset(self):
-        return models.DailyReport.objects.select_related('agent')
-
-    def get_object(self, queryset=None):
-        if queryset is None:
-            queryset = self.get_queryset()
-        agent_pk = self.kwargs.get('agent_pk')
-        date = self.kwargs.get('date')
-        try:
-            obj = queryset.get(agent__pk=agent_pk, date=date)
-        except models.DailyReport.DoesNotExist:
-            raise Http404("گزارش روزانه یافت نشد")
-        return obj
-
-    def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        form = self.get_form()
-        if form.is_valid():
-            return self.form_valid(form)
-        else:
-            return self.form_invalid(form)
-
-    def form_valid(self, form):
-        messages.success(self.request, "گزارش روزانه با موفقیت ویرایش شد.")
-        return super().form_valid(form)
-
-    def form_invalid(self, form):
-        return self.render_to_response(self.get_context_data(form=form))
-
-    def get_success_url(self):
-        return reverse('daily_report_detail', kwargs={
-            'agent_pk': self.object.agent.pk,
-            'date': self.object.date
-        })
-
-
-class DailyReportNoteView(PermissionRequiredMixin, UpdateView):
-    model = models.DailyReport
-    form_class = forms.DailyReportBossNoteForm
-    template_name = 'dashboard/reports/daily_report_note.html'
-    context_object_name = 'daily_report'
-    permission_model = 'DailyReport'
-    permission_action = 'update'
-
-    def get_queryset(self):
-        return models.DailyReport.objects.select_related('agent')
-
-    def get_object(self, queryset=None):
-        if queryset is None:
-            queryset = self.get_queryset()
-        agent_pk = self.kwargs.get('agent_pk')
-        date = self.kwargs.get('date')
-        try:
-            obj = queryset.get(agent__pk=agent_pk, date=date)
-        except models.DailyReport.DoesNotExist:
-            raise Http404("گزارش روزانه یافت نشد")
-        return obj
-
-    def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        form = self.get_form()
-        if form.is_valid():
-            return self.form_valid(form)
-        else:
-            return self.form_invalid(form)
-
-    def form_valid(self, form):
-        messages.success(self.request, "نظر مدیر با موفقیت ثبت شد.")
-        return super().form_valid(form)
-
-    def form_invalid(self, form):
-        return self.render_to_response(self.get_context_data(form=form))
-
-    def get_success_url(self):
-        return reverse('daily_report_detail', kwargs={
-            'agent_pk': self.object.agent.pk,
-            'date': self.object.date
-        })
-
-
-class DailyReportCloseView(PermissionRequiredMixin, UpdateView):
-    model = models.DailyReport
-    form_class = forms.DailyReportCloseForm
-    template_name = 'dashboard/reports/daily_report_close.html'
-    context_object_name = 'daily_report'
-    permission_model = 'DailyReport'
-    permission_action = 'update'
-
-    def get_queryset(self):
-        return models.DailyReport.objects.select_related('agent')
-
-    def get_object(self, queryset=None):
-        if queryset is None:
-            queryset = self.get_queryset()
-        agent_pk = self.kwargs.get('agent_pk')
-        date = self.kwargs.get('date')
-        try:
-            obj = queryset.get(agent__pk=agent_pk, date=date)
-        except models.DailyReport.DoesNotExist:
-            raise Http404("گزارش روزانه یافت نشد")
-        return obj
-
-    def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        form = self.get_form()
-        if form.is_valid():
-            return self.form_valid(form)
-        else:
-            return self.form_invalid(form)
-
-    def form_valid(self, form):
-        messages.success(self.request, "گزارش با موفقیت بسته شد.")
-        return super().form_valid(form)
-
-    def form_invalid(self, form):
-        return self.render_to_response(self.get_context_data(form=form))
-
-    def get_success_url(self):
-        return reverse('daily_report_detail', kwargs={
-            'agent_pk': self.object.agent.pk,
-            'date': self.object.date
-        })
 
 
 # --------------------------------- Services --------------------------------
@@ -4694,7 +4614,7 @@ def calendar_current_month_view(request):
     next_2_month = functions.next_2_month_finder(today.month)
 
     # Reports
-    user_reports = models.DailyReport.objects.filter(
+    user_reports = models.Report.objects.filter(
         agent=user
     ).values_list('date', flat=True)
     report_dates = set(user_reports)
@@ -4710,7 +4630,6 @@ def calendar_current_month_view(request):
             'has_report': day in report_dates,
         }
         days_data.append(day_info)
-
     context = {
         'user': user,
         'today': today_str,
@@ -4737,7 +4656,7 @@ def calendar_previous_month_view(request):
     next_2_month = functions.next_2_month_finder(today.month)
 
     # Reports
-    user_reports = models.DailyReport.objects.filter(
+    user_reports = models.Report.objects.filter(
         agent=user
     ).values_list('date', flat=True)
     report_dates = set(user_reports)
@@ -4780,7 +4699,7 @@ def calendar_previous_2_month_view(request):
     next_2_month = functions.next_2_month_finder(today.month)
 
     # Reports
-    user_reports = models.DailyReport.objects.filter(
+    user_reports = models.Report.objects.filter(
         agent=user
     ).values_list('date', flat=True)
     report_dates = set(user_reports)
@@ -4903,6 +4822,5 @@ def dated_task_list_view(request):
         'tasks': tasks,
     }
     return render(request, 'dashboard/tasks/dated_task_list.html', context=context)
-
 
 

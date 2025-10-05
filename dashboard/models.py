@@ -493,8 +493,7 @@ class Buyer(models.Model):
                              verbose_name=_('City'))
     district = models.ForeignKey(District, on_delete=models.SET_NULL, null=True, blank=True, related_name='buyers',
                                  verbose_name=_('District'))
-    sub_districts = models.ManyToManyField(SubDistrict, blank=True, related_name='buyers',
-                                           verbose_name=_('Sub-Districts'))
+    sub_districts = models.ManyToManyField(SubDistrict, blank=True, related_name='buyers',  verbose_name=_('Sub-Districts'))
     # properties
     budget_announced = models.PositiveBigIntegerField(blank=True, null=True, verbose_name=_('Announced Budget'))
     budget_max = models.PositiveBigIntegerField(blank=True, null=True, verbose_name=_('Max Budget'))
@@ -547,8 +546,7 @@ class Renter(models.Model):
                              verbose_name=_('City'))
     district = models.ForeignKey(District, on_delete=models.SET_NULL, null=True, blank=True, related_name='renters',
                                  verbose_name=_('District'))
-    sub_districts = models.ManyToManyField(SubDistrict, blank=True, related_name='renters',
-                                           verbose_name=_('Sub-Districts'))
+    sub_districts = models.ManyToManyField(SubDistrict, blank=True, related_name='renters',  verbose_name=_('Sub-Districts'))
     # properties
     deposit_announced = models.PositiveBigIntegerField(blank=True, null=True, verbose_name=_('Announced Deposit'))
     deposit_max = models.PositiveBigIntegerField(blank=True, null=True, verbose_name=_('Max Deposit'))
@@ -957,13 +955,9 @@ class Mark(models.Model):
         return reverse('mark_detail', args=[self.pk])
 
 
-class DailyReport(models.Model):
-    agent = models.ForeignKey(CustomUserModel, on_delete=models.SET_NULL, null=True, blank=True, related_name='reports',
+class Report(models.Model):
+    agent = models.ForeignKey(CustomUserModel, on_delete=models.SET_NULL, null=True, blank=True, related_name='new_reports',
                               verbose_name='مشاور')
-    discount = models.TextField(max_length=500, blank=True, null=True, verbose_name='تخفیف')
-    service = models.TextField(max_length=500, blank=True, null=True, verbose_name='سرویس')
-    evaluation = models.TextField(max_length=500, blank=True, null=True, verbose_name='کارشناسی')
-    ads = models.TextField(max_length=500, blank=True, null=True, verbose_name='آگهی')
     description = models.TextField(max_length=1000, blank=True, null=True, verbose_name='توضیحات')
     boss_note = models.TextField(max_length=1000, blank=True, null=True, verbose_name='توضیحات مدیر')
     status = models.CharField(max_length=10, choices=choices.report_statuses, default='wfb', verbose_name='وضعیت')
@@ -979,8 +973,8 @@ class DailyReport(models.Model):
         super().save(*args, **kwargs)
 
     class Meta:
-        verbose_name = 'گزارش روزانه'
-        verbose_name_plural = 'گزارش‌های روزانه'
+        verbose_name = 'گزارش'
+        verbose_name_plural = 'گزارش‌ها'
         ordering = ['-date']
 
     def __str__(self):
@@ -990,6 +984,62 @@ class DailyReport(models.Model):
             return f"گزارش روزانه: {self.agent} - {self.date}"
 
     def get_absolute_url(self):
-        return reverse('daily_report_detail', args=[self.agent, self.date])
+        return reverse('report_detail', args=[self.agent, self.date])
+
+
+class ReportItem(models.Model):
+    report = models.ForeignKey(Report, on_delete=models.CASCADE, null=True, blank=True, related_name='ads', verbose_name='کزارش')
+    file_code = models.CharField(max_length=10, null=True, blank=True, verbose_name='کد فایل')
+    customer_code = models.CharField(max_length=10, null=True, blank=True, verbose_name='کد مشتری')
+    description = models.TextField(max_length=1000, blank=True, null=True, verbose_name='توضیحات')
+    type = models.CharField(max_length=10, choices=choices.report_item_choices, verbose_name='نوع')
+    datetime_created = models.DateTimeField(auto_now_add=True, verbose_name=_('Date and Time of Creation'))
+
+    @property
+    def file(self):
+        sale_file_codes = (SaleFile.objects.exclude(delete_request='Yes').filter(status='acc')
+                           .values('code').values_list('code', flat=True))
+        rent_file_codes = (RentFile.objects.exclude(delete_request='Yes').filter(status='acc')
+                           .values('code').values_list('code', flat=True))
+        if self.file_code in sale_file_codes:
+            file = SaleFile.objects.get(code=self.file_code)
+            return file
+        if self.file_code in rent_file_codes:
+            file = RentFile.objects.get(code=self.file_code)
+            return file
+        return None
+
+    @property
+    def customer(self):
+        buyer_codes = (Buyer.objects.exclude(delete_request='Yes').filter(status='acc')
+                           .values('code').values_list('code', flat=True))
+        renter_codes = (Renter.objects.exclude(delete_request='Yes').filter(status='acc')
+                           .values('code').values_list('code', flat=True))
+        if self.customer_code in buyer_codes:
+            customer = Buyer.objects.get(code=self.customer_code)
+            return customer
+        if self.customer_code in renter_codes:
+            customer = Renter.objects.get(code=self.customer_code)
+            return customer
+        return None
+
+    class Meta:
+        verbose_name = 'آگهی'
+        verbose_name_plural = 'آگهی‌ها'
+        ordering = ['-datetime_created']
+
+    def __str__(self):
+        if self.report.agent.name_family:
+            return f"{self.report.agent.name_family} - {self.file_code}"
+        else:
+            return f"{self.report.agent} - {self.file_code}"
+
+    def get_absolute_url(self):
+        if self.file_code:
+            return reverse('report_item_detail', args=[self.pk, self.type, self.file_code])
+        elif self.customer_code:
+            return reverse('report_item_detail', args=[self.pk, self.type, self.customer_code])
+        else:
+            return reverse('report_item_detail', args=[self.pk, self.type])
 
 

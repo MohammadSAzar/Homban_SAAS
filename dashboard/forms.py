@@ -1,5 +1,6 @@
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django import forms
+from django.forms import inlineformset_factory
 from django.utils.translation import gettext as _
 from jdatetime import datetime as jdatetime
 
@@ -1601,45 +1602,75 @@ class TaskFilterForm(forms.Form):
 
 
 # ---------------------------------- Reports ----------------------------------
-report_required_fields = ['discount', 'service', 'evaluation', 'ads']
-
-
-class DailyReportCreateForm(forms.ModelForm):
+class ReportForm(forms.ModelForm):
     class Meta:
-        model = models.DailyReport
-        fields = ['discount', 'service', 'evaluation', 'ads', 'description']
+        model = models.Report
+        fields = ['description']
+        widgets = {
+            'description': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'توضیحات گزارش روزانه...'
+            }),
+        }
+
+
+class ReportItemForm(forms.ModelForm):
+    class Meta:
+        model = models.ReportItem
+        fields = ['type', 'file_code', 'customer_code', 'description']
+        widgets = {
+            'type': forms.Select(attrs={
+                'class': 'form-control item-type-select',
+                'required': True
+            }),
+            'file_code': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'کد فایل',
+                'required': True
+            }),
+            'customer_code': forms.TextInput(attrs={
+                'class': 'form-control customer-code-field',
+                'placeholder': 'کد مشتری',
+                'required': False
+            }),
+            'description': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 2,
+                'placeholder': 'توضیحات...'
+            }),
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        for field in report_required_fields:
-            self.fields[field].required = True
-
-
-class DailyReportBossNoteForm(forms.ModelForm):
-    class Meta:
-        model = models.DailyReport
-        fields = ['boss_note', 'status']
+        self.fields['customer_code'].required = False
 
     def clean(self):
-        status = self.cleaned_data['status']
-        boss_note = self.cleaned_data['boss_note']
-        if boss_note:
-            if status != 'wfr':
-                self.add_error('status', 'برای ثبت نظر، باید وضعیت را به "منتظر مشاهده نظر مدیر" تغییر دهید')
-        else:
-            if status != 'cls':
-                self.add_error('status', 'در صورت عدم تمایل به ثبت نظر، باید وضعیت را به "بسته" تغییر دهید')
+        cleaned_data = super().clean()
+        item_type = cleaned_data.get('type')
+        customer_code = cleaned_data.get('customer_code')
+        if item_type == 'service' and not customer_code:
+            raise forms.ValidationError('کد مشتری برای نوع خدمات الزامی است.')
+        return cleaned_data
 
 
-class DailyReportCloseForm(forms.ModelForm):
-    class Meta:
-        model = models.DailyReport
-        fields = ['status']
-
-    def clean(self):
-        status = self.cleaned_data['status']
-        if status != 'cls':
-            self.add_error('status', 'برای بستن گزارش، باید وضعیت را به "بسته" تغییر دهید')
+# Report Formset
+ReportItemFormSet = inlineformset_factory(
+    models.Report,
+    models.ReportItem,
+    form=ReportItemForm,
+    extra=1,  # Number of empty forms to display
+    min_num=1,  # Minimum number of forms required
+    validate_min=True,
+    can_delete=True,
+    widgets={
+        'type': forms.Select(attrs={'class': 'form-control item-type-select'}),
+        'file_code': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'کد فایل'}),
+        'customer_code': forms.TextInput(
+            attrs={'class': 'form-control customer-code-field', 'placeholder': 'کد مشتری'}),
+        'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 2, 'placeholder': 'توضیحات...'}),
+    }
+)
 
 
 # -------------------------------- BossTasks --------------------------------
