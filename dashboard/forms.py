@@ -1648,19 +1648,47 @@ class ReportItemForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super().clean()
         item_type = cleaned_data.get('type')
+        file_code = cleaned_data.get('file_code')
         customer_code = cleaned_data.get('customer_code')
+
         if item_type == 'service' and not customer_code:
-            raise forms.ValidationError('کد مشتری برای نوع خدمات الزامی است.')
+            self.add_error('customer_code', 'کد مشتری برای نوع خدمات الزامی است.')
+
+        sale_file_codes = list(
+            models.SaleFile.objects.exclude(delete_request='Yes').filter(status='acc').values_list('code', flat=True))
+        rent_file_codes = list(
+            models.RentFile.objects.exclude(delete_request='Yes').filter(status='acc').values_list('code', flat=True))
+        buyer_codes = list(
+            models.Buyer.objects.exclude(delete_request='Yes').filter(status='acc').values_list('code', flat=True))
+        renter_codes = list(
+            models.Renter.objects.exclude(delete_request='Yes').filter(status='acc').values_list('code', flat=True))
+
+        if file_code:
+            if file_code not in sale_file_codes and file_code not in rent_file_codes:
+                self.add_error('file_code', 'کد فایل وجود ندارد.')
+        if customer_code:
+            if customer_code not in buyer_codes and customer_code not in renter_codes:
+                self.add_error('customer_code', 'کد مشتری وجود ندارد.')
+
+        if item_type == 'ser' and file_code and customer_code:
+            if file_code in sale_file_codes:
+                if customer_code not in buyer_codes:
+                    self.add_error('file_code', 'فایل و مشتری باید از یک نوع باشند.')
+                    self.add_error('customer_code', 'فایل و مشتری باید از یک نوع باشند.')
+            if file_code in rent_file_codes:
+                if customer_code not in renter_codes:
+                    self.add_error('file_code', 'فایل و مشتری باید از یک نوع باشند.')
+                    self.add_error('customer_code', 'فایل و مشتری باید از یک نوع باشند.')
         return cleaned_data
 
 
-# Report Formset
+# Formset
 ReportItemFormSet = inlineformset_factory(
     models.Report,
     models.ReportItem,
     form=ReportItemForm,
-    extra=1,  # Number of empty forms to display
-    min_num=1,  # Minimum number of forms required
+    extra=1,
+    min_num=1,
     validate_min=True,
     can_delete=True,
     widgets={
@@ -2158,5 +2186,6 @@ class CombinedSessionResultForm(forms.Form):
     def save(self):
         self.boss_form.save()
         self.result_session_form.save()
+
 
 
