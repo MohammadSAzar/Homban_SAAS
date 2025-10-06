@@ -18,22 +18,104 @@
         <div class="card-aside-wrap">
             <div class="card-inner card-inner-lg">
 
-                <!-- Name -->
+                <!-- Upper -->
                 <div class="nk-block-head  nk-block-head-lg">
                     <div class="nk-block-between">
                         <div class="nk-block-head-content">
+                        
+                            <!-- Name + Suggestions -->
                             <h5 class="nk-block-title">خریدار: {{ buyer.name|farsi_number }}
                                 {% if buyer.phone_number in duplicate_phone_numbers %}
                                     | <span style="color: red; font-size: 0.7em;">( خریدار تکراری )</span>
                                 {% endif %}
+                                <!-- Suggestions (Button) -->
+                                <button type="button"
+                                        data-bs-toggle="modal" data-bs-target="#modalLarge"
+                                        class="btn btn-primary mark-btn"
+                                        style="margin-right: 0.6em; font-size: 0.7em; line-height: 0.7em;"
+                                        title="فایل‌های پیشنهادی">
+                                    <em class="icon ni ni-eye"></em>
+                                </button>
+                                <!-- end:Suggestions (Button) -->
+                                <!-- Suggestions (Modal) -->
+                                <div class="modal fade" tabindex="-1" id="modalLarge">
+                                    <div class="modal-dialog modal-lg" role="document">
+                                        <div class="modal-content">
+                
+                                            <!-- Title -->
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">فایل‌های پیشنهادی</h5>
+                                                <a href="#" class="close" data-bs-dismiss="modal" aria-label="بستن">
+                                                    <em class="icon ni ni-cross"></em>
+                                                </a>
+                                            </div>
+                
+                                            <!-- Files -->
+                                            <div class="modal-body">
+                                                <div class="card card-bordered card-preview">
+                                                    <div class="card-inner">
+                                                        <div class="row g-gs">
+                                                            {% for file in suggested_files %}
+                                                                <div class="col-lg-6">
+                                                                    <div class="card">
+                                                                        <!-- Code -->
+                                                                        <div class="card-header border-bottom">
+                                                                            <a href="{{ file.get_absolute_url }}" target="_blank" style="color: #00a65c; border-bottom: 1px solid #00a65c">
+                                                                                {{ file.code }}
+                                                                            </a>
+                                                                        </div>
+                                                                        <div class="card-inner" style="background-color: #FAFAFA">
+                                                                            <!-- Info -->
+                                                                            <p class="card-text" style="color: #00a65c; height: 3em;!important; -webkit-line-clamp: 2;!important;">
+                                                                                {{ file.sub_district }}
+                                                                            </p>
+                                                                            {% if file.created_by.name_family %}
+                                                                                <p class="card-text">مشاور: {{ file.created_by.name_family }}</p>
+                                                                            {% else %}
+                                                                                <p class="card-text">مشاور: {{ file.created_by }}</p>
+                                                                            {% endif %}
+                                                                            <p class="card-text">قیمت: {{ file.price_announced|intcomma:False|farsi_number }}</p>
+                                                                            <p class="card-text">متراژ: {{ file.area }}</p>
+                                                                            <p class="card-text">اتاق: {{ file.room }}</p>
+                                                                            <!-- Link -->
+                                                                            <a href="{% url 'sale_file_detail' file.pk file.unique_url_id %}"
+                                                                               class="btn btn-primary"
+                                                                               style="font-size: 0.75em; width:100%; text-align: center; justify-content: center;"
+                                                                               target="_blank">
+                                                                               مشاهده
+                                                                            </a>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            {% endfor %}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                
+                                            <!-- More -->
+                                            <div class="modal-footer bg-light">
+                                                <a href="{% url 'buyer_suggested_files' buyer.pk buyer.code %}" target="_blank" class="sub-text">مشاهده همه</a>
+                                            </div>
+                
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- end:Suggestions (Modal) -->
                             </h5>
-                            <div style="font-size: 0.9em; margin-top: 1em;">
+                        
+                            <!-- Buttons -->
+                            <div style="font-size: 0.9em;margin-top: 3em;">
                                 <a href="{% url 'buyer_update' buyer.pk buyer.code %}" class="btn btn-primary" style="margin-left: 10px;">بروزرسانی</a>
                                 <a href="{% url 'buyer_delete_request' buyer.pk buyer.code %}" class="btn btn-danger">حذف کردن</a>
                             </div>
+                        
+                            <!-- Phone -->
                             <div class="nk-block-des" style="margin-top: 1.2em;">
                                 <span>شماره تلفن: {{ buyer.phone_number }}</span>
                             </div>
+                        
+                            <!-- Code -->
                             <div class="nk-block-des">
                                 <span>کد:
                                     <!-- Code -->
@@ -41,7 +123,7 @@
                                        {{ buyer.code }}
                                     </button>
                                     <span class="feedback" id="feedback-{{ buyer.code }}" style="display: none; color: #00a65c">شد!</span>
-                                    <!-- Code (JS) -->
+                                    <!-- JS -->
                                     <script>
                                         function copyCode(element) {
                                             // Get the code from the button's text content instead of parameter
@@ -103,7 +185,7 @@
                         </div>
                     </div>
                 </div>
-                <!-- end: Name -->
+                <!-- end: Upper -->
 
                 <!-- Info -->
                 <div class=" nk-block">
@@ -265,88 +347,6 @@
                     </div>
                 </div>
                 <!-- end: Services -->
-            
-                <!-- Suggestions (Box) -->
-                <div class=" nk-block">
-                    <div class="nk-data data-list">
-                        <div class="data-head">
-                            <h6 class="title">فایل‌های پیشنهادی</h6>
-                        </div>
-                        <div class="data-item" data-bs-toggle="modal" data-bs-target="#profile-edit">
-                            <div style="font-size: 0.9em; margin-top: 0.4em;">
-                                <div class="btn btn-primary" style="font-size: 0.9em;">
-                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalLarge">برای مشاهده فایل‌های پیشنهادی کلیک کنید</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- end: Suggestions (Box) -->
-                <!-- Suggestions (Modal) -->
-                <div class="modal fade" tabindex="-1" id="modalLarge">
-                    <div class="modal-dialog modal-lg" role="document">
-                        <div class="modal-content">
-
-                            <!-- Title -->
-                            <div class="modal-header">
-                                <h5 class="modal-title">فایل‌های پیشنهادی</h5>
-                                <a href="#" class="close" data-bs-dismiss="modal" aria-label="بستن">
-                                    <em class="icon ni ni-cross"></em>
-                                </a>
-                            </div>
-
-                            <!-- Files -->
-                            <div class="modal-body">
-                                <div class="card card-bordered card-preview">
-                                    <div class="card-inner">
-                                        <div class="row g-gs">
-                                            {% for file in suggested_files %}
-                                                <div class="col-lg-6">
-                                                    <div class="card">
-                                                        <!-- Code -->
-                                                        <div class="card-header border-bottom">
-                                                            <a href="{{ file.get_absolute_url }}" target="_blank" style="color: #00a65c; border-bottom: 1px solid #00a65c">
-                                                                {{ file.code }}
-                                                            </a>
-                                                        </div>
-                                                        <div class="card-inner" style="background-color: #FAFAFA">
-                                                            <!-- Info -->
-                                                            <p class="card-text" style="color: #00a65c; height: 3em;!important; -webkit-line-clamp: 2;!important;">
-                                                                {{ file.sub_district }}
-                                                            </p>
-                                                            {% if file.created_by.name_family %}
-                                                                <p class="card-text">مشاور: {{ file.created_by.name_family }}</p>
-                                                            {% else %}
-                                                                <p class="card-text">مشاور: {{ file.created_by }}</p>
-                                                            {% endif %}
-                                                            <p class="card-text">قیمت: {{ file.price_announced|intcomma:False|farsi_number }}</p>
-                                                            <p class="card-text">متراژ: {{ file.area }}</p>
-                                                            <p class="card-text">اتاق: {{ file.room }}</p>
-                                                            <!-- Link -->
-                                                            <a href="{% url 'sale_file_detail' file.pk file.unique_url_id %}"
-                                                               class="btn btn-primary"
-                                                               style="font-size: 0.75em; width:100%; text-align: center; justify-content: center;"
-                                                               target="_blank">
-                                                               مشاهده
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            {% endfor %}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- More -->
-                            <div class="modal-footer bg-light">
-                                <a href="{% url 'buyer_suggested_files' buyer.pk buyer.code %}" target="_blank" class="sub-text">مشاهده همه</a>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-                <!-- end:Suggestions (Modal) -->
 
             </div>
         </div>

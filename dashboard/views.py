@@ -797,7 +797,7 @@ class SaleFileDetailView(ReadOnlyPermissionMixin, DetailView):
             area_max__lt=1.2 * sale_file.area
         ).exclude(delete_request='Yes')
 
-        paginator = Paginator(suggested_buyers_queryset, 6)
+        paginator = Paginator(suggested_buyers_queryset, 1000)
         page_number = self.request.GET.get('page', 1)
         page_obj = paginator.get_page(page_number)
 
@@ -1383,7 +1383,7 @@ class RentFileDetailView(ReadOnlyPermissionMixin, DetailView):
         suggested_renters_queryset = (
                 non_convertable_suggested_renters_queryset | convertable_suggested_renters_queryset).distinct()
 
-        paginator = Paginator(suggested_renters_queryset, 6)
+        paginator = Paginator(suggested_renters_queryset, 1000)
         page_number = self.request.GET.get('page', 1)
         page_obj = paginator.get_page(page_number)
 
@@ -1957,7 +1957,7 @@ class BuyerDetailView(ReadOnlyPermissionMixin, DetailView):
             similar_sub_districts = buyer.sub_districts.all()
             suggested_files_queryset = suggested_files_queryset.filter(sub_district__in=similar_sub_districts)
 
-        paginator = Paginator(suggested_files_queryset, 6)
+        paginator = Paginator(suggested_files_queryset, 1000)
         page_number = self.request.GET.get('page', 1)
         page_obj = paginator.get_page(page_number)
 
@@ -2326,7 +2326,7 @@ class RenterDetailView(ReadOnlyPermissionMixin, DetailView):
         if self.request.user.title != 'bs':
             suggested_files_queryset = suggested_files_queryset.filter(sub_district__in=renter.sub_districts.all())
 
-        paginator = Paginator(suggested_files_queryset, 6)
+        paginator = Paginator(suggested_files_queryset, 1000)
         page_number = self.request.GET.get('page', 1)
         page_obj = paginator.get_page(page_number)
 
@@ -3849,6 +3849,15 @@ class ReportCreateView(LoginRequiredMixin, CreateView):
     form_class = forms.ReportForm
     template_name = 'dashboard/reports/report_create.html'
     success_url = reverse_lazy('current_month')
+
+    def dispatch(self, request, *args, **kwargs):
+        now = timezone.now()
+        today = datetime2jalali(now)
+        today = today.strftime('%Y/%m/%d')
+        user_today_report = models.Report.objects.filter(agent=request.user).filter(date=today)
+        if user_today_report:
+            raise PermissionDenied("گزارش امروز شما موجود است و اجازه دسترسی مجدد ندارید.")
+        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
