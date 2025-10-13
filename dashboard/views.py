@@ -1,22 +1,28 @@
 import os
 import urllib.parse
 
+from operator import attrgetter
+from collections import defaultdict
 from django.http import JsonResponse, HttpResponse, Http404, FileResponse
 from django.urls import reverse, reverse_lazy
+from django.shortcuts import get_object_or_404, render, redirect
+
 from django.views import View
 from django.views.generic import DetailView, CreateView, ListView, UpdateView, DeleteView, TemplateView
 from django.views.decorators.http import require_GET, require_POST
+
 from django.db import transaction
 from django.db.models import Prefetch, Count, Q, F, PositiveBigIntegerField
 from django.db.models.functions import Cast
+
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
+from django.core.cache import cache
+
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
+from django.contrib.contenttypes.models import ContentType
 from django.contrib import messages
-from django.shortcuts import get_object_or_404, render, redirect
-from operator import attrgetter
-from collections import defaultdict
 
 from jalali_date import datetime2jalali
 from datetime import datetime, timedelta
@@ -4831,5 +4837,322 @@ def dated_task_list_view(request):
         'tasks': tasks,
     }
     return render(request, 'dashboard/tasks/dated_task_list.html', context=context)
+
+
+# ------------------------------- Interactions ------------------------------
+class AnnouncementListView(LoginRequiredMixin, ListView):
+    model = models.Announcement
+    template_name = 'dashboard/interactions/announcement_list.html'
+    context_object_name = 'announcements'
+    paginate_by = 20
+
+    def get_queryset(self):
+        return models.Announcement.objects.filter(
+            visible_to=self.request.user,
+            is_active=True
+        ).select_related(
+            'created_by',
+            'content_type'
+        ).prefetch_related(
+            'viewed_by'
+        ).order_by('-datetime_created')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['unviewed_count'] = self.get_queryset().exclude(viewed_by=self.request.user).count()
+        return context
+
+
+class AnnouncementDetailView(LoginRequiredMixin, DetailView):
+    model = models.Announcement
+    template_name = 'dashboard/interactions/announcement_detail.html'
+    context_object_name = 'announcement'
+
+    def get_object(self):
+        announcement = super().get_object()
+        if self.request.user not in announcement.viewed_by.all():
+            announcement.viewed_by.add(self.request.user)
+            cache.delete(f'notifications_{self.request.user.pk}')
+        return announcement
+
+    def get_suggestions_for_sale_file(self, sale_file):
+        suggested_buyers = models.Buyer.objects.select_related(
+            'created_by', 'province', 'city', 'district'
+        ).prefetch_related(
+            'sub_districts'
+        ).filter(
+            created_by=self.request.user,
+            status='acc',
+            budget_announced__gt=0.9 * sale_file.price_announced,
+            budget_announced__lt=1.1 * sale_file.price_announced,
+            area_min__lt=1.2 * sale_file.area,
+            area_max__gt=0.8 * sale_file.area
+        ).exclude(delete_request='Yes')
+        return suggested_buyers
+
+    def get_suggestions_for_rent_file(self, rent_file):
+        base_queryset = models.Renter.objects.select_related(
+            'created_by', 'province', 'city', 'district'
+        ).prefetch_related(
+            'sub_districts'
+        ).filter(
+            created_by=self.request.user
+        ).annotate(
+            deposit_total_calc=Cast(
+                F('deposit_announced') + (100 * F('rent_announced') / 3),
+                PositiveBigIntegerField()
+            )
+        )
+
+        non_convertable_renters = base_queryset.filter(
+            status='acc',
+            convertable='isnt',
+            deposit_announced__gt=0.8 * rent_file.deposit_announced,
+            deposit_announced__lt=1.2 * rent_file.deposit_announced,
+            rent_announced__gt=0.8 * rent_file.rent_announced,
+            rent_announced__lt=1.2 * rent_file.rent_announced,
+            area_min__lt=1.2 * rent_file.area,
+            area_max__gt=0.8 * rent_file.area
+        ).exclude(delete_request='Yes')
+
+        rent_total_min = 0.8 * (rent_file.deposit_announced + 100 * (rent_file.rent_announced / 3))
+        rent_total_max = 1.2 * (rent_file.deposit_announced + 100 * (rent_file.rent_announced / 3))
+
+        convertable_renters = base_queryset.filter(
+            status='acc',
+            convertable='is',
+            deposit_total_calc__gt=rent_total_min,
+            deposit_total_calc__lt=rent_total_max,
+            area_min__lt=1.2 * rent_file.area,
+            area_max__gt=0.8 * rent_file.area
+        ).exclude(delete_request='Yes')
+        suggested_renters = (non_convertable_renters | convertable_renters).distinct()
+        return suggested_renters
+
+    def get_suggestions_for_buyer(self, buyer):
+        budget_min = 0.9 * buyer.budget_announced
+        budget_max = 1.1 * buyer.budget_announced
+        area_min = 0.8 * buyer.area_min
+        area_max = 1.2 * buyer.area_max
+
+        suggested_files = models.SaleFile.objects.select_related(
+            'created_by', 'sub_district', 'sub_district__district',
+            'sub_district__district__city', 'sub_district__district__city__province'
+        ).filter(
+            created_by=self.request.user,
+            status='acc',
+            price_announced__gt=budget_min,
+            price_announced__lt=budget_max,
+            area__gt=area_min,
+            area__lt=area_max
+        ).exclude(delete_request='Yes')
+        return suggested_files
+
+    def get_suggestions_for_renter(self, renter):
+        deposit_min = 0.8 * renter.deposit_announced
+        deposit_max = 1.2 * renter.deposit_announced
+        rent_min = 0.8 * renter.rent_announced
+        rent_max = 1.2 * renter.rent_announced
+        area_min = 0.8 * renter.area_min
+        area_max = 1.2 * renter.area_max
+        renter_total_min = 0.8 * (renter.deposit_announced + 100 * (renter.rent_announced / 3))
+        renter_total_max = 1.2 * (renter.deposit_announced + 100 * (renter.rent_announced / 3))
+
+        base_queryset = models.RentFile.objects.select_related(
+            'created_by', 'sub_district', 'sub_district__district',
+            'sub_district__district__city', 'sub_district__district__city__province'
+        ).filter(
+            created_by=self.request.user
+        ).annotate(
+            deposit_total_calc=Cast(
+                F('deposit_announced') + (100 * F('rent_announced') / 3),
+                PositiveBigIntegerField()
+            )
+        )
+
+        non_convertable_files = base_queryset.filter(
+            status='acc',
+            convertable='isnt',
+            deposit_announced__gt=deposit_min,
+            deposit_announced__lt=deposit_max,
+            rent_announced__gt=rent_min,
+            rent_announced__lt=rent_max,
+            area__gt=area_min,
+            area__lt=area_max
+        ).exclude(delete_request='Yes')
+
+        convertable_files = base_queryset.filter(
+            status='acc',
+            convertable='is',
+            deposit_total_calc__gt=renter_total_min,
+            deposit_total_calc__lt=renter_total_max,
+            area__gt=area_min,
+            area__lt=area_max
+        ).exclude(delete_request='Yes')
+
+        suggested_files = (non_convertable_files | convertable_files).distinct()
+        return suggested_files
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        announcement = self.object
+        suggestions = []
+        interaction_type = None
+        if announcement.announcement_type == 'sf':
+            sale_file = announcement.content_object
+            suggestions = self.get_suggestions_for_sale_file(sale_file)
+            interaction_type = 'buyers_to_sale_file'
+        elif announcement.announcement_type == 'rf':
+            rent_file = announcement.content_object
+            suggestions = self.get_suggestions_for_rent_file(rent_file)
+            interaction_type = 'renters_to_rent_file'
+        elif announcement.announcement_type == 'by':
+            buyer = announcement.content_object
+            suggestions = self.get_suggestions_for_buyer(buyer)
+            interaction_type = 'sale_files_to_buyer'
+        elif announcement.announcement_type == 'rt':
+            renter = announcement.content_object
+            suggestions = self.get_suggestions_for_renter(renter)
+            interaction_type = 'rent_files_to_renter'
+
+        paginator = Paginator(suggestions, 20)
+        page_number = self.request.GET.get('page', 1)
+        page_obj = paginator.get_page(page_number)
+
+        context['suggestions'] = page_obj.object_list
+        context['page_obj'] = page_obj
+        context['is_paginated'] = page_obj.has_other_pages()
+        context['interaction_type'] = interaction_type
+        context['total_suggestions'] = suggestions.count
+        return context
+
+
+class InteractionCreateView(LoginRequiredMixin, CreateView):
+    model = models.Interaction
+    fields = []
+
+    def post(self, request, *args, **kwargs):
+        announcement_id = self.kwargs.get('announcement_id')
+        announcement = get_object_or_404(
+            models.Announcement,
+            pk=announcement_id,
+            visible_to=request.user
+        )
+
+        selected_ids = request.POST.getlist('selected_suggestions')
+        message = request.POST.get('message', '')
+        if not selected_ids:
+            messages.error(request, 'لطفاً حداقل یک پیشنهاد را انتخاب کنید.')
+            return redirect('announcement_detail', pk=announcement_id)
+
+        interaction_type_map = {
+            'sf': ('buyers_to_sale_file', ContentType.objects.get_for_model(models.Buyer)),
+            'rf': ('renters_to_rent_file', ContentType.objects.get_for_model(models.Renter)),
+            'by': ('sale_files_to_buyer', ContentType.objects.get_for_model(models.SaleFile)),
+            'rt': ('rent_files_to_renter', ContentType.objects.get_for_model(models.RentFile)),
+        }
+        interaction_type, content_type = interaction_type_map[announcement.announcement_type]
+
+        interaction = models.Interaction.objects.create(
+            announcement=announcement,
+            sender=request.user,
+            receiver=announcement.created_by,
+            interaction_type=interaction_type,
+            message=message,
+            status='sent'
+        )
+
+        for suggestion_id in selected_ids:
+            suggestion_obj = content_type.model_class().objects.get(pk=suggestion_id)
+            if hasattr(suggestion_obj, 'price_announced'):
+                cached_price = suggestion_obj.price_announced
+            elif hasattr(suggestion_obj, 'deposit_announced'):
+                cached_price = suggestion_obj.deposit_announced
+            else:
+                cached_price = None
+            if hasattr(suggestion_obj, 'area'):
+                cached_area = suggestion_obj.area
+            elif hasattr(suggestion_obj, 'area_min'):
+                cached_area = suggestion_obj.area_min
+            else:
+                cached_area = None
+
+            models.InteractionItem.objects.create(
+                interaction=interaction,
+                content_object=suggestion_obj,
+                cached_price=cached_price,
+                cached_area=cached_area
+            )
+        messages.success(
+            request,
+            f'پیشنهادات شما ({len(selected_ids)} مورد) با موفقیت ارسال شد.'
+        )
+        cache.delete(f'notifications_{interaction.receiver.pk}')
+
+        return redirect('interaction_detail', pk=interaction.pk)
+
+
+class InteractionListView(LoginRequiredMixin, ListView):
+    model = models.Interaction
+    template_name = 'dashboard/interactions/interaction_list.html'
+    context_object_name = 'interactions'
+    paginate_by = 20
+
+    def get_queryset(self):
+        base_qs = models.Interaction.objects.select_related(
+            'sender', 'receiver', 'announcement'
+        ).prefetch_related(
+            'items'
+        )
+
+        filter_type = self.request.GET.get('filter', 'all')
+        if filter_type == 'sent':
+            return base_qs.filter(sender=self.request.user).order_by('-datetime_created')
+        elif filter_type == 'received':
+            return base_qs.filter(receiver=self.request.user).order_by('-datetime_created')
+        else:
+            return base_qs.filter(
+                Q(sender=self.request.user) | Q(receiver=self.request.user)
+            ).order_by('-datetime_created')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['filter_type'] = self.request.GET.get('filter', 'all')
+        context['unviewed_received_count'] = models.Interaction.objects.filter(
+            receiver=self.request.user,
+            status='sent'
+        ).count()
+        return context
+
+
+class InteractionDetailView(LoginRequiredMixin, DetailView):
+    model = models.Interaction
+    template_name = 'dashboard/interactions/interaction_detail.html'
+    context_object_name = 'interaction'
+
+    def get_queryset(self):
+        return models.Interaction.objects.filter(
+            Q(sender=self.request.user) | Q(receiver=self.request.user)
+        ).select_related(
+            'sender', 'receiver', 'announcement'
+        ).prefetch_related(
+            'items__content_type',
+            'items__content_object'
+        )
+
+    def get_object(self):
+        interaction = super().get_object()
+        if interaction.receiver == self.request.user and interaction.status == 'sent':
+            interaction.status = 'viewed'
+            interaction.datetime_viewed = timezone.now()
+            interaction.save(update_fields=['status', 'datetime_viewed'])
+            cache.delete(f'notifications_{self.request.user.pk}')
+        return interaction
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['announcement_object'] = self.object.announcement.content_object
+        return context
+
 
 

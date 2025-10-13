@@ -1,0 +1,181 @@
+{% extends '_base_dashboard.html' %}
+
+{% load static %}
+{% load i18n %}
+{% load jalali_tags %}
+{% load jalali_date_converter %}
+{% load number_converter %}
+{% load price_converter %}
+{% load humanize %}
+{% load widget_tweaks %}
+{% load pagination %}
+
+
+{% block title %}تعامل‌ها{% endblock %}
+
+
+{% block content %}
+
+    <!-- Main -->
+    <div class="nk-block">
+        <div class="row gy-4">
+
+            <!-- Upper -->
+            <div class="col-lg-12">
+                <div class="card card-bordered">
+                    <div class="card-inner">
+
+                        <!-- Title & Count -->
+                        <div class="card-title-group align-start mb-3">
+                            <div class="card-title" style="margin-bottom: 1em;">
+                                <h5 class="title" style="font-size: 1.3em;">تعامل‌ها</h5>
+                            </div>
+                            {% if unviewed_received_count > 0 %}
+                                <div class="card-tools">
+                                    <span class="badge badge-dim bg-danger" style="font-size: 1em; padding: 8px 15px; font-family: Estedad">
+                                        {{ unviewed_received_count|farsi_number }} مورد جدید دریافتی
+                                    </span>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Tabs -->
+                        <ul class="nav nav-tabs">
+                            <li class="nav-item">
+                                <a class="nav-link {% if filter_type == 'all' %}active{% endif %}"
+                                   href="{% url 'interaction_list' %}?filter=all">همه</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {% if filter_type == 'sent' %}active{% endif %}"
+                                   href="{% url 'interaction_list' %}?filter=sent">ارسال شده</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {% if filter_type == 'received' %}active{% endif %}"
+                                   href="{% url 'interaction_list' %}?filter=received">
+                                    دریافت شده
+                                    {% if unviewed_received_count > 0 %}
+                                        <span class="badge badge-dim bg-danger" style="font-family: Estedad">{{ unviewed_received_count|farsi_number }}</span>
+                                    {% endif %}
+                                </a>
+                            </li>
+                        </ul>
+
+                    </div>
+                </div>
+            </div>
+            <!-- end: Header -->
+
+            <!-- Interactions -->
+            <div class="col-lg-12">
+                <div class="card card-bordered">
+                    <div class="card-inner">
+                        {% if interactions %}
+
+                            <!-- Loop -->
+                            {% for interaction in interactions %}
+                                <div style="border: 1px solid #dbdfea; border-radius: 4px; padding: 20px; margin-bottom: 20px;
+                                            {% if interaction.receiver == request.user and interaction.status == 'sent' %}background-color: #FFF3E0;{% else %}background-color: #f5f6fa;{% endif %}">
+
+                                    <!-- Upper -->
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #dbdfea;">
+                                        <div style="flex: 1;">
+                                            <span style="font-weight: bold; color: #364a63; font-size: 1.1em;">
+                                                {% if interaction.sender == request.user %}
+                                                    <em class="icon ni ni-send" style="font-size: 1.2em; color: #1976D2;"></em> ارسال شده به:
+                                                    <span style="color: #1976D2;">{{ interaction.receiver.name_family|default:interaction.receiver }}</span>
+                                                {% else %}
+                                                    <em class="icon ni ni-inbox" style="font-size: 1.2em; color: #388E3C;"></em> دریافت شده از:
+                                                    <span style="color: #388E3C;">{{ interaction.sender.name_family|default:interaction.sender }}</span>
+                                                {% endif %}
+                                            </span>
+                                        </div>
+                                        <div style="text-align: left;">
+                                            {% if interaction.status == 'sent' %}
+                                                <span class="badge badge-dim bg-primary" style="font-family: Estedad">ارسال‌شده</span>
+                                            {% elif interaction.status == 'received' %}
+                                                <span class="badge badge-dim bg-success" style="font-family: Estedad">دیده‌شده</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+
+                                    <!-- Info -->
+                                    <div class="row gy-3 mb-3">
+                                        <!-- Type -->
+                                        <div class="col-lg-4 col-sm-6">
+                                            <strong style="color: #526484;">نوع:</strong>
+                                            <span style="font-size: 0.85em;">{{ interaction.get_interaction_type_display }}</span>
+                                        </div>
+                                        <!-- Count -->
+                                        <div class="col-lg-4 col-sm-6">
+                                            <strong style="color: #526484;">تعداد آیتم‌ها:</strong>
+                                            <span class="badge badge-dim bg-secondary" style="font-family: Estedad">{{ interaction.items.count|farsi_number }} مورد</span>
+                                        </div>
+                                        <!-- Date -->
+                                        <div class="col-lg-4 col-sm-6">
+                                            <strong style="color: #526484;">تاریخ:</strong>
+                                            <span style="color: #364a63;">{{ interaction.datetime_created|to_jalali:'%Y/%m/%d - %H:%M'|farsi_number }}</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Note -->
+                                    {% if interaction.message %}
+                                        <div class="alert alert-light" style="margin-bottom: 15px; padding: 10px;">
+                                            <strong style="color: #526484;">یادداشت:</strong> {{ interaction.message|truncatewords:15 }}
+                                        </div>
+                                    {% endif %}
+
+                                    <!-- Button -->
+                                    <div style="text-align: left;">
+                                        <a href="{% url 'interaction_detail' interaction.pk %}" target="_blank" class="btn btn-primary">
+                                            <em class="icon ni ni-eye"></em>
+                                            <span>مشاهده جزئیات</span>
+                                        </a>
+                                    </div>
+
+                                </div>
+                            {% endfor %}
+                            <!-- end: Loop -->
+
+                            <!-- Pagination -->
+                            {% if is_paginated %}
+                                <div class="card-inner">
+                                    <ul class="pagination justify-content-center justify-content-md-start">
+                                        {% if page_obj.has_previous %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?filter={{ filter_type }}&page={{ page_obj.previous_page_number }}">قبلی</a>
+                                        </li>
+                                        {% endif %}
+
+                                        <li class="page-item active">
+                                            <span class="page-link">{{ page_obj.number|farsi_number }} از {{ page_obj.paginator.num_pages|farsi_number }}</span>
+                                        </li>
+
+                                        {% if page_obj.has_next %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?filter={{ filter_type }}&page={{ page_obj.next_page_number }}">بعدی</a>
+                                        </li>
+                                        {% endif %}
+                                    </ul>
+                                </div>
+                            {% endif %}
+
+                        {% else %}
+                            <div class="alert alert-info" style="text-align: center;">
+                                <em class="icon ni ni-info" style="font-size: 2em;"></em>
+                                <p style="margin-top: 10px;">هیچ تعاملی یافت نشد.</p>
+                            </div>
+                        {% endif %}
+
+                    </div>
+                </div>
+            </div>
+            <!-- end: Interactions List -->
+
+        </div>
+    </div>
+    <!-- end: Main -->
+
+{% endblock %}
+
+
+

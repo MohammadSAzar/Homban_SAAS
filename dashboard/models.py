@@ -8,8 +8,10 @@ from jdatetime import timedelta, datetime
 
 from django.conf import settings
 from django.db import models
-from django.contrib.auth.models import AbstractUser
 from django.shortcuts import reverse
+from django.contrib.auth.models import AbstractUser
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from django.utils.text import slugify
 from django.utils import timezone
 from django.utils.translation import gettext as _
@@ -1041,5 +1043,82 @@ class ReportItem(models.Model):
             return reverse('report_item_detail', args=[self.pk, self.type, self.customer_code])
         else:
             return reverse('report_item_detail', args=[self.pk, self.type])
+
+
+class Announcement(models.Model):
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey('content_type', 'object_id')
+    created_by = models.ForeignKey(CustomUserModel, on_delete=models.CASCADE, related_name='created_announcements', verbose_name='منشا')
+    visible_to = models.ManyToManyField(CustomUserModel, blank=True, related_name='visible_announcements', verbose_name='مخاطب')
+    viewed_by = models.ManyToManyField(CustomUserModel, blank=True, related_name='viewed_announcements', verbose_name='بیننده')
+    announcement_type = models.CharField(max_length=20, choices=choices.mark_types, verbose_name='نوع')
+    is_active = models.BooleanField(default=True, verbose_name='فعال بودن')
+    datetime_created = models.DateTimeField(auto_now_add=True, verbose_name='زمان ساخت')
+
+    class Meta:
+        verbose_name = 'اعلان'
+        verbose_name_plural = 'اعلان‌ها'
+        ordering = ['-datetime_created']
+        indexes = [
+            models.Index(fields=['content_type', 'object_id']),
+            models.Index(fields=['-datetime_created']),
+        ]
+
+    def __str__(self):
+        return f"اعلان: {self.announcement_type} - {self.object_id}"
+
+    def get_object_display(self):
+        return str(self.content_object)
+
+    def get_absolute_url(self):
+        return reverse('announcement_detail', args=[self.pk])
+
+
+class Interaction(models.Model):
+    announcement = models.ForeignKey(Announcement, on_delete=models.CASCADE, related_name='interactions', verbose_name='اعلان')
+    sender = models.ForeignKey(CustomUserModel, on_delete=models.CASCADE, related_name='sent_interactions', verbose_name='فرستنده')
+    receiver = models.ForeignKey(CustomUserModel, on_delete=models.CASCADE, related_name='received_interactions', verbose_name='گیرنده')
+    interaction_type = models.CharField(max_length=20, choices=choices.interaction_types, verbose_name='نوع')
+    message = models.TextField(max_length=1000, blank=True, null=True, verbose_name='پبغام')
+    status = models.CharField(max_length=20, choices=choices.interactions_statuses, default='sent', verbose_name='وضعیت')
+    datetime_viewed = models.DateTimeField(null=True, blank=True, verbose_name='زمان مشاهده')
+    datetime_created = models.DateTimeField(auto_now_add=True, verbose_name='زمان ساخت')
+
+    class Meta:
+        verbose_name = 'تعامل'
+        verbose_name_plural = 'تعامل‌ها'
+        ordering = ['-datetime_created']
+        indexes = [
+            models.Index(fields=['sender', '-datetime_created']),
+            models.Index(fields=['receiver', '-datetime_created']),
+            models.Index(fields=['status']),
+        ]
+
+    def __str__(self):
+        return f"تعامل از  {self.sender} به {self.receiver} - {self.interaction_type}"
+
+    def get_absolute_url(self):
+        return reverse('interaction_detail', args=[self.pk])
+
+
+class InteractionItem(models.Model):
+    interaction = models.ForeignKey(Interaction, on_delete=models.CASCADE, related_name='items', verbose_name='تعامل')
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey('content_type', 'object_id')
+    cached_price = models.PositiveBigIntegerField(null=True, blank=True, verbose_name='قیمت کش')
+    cached_area = models.PositiveIntegerField(null=True, blank=True, verbose_name='متراژ کش')
+    notes = models.TextField(blank=True, null=True, verbose_name='یادداشت')
+
+    class Meta:
+        verbose_name = 'آیتم تعامل'
+        verbose_name_plural = 'آیتم‌های تعامل'
+        indexes = [
+            models.Index(fields=['content_type', 'object_id']),
+        ]
+
+    def __str__(self):
+        return f"آیتم در  {self.interaction.id} - {self.content_object}"
 
 

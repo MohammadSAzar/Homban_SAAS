@@ -136,6 +136,13 @@ urlpatterns = [
     path('tasks/boss/delete-requests/', views.delete_request_list_view, name='delete_request_list'),
     re_path(r'tasks/boss/approve/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/', views.TaskBossApproveView.as_view(), name='boss_task_approve'),
     re_path(r'tasks/boss/delete/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/', views.TaskBossDeleteView.as_view(), name='boss_task_delete'),
+    # interactions
+    path('announcement-list/', views.AnnouncementListView.as_view(), name='announcement_list'),
+    path('announcement-detail/<int:pk>/', views.AnnouncementDetailView.as_view(), name='announcement_detail'),
+    path('interaction-list/', views.InteractionListView.as_view(), name='interaction_list'),
+    path('interaction-detail/<int:pk>/', views.InteractionDetailView.as_view(), name='interaction_detail'),
+    path('announcement-create/<int:announcement_id>/create-interaction/', views.InteractionCreateView.as_view(), name='interaction_create'),
 ]
+
 
 

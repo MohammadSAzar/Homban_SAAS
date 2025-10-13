@@ -5,6 +5,7 @@
 {% load humanize %}
 {% load widget_tweaks %}
 
+
 <!DOCTYPE html>
 <html lang="fa" class="js" dir="rtl">
     <head>
@@ -19,6 +20,14 @@
         <link rel="stylesheet" href="{% static 'dashboard/assets/css/dashlite.rtl.css' %}" />
         <link id="skin-default" rel="stylesheet" href="{% static 'dashboard/assets/css/theme.css' %}" />
         <link id="skin-default" rel="stylesheet" href="{% static 'dashboard/assets/date_picker/css/persianDatepicker-default.css' %}" />
+        <!-- CSS (notification) -->
+        <style>
+            .notification-badge {
+                padding: 0 5px;
+                background-color: #00a65c;
+                color: white;
+            }
+        </style>
 
         <!-- JS -->
         <script src="{% static 'dashboard/assets/js/bundle.js' %}"></script>
@@ -27,6 +36,32 @@
         <script src="{% static 'dashboard/assets/js/mark.js' %}"></script>
         <script src="{% static 'dashboard/assets/date_picker/js/jquery-1.10.1.min.js' %}"></script>
         <script src="{% static 'dashboard/assets/date_picker/js/persianDatepicker.min.js' %}"></script>
+        <!-- JS (notification) -->
+        <script>
+            setInterval(function() {
+                fetch('/api/check-notifications/')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.has_new) {
+                            new Audio('/dashboard/sounds/notification.mp3').play();
+                            location.reload();
+                        }
+                    });
+            }, 60000);
+        </script>
+        <script>
+            if ('Notification' in window && Notification.permission !== 'granted') {
+                Notification.requestPermission();
+            }
+            function showNotification(title, body) {
+                if (Notification.permission === 'granted') {
+                    new Notification(title, {
+                        body: body,
+                        icon: '/static/icon.png'
+                    });
+                }
+            }
+        </script>
 
         <!-- Favicon -->
         <link rel="icon" type="image/png" href="{% static 'main/img/logos/ho-fav.png' %}">
@@ -233,14 +268,34 @@
                                             </ul>
                                         </li>
 
-
-{#                                        <!-- Chat -->#}
-{#                                        <li class="nk-menu-item has-sub">#}
-{#                                            <a href="#" class="nk-menu-link nk-menu-toggle">#}
-{#                                                <span class="nk-menu-icon"><em class="icon ni ni-mail"></em></span>#}
-{#                                                <span class="nk-menu-text">{% trans 'Online Chat' %}</span>#}
-{#                                            </a>#}
-{#                                        </li>#}
+                                        <!-- Interaction -->
+                                        <li class="nk-menu-item has-sub">
+                                            <a href="#" class="nk-menu-link nk-menu-toggle" style="position: relative;">
+                                                <span class="nk-menu-icon"><em class="icon ni ni-chat"></em></span>
+                                                <span class="nk-menu-text">تعامل</span>
+                                                {% if has_unread_notifications %}
+                                                    <span class="notification-badge">{{ total_unread_count|farsi_number }}</span>
+                                                {% endif %}
+                                            </a>
+                                            <ul class="nk-menu-sub">
+                                                <li class="nk-menu-item">
+                                                    <a href="{% url 'announcement_list' %}" class="nk-menu-link">
+                                                        <span class="nk-menu-text">اعلان‌ها</span>
+                                                        {% if unread_announcements_count > 0 %}
+                                                            <span class="notification-badge">{{ unread_announcements_count|farsi_number }}</span>
+                                                        {% endif %}
+                                                    </a>
+                                                </li>
+                                                <li class="nk-menu-item">
+                                                    <a href="{% url 'interaction_list' %}" class="nk-menu-link">
+                                                        <span class="nk-menu-text">تعامل‌ها</span>
+                                                        {% if unread_interactions_count > 0 %}
+                                                            <span class="notification-badge">{{ unread_interactions_count|farsi_number }}</span>
+                                                        {% endif %}
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </li>
 
                                     </ul>
                                     <!-- end:Sidebar >>> menu >>> items -->
@@ -341,5 +396,6 @@
     </body>
 
 </html>
+
 
 

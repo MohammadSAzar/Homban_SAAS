@@ -184,3 +184,78 @@ class MarkAdmin(admin.ModelAdmin):
     list_per_page = getattr(settings, 'DJANGO_ADMIN_PER_PAGE', 20)
 
 
+@admin.register(models.Announcement)
+class AnnouncementAdmin(admin.ModelAdmin):
+    list_display = ['id', 'announcement_type', 'created_by', 'datetime_created', 'is_active', 'visible_to_count', 'viewed_by_count']
+    list_filter = ['announcement_type', 'is_active', 'datetime_created']
+    search_fields = ['created_by__username', 'created_by__name_family']
+    readonly_fields = ['content_type', 'object_id', 'datetime_created']
+    filter_horizontal = ['visible_to', 'viewed_by']
+    date_hierarchy = 'datetime_created'
+
+    def visible_to_count(self, obj):
+        return obj.visible_to.count()
+
+    visible_to_count.short_description = 'تعداد مخاطب'
+
+    def viewed_by_count(self, obj):
+        return obj.viewed_by.count()
+
+    viewed_by_count.short_description = 'تعداد بیننده'
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.prefetch_related('visible_to', 'viewed_by')
+
+
+class InteractionItemInline(admin.TabularInline):
+    model = models.InteractionItem
+    extra = 0
+    readonly_fields = ['content_type', 'object_id', 'cached_price', 'cached_area']
+    fields = ['content_type', 'object_id', 'cached_price', 'cached_area', 'notes']
+
+
+@admin.register(models.Interaction)
+class InteractionAdmin(admin.ModelAdmin):
+    list_display = ['id', 'sender', 'receiver', 'interaction_type', 'status', 'datetime_created', 'datetime_viewed', 'items_count']
+    list_filter = ['interaction_type', 'status', 'datetime_created']
+    search_fields = ['sender__username', 'sender__name_family', 'receiver__username', 'receiver__name_family']
+    readonly_fields = ['datetime_created', 'datetime_viewed']
+    date_hierarchy = 'datetime_created'
+    inlines = [InteractionItemInline]
+
+    fieldsets = (
+        ('اطلاعات اصلی', {
+            'fields': ('announcement', 'sender', 'receiver', 'interaction_type')
+        }),
+        ('محتوا', {
+            'fields': ('message',)
+        }),
+        ('وضعیت', {
+            'fields': ('status', 'datetime_created', 'datetime_viewed')
+        }),
+    )
+
+    def items_count(self, obj):
+        return obj.items.count()
+
+    items_count.short_description = 'تعداد آیتم'
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.select_related('sender', 'receiver', 'announcement').prefetch_related('items')
+
+
+@admin.register(models.InteractionItem)
+class InteractionItemAdmin(admin.ModelAdmin):
+    list_display = ['id', 'interaction', 'content_type', 'object_id', 'cached_price', 'cached_area']
+    list_filter = ['content_type']
+    search_fields = ['interaction__id']
+    readonly_fields = ['content_type', 'object_id']
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.select_related('interaction', 'content_type')
+
+
+

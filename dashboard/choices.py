@@ -239,7 +239,6 @@ mark_types = [
 ]
 
 
-# --------------------------------- REPs --------------------------------
 report_statuses = [
     ('wfb', 'منتظر نظر مدیر'),
     ('wfr', 'منتظر مشاهده نظر مدیر'),
@@ -252,6 +251,20 @@ report_item_choices = [
     ('eva', 'کارشناسی'),
     ('dis', 'تخفیف'),
     ('ser', 'سرویس'),
+]
+
+
+interaction_types = [
+    ('buyers_to_sale_file', 'خریداران برای فایل فروش'),
+    ('renters_to_rent_file', 'مستاجران برای فایل اجاره'),
+    ('sale_files_to_buyer', 'فایل‌های فروش برای خریداران'),
+    ('rent_files_to_renter', 'فایل‌های اجاره برای مستاجران'),
+]
+
+
+interactions_statuses = [
+    ('sent', 'ارسال‌شده'),
+    ('received', 'دیده‌شده'),
 ]
 
 
@@ -270,5 +283,6 @@ code_finder_types = [
     ('by', 'خریدار'),
     ('rt', 'مستاجر'),
 ]
+
 
 
