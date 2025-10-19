@@ -36,12 +36,6 @@ def boss_task_person(sender, instance, created, **kwargs):
         models.TaskBoss.objects.create(new_person=instance, type='ps')
 
 
-@receiver(post_save, sender=models.Visit)
-def boss_task_visit(sender, instance, created, **kwargs):
-    if created:
-        models.TaskBoss.objects.create(new_visit=instance, type='vs')
-
-
 @receiver(post_save, sender=models.Session)
 def boss_task_session(sender, instance, created, **kwargs):
     if created:

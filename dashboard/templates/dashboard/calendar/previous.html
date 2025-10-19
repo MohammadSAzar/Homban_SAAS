@@ -71,18 +71,13 @@
                                             <span class="preview-icon-name" style="font-size: 0.8em;">{{ day_info.date|weekday_finder }}</span>
                                             <div class="preview-icon-box card">
                                                 {{ day_info.date }}
-
-                                                <!-- Tasks -->
-                                                <a href="{% url 'task_create' %}?deadline={{ day_info.date }}" class="preview-icon-name" target="_blank" style="margin-top: 2em;">
-                                                    <em class="icon ni ni-plus" style="font-size: 1.2em;"></em>
-                                                </a>
-                                                <a href="{% url 'dated_task_list' %}?date={{ day_info.date }}" class="preview-icon-name" target="_blank" style="margin-top: 2em;">
+                                                <!-- Reminder -->
+                                                <a href="{% url 'dated_reminder_list' %}?date={{ day_info.date }}" title="لیست یادآورها" class="preview-icon-name" target="_blank" style="margin-top: 2em;">
                                                     <em class="icon ni ni-list" style="font-size: 1.2em;"></em>
                                                 </a>
-
                                                 <!-- Reports -->
                                                 {% if day_info.has_report %}
-                                                    <a href="{% url 'report_detail' user.pk day_info.date %}" class="preview-icon-name" target="_blank" style="margin-top: 2em;">
+                                                    <a href="{% url 'report_detail' user.pk day_info.date %}" title="مشاهده گزارش" class="preview-icon-name" target="_blank" style="margin-top: 2em;">
                                                         <em class="icon ni ni-file-text" style="font-size: 1.2em; color: #4CAF50;"></em>
                                                     </a>
                                                 {% else %}
@@ -90,7 +85,6 @@
                                                         <em class="icon ni ni-file-text" style="font-size: 1.2em;"></em>
                                                     </span>
                                                 {% endif %}
-
                                             </div>
                                         </li>
                                     {% endfor %}
@@ -102,20 +96,10 @@
                                             <span class="preview-icon-name" style="font-size: 0.8em;">{{ day_info.date|weekday_finder }}</span>
                                             <div class="preview-icon-box card">
                                                 {{ day_info.date }}
-
-                                                <!-- Tasks -->
-                                                <a href="{% url 'task_create' %}?deadline={{ day_info.date }}" class="preview-icon-name" target="_blank" style="margin-top: 2em;">
-                                                    <em class="icon ni ni-plus" style="font-size: 1.2em;"></em>
-                                                </a>
-                                                <a href="{% url 'dated_task_list' %}?date={{ day_info.date }}" class="preview-icon-name" target="_blank" style="margin-top: 2em;">
-                                                    <em class="icon ni ni-list" style="font-size: 1.2em;"></em>
-                                                </a>
-
                                                 <!-- Reports -->
-                                                <a href="{% url 'report_list' day_info.date %}" class="preview-icon-name" target="_blank" style="margin-top: 2em;">
+                                                <a href="{% url 'report_list' day_info.date %}" title="لیست گزارش‌ها" class="preview-icon-name" target="_blank" style="margin-top: 2em;">
                                                     <em class="icon ni ni-reports" style="font-size: 1.2em; color: #FF9800;"></em>
                                                 </a>
-
                                             </div>
                                         </li>
                                     {% endfor %}
@@ -131,5 +115,4 @@
     </div>
 
 {% endblock %}
-
 

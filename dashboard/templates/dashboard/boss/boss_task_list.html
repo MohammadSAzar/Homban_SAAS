@@ -114,16 +114,10 @@
                                                     </div>
                                                     <!-- agent -->
                                                     <div style="margin-bottom: 0.6em;">
-                                                        {% if boss_task.type == 'ts' %}
-                                                            <span style="font-size: 0.9em;">مشاور: {{ boss_task.ur_task.agent.name_family|default:boss_task.ur_task.agent }}</span>
-                                                        {% elif boss_task.type == 'rs' %}
+                                                        {% if boss_task.type == 'rs' %}
                                                             <span style="font-size: 0.9em;">مشاور: {{ boss_task.result_session.agent.name_family|default:boss_task.result_session.agent }}</span>
                                                         {% elif boss_task.type == 'ss' %}
                                                             <span style="font-size: 0.9em;">مشاور: {{ boss_task.new_session.agent.name_family|default:boss_task.new_session.agent }}</span>
-                                                        {% elif boss_task.type == 'rv' %}
-                                                            <span style="font-size: 0.9em;">مشاور: {{ boss_task.result_visit.agent.name_family|default:boss_task.result_visit.agent }}</span>
-                                                        {% elif boss_task.type == 'vs' %}
-                                                            <span style="font-size: 0.9em;">مشاور: {{ boss_task.new_visit.agent.name_family|default:boss_task.new_visit.agent }}</span>
                                                         {% else %}
                                                             <span style="font-size: 0.9em;">مشاور: {{ boss_task.agent.name_family|default:boss_task.agent }}</span>
                                                         {% endif %}
@@ -151,26 +145,12 @@
                                                     {% elif boss_task.type == 'ps' %}
                                                         <h6 class="title" style="margin-bottom: 0.7em;">تایید آگهی‌دهنده جدید: </h6>
                                                         <span class="sub-text" style="font-size: 0.85em;">{{ boss_task.new_person.name }}</span>
-                                                    {% elif boss_task.type == 'vs' %}
-                                                        <h6 class="title" style="margin-bottom: 0.7em;">تایید بازدید جدید: </h6>
-                                                        {% if boss_task.new_visit.type == 'sale' %}
-                                                            <span class="sub-text" style="font-size: 0.85em;">{{ boss_task.new_visit.sale_file.title }}</span>
-                                                        {% elif boss_task.new_visit.type == 'rent' %}
-                                                            <span class="sub-text" style="font-size: 0.85em;">{{ boss_task.new_visit.rent_file.title }}</span>
-                                                        {% endif %}
                                                     {% elif boss_task.type == 'ss' %}
                                                         <h6 class="title" style="margin-bottom: 0.7em;">تایید نشست جدید: </h6>
                                                         {% if boss_task.new_session.type == 'sale' %}
                                                             <span class="sub-text" style="font-size: 0.85em;">{{ boss_task.new_session.sale_file.title }}</span>
                                                         {% elif boss_task.new_session.type == 'rent' %}
                                                             <span class="sub-text" style="font-size: 0.85em;">{{ boss_task.new_session.rent_file.title }}</span>
-                                                        {% endif %}
-                                                    {% elif boss_task.type == 'rv' %}
-                                                        <h6 class="title" style="margin-bottom: 0.7em;">نتیجه بازدید: </h6>
-                                                        {% if boss_task.result_visit.type == 'sale' %}
-                                                            <span class="sub-text" style="font-size: 0.85em;">{{ boss_task.result_visit.sale_file.title }}</span>
-                                                        {% elif boss_task.result_visit.type == 'rent' %}
-                                                            <span class="sub-text" style="font-size: 0.85em;">{{ boss_task.result_visit.rent_file.title }}</span>
                                                         {% endif %}
                                                     {% elif boss_task.type == 'rs' %}
                                                         <h6 class="title" style="margin-bottom: 0.7em;">نتیجه نشست: </h6>
@@ -179,16 +159,13 @@
                                                         {% elif boss_task.result_session.type == 'rent' %}
                                                             <span class="sub-text" style="font-size: 0.85em;">{{ boss_task.result_session.rent_file.title }}</span>
                                                         {% endif %}
-                                                    {% elif boss_task.type == 'ts' %}
-                                                        <h6 class="title" style="margin-bottom: 0.7em;">بررسی وظیفه تحویل داده شده:</h6>
-                                                        <span class="sub-text" style="font-size: 0.85em;">{{ boss_task.ur_task.title|farsi_number }}</span>
                                                     {% endif %}
                                                 </div>
                                             </div>
                                         </div>
         
                                         <!-- Approve - Delete -->
-                                        {% if request.user.title == 'bs' or request.user.sub_district == visit.sale_file.sub_district or request.user.sub_district == visit.rent_file.sub_district %}
+                                        {% if request.user.title == 'bs' %}
                                             <div class="project-meta">
                                                 <a href="{% url 'boss_task_approve' boss_task.pk boss_task.code %}" class="btn btn-primary justify-center" style="margin-top: 1em;"><em class="icon ni ni-edit"></em><span>تایید</span></a>
                                                 <a href="{% url 'boss_task_delete' boss_task.pk boss_task.code %}" class="btn btn-danger justify-center" style="margin-top: 1em;"><em class="icon ni ni-delete"></em><span>حذف</span></a>
@@ -215,7 +192,5 @@
     <!-- end: Pagination -->
 
 {% endblock %}
-
-
 
 

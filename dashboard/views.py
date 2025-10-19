@@ -111,27 +111,12 @@ class DashboardView(ReadOnlyPermissionMixin, TemplateView):
             thirty_days_ago_str = thirty_days_ago.strftime('%Y/%m/%d')
             seven_days_ago_str = seven_days_ago.strftime('%Y/%m/%d')
 
-            visits_last_30_days = models.Visit.objects.select_related(
-                'agent', 'sale_file', 'rent_file', 'buyer', 'renter'
-            ).filter(
-                agent=agent,
-                date__gte=thirty_days_ago_str
-            ).count()
-
-            visits_last_7_days = models.Visit.objects.select_related(
-                'agent', 'sale_file', 'rent_file', 'buyer', 'renter'
-            ).filter(
-                agent=agent,
-                date__gte=seven_days_ago_str
-            ).count()
-
             sessions_last_30_days = models.Session.objects.select_related(
                 'agent', 'sale_file', 'rent_file', 'buyer', 'renter'
             ).filter(
                 agent=agent,
                 date__gte=thirty_days_ago_str
             ).count()
-
             sessions_last_7_days = models.Session.objects.select_related(
                 'agent', 'sale_file', 'rent_file', 'buyer', 'renter'
             ).filter(
@@ -139,8 +124,6 @@ class DashboardView(ReadOnlyPermissionMixin, TemplateView):
                 date__gte=seven_days_ago_str
             ).count()
 
-            context['visits_last_30_days'] = visits_last_30_days
-            context['visits_last_7_days'] = visits_last_7_days
             context['sessions_last_30_days'] = sessions_last_30_days
             context['sessions_last_7_days'] = sessions_last_7_days
         return context
@@ -179,30 +162,21 @@ class AgentDetailView(DetailView):
         today = timezone.now().date()
         thirty_days_ago = today - timedelta(days=30)
         seven_days_ago = today - timedelta(days=7)
-
-        visits_counts = models.Visit.objects.filter(
-            agent=agent
-        ).aggregate(
-            visits_30_days=Count('id', filter=Q(date__gte=thirty_days_ago)),
-            visits_7_days=Count('id', filter=Q(date__gte=seven_days_ago))
-        )
         sessions_counts = models.Session.objects.filter(
             agent=agent
         ).aggregate(
             sessions_30_days=Count('id', filter=Q(date__gte=thirty_days_ago)),
             sessions_7_days=Count('id', filter=Q(date__gte=seven_days_ago))
         )
+
         context.update({
             'sale_files': counts_data['sale_files_count'],
             'rent_files': counts_data['rent_files_count'],
             'buyers': counts_data['buyers_count'],
             'renters': counts_data['renters_count'],
-            'visits_last_30_days': visits_counts['visits_30_days'],
-            'visits_last_7_days': visits_counts['visits_7_days'],
             'sessions_last_30_days': sessions_counts['sessions_30_days'],
             'sessions_last_7_days': sessions_counts['sessions_7_days'],
         })
-
         return context
 
 
@@ -3163,208 +3137,26 @@ def toggle_mark_renter(request, object_type, object_id):
         })
 
 
-# ---------------------------------- Tasks ---------------------------------
-class TaskBossURListView(ReadOnlyPermissionMixin, ListView):
-    model = models.Task
-    template_name = 'dashboard/tasks/task_bs_ur_list.html'
-    context_object_name = 'tasks'
+# -------------------------------- Reminders -------------------------------
+class ReminderListView(ReadOnlyPermissionMixin, ListView):
+    model = models.Reminder
+    template_name = 'dashboard/reminders/reminder_list.html'
+    context_object_name = 'reminders'
     paginate_by = 6
-    permission_model = 'Task'
+    permission_model = 'Reminder'
 
     def get_queryset(self):
-        if self.request.user.title == 'bs':
-            queryset = models.Task.objects.select_related('agent', 'sale_file', 'rent_file', 'buyer', 'renter',
-                                                          'agent__sub_district').filter(status='UR')
-            return queryset
-        else:
-            return models.Task.objects.none()
+        agent = self.request.user
+        queryset = models.Reminder.objects.select_related('agent', 'sale_file', 'rent_file', 'buyer', 'renter',
+                                                      'agent__sub_district').filter(agent=agent)
+        return queryset
 
 
-class TaskBossOPListView(ReadOnlyPermissionMixin, ListView):
-    model = models.Task
-    template_name = 'dashboard/tasks/task_bs_op_list.html'
-    context_object_name = 'tasks'
-    paginate_by = 6
-    permission_model = 'Task'
-
-    def get_queryset(self):
-        if self.request.user.title == 'bs':
-            queryset = models.Task.objects.select_related('agent', 'sale_file', 'rent_file', 'buyer', 'renter',
-                                                          'agent__sub_district').filter(status='OP')
-            return queryset
-        else:
-            return models.Task.objects.none()
-
-
-class TaskBossCLListView(ReadOnlyPermissionMixin, ListView):
-    model = models.Task
-    template_name = 'dashboard/tasks/task_bs_cl_list.html'
-    context_object_name = 'tasks'
-    paginate_by = 6
-    permission_model = 'Task'
-
-    def get_queryset(self):
-        if self.request.user.title == 'bs':
-            queryset = models.Task.objects.select_related('agent', 'sale_file', 'rent_file', 'buyer', 'renter',
-                                                          'agent__sub_district').filter(status='CL')
-            return queryset
-        else:
-            return models.Task.objects.none()
-
-
-class TaskFPListView(ReadOnlyPermissionMixin, ListView):
-    model = models.Task
-    template_name = 'dashboard/tasks/task_fp_list.html'
-    context_object_name = 'tasks'
-    paginate_by = 6
-    permission_model = 'Task'
-
-    def get_queryset(self):
-        if self.request.user.title == 'bs':
-            queryset = models.Task.objects.select_related('agent', 'sale_file', 'rent_file', 'buyer', 'renter',
-                                                          'agent__sub_district').filter(type='fp')
-            form = forms.TaskFilterForm(self.request.GET)
-            if form.is_valid():
-                queryset_filtered = queryset
-                if form.cleaned_data['status']:
-                    queryset_filtered = queryset_filtered.filter(status=form.cleaned_data['status'])
-                queryset_filtered = list(queryset_filtered)
-                return queryset_filtered
-            return queryset
-
-        elif self.request.user.title == 'fp':
-            agent = self.request.user
-            queryset = models.Task.objects.select_related('agent', 'sale_file', 'rent_file', 'buyer', 'renter',
-                                                          'agent__sub_district').filter(agent=agent).filter(type='fp')
-            form = forms.TaskFilterForm(self.request.GET)
-            if form.is_valid():
-                queryset_filtered = queryset
-                if form.cleaned_data['status']:
-                    queryset_filtered = queryset_filtered.filter(status=form.cleaned_data['status'])
-                queryset_filtered = list(queryset_filtered)
-                return queryset_filtered
-            return queryset
-        else:
-            return models.Task.objects.none()
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        form = forms.TaskFilterForm(self.request.GET)
-        context['filter_form'] = form
-        return context
-
-
-class TaskCPListView(ReadOnlyPermissionMixin, ListView):
-    model = models.Task
-    template_name = 'dashboard/tasks/task_cp_list.html'
-    context_object_name = 'tasks'
-    paginate_by = 6
-    permission_model = 'Task'
-
-    def get_queryset(self):
-        if self.request.user.title == 'bs':
-            queryset = models.Task.objects.select_related('agent', 'sale_file', 'rent_file', 'buyer', 'renter',
-                                                          'agent__sub_district').filter(type='cp')
-            form = forms.TaskFilterForm(self.request.GET)
-            if form.is_valid():
-                queryset_filtered = queryset
-                if form.cleaned_data['status']:
-                    queryset_filtered = queryset_filtered.filter(status=form.cleaned_data['status'])
-                queryset_filtered = list(queryset_filtered)
-                return queryset_filtered
-            return queryset
-
-        elif self.request.user.title == 'cp':
-            agent = self.request.user
-            queryset = models.Task.objects.select_related('agent', 'sale_file', 'rent_file', 'buyer', 'renter',
-                                                          'agent__sub_district').filter(agent=agent).filter(type='cp')
-            form = forms.TaskFilterForm(self.request.GET)
-            if form.is_valid():
-                queryset_filtered = queryset
-                if form.cleaned_data['status']:
-                    queryset_filtered = queryset_filtered.filter(status=form.cleaned_data['status'])
-                queryset_filtered = list(queryset_filtered)
-                return queryset_filtered
-            return queryset
-        else:
-            return models.Task.objects.none()
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        form = forms.TaskFilterForm(self.request.GET)
-
-        context['filter_form'] = form
-        return context
-
-
-class TaskBTListView(ReadOnlyPermissionMixin, ListView):
-    model = models.Task
-    template_name = 'dashboard/tasks/task_bt_list.html'
-    context_object_name = 'tasks'
-    paginate_by = 6
-    permission_model = 'Task'
-
-    def get_queryset(self):
-        if self.request.user.title == 'bs':
-            queryset = models.Task.objects.select_related('agent', 'sale_file', 'rent_file', 'buyer', 'renter',
-                                                          'agent__sub_district').filter(type='bt')
-            form = forms.TaskFilterForm(self.request.GET)
-            if form.is_valid():
-                queryset_filtered = queryset
-                if form.cleaned_data['status']:
-                    queryset_filtered = queryset_filtered.filter(status=form.cleaned_data['status'])
-                queryset_filtered = list(queryset_filtered)
-                return queryset_filtered
-            return queryset
-
-        elif self.request.user.title == 'bt':
-            agent = self.request.user
-            queryset = models.Task.objects.select_related('agent', 'sale_file', 'rent_file', 'buyer', 'renter',
-                                                          'agent__sub_district').filter(agent=agent).filter(type='bt')
-            form = forms.TaskFilterForm(self.request.GET)
-            if form.is_valid():
-                queryset_filtered = queryset
-                if form.cleaned_data['status']:
-                    queryset_filtered = queryset_filtered.filter(status=form.cleaned_data['status'])
-                queryset_filtered = list(queryset_filtered)
-                return queryset_filtered
-            return queryset
-        else:
-            return models.Task.objects.none()
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        form = forms.TaskFilterForm(self.request.GET)
-
-        context['filter_form'] = form
-        return context
-
-
-class TaskDetailView(ReadOnlyPermissionMixin, DetailView):
-    model = models.Task
-    context_object_name = 'task'
-    template_name = 'dashboard/tasks/task_detail.html'
-    permission_model = 'Task'
-
-    def get_queryset(self):
-        return models.Task.objects.select_related(
-            'agent',
-            'agent__sub_district',
-            'agent__sub_district__district',
-            'agent__sub_district__district__city',
-            'agent__sub_district__district__city__province',
-            'sale_file',
-            'rent_file',
-            'buyer',
-            'renter',
-        )
-
-
-class TaskCreateView(PermissionRequiredMixin, CreateView):
-    model = models.Task
-    form_class = forms.TaskCreateForm
-    template_name = 'dashboard/tasks/task_create.html'
-    permission_model = 'Task'
+class ReminderCreateView(PermissionRequiredMixin, CreateView):
+    model = models.Reminder
+    form_class = forms.ReminderCreateForm
+    template_name = 'dashboard/reminders/reminder_create.html'
+    permission_model = 'Reminder'
     permission_action = 'create'
 
     def get_form_kwargs(self):
@@ -3374,9 +3166,9 @@ class TaskCreateView(PermissionRequiredMixin, CreateView):
 
     def get_initial(self):
         initial = super().get_initial()
-        deadline = self.request.GET.get('deadline')
-        if deadline:
-            initial['deadline'] = deadline
+        date = self.request.GET.get('date')
+        if date:
+            initial['date'] = date
         return initial
 
     def post(self, request, *args, **kwargs):
@@ -3387,7 +3179,7 @@ class TaskCreateView(PermissionRequiredMixin, CreateView):
             return self.form_invalid(form)
 
     def form_valid(self, form):
-        messages.success(self.request, "وظیفه جدید در سامانه ثبت شد.")
+        messages.success(self.request, "یادآور جدید در سامانه ثبت شد.")
         return super().form_valid(form)
 
     def form_invalid(self, form):
@@ -3395,53 +3187,19 @@ class TaskCreateView(PermissionRequiredMixin, CreateView):
         return self.render_to_response(self.get_context_data(form=form))
 
     def get_success_url(self):
-        task_type = self.object.type
-        if task_type == 'cp':
-            return reverse('task_cp_list')
-        elif task_type == 'fp':
-            return reverse('task_fp_list')
-        elif task_type == 'bt':
-            return reverse('task_bt_list')
-        return reverse('dashboard')
+        return reverse('reminder_list')
 
 
-class TaskUpdateView(PermissionRequiredMixin, UpdateView):
-    model = models.Task
-    form_class = forms.TaskCreateForm
-    template_name = 'dashboard/tasks/task_update.html'
-    context_object_name = 'task'
-    permission_model = 'Task'
-    permission_action = 'update'
-
-    def form_valid(self, form):
-        messages.success(self.request, "تغییرات شما در سامانه ثبت شد.")
-        return super().form_valid(form)
-
-    def form_invalid(self, form):
-        self.object = None
-        return self.render_to_response(self.get_context_data(form=form))
-
-    def get_success_url(self):
-        task_type = self.object.type
-        if task_type == 'cp':
-            return reverse('task_cp_list')
-        elif task_type == 'fp':
-            return reverse('task_fp_list')
-        elif task_type == 'bt':
-            return reverse('task_bt_list')
-        return reverse('dashboard')
-
-
-class TaskDeleteView(PermissionRequiredMixin, DeleteView):
-    model = models.Task
-    template_name = 'dashboard/tasks/task_delete.html'
-    success_url = reverse_lazy('dashboard')
-    context_object_name = 'task'
-    permission_model = 'Task'
+class ReminderDeleteView(PermissionRequiredMixin, DeleteView):
+    model = models.Reminder
+    template_name = 'dashboard/reminders/reminder_delete.html'
+    success_url = reverse_lazy('reminder_list')
+    context_object_name = 'reminder'
+    permission_model = 'Reminder'
     permission_action = 'delete'
 
     def form_valid(self, form):
-        messages.error(self.request, "وظیفه مربوطه از سامانه حذف شد.")
+        messages.error(self.request, "یادآور مربوطه از سامانه حذف شد.")
         return super().form_valid(form)
 
     def form_invalid(self, form):
@@ -3449,31 +3207,20 @@ class TaskDeleteView(PermissionRequiredMixin, DeleteView):
         return self.render_to_response(self.get_context_data(form=form))
 
 
-class TaskResultView(PermissionRequiredMixin, UpdateView):
-    model = models.Task
-    form_class = forms.TaskResultForm
-    template_name = 'dashboard/tasks/task_result.html'
-    context_object_name = 'task'
-    permission_model = 'Task'
-    permission_action = 'update'
-
-    def form_valid(self, form):
-        messages.success(self.request, "تغییرات شما در سامانه ثبت شد (و توسط مدیر مشاهده خواهد شد).")
-        return super().form_valid(form)
-
-    def form_invalid(self, form):
-        self.object = None
-        return self.render_to_response(self.get_context_data(form=form))
-
-    def get_success_url(self):
-        task_type = self.object.type
-        if task_type == 'cp':
-            return reverse('task_cp_list')
-        elif task_type == 'fp':
-            return reverse('task_fp_list')
-        elif task_type == 'bt':
-            return reverse('task_bt_list')
-        return reverse('dashboard')
+def dated_reminder_list_view(request):
+    user = request.user
+    date = request.GET.get('date')
+    reminders = models.Reminder.objects.filter(agent=user)
+    if date:
+        if user.title != 'bs':
+            reminders = (models.Reminder.objects.select_related('agent', 'sale_file', 'rent_file', 'buyer', 'renter')
+                         .filter(agent=user).filter(date=date))
+    context = {
+        'user': user,
+        'date': date,
+                'reminders': reminders,
+    }
+    return render(request, 'dashboard/reminders/dated_reminder_list.html', context=context)
 
 
 # -------------------------------- BossTasks -------------------------------
@@ -3485,8 +3232,6 @@ class TaskBossListView(ListView):
 
     def get_queryset(self):
         queryset = models.TaskBoss.objects.select_related(
-            'ur_task',
-
             'new_sale_file',
             'new_sale_file__created_by',
             'new_sale_file__sub_district',
@@ -3512,13 +3257,6 @@ class TaskBossListView(ListView):
             'new_person',
             'new_person__created_by',
 
-            'new_visit',
-            'new_visit__agent',
-            'new_visit__sale_file',
-            'new_visit__rent_file',
-            'new_visit__buyer',
-            'new_visit__renter',
-
             'new_session',
             'new_session__agent',
             'new_session__sale_file',
@@ -3526,8 +3264,6 @@ class TaskBossListView(ListView):
             'new_session__buyer',
             'new_session__renter',
 
-            'result_visit',
-            'result_visit__agent',
             'result_session',
             'result_session__agent'
         ).prefetch_related(
@@ -3592,14 +3328,6 @@ class TaskBossApproveView(View):
                 'boss_task': boss_task,
                 'person': person,
             })
-        if boss_task.type == 'vs':
-            visit = boss_task.new_visit
-            form = forms.CombinedVisitStatusForm(visit_instance=visit, boss_instance=boss_task)
-            return render(request, 'dashboard/boss/boss_task_approve.html', {
-                'form': form,
-                'boss_task': boss_task,
-                'visit': visit,
-            })
         if boss_task.type == 'ss':
             session = boss_task.new_session
             form = forms.CombinedSessionStatusForm(session_instance=session, boss_instance=boss_task)
@@ -3608,14 +3336,6 @@ class TaskBossApproveView(View):
                 'boss_task': boss_task,
                 'session': session,
             })
-        if boss_task.type == 'rv':
-            result_visit = boss_task.result_visit
-            form = forms.CombinedVisitResultForm(result_visit_instance=result_visit, boss_instance=boss_task)
-            return render(request, 'dashboard/boss/boss_task_approve.html', {
-                'form': form,
-                'boss_task': boss_task,
-                'result_visit': result_visit,
-            })
         if boss_task.type == 'rs':
             result_session = boss_task.result_session
             form = forms.CombinedSessionResultForm(result_session_instance=result_session, boss_instance=boss_task)
@@ -3623,14 +3343,6 @@ class TaskBossApproveView(View):
                 'form': form,
                 'boss_task': boss_task,
                 'result_session': result_session,
-            })
-        if boss_task.type == 'ts':
-            task = boss_task.ur_task
-            form = forms.CombinedTaskStatusForm(task_instance=task, boss_instance=boss_task)
-            return render(request, 'dashboard/boss/boss_task_approve.html', {
-                'form': form,
-                'boss_task': boss_task,
-                'task': task,
             })
 
     def post(self, request, pk, code):
@@ -3695,18 +3407,6 @@ class TaskBossApproveView(View):
                 'boss_task': boss_task,
                 'person': person,
             })
-        if boss_task.type == 'vs':
-            visit = boss_task.new_visit
-            form = forms.CombinedVisitStatusForm(request.POST, visit_instance=visit, boss_instance=boss_task)
-            if form.is_valid():
-                form.save()
-                messages.success(self.request, "تغییرات در سامانه ثبت شد.")
-                return redirect('boss_task_list')
-            return render(request, 'dashboard/boss/boss_task_approve.html', {
-                'form': form,
-                'boss_task': boss_task,
-                'visit': visit,
-            })
         if boss_task.type == 'ss':
             session = boss_task.new_session
             form = forms.CombinedSessionStatusForm(request.POST, session_instance=session, boss_instance=boss_task)
@@ -3718,19 +3418,6 @@ class TaskBossApproveView(View):
                 'form': form,
                 'boss_task': boss_task,
                 'session': session,
-            })
-        if boss_task.type == 'rv':
-            result_visit = boss_task.result_visit
-            form = forms.CombinedVisitResultForm(request.POST, result_visit_instance=result_visit,
-                                                 boss_instance=boss_task)
-            if form.is_valid():
-                form.save()
-                messages.success(self.request, "تغییرات در سامانه ثبت شد.")
-                return redirect('boss_task_list')
-            return render(request, 'dashboard/boss/boss_task_approve.html', {
-                'form': form,
-                'boss_task': boss_task,
-                'result_visit': result_visit,
             })
         if boss_task.type == 'rs':
             result_session = boss_task.result_session
@@ -3744,18 +3431,6 @@ class TaskBossApproveView(View):
                 'form': form,
                 'boss_task': boss_task,
                 'result_session': result_session,
-            })
-        if boss_task.type == 'ts':
-            task = boss_task.ur_task
-            form = forms.CombinedTaskStatusForm(request.POST, task_instance=task, boss_instance=boss_task)
-            if form.is_valid():
-                form.save()
-                messages.success(self.request, "تغییرات در سامانه ثبت شد.")
-                return redirect('boss_task_list')
-            return render(request, 'dashboard/boss/boss_task_approve.html', {
-                'form': form,
-                'boss_task': boss_task,
-                'task': task,
             })
 
 
@@ -4031,236 +3706,6 @@ class ReportListView(ReadOnlyPermissionMixin, ListView):
 
 
 # --------------------------------- Services --------------------------------
-class VisitListView(ReadOnlyPermissionMixin, ListView):
-    model = models.Visit
-    template_name = 'dashboard/services/visit_list.html'
-    context_object_name = 'visits'
-    paginate_by = 6
-    permission_model = 'Visit'
-
-    def get_queryset(self):
-        if self.request.user.title == 'bs':
-            queryset = (models.Visit.objects
-                        .select_related('agent', 'agent__sub_district', 'sale_file', 'rent_file', 'buyer', 'renter').all())
-            form = forms.ServiceFilterForm(self.request.GET)
-            if form.is_valid():
-                queryset_filtered = queryset
-                if form.cleaned_data['type']:
-                    queryset_filtered = queryset_filtered.filter(type=form.cleaned_data['type'])
-                if form.cleaned_data['status']:
-                    queryset_filtered = queryset_filtered.filter(status=form.cleaned_data['status'])
-                queryset_filtered = list(queryset_filtered)
-                return queryset_filtered
-            return queryset
-        else:
-            if not self.request.user.sub_district:
-                return models.Visit.objects.none()
-
-            user_sub_district = self.request.user.sub_district
-            sale_visits = models.Visit.objects.filter(
-                sale_file_code__isnull=False,
-                sale_file_code__in=models.SaleFile.objects.filter(
-                    sub_district=user_sub_district
-                ).values_list('code', flat=True)
-            )
-            rent_visits = models.Visit.objects.filter(
-                rent_file_code__isnull=False,
-                rent_file_code__in=models.RentFile.objects.filter(
-                    sub_district=user_sub_district
-                ).values_list('code', flat=True)
-            )
-            queryset = (sale_visits | rent_visits).distinct()
-            queryset = queryset.filter(agent=self.request.user)
-            form = forms.ServiceFilterForm(self.request.GET)
-            if form.is_valid():
-                queryset_filtered = queryset
-                if form.cleaned_data['type']:
-                    queryset_filtered = queryset_filtered.filter(type=form.cleaned_data['type'])
-                if form.cleaned_data['status']:
-                    queryset_filtered = queryset_filtered.filter(status=form.cleaned_data['status'])
-                queryset_filtered = list(queryset_filtered)
-                return queryset_filtered
-
-            return queryset
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        form = forms.ServiceFilterForm(self.request.GET)
-        context['filter_form'] = form
-        return context
-
-
-class VisitCreateView(PermissionRequiredMixin, CreateView):
-    model = models.Visit
-    form_class = forms.VisitCreateForm
-    template_name = 'dashboard/services/visit_create.html'
-    permission_model = 'Visit'
-    permission_action = 'create'
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs['user'] = self.request.user
-        sale_file_code = self.request.GET.get('sale_file_code')
-        if sale_file_code:
-            kwargs['sale_file_code'] = sale_file_code
-        rent_file_code = self.request.GET.get('rent_file_code')
-        if rent_file_code:
-            kwargs['rent_file_code'] = rent_file_code
-        buyer_code = self.request.GET.get('buyer_code')
-        if buyer_code:
-            kwargs['buyer_code'] = buyer_code
-        renter_code = self.request.GET.get('renter_code')
-        if renter_code:
-            kwargs['renter_code'] = renter_code
-        return kwargs
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        sale_file_code = self.request.GET.get('sale_file_code')
-        if sale_file_code:
-            try:
-                sale_file = models.SaleFile.objects.get(code=sale_file_code)
-                context['sale_file'] = sale_file
-                context['pre_selected_sale_file'] = True
-            except models.SaleFile.DoesNotExist:
-                pass
-        rent_file_code = self.request.GET.get('rent_file_code')
-        if rent_file_code:
-            try:
-                rent_file = models.RentFile.objects.get(code=rent_file_code)
-                context['rent_file'] = rent_file
-                context['pre_selected_rent_file'] = True
-            except models.RentFile.DoesNotExist:
-                pass
-        buyer_code = self.request.GET.get('buyer_code')
-        if buyer_code:
-            try:
-                buyer = models.Buyer.objects.get(code=buyer_code)
-                context['buyer'] = buyer
-                context['pre_selected_buyer'] = True
-            except models.Buyer.DoesNotExist:
-                pass
-        renter_code = self.request.GET.get('renter_code')
-        if renter_code:
-            try:
-                renter = models.Renter.objects.get(code=renter_code)
-                context['renter'] = renter
-                context['pre_selected_renter'] = True
-            except models.Renter.DoesNotExist:
-                pass
-        return context
-
-    def post(self, request, *args, **kwargs):
-        form = self.get_form()
-        if form.is_valid():
-            return self.form_valid(form)
-        else:
-            return self.form_invalid(form)
-
-    def form_valid(self, form):
-        messages.success(self.request, "بازدید جدید در سامانه ثبت شد.")
-        return super().form_valid(form)
-
-    def form_invalid(self, form):
-        self.object = None
-        return self.render_to_response(self.get_context_data(form=form))
-
-    def get_success_url(self):
-        return reverse('visit_list')
-
-
-class VisitUpdateView(PermissionRequiredMixin, UpdateView):
-    model = models.Visit
-    form_class = forms.VisitCreateForm
-    template_name = 'dashboard/services/visit_update.html'
-    context_object_name = 'visit'
-    permission_model = 'Visit'
-    permission_action = 'update'
-
-    def get_queryset(self):
-        return models.Visit.objects.select_related(
-            'agent',
-            'agent__sub_district',
-            'agent__sub_district__district',
-            'agent__sub_district__district__city',
-            'agent__sub_district__district__city__province',
-            'sale_file',
-            'rent_file',
-            'buyer',
-            'renter',
-        )
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs['user'] = self.request.user
-        return kwargs
-
-    def form_valid(self, form):
-        messages.success(self.request, "تغییرات شما در سامانه ثبت شد.")
-        return super().form_valid(form)
-
-    def form_invalid(self, form):
-        return self.render_to_response(self.get_context_data(form=form))
-
-    def get_success_url(self):
-        return reverse('visit_list')
-
-
-class VisitDeleteView(PermissionRequiredMixin, DeleteView):
-    model = models.Visit
-    template_name = 'dashboard/services/visit_delete.html'
-    success_url = reverse_lazy('visit_list')
-    context_object_name = 'visit'
-    permission_model = 'Visit'
-    permission_action = 'delete'
-
-    def form_valid(self, form):
-        messages.error(self.request, "بازدید مربوطه از سامانه حذف شد.")
-        return super().form_valid(form)
-
-    def form_invalid(self, form):
-        return self.render_to_response(self.get_context_data(form=form))
-
-
-class VisitDetailView(ReadOnlyPermissionMixin, DetailView):
-    model = models.Visit
-    context_object_name = 'visit'
-    template_name = 'dashboard/services/visit_detail.html'
-    permission_model = 'Visit'
-
-    def get_queryset(self):
-        return models.Visit.objects.select_related(
-            'agent',
-            'agent__sub_district',
-            'agent__sub_district__district',
-            'agent__sub_district__district__city',
-            'agent__sub_district__district__city__province',
-            'sale_file',
-            'rent_file',
-            'buyer',
-            'renter',
-        )
-
-
-class VisitResultView(PermissionRequiredMixin, UpdateView):
-    model = models.Visit
-    form_class = forms.VisitResultForm
-    template_name = 'dashboard/services/visit_result.html'
-    context_object_name = 'visit'
-    permission_model = 'Visit'
-    permission_action = 'update'
-
-    def form_valid(self, form):
-        messages.success(self.request, "تغییرات شما در سامانه ثبت شد (و توسط مدیر مشاهده خواهد شد).")
-        return super().form_valid(form)
-
-    def form_invalid(self, form):
-        return self.render_to_response(self.get_context_data(form=form))
-
-    def get_success_url(self):
-        return reverse('visit_list')
-
-
 class SessionListView(ReadOnlyPermissionMixin, ListView):
     model = models.Session
     template_name = 'dashboard/services/session_list.html'
@@ -4821,24 +4266,6 @@ def calendar_next_2_month_view(request):
     return render(request, 'dashboard/calendar/2next.html', context=context)
 
 
-def dated_task_list_view(request):
-    user = request.user
-    date = request.GET.get('date')
-    tasks = models.Task.objects.filter(agent=user)
-    if date:
-        if user.title != 'bs':
-            tasks = (models.Task.objects.select_related('agent', 'sale_file', 'rent_file', 'buyer', 'renter')
-                     .filter(agent=user).filter(deadline=date))
-        else:
-            tasks = models.Task.objects.select_related('agent', 'sale_file', 'rent_file', 'buyer', 'renter').filter(deadline=date)
-    context = {
-        'user': user,
-        'date': date,
-        'tasks': tasks,
-    }
-    return render(request, 'dashboard/tasks/dated_task_list.html', context=context)
-
-
 # ------------------------------- Interactions ------------------------------
 class AnnouncementListView(LoginRequiredMixin, ListView):
     model = models.Announcement
@@ -5153,6 +4580,5 @@ class InteractionDetailView(LoginRequiredMixin, DetailView):
         context = super().get_context_data(**kwargs)
         context['announcement_object'] = self.object.announcement.content_object
         return context
-
 
 

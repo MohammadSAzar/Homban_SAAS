@@ -69,25 +69,24 @@
                                     {% for day_info in days_data %}
                                         <li class="preview-icon-item">
                                             <span class="preview-icon-name" style="font-size: 0.8em;">{{ day_info.date|weekday_finder }}</span>
-
                                             {% if day_info.is_today %}
                                                 <!-- Today -->
                                                 <div class="preview-icon-box card" style="background-color: #B2DFDB">
                                                     {{ day_info.date }}
-                                                    <!-- Task -->
-                                                    <a href="{% url 'task_create' %}?deadline={{ day_info.date }}" class="preview-icon-name" target="_blank" style="margin-top: 2em;">
+                                                    <!-- Reminder -->
+                                                    <a href="{% url 'reminder_create' %}?date={{ day_info.date }}" class="preview-icon-name" title="افزودن یادآور" target="_blank" style="margin-top: 2em;">
                                                         <em class="icon ni ni-plus" style="font-size: 1.2em;"></em>
                                                     </a>
-                                                    <a href="{% url 'dated_task_list' %}?date={{ day_info.date }}" class="preview-icon-name" target="_blank" style="margin-top: 2em;">
+                                                    <a href="{% url 'dated_reminder_list' %}?date={{ day_info.date }}" class="preview-icon-name" title="لیست یادآورها" target="_blank" style="margin-top: 2em;">
                                                         <em class="icon ni ni-list" style="font-size: 1.2em;"></em>
                                                     </a>
                                                     <!-- Report -->
                                                     {% if day_info.has_report %}
-                                                        <a href="{% url 'report_detail' user.pk day_info.date %}" class="preview-icon-name" target="_blank" style="margin-top: 2em;">
+                                                        <a href="{% url 'report_detail' user.pk day_info.date %}" class="preview-icon-name" title="مشاهده گزارش" target="_blank" style="margin-top: 2em;">
                                                             <em class="icon ni ni-file-text" style="font-size: 1.2em; color: #4CAF50;"></em>
                                                         </a>
                                                     {% else %}
-                                                        <a href="{% url 'report_create' %}" class="preview-icon-name" target="_blank" style="margin-top: 2em;">
+                                                        <a href="{% url 'report_create' %}" class="preview-icon-name" title="افزودن گزارش" target="_blank" style="margin-top: 2em;">
                                                             <em class="icon ni ni-edit" style="font-size: 1.2em; color: #2196F3;"></em>
                                                         </a>
                                                     {% endif %}
@@ -97,16 +96,16 @@
                                                 <!-- Past -->
                                                 <div class="preview-icon-box card">
                                                     {{ day_info.date }}
-                                                    <!-- Task Links -->
-                                                    <a href="{% url 'task_create' %}?deadline={{ day_info.date }}" class="preview-icon-name" target="_blank" style="margin-top: 2em;">
+                                                    <!-- Reminders -->
+                                                    <span class="preview-icon-name" style="margin-top: 2em; opacity: 0.3; cursor: not-allowed;">
                                                         <em class="icon ni ni-plus" style="font-size: 1.2em;"></em>
-                                                    </a>
-                                                    <a href="{% url 'dated_task_list' %}?date={{ day_info.date }}" class="preview-icon-name" target="_blank" style="margin-top: 2em;">
+                                                    </span>
+                                                    <a href="{% url 'dated_reminder_list' %}?date={{ day_info.date }}" title="لیست یادآورها" class="preview-icon-name" target="_blank" style="margin-top: 2em;">
                                                         <em class="icon ni ni-list" style="font-size: 1.2em;"></em>
                                                     </a>
                                                     <!-- Report -->
                                                     {% if day_info.has_report %}
-                                                        <a href="{% url 'report_detail' user.pk day_info.date %}" class="preview-icon-name" target="_blank" style="margin-top: 2em;">
+                                                        <a href="{% url 'report_detail' user.pk day_info.date %}" title="مشاهده گزارش" class="preview-icon-name" target="_blank" style="margin-top: 2em;">
                                                             <em class="icon ni ni-file-text" style="font-size: 1.2em; color: #4CAF50;"></em>
                                                         </a>
                                                     {% else %}
@@ -120,11 +119,11 @@
                                                 <!-- Future -->
                                                 <div class="preview-icon-box card" style="opacity: 0.6;">
                                                     {{ day_info.date }}
-                                                    <!-- Task -->
-                                                    <a href="{% url 'task_create' %}?deadline={{ day_info.date }}" class="preview-icon-name" target="_blank" style="margin-top: 2em;">
+                                                    <!-- Reminder -->
+                                                    <a href="{% url 'reminder_create' %}?date={{ day_info.date }}" title="افزودن یادآور" class="preview-icon-name" target="_blank" style="margin-top: 2em;">
                                                         <em class="icon ni ni-plus" style="font-size: 1.2em;"></em>
                                                     </a>
-                                                    <a href="{% url 'dated_task_list' %}?date={{ day_info.date }}" class="preview-icon-name" target="_blank" style="margin-top: 2em;">
+                                                    <a href="{% url 'dated_reminder_list' %}?date={{ day_info.date }}" title="لیست یادآورها" class="preview-icon-name" target="_blank" style="margin-top: 2em;">
                                                         <em class="icon ni ni-list" style="font-size: 1.2em;"></em>
                                                     </a>
                                                     <!-- Report -->
@@ -146,15 +145,8 @@
                                                 <!-- Today -->
                                                 <div class="preview-icon-box card" style="background-color: #B2DFDB">
                                                     {{ day_info.date }}
-                                                    <!-- Tasks -->
-                                                    <a href="{% url 'task_create' %}?deadline={{ day_info.date }}" class="preview-icon-name" target="_blank" style="margin-top: 2em;">
-                                                        <em class="icon ni ni-plus" style="font-size: 1.2em;"></em>
-                                                    </a>
-                                                    <a href="{% url 'dated_task_list' %}?date={{ day_info.date }}" class="preview-icon-name" target="_blank" style="margin-top: 2em;">
-                                                        <em class="icon ni ni-list" style="font-size: 1.2em;"></em>
-                                                    </a>
                                                     <!-- Reports -->
-                                                    <a href="{% url 'report_list' day_info.date %}" class="preview-icon-name" target="_blank" style="margin-top: 2em;">
+                                                    <a href="{% url 'report_list' day_info.date %}" title="لیست یادآورها" class="preview-icon-name" target="_blank" style="margin-top: 2em;">
                                                         <em class="icon ni ni-reports" style="font-size: 1.2em; color: #FF9800;"></em>
                                                     </a>
                                                 </div>
@@ -163,15 +155,8 @@
                                                 <!-- Past -->
                                                 <div class="preview-icon-box card">
                                                     {{ day_info.date }}
-                                                    <!-- Tasks -->
-                                                    <a href="{% url 'task_create' %}?deadline={{ day_info.date }}" class="preview-icon-name" target="_blank" style="margin-top: 2em;">
-                                                        <em class="icon ni ni-plus" style="font-size: 1.2em;"></em>
-                                                    </a>
-                                                    <a href="{% url 'dated_task_list' %}?date={{ day_info.date }}" class="preview-icon-name" target="_blank" style="margin-top: 2em;">
-                                                        <em class="icon ni ni-list" style="font-size: 1.2em;"></em>
-                                                    </a>
                                                     <!-- Reports -->
-                                                    <a href="{% url 'report_list' day_info.date %}" class="preview-icon-name" target="_blank" style="margin-top: 2em;">
+                                                    <a href="{% url 'report_list' day_info.date %}" title="لیست گزارش‌ها" class="preview-icon-name" target="_blank" style="margin-top: 2em;">
                                                         <em class="icon ni ni-reports" style="font-size: 1.2em; color: #FF9800;"></em>
                                                     </a>
                                                 </div>
@@ -180,13 +165,6 @@
                                                 <!-- Future -->
                                                 <div class="preview-icon-box card" style="opacity: 0.6;">
                                                     {{ day_info.date }}
-                                                    <!-- Tasks -->
-                                                    <a href="{% url 'task_create' %}?deadline={{ day_info.date }}" class="preview-icon-name" target="_blank" style="margin-top: 2em;">
-                                                        <em class="icon ni ni-plus" style="font-size: 1.2em;"></em>
-                                                    </a>
-                                                    <a href="{% url 'dated_task_list' %}?date={{ day_info.date }}" class="preview-icon-name" target="_blank" style="margin-top: 2em;">
-                                                        <em class="icon ni ni-list" style="font-size: 1.2em;"></em>
-                                                    </a>
                                                     <!-- Reports -->
                                                     <span class="preview-icon-name" style="margin-top: 2em; opacity: 0.3; cursor: not-allowed;">
                                                         <em class="icon ni ni-reports" style="font-size: 1.2em;"></em>

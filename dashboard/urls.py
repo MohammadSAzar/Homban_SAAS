@@ -15,7 +15,6 @@ urlpatterns = [
     path('calendar/previous-2/', views.calendar_previous_2_month_view, name='previous_2_month'),
     path('calendar/next/', views.calendar_next_month_view, name='next_month'),
     path('calendar/next-2/', views.calendar_next_2_month_view, name='next_2_month'),
-    path('dated-task-list/', views.dated_task_list_view, name='dated_task_list'),
     # sale_file
     path('sale-files/', views.SaleFileListView.as_view(), name='sale_file_list'),
     re_path(r'sale-file/update/(?P<pk>[-\w]+)/(?P<unique_url_id>[-\w]+)/', views.SaleFileUpdateView.as_view(), name='sale_file_update'),
@@ -96,30 +95,17 @@ urlpatterns = [
     path('marked-rent-file-delete/<int:pk>/', views.RentFileMarkDeleteView.as_view(), name='rent_file_mark_delete'),
     path('marked-buyer-delete/<int:pk>/', views.BuyerMarkDeleteView.as_view(), name='buyer_mark_delete'),
     path('marked-renter-delete/<int:pk>/', views.RenterMarkDeleteView.as_view(), name='renter_mark_delete'),
-    # tasks
-    path('tasks/for-files/', views.TaskFPListView.as_view(), name='task_fp_list'),
-    path('tasks/for-customers/', views.TaskCPListView.as_view(), name='task_cp_list'),
-    path('tasks/dual/', views.TaskBTListView.as_view(), name='task_bt_list'),
-    path('tasks/boss/under-review/', views.TaskBossURListView.as_view(), name='task_bs_ur_list'),
-    path('tasks/boss/open/', views.TaskBossOPListView.as_view(), name='task_bs_op_list'),
-    path('tasks/boss/close/', views.TaskBossCLListView.as_view(), name='task_bs_cl_list'),
-    re_path(r'task/update/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/', views.TaskUpdateView.as_view(), name='task_update'),
-    re_path(r'task/result/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/', views.TaskResultView.as_view(), name='task_result'),
-    re_path(r'task/detail/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/', views.TaskDetailView.as_view(), name='task_detail'),
-    re_path(r'task/delete/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/', views.TaskDeleteView.as_view(), name='task_delete'),
-    re_path(r'task/create/', views.TaskCreateView.as_view(), name='task_create'),
+    # reminders
+    path('reminders/', views.ReminderListView.as_view(), name='reminder_list'),
+    re_path(r'reminder/delete/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/', views.ReminderDeleteView.as_view(), name='reminder_delete'),
+    re_path(r'reminder/create/', views.ReminderCreateView.as_view(), name='reminder_create'),
+    path('dated-reminder-list/', views.dated_reminder_list_view, name='dated_reminder_list'),
     # reports
     path('reports-for-boss/<path:date>/', views.ReportListView.as_view(), name='report_list'),
     path('report/create/', views.ReportCreateView.as_view(), name='report_create'),
     path('report-detail/<int:agent_pk>/<path:date>/', views.ReportDetailView.as_view(), name='report_detail'),
     path('report-edit/<int:agent_pk>/<path:date>/', views.ReportUpdateView.as_view(), name='report_update'),
     # services
-    path('services/visits/', views.VisitListView.as_view(), name='visit_list'),
-    re_path(r'visit/update/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/', views.VisitUpdateView.as_view(), name='visit_update'),
-    re_path(r'visit/result/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/', views.VisitResultView.as_view(), name='visit_result'),
-    re_path(r'visit/detail/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/', views.VisitDetailView.as_view(), name='visit_detail'),
-    re_path(r'visit/delete/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/', views.VisitDeleteView.as_view(), name='visit_delete'),
-    re_path(r'visit/create/', views.VisitCreateView.as_view(), name='visit_create'),
     path('services/sessions/', views.SessionListView.as_view(), name='session_list'),
     re_path(r'session/update/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/', views.SessionUpdateView.as_view(), name='session_update'),
     re_path(r'session/result/(?P<pk>[-\w]+)/(?P<code>[-\w]+)/', views.SessionResultView.as_view(), name='session_result'),
@@ -143,6 +129,4 @@ urlpatterns = [
     path('interaction-detail/<int:pk>/', views.InteractionDetailView.as_view(), name='interaction_detail'),
     path('announcement-create/<int:announcement_id>/create-interaction/', views.InteractionCreateView.as_view(), name='interaction_create'),
 ]
-
-
 

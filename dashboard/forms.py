@@ -830,272 +830,8 @@ class SubDistrictCreateForm(forms.ModelForm):
 
 
 # -------------------------------- Services ---------------------------------
-visit_required_fields = ['type', 'date', 'time']
 session_required_fields = ['type', 'date', 'time']
 trade_required_fields = ['session_code', 'type', 'date', 'contract_owner']
-
-
-class VisitCreateForm(forms.ModelForm):
-    class Meta:
-        model = models.Visit
-        fields = ['type', 'agent', 'date', 'time', 'sale_file_code', 'rent_file_code', 'buyer_code', 'renter_code',
-                  'description']
-
-    def __init__(self, *args, **kwargs):
-        self.user = kwargs.pop('user', None)
-        sale_file_code = kwargs.pop('sale_file_code', None)
-        rent_file_code = kwargs.pop('rent_file_code', None)
-        buyer_code = kwargs.pop('buyer_code', None)
-        renter_code = kwargs.pop('renter_code', None)
-        super(VisitCreateForm, self).__init__(*args, **kwargs)
-
-        self.fields['date'] = forms.ChoiceField(
-            choices=models.last_and_next_week_shamsi(),
-            required=True,
-            label=self.fields['date'].label,
-        )
-
-        if sale_file_code:
-            self.fields['sale_file_code'].initial = sale_file_code
-            self.fields['type'].initial = 'sale'
-            self.fields['sale_file_code'].widget.attrs.update({
-                'readonly': True,
-                'class': 'form-control form-control-xl form-control-outlined bg-light',
-                'data-locked': 'true',
-                'title': 'این کد از فایل فروش انتخاب شده پر شده و قابل تغییر نیست'
-            })
-            self.fields['rent_file_code'].widget.attrs.update({
-                'readonly': True,
-                'disabled': True,
-                'class': 'form-control form-control-xl form-control-outlined bg-secondary text-muted',
-                'placeholder': 'غیرفعال - فایل فروش انتخاب شده'
-            })
-            self.fields['renter_code'].widget.attrs.update({
-                'readonly': True,
-                'disabled': True,
-                'class': 'form-control form-control-xl form-control-outlined bg-secondary text-muted',
-                'placeholder': 'غیرفعال - فایل فروش انتخاب شده'
-            })
-            self.fields['type'].widget.attrs.update({
-                'data-locked': 'sale',
-                'class': 'form-control form-control-xl form-control-outlined'
-            })
-        if rent_file_code:
-            self.fields['rent_file_code'].initial = rent_file_code
-            self.fields['type'].initial = 'rent'
-            self.fields['rent_file_code'].widget.attrs.update({
-                'readonly': True,
-                'class': 'form-control form-control-xl form-control-outlined bg-light',
-                'data-locked': 'true',
-                'title': 'این کد از فایل اجاره انتخاب شده پر شده و قابل تغییر نیست'
-            })
-            self.fields['sale_file_code'].widget.attrs.update({
-                'readonly': True,
-                'disabled': True,
-                'class': 'form-control form-control-xl form-control-outlined bg-secondary text-muted',
-                'placeholder': 'غیرفعال - فایل اجاره انتخاب شده'
-            })
-            self.fields['buyer_code'].widget.attrs.update({
-                'readonly': True,
-                'disabled': True,
-                'class': 'form-control form-control-xl form-control-outlined bg-secondary text-muted',
-                'placeholder': 'غیرفعال - فایل اجاره انتخاب شده'
-            })
-            self.fields['type'].widget.attrs.update({
-                'data-locked': 'rent',
-                'class': 'form-control form-control-xl form-control-outlined'
-            })
-        if buyer_code:
-            self.fields['buyer_code'].initial = buyer_code
-            self.fields['type'].initial = 'sale'
-            self.fields['buyer_code'].widget.attrs.update({
-                'readonly': True,
-                'class': 'form-control form-control-xl form-control-outlined bg-light',
-                'data-locked': 'true',
-                'title': 'این کد از خریدار انتخاب شده پر شده و قابل تغییر نیست'
-            })
-            self.fields['renter_code'].widget.attrs.update({
-                'readonly': True,
-                'disabled': True,
-                'class': 'form-control form-control-xl form-control-outlined bg-secondary text-muted',
-                'placeholder': 'غیرفعال - خریدار انتخاب شده'
-            })
-            self.fields['rent_file_code'].widget.attrs.update({
-                'readonly': True,
-                'disabled': True,
-                'class': 'form-control form-control-xl form-control-outlined bg-secondary text-muted',
-                'placeholder': 'غیرفعال - خریدار انتخاب شده'
-            })
-            self.fields['type'].widget.attrs.update({
-                'data-locked': 'sale',
-                'class': 'form-control form-control-xl form-control-outlined'
-            })
-        if renter_code:
-            self.fields['renter_code'].initial = renter_code
-            self.fields['type'].initial = 'rent'
-            self.fields['renter_code'].widget.attrs.update({
-                'readonly': True,
-                'class': 'form-control form-control-xl form-control-outlined bg-light',
-                'data-locked': 'true',
-                'title': 'این کد از مستاجر انتخاب شده پر شده و قابل تغییر نیست'
-            })
-            self.fields['buyer_code'].widget.attrs.update({
-                'readonly': True,
-                'disabled': True,
-                'class': 'form-control form-control-xl form-control-outlined bg-secondary text-muted',
-                'placeholder': 'غیرفعال - مستاجر انتخاب شده'
-            })
-            self.fields['sale_file_code'].widget.attrs.update({
-                'readonly': True,
-                'disabled': True,
-                'class': 'form-control form-control-xl form-control-outlined bg-secondary text-muted',
-                'placeholder': 'غیرفعال - مستاجر انتخاب شده'
-            })
-            self.fields['type'].widget.attrs.update({
-                'data-locked': 'rent',
-                'class': 'form-control form-control-xl form-control-outlined'
-            })
-        for field in visit_required_fields:
-            self.fields[field].required = True
-
-    def save(self, commit=True):
-        instance = super().save(commit=False)
-        if self.user and self.user.title != 'bs':
-            instance.agent = self.user
-        if commit:
-            instance.save()
-            self.save_m2m()
-        return instance
-
-    def clean(self):
-        cleaned_data = super().clean()
-        if self.user.title == 'bs':
-            agent = cleaned_data.get('agent')
-            if agent is None:
-                self.add_error('agent', 'انتخاب مشاور برای بازدید الزامی است')
-        else:
-            agent = self.user
-        visit_type = cleaned_data.get('type')
-        sale_file_code = cleaned_data.get('sale_file_code')
-        rent_file_code = cleaned_data.get('rent_file_code')
-        buyer_code = cleaned_data.get('buyer_code')
-        renter_code = cleaned_data.get('renter_code')
-        is_sale_file_locked = self.fields['sale_file_code'].widget.attrs.get('data-locked') == 'true'
-        is_rent_file_locked = self.fields['rent_file_code'].widget.attrs.get('data-locked') == 'true'
-        is_buyer_locked = self.fields['buyer_code'].widget.attrs.get('data-locked') == 'true'
-        is_renter_locked = self.fields['renter_code'].widget.attrs.get('data-locked') == 'true'
-
-        if is_sale_file_locked:
-            if visit_type != 'sale':
-                self.add_error('type', 'نوع معامله باید "فروش" باشد - فایل فروش از قبل انتخاب شده است')
-            if rent_file_code:
-                cleaned_data['rent_file_code'] = ''
-            if renter_code:
-                cleaned_data['renter_code'] = ''
-        if is_rent_file_locked:
-            if visit_type != 'rent':
-                self.add_error('type', 'نوع معامله باید "اجاره" باشد - فایل اجاره از قبل انتخاب شده است')
-            if rent_file_code:
-                cleaned_data['sale_file_code'] = ''
-            if renter_code:
-                cleaned_data['buyer_code'] = ''
-        if is_buyer_locked:
-            if visit_type != 'sale':
-                self.add_error('type', 'نوع معامله باید "فروش" باشد - خریدار از قبل انتخاب شده است')
-            if rent_file_code:
-                cleaned_data['rent_file_code'] = ''
-            if renter_code:
-                cleaned_data['renter_code'] = ''
-        if is_renter_locked:
-            if visit_type != 'rent':
-                self.add_error('type', 'نوع معامله باید "اجاره" باشد - مستاجر از قبل انتخاب شده است')
-            if sale_file_code:
-                cleaned_data['sale_file_code'] = ''
-            if buyer_code:
-                cleaned_data['buyer_code'] = ''
-
-        sale_file_codes = list(models.SaleFile.objects.values_list('code', flat=True))
-        rent_file_codes = list(models.RentFile.objects.values_list('code', flat=True))
-        buyer_codes = list(models.Buyer.objects.values_list('code', flat=True))
-        renter_codes = list(models.Renter.objects.values_list('code', flat=True))
-
-        if visit_type == 'sale' and not sale_file_code:
-            self.add_error('sale_file_code', 'انتخاب فایل فروش الزامی است')
-        if visit_type == 'sale' and not buyer_code:
-            self.add_error('buyer_code', 'انتخاب مشتری (خریدار) الزامی است')
-        if visit_type == 'rent' and not rent_file_code:
-            self.add_error('rent_file_code', 'انتخاب فایل اجاره الزامی است')
-        if visit_type == 'rent' and not renter_code:
-            self.add_error('renter_code', 'انتخاب مشتری (مستاجر) الزامی است')
-
-        if visit_type == 'sale' and rent_file_code:
-            self.add_error('rent_file_code', 'نوع معامله فروش است، امکان انتخاب فایل اجاره وجود ندارد')
-        if visit_type == 'sale' and renter_code:
-            self.add_error('renter_code', 'نوع معامله فروش است، امکان انتخاب مشتری مستاجر وجود ندارد')
-        if visit_type == 'rent' and sale_file_code:
-            self.add_error('sale_file_code', 'نوع معامله اجاره است، امکان انتخاب فایل فروش وجود ندارد')
-        if visit_type == 'rent' and buyer_code:
-            self.add_error('buyer_code', 'نوع معامله اجاره است، امکان انتخاب مشتری خریدار وجود ندارد')
-
-        if sale_file_code and sale_file_code not in sale_file_codes:
-            self.add_error('sale_file_code', 'کد فایل فروش وارد شده معتبر نیست')
-        if rent_file_code and rent_file_code not in rent_file_codes:
-            self.add_error('rent_file_code', 'کد فایل اجاره وارد شده معتبر نیست')
-        if buyer_code and buyer_code not in buyer_codes:
-            self.add_error('buyer_code', 'کد خریدار وارد شده معتبر نیست')
-        if renter_code and renter_code not in renter_codes:
-            self.add_error('renter_code', 'کد مستاجر وارد شده معتبر نیست')
-
-        if visit_type == 'sale' and sale_file_code in sale_file_codes and buyer_code in buyer_codes:
-            sale_file = models.SaleFile.objects.get(code=sale_file_code)
-            buyer = models.Buyer.objects.get(code=buyer_code)
-            if sale_file.sub_district not in buyer.sub_districts.all():
-                self.add_error('sale_file_code', 'فایل فروش و خریدار، زیرمحله مشترک ندارند')
-                self.add_error('buyer_code', 'فایل فروش و خریدار، زیرمحله مشترک ندارند')
-            if self.user.title:
-                if self.user.title == 'fp' or self.user.title == 'bt':
-                    if self.user.sub_district != sale_file.sub_district:
-                        self.add_error('sale_file_code', 'شما اجازه تنظیم بازدید برای فایل فروش مربوطه را ندارید')
-                if self.user.title == 'cp' or self.user.title == 'bt':
-                    if self.user.sub_district not in buyer.sub_districts.all():
-                        self.add_error('buyer_code', 'شما اجازه تنظیم بازدید برای خریدار مربوطه را ندارید')
-            if agent and agent.sub_district != sale_file.sub_district:
-                self.add_error('sale_file_code', 'فایل فروش و مشاور، زیرمحله مشترک ندارند')
-                self.add_error('agent', 'فایل فروش و مشاور، زیرمحله مشترک ندارند')
-
-        if visit_type == 'rent' and rent_file_code in rent_file_codes and renter_code in renter_codes:
-            rent_file = models.RentFile.objects.get(code=rent_file_code)
-            renter = models.Renter.objects.get(code=renter_code)
-            if rent_file.sub_district not in renter.sub_districts.all():
-                self.add_error('rent_file_code', 'فایل اجاره و مستاجر، زیرمحله مشترک ندارند')
-                self.add_error('renter_code', 'فایل اجاره و مستاجر، زیرمحله مشترک ندارند')
-            if self.user.title == 'fp' or self.user.title == 'bt':
-                if self.user.sub_district != rent_file.sub_district:
-                    self.add_error('rent_file_code', 'شما اجازه تنظیم بازدید برای فایل اجاره مربوطه را ندارید')
-            if self.user.title == 'cp' or self.user.title == 'bt':
-                if self.user.sub_district not in renter.sub_districts.all():
-                    self.add_error('renter_code', 'شما اجازه تنظیم بازدید برای مستاجر مربوطه را ندارید')
-            if agent and agent.sub_district != rent_file.sub_district:
-                self.add_error('rent_file_code', 'فایل اجاره و مشاور، زیرمحله مشترک ندارند')
-                self.add_error('agent', 'فایل اجاره و مشاور، زیرمحله مشترک ندارند')
-
-
-class VisitResultForm(forms.ModelForm):
-    class Meta:
-        model = models.Visit
-        fields = ['result', 'status']
-
-    def clean(self):
-        cleaned_data = super().clean()
-        result = cleaned_data.get('result')
-        status = cleaned_data.get('status')
-
-        if result == '':
-            self.add_error('result', "در صورت انجام بازدید، ثبت نتیجه آن الزامی است.")
-        if status != 'dne':
-            self.add_error('status', "برای ثبت نتیجه، تعیین وضعیتی به جز 'انجام شده' مجاز نیست")
-
-        return cleaned_data
 
 
 class SessionCreateForm(forms.ModelForm):
@@ -1457,30 +1193,45 @@ class TradeFilterForm(forms.Form):
 
 
 # ---------------------------------- Tasks ----------------------------------
-task_required_fields = ['title', 'type', 'agent', 'deadline', 'description']
+reminder_required_fields = ['title', 'agent', 'date', 'description']
 
 
-class TaskCreateForm(forms.ModelForm):
+class ReminderAdminForm(forms.ModelForm):
     class Meta:
-        model = models.Task
-        fields = ['title', 'type', 'agent', 'deadline', 'sale_file_code', 'rent_file_code', 'buyer_code', 'renter_code', 'description']
+        model = models.Reminder
+        fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super(ReminderAdminForm, self).__init__(*args, **kwargs)
+
+        self.fields['date'] = forms.ChoiceField(
+            choices=models.next_month_shamsi(),
+            required=False,
+            label=self.fields['date'].label,
+        )
+
+
+class ReminderCreateForm(forms.ModelForm):
+    class Meta:
+        model = models.Reminder
+        fields = ['title', 'agent', 'date', 'sale_file_code', 'rent_file_code', 'buyer_code', 'renter_code', 'description']
 
     def __init__(self, *args, **kwargs):
         self.request = kwargs.pop('request', None)
-        super(TaskCreateForm, self).__init__(*args, **kwargs)
-        initial_deadline = self.initial.get('deadline') or self.data.get('deadline')
-        if 'deadline' in self.initial or 'deadline' in self.data:
-            self.fields['deadline'] = forms.CharField(
-                initial=initial_deadline,
+        super(ReminderCreateForm, self).__init__(*args, **kwargs)
+        initial_date = self.initial.get('date') or self.data.get('date')
+        if 'date' in self.initial or 'date' in self.data:
+            self.fields['date'] = forms.CharField(
+                initial=initial_date,
                 required=True,
-                label='مهلت انجام',
+                label='تاریخ انجام',
                 widget=forms.TextInput(attrs={'readonly': 'readonly'})
             )
         else:
-            self.fields['deadline'] = forms.ChoiceField(
+            self.fields['date'] = forms.ChoiceField(
                 choices=models.next_month_shamsi(),
                 required=True,
-                label='مهلت انجام'
+                label='تاریخ انجام'
             )
         if self.request and self.request.user.title != 'bs':
             self.fields['agent'].initial = self.request.user
@@ -1500,28 +1251,27 @@ class TaskCreateForm(forms.ModelForm):
             self.fields['agent'].widget = ReadOnlyUserWidget(self.request.user)
         else:
             self.fields['agent'].queryset = models.CustomUserModel.objects.exclude(title='bs')
-        for field in task_required_fields:
+        for field in reminder_required_fields:
             self.fields[field].required = True
 
     def clean(self):
         cleaned_data = super().clean()
-        task_type = cleaned_data.get('type')
         agent = cleaned_data.get('agent')
         sale_file_code = cleaned_data.get('sale_file_code')
         rent_file_code = cleaned_data.get('rent_file_code')
         buyer_code = cleaned_data.get('buyer_code')
         renter_code = cleaned_data.get('renter_code')
-        deadline = cleaned_data.get('deadline')
+        date = cleaned_data.get('date')
 
-        if deadline:
+        if date:
             try:
-                year, month, day = map(int, deadline.split('/'))
-                deadline_date = jdatetime(year, month, day)
+                year, month, day = map(int, date.split('/'))
+                date_date = jdatetime(year, month, day)
                 today = jdatetime.now().date()
-                if deadline_date < today:
-                    self.add_error('deadline', 'ددلاین انتخابی گذشته است')
+                if date_date < today:
+                    self.add_error('date', 'تاریخ انتخابی گذشته است')
             except (ValueError, AttributeError):
-                self.add_error('deadline', 'فرمت تاریخ نامعتبر است')
+                self.add_error('date', 'فرمت تاریخ نامعتبر است')
 
         sale_file_codes = list(models.SaleFile.objects.values_list('code', flat=True))
         rent_file_codes = list(models.RentFile.objects.values_list('code', flat=True))
@@ -1555,50 +1305,9 @@ class TaskCreateForm(forms.ModelForm):
                 self.add_error('renter_code', 'مستاجر و مشاور مربوطه، زیرمحله مشترک ندارند')
 
         if agent and agent.title == 'bs':
-            self.add_error('agent', 'امکان تعریف وظیفه برای مدیر وجود ندارد')
-        if agent and agent.title != task_type and agent.title != 'bs':
-            self.add_error('agent', 'مشاور انتخابی با "نوع وظیفه" همخوانی ندارد')
-            self.add_error('type', 'نوع وظیفه با "مشاور انتخابی" همخوانی ندارد')
+            self.add_error('agent', 'امکان تعریف یادآور برای مدیر وجود ندارد')
 
         return cleaned_data
-
-
-class TaskResultForm(forms.ModelForm):
-    class Meta:
-        model = models.Task
-        fields = ['result', 'status']
-
-    def clean(self):
-        cleaned_data = super().clean()
-        status = cleaned_data.get('status')
-        result = cleaned_data.get('result')
-
-        if result != '':
-            if status != 'UR':
-                self.add_error('status', "برای ثبت نتیجه، وضعیت را به 'تحویل داده شده' تغییر دهید.")
-        if status == 'CL':
-            self.add_error('status', "بستن وظیفه فقط از طریق پنل مدیر ممکن است.")
-
-        return cleaned_data
-
-
-class TaskAdminForm(forms.ModelForm):
-    class Meta:
-        model = models.Task
-        fields = '__all__'
-
-    def __init__(self, *args, **kwargs):
-        super(TaskAdminForm, self).__init__(*args, **kwargs)
-
-        self.fields['deadline'] = forms.ChoiceField(
-            choices=models.next_month_shamsi(),
-            required=False,
-            label=self.fields['deadline'].label,
-        )
-
-
-class TaskFilterForm(forms.Form):
-    status = forms.ChoiceField(choices=[('', '---------')] + choices.task_statuses, required=False, label='وضعیت وظیفه')
 
 
 # ---------------------------------- Reports ----------------------------------
@@ -1747,76 +1456,16 @@ class PersonStatusForm(forms.ModelForm):
         fields = ['status']
 
 
-class VisitStatusForm(forms.ModelForm):
-    class Meta:
-        model = models.Visit
-        fields = ['status', 'boss_notes']
-
-
 class SessionStatusForm(forms.ModelForm):
     class Meta:
         model = models.Session
         fields = ['status', 'boss_notes']
 
 
-class VisitResultBossForm(forms.ModelForm):
-    class Meta:
-        model = models.Visit
-        fields = ['status', 'boss_final_comment']
-
-
 class SessionResultBossForm(forms.ModelForm):
     class Meta:
         model = models.Session
         fields = ['status', 'boss_final_comment']
-
-
-class TaskStatusForm(forms.ModelForm):
-    class Meta:
-        model = models.Task
-        fields = ['status']
-
-
-class CombinedTaskStatusForm(forms.Form):
-    def __init__(self, *args, **kwargs):
-        self.boss_instance = kwargs.pop('boss_instance', None)
-        self.task_instance = kwargs.pop('task_instance', None)
-        super().__init__(*args, **kwargs)
-
-        data = args[0] if args else None
-        self.boss_form = TaskBossStatusForm(data=data, instance=self.boss_instance)
-        self.task_form = TaskStatusForm(data=data, instance=self.task_instance)
-
-    def is_valid(self):
-        valid = self.task_form.is_valid() and self.boss_form.is_valid()
-        return valid and self._cross_form_validation()
-
-    def _cross_form_validation(self):
-        condition = self.boss_form.cleaned_data.get('condition')
-        status = self.task_form.cleaned_data.get('status')
-
-        if status == 'OP' and condition == 'op':
-            self.boss_form.add_error('condition', 'برای وضعیت "باز"، این فیلد باید "بسته" باشد')
-            self.task_form.add_error('status', 'برای وظیفه مدیریتی "باز"، این فیلد باید "تحویل داده شده" باشد')
-            return False
-        if status == 'UR' and condition == 'cl':
-            self.boss_form.add_error('condition', 'برای وضعیت "تحویل داده شده"،این فیلد باید "باز" باشد')
-            self.task_form.add_error('status', 'برای وظیفه مدیریتی "بسته"، این فیلد باید "باز" یا "بسته" باشد')
-            return False
-        if status == 'UR' and condition == 'op':
-            self.boss_form.add_error('condition', 'هیچ تغییری در فرم ایجاد نشده است')
-            self.task_form.add_error('status', 'هیچ تغییری در فرم ایجاد نشده است')
-            return False
-        if status == 'CL' and condition == 'op':
-            self.boss_form.add_error('condition', 'برای وضعیت "بسته"، این فیلد باید "بسته" باشد')
-            self.task_form.add_error('status', 'برای وظیفه مدیریتی "باز"، این فیلد باید "تحویل داده شده" باشد')
-            return False
-
-        return True
-
-    def save(self):
-        self.boss_form.save()
-        self.task_form.save()
 
 
 class CombinedSaleFileStatusForm(forms.Form):
@@ -2029,54 +1678,6 @@ class CombinedPersonStatusForm(forms.Form):
         self.person_form.save()
 
 
-class CombinedVisitStatusForm(forms.Form):
-    def __init__(self, *args, **kwargs):
-        self.boss_instance = kwargs.pop('boss_instance', None)
-        self.visit_instance = kwargs.pop('visit_instance', None)
-        super().__init__(*args, **kwargs)
-
-        data = args[0] if args else None
-        self.boss_form = TaskBossStatusForm(data=data, instance=self.boss_instance)
-        self.visit_form = VisitStatusForm(data=data, instance=self.visit_instance)
-
-    def is_valid(self):
-        valid = self.visit_form.is_valid() and self.boss_form.is_valid()
-        return valid and self._cross_form_validation()
-
-    def _cross_form_validation(self):
-        status = self.visit_form.cleaned_data.get('status')
-        condition = self.boss_form.cleaned_data.get('condition')
-
-        if status == 'sub' and condition == 'op':
-            self.visit_form.add_error('status', 'هیچ تغییری اعمال نشده است')
-            self.boss_form.add_error('condition', 'هیچ تغییری اعمال نشده است')
-            return False
-        if status == 'sub' and condition == 'cl':
-            self.visit_form.add_error('status', 'برای بستن وظیفه مدیریتی، این فیلد باید "تایید شده" یا "رد شده" باشد')
-            return False
-        if status == 'acc' and condition == 'op':
-            self.boss_form.add_error('condition', 'برای وضعیت "تایید شده"، این فیلد باید "بسته" باشد')
-            return False
-        if status == 'can' and condition == 'op':
-            self.boss_form.add_error('condition', 'برای وضعیت "رد شده"، این فیلد باید "بسته" باشد')
-            return False
-        if status == 'dne' or status == 'end':
-            self.visit_form.add_error('status', 'انتخاب "انجام شده" و "تایید نتیجه" برای این فیلد، فعلا مجاز نیست')
-            return False
-        if not condition:
-            self.boss_form.add_error('condition', 'تعیین این فیلد الزامی است')
-            return False
-        if not status:
-            self.visit_form.add_error('status', 'تعیین این فیلد الزامی است')
-            return False
-
-        return True
-
-    def save(self):
-        self.boss_form.save()
-        self.visit_form.save()
-
-
 class CombinedSessionStatusForm(forms.Form):
     def __init__(self, *args, **kwargs):
         self.boss_instance = kwargs.pop('boss_instance', None)
@@ -2124,38 +1725,6 @@ class CombinedSessionStatusForm(forms.Form):
         self.session_form.save()
 
 
-class CombinedVisitResultForm(forms.Form):
-    def __init__(self, *args, **kwargs):
-        self.boss_instance = kwargs.pop('boss_instance', None)
-        self.result_visit_instance = kwargs.pop('result_visit_instance', None)
-        super().__init__(*args, **kwargs)
-
-        data = args[0] if args else None
-        self.boss_form = TaskBossStatusForm(data=data, instance=self.boss_instance)
-        self.result_visit_form = VisitResultBossForm(data=data, instance=self.result_visit_instance)
-
-    def is_valid(self):
-        valid = self.result_visit_form.is_valid() and self.boss_form.is_valid()
-        return valid and self._cross_form_validation()
-
-    def _cross_form_validation(self):
-        status = self.result_visit_form.cleaned_data.get('status')
-        condition = self.boss_form.cleaned_data.get('condition')
-
-        if status != 'end':
-            self.result_visit_form.add_error('status', "برای بازدید انجام شده، این فیلد فقط می‌تواند 'تایید نتیجه' باشد")
-            return False
-        if condition != 'cl':
-            self.boss_form.add_error('condition', "برای تایید نتیجه، این فیلد باید 'بسته' باشد")
-            return False
-
-        return True
-
-    def save(self):
-        self.boss_form.save()
-        self.result_visit_form.save()
-
-
 class CombinedSessionResultForm(forms.Form):
     def __init__(self, *args, **kwargs):
         self.boss_instance = kwargs.pop('boss_instance', None)
@@ -2186,6 +1755,4 @@ class CombinedSessionResultForm(forms.Form):
     def save(self):
         self.boss_form.save()
         self.result_session_form.save()
-
-
 

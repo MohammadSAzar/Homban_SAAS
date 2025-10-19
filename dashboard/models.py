@@ -597,67 +597,6 @@ class Renter(models.Model):
 
 
 # --------------------------------- SERVs ----------------------------------
-class Visit(models.Model):
-    agent = models.ForeignKey(CustomUserModel, on_delete=models.SET_NULL, null=True, blank=True, related_name='visits',
-                              verbose_name=_('Agent'))
-    sale_file_code = models.CharField(max_length=6, null=True, blank=True, verbose_name=_('Sale File Code'))
-    sale_file = models.ForeignKey(SaleFile, on_delete=models.SET_NULL, null=True, blank=True, related_name='visits',
-                                  verbose_name=_('Visit Sale File'))
-    rent_file_code = models.CharField(max_length=6, null=True, blank=True, verbose_name=_('Rent File Code'))
-    rent_file = models.ForeignKey(RentFile, on_delete=models.SET_NULL, null=True, blank=True, related_name='visits',
-                                  verbose_name=_('Visit Rent File'))
-    buyer_code = models.CharField(max_length=10, null=True, blank=True, verbose_name=_('Buyer Code'))
-    buyer = models.ForeignKey(Buyer, on_delete=models.SET_NULL, null=True, blank=True, related_name='visits',
-                              verbose_name=_('Visit Buyer'))
-    renter_code = models.CharField(max_length=10, null=True, blank=True, verbose_name=_('Renter Code'))
-    renter = models.ForeignKey(Renter, on_delete=models.SET_NULL, null=True, blank=True, related_name='visits',
-                               verbose_name=_('Visit Renter'))
-    type = models.CharField(max_length=10, choices=choices.types, blank=True, null=True,
-                            verbose_name=_('Type of Trade'))
-    description = models.TextField(max_length=1000, blank=True, null=True, verbose_name=_('Description'))
-    boss_notes = models.TextField(max_length=1000, blank=True, null=True, verbose_name=_('Boss Notes'))
-    result = models.TextField(max_length=1000, blank=True, null=True, verbose_name=_('Result'))
-    boss_final_comment = models.TextField(max_length=1000, blank=True, null=True, verbose_name=_('Boss Final Comment'))
-    date = models.CharField(max_length=200, verbose_name=_('Date of Visit'))
-    time = models.CharField(max_length=200, choices=choices.times, verbose_name=_('Time of Visit'))
-    code = models.CharField(max_length=10, null=True, unique=True, blank=True, verbose_name=_('Code'))
-    status = models.CharField(max_length=10, choices=choices.serv_statuses, default='sub', verbose_name=_('Status'))
-    datetime_created = models.DateTimeField(auto_now_add=True, verbose_name=_('Date and Time of Creation'))
-
-    def save(self, *args, **kwargs):
-        if not self.sale_file and self.sale_file_code:
-            self.sale_file = SaleFile.objects.get(code=self.sale_file_code)
-        if not self.rent_file and self.rent_file_code:
-            self.rent_file = RentFile.objects.get(code=self.rent_file_code)
-        if not self.buyer and self.buyer_code:
-            self.buyer = Buyer.objects.get(code=self.buyer_code)
-        if not self.renter and self.renter_code:
-            self.renter = Renter.objects.get(code=self.renter_code)
-        if not self.code:
-            self.code = generate_unique_code_longer()
-        is_new = self.pk is None
-        previous_status = None
-        if not is_new:
-            previous = Visit.objects.filter(pk=self.pk).first()
-            if previous:
-                previous_status = previous.status
-        super(Visit, self).save(*args, **kwargs)
-        if self.status == 'dne' and previous_status != 'dne':
-            if not TaskBoss.objects.filter(result_visit=self).exists():
-                TaskBoss.objects.create(result_visit=self, type='rv')
-
-    def __str__(self):
-        return f'بازدید: {self.get_type_display()} / {self.code}'
-
-    class Meta:
-        ordering = ('-datetime_created',)
-        verbose_name = 'بازدید'
-        verbose_name_plural = 'بازدیدها'
-
-    def get_absolute_url(self):
-        return reverse('visit_detail', args=[self.pk, self.code])
-
-
 class Session(models.Model):
     agent = models.ForeignKey(CustomUserModel, on_delete=models.SET_NULL, null=True, blank=True,
                               related_name='sessions', verbose_name=_('Agent'))
@@ -796,68 +735,6 @@ class Trade(models.Model):
 
 
 # --------------------------------- USERs ---------------------------------
-class Task(models.Model):
-    title = models.CharField(max_length=200, verbose_name=_('Title'))
-    deadline = models.CharField(max_length=200, verbose_name=_('Deadline'))
-    type = models.CharField(max_length=10, choices=choices.task_types, verbose_name=_('Type of Task'))
-    agent = models.ForeignKey(CustomUserModel, on_delete=models.SET_NULL, null=True, blank=True, related_name='tasks',
-                              verbose_name=_('Agent'))
-    sale_file_code = models.CharField(max_length=6, null=True, blank=True, verbose_name=_('Sale File Code'))
-    sale_file = models.ForeignKey(SaleFile, on_delete=models.SET_NULL, null=True, blank=True, related_name='tasks',
-                                  verbose_name=_('Task Sale File'))
-    rent_file_code = models.CharField(max_length=6, null=True, blank=True, verbose_name=_('Rent File Code'))
-    rent_file = models.ForeignKey(RentFile, on_delete=models.SET_NULL, null=True, blank=True, related_name='tasks',
-                                  verbose_name=_('Task Rent File'))
-    buyer_code = models.CharField(max_length=10, null=True, blank=True, verbose_name=_('Buyer Code'))
-    buyer = models.ForeignKey(Buyer, on_delete=models.SET_NULL, null=True, blank=True, related_name='tasks',
-                              verbose_name=_('Task Buyer'))
-    renter_code = models.CharField(max_length=10, null=True, blank=True, verbose_name=_('Renter Code'))
-    renter = models.ForeignKey(Renter, on_delete=models.SET_NULL, null=True, blank=True, related_name='tasks',
-                               verbose_name=_('Task Renter'))
-    code = models.CharField(max_length=10, null=True, unique=True, blank=True)
-    description = models.TextField(max_length=1000, blank=True, null=True, verbose_name=_('Description'))
-    result = models.TextField(max_length=1000, blank=True, null=True, verbose_name=_('Result'))
-    status = models.CharField(max_length=10, choices=choices.task_statuses, default='OP', verbose_name=_('Status'))
-    datetime_created = models.DateTimeField(auto_now_add=True, verbose_name=_('Date and Time of Creation'))
-
-    @property
-    def sub_district(self):
-        return self.agent.sub_district
-
-    def save(self, *args, **kwargs):
-        if not self.sale_file and self.sale_file_code:
-            self.sale_file = SaleFile.objects.get(code=self.sale_file_code)
-        if not self.rent_file and self.rent_file_code:
-            self.rent_file = RentFile.objects.get(code=self.rent_file_code)
-        if not self.buyer and self.buyer_code:
-            self.buyer = Buyer.objects.get(code=self.buyer_code)
-        if not self.renter and self.renter_code:
-            self.renter = Renter.objects.get(code=self.renter_code)
-        if not self.code:
-            self.code = generate_unique_code_longer()
-        is_new = self.pk is None
-        previous_status = None
-        if not is_new:
-            previous = Task.objects.filter(pk=self.pk).first()
-            if previous:
-                previous_status = previous.status
-        super(Task, self).save(*args, **kwargs)
-        if self.status == 'UR' and previous_status != 'UR':
-            if not TaskBoss.objects.filter(ur_task=self).exists():
-                TaskBoss.objects.create(ur_task=self, type='ts')
-
-    def __str__(self):
-        return f'{self.get_type_display()} / {self.code}'
-
-    class Meta:
-        ordering = ('-datetime_created',)
-        verbose_name = 'وظیفه'
-        verbose_name_plural = 'وظایف'
-
-    def get_absolute_url(self):
-        return reverse('task_detail', args=[self.pk, self.code])
-
-
 class TaskBoss(models.Model):
     new_sale_file = models.ForeignKey(SaleFile, on_delete=models.CASCADE, blank=True, null=True,
                                       related_name='new_sale_files', verbose_name='فایل فروش جدید')
@@ -869,16 +746,10 @@ class TaskBoss(models.Model):
                                    related_name='new_renter', verbose_name='مستاجر جدید')
     new_person = models.ForeignKey(Person, on_delete=models.CASCADE, blank=True, null=True,
                                    related_name='new_persons', verbose_name='آگهی‌دهنده جدید')
-    new_visit = models.ForeignKey(Visit, on_delete=models.CASCADE, blank=True, null=True,
-                                  related_name='new_visits', verbose_name='بازدید جدید')
     new_session = models.ForeignKey(Session, on_delete=models.CASCADE, blank=True, null=True,
                                     related_name='new_sessions', verbose_name='نشست جدید')
-    result_visit = models.ForeignKey(Visit, on_delete=models.CASCADE, blank=True, null=True,
-                                     related_name='result_visits', verbose_name='نتیجه بازدید')
     result_session = models.ForeignKey(Session, on_delete=models.CASCADE, blank=True, null=True,
                                        related_name='result_sessions', verbose_name='نتیجه نشست')
-    ur_task = models.ForeignKey(Task, on_delete=models.CASCADE, blank=True, null=True,
-                                related_name='ur_tasks', verbose_name='وظیفه تحویل داده شده')
     type = models.CharField(max_length=10, choices=choices.boss_task_types, blank=True, null=True, verbose_name='نوع')
     condition = models.CharField(max_length=10, choices=choices.boss_task_statuses, default='op', blank=True, null=True,
                                  verbose_name='وضعیت وظیفه مدیر')
@@ -914,6 +785,57 @@ class TaskBoss(models.Model):
 
     def get_absolute_url(self):
         return reverse('boss_task_approve', args=[self.pk, self.code])
+
+
+class Reminder(models.Model):
+    title = models.CharField(max_length=200, verbose_name=_('Title'))
+    date = models.CharField(max_length=200, verbose_name=_('Deadline'))
+    agent = models.ForeignKey(CustomUserModel, on_delete=models.SET_NULL, null=True, blank=True, related_name='reminders',
+                              verbose_name=_('Agent'))
+    sale_file_code = models.CharField(max_length=6, null=True, blank=True, verbose_name=_('Sale File Code'))
+    sale_file = models.ForeignKey(SaleFile, on_delete=models.SET_NULL, null=True, blank=True, related_name='reminders',
+                                  verbose_name='فایل فروش')
+    rent_file_code = models.CharField(max_length=6, null=True, blank=True, verbose_name=_('Rent File Code'))
+    rent_file = models.ForeignKey(RentFile, on_delete=models.SET_NULL, null=True, blank=True, related_name='reminders',
+                                  verbose_name='فایل اجاره')
+    buyer_code = models.CharField(max_length=10, null=True, blank=True, verbose_name=_('Buyer Code'))
+    buyer = models.ForeignKey(Buyer, on_delete=models.SET_NULL, null=True, blank=True, related_name='reminders',
+                              verbose_name='خریدار')
+    renter_code = models.CharField(max_length=10, null=True, blank=True, verbose_name=_('Renter Code'))
+    renter = models.ForeignKey(Renter, on_delete=models.SET_NULL, null=True, blank=True, related_name='reminders',
+                               verbose_name='مستاجر')
+    code = models.CharField(max_length=10, null=True, unique=True, blank=True)
+    description = models.TextField(max_length=1000, blank=True, null=True, verbose_name=_('Description'))
+    status = models.CharField(max_length=10, choices=choices.reminder_statuses, default='OP', verbose_name=_('Status'))
+    datetime_created = models.DateTimeField(auto_now_add=True, verbose_name=_('Date and Time of Creation'))
+
+    @property
+    def sub_district(self):
+        return self.agent.sub_district
+
+    def save(self, *args, **kwargs):
+        if not self.sale_file and self.sale_file_code:
+            self.sale_file = SaleFile.objects.get(code=self.sale_file_code)
+        if not self.rent_file and self.rent_file_code:
+            self.rent_file = RentFile.objects.get(code=self.rent_file_code)
+        if not self.buyer and self.buyer_code:
+            self.buyer = Buyer.objects.get(code=self.buyer_code)
+        if not self.renter and self.renter_code:
+            self.renter = Renter.objects.get(code=self.renter_code)
+        if not self.code:
+            self.code = generate_unique_code_longer()
+        super(Reminder, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return f'{self.agent} / {self.date} / {self.code}'
+
+    class Meta:
+        ordering = ('-datetime_created',)
+        verbose_name = 'یادآور'
+        verbose_name_plural = 'یادآورها'
+
+    def get_absolute_url(self):
+        return reverse('reminder_detail', args=[self.pk, self.code])
 
 
 class Mark(models.Model):

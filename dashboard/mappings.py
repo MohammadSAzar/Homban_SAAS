@@ -7,7 +7,5 @@ RELATED_MODELS = {
     'by': ('new_buyer', forms.BuyerStatusForm),
     'rt': ('new_renter', forms.RenterStatusForm),
     'ps': ('new_person', forms.PersonStatusForm),
-    'ts': ('ur_task', forms.TaskStatusForm),
 }
-
 

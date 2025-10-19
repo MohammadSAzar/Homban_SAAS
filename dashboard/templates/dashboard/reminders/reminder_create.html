@@ -8,7 +8,7 @@
 {% load widget_tweaks %}
 
 
-{% block title %}ایجاد وظیفه جدید{% endblock %}
+{% block title %}ایجاد یادآور جدید{% endblock %}
 
 
 {% block content %}
@@ -32,7 +32,7 @@
                         <!-- Title -->
                         <div class="nk-block-head nk-block-head-lg wide-sm">
                             <div class="nk-block-head-content">
-                                <h6 class="nk-block-title page-title" style="line-height: 45px;">ایجاد وظیفه جدید</h6>
+                                <h6 class="nk-block-title page-title" style="line-height: 45px;">ایجاد یادآور جدید</h6>
                             </div>
                         </div>
                         <!-- end: Title -->
@@ -41,41 +41,11 @@
                         <form class="row gy-4" method="post" enctype="multipart/form-data" novalidate>
                             {% csrf_token %}
 
-                            <!-- type -->
-                            <div class="col-lg-6 col-sm-6">
-                                <div class="form-group">
-                                    <div class="form-control-wrap">
-                                        <label class="form-label" for="{{ form.type.id_for_label }}">نوع وظیفه</label>
-                                        {% render_field form.type id="type" type="text" class="form-control form-control-xl form-control-outlined" %}
-                                    </div>
-                                    {% if form.type.errors %}
-                                        {% for error in form.type.errors %}
-                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
-                                        {% endfor %}
-                                    {% endif %}
-                                </div>
-                            </div>
-
-                            <!-- agent -->
-                            <div class="col-lg-6 col-sm-6">
-                                <div class="form-group">
-                                    <div class="form-control-wrap">
-                                        <label class="form-label" for="{{ form.agent.id_for_label }}">مشاور</label>
-                                        {% render_field form.agent id="agent" type="text" class="form-control form-control-xl form-control-outlined" %}
-                                    </div>
-                                    {% if form.agent.errors %}
-                                        {% for error in form.agent.errors %}
-                                            <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
-                                        {% endfor %}
-                                    {% endif %}
-                                </div>
-                            </div>
-
                             <!-- title -->
                             <div class="col-lg-6 col-sm-6">
                                 <div class="form-group">
                                     <div class="form-control-wrap">
-                                        <label class="form-label" for="{{ form.title.id_for_label }}">عنوان وظیفه</label>
+                                        <label class="form-label" for="{{ form.title.id_for_label }}">عنوان یادآور</label>
                                         {% render_field form.title id="title" type="text" class="form-control form-control-xl form-control-outlined" %}
                                     </div>
                                     {% if form.title.errors %}
@@ -86,15 +56,15 @@
                                 </div>
                             </div>
 
-                            <!-- deadline -->
+                            <!-- date -->
                             <div class="col-lg-6 col-sm-6">
                                 <div class="form-group">
                                     <div class="form-control-wrap">
-                                        <label class="form-label" for="{{ form.deadline.id_for_label }}">ددلاین</label>
-                                        {% render_field form.deadline id="deadline" type="text" class="form-control form-control-xl form-control-outlined" %}
+                                        <label class="form-label" for="{{ form.date.id_for_label }}">تاریخ</label>
+                                        {% render_field form.date id="date" type="text" class="form-control form-control-xl form-control-outlined" %}
                                     </div>
-                                    {% if form.deadline.errors %}
-                                        {% for error in form.deadline.errors %}
+                                    {% if form.date.errors %}
+                                        {% for error in form.date.errors %}
                                             <p style="font-weight: normal; font-size: small; color: red;">{{ error }}</p>
                                         {% endfor %}
                                     {% endif %}
@@ -190,6 +160,5 @@
     </div>
 
 {% endblock %}
-
 
 

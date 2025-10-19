@@ -12,10 +12,9 @@ ROLE_PERMISSIONS = {
         'Person': ['create', 'read', 'update', 'delete'],
         'Buyer': ['create', 'read', 'update', 'delete'],
         'Renter': ['create', 'read', 'update', 'delete'],
-        'Visit': ['create', 'read', 'update', 'delete'],
         'Session': ['create', 'read', 'update', 'delete'],
         'Trade': ['create', 'read', 'update', 'delete'],
-        'Task': ['create', 'read', 'update', 'delete'],
+        'Reminder': ['create', 'read', 'update', 'delete'],
         'TaskBoss': ['create', 'read', 'update', 'delete'],
         'Report': ['create', 'read', 'update', 'delete'],
         'ReportItem': ['create', 'read', 'update', 'delete'],
@@ -29,10 +28,9 @@ ROLE_PERMISSIONS = {
         'Person': ['create', 'read', 'update', 'delete'],
         'Buyer': ['read'],
         'Renter': ['read'],
-        'Visit': ['create', 'read', 'update', 'delete'],
         'Session': ['create', 'read', 'update', 'delete'],
         'Trade': ['create', 'read', 'update', 'delete'],
-        'Task': ['read', 'update', 'create'],
+        'Reminder': ['create', 'read', 'update', 'delete'],
         'Report': ['create', 'read', 'update'],
         'ReportItem': ['create', 'read', 'update', 'delete'],
         'Mark': ['create', 'read', 'update', 'delete'],
@@ -45,10 +43,9 @@ ROLE_PERMISSIONS = {
         'Person': ['read'],
         'Buyer': ['create', 'read', 'update', 'delete'],
         'Renter': ['create', 'read', 'update', 'delete'],
-        'Visit': ['create', 'read', 'update', 'delete'],
         'Session': ['create', 'read', 'update', 'delete'],
         'Trade': ['create', 'read', 'update', 'delete'],
-        'Task': ['read', 'update', 'create'],
+        'Reminder': ['create', 'read', 'update', 'delete'],
         'Report': ['create', 'read', 'update'],
         'ReportItem': ['create', 'read', 'update', 'delete'],
         'Mark': ['create', 'read', 'update', 'delete'],
@@ -61,10 +58,9 @@ ROLE_PERMISSIONS = {
         'Person': ['create', 'read', 'update', 'delete'],
         'Buyer': ['create', 'read', 'update', 'delete'],
         'Renter': ['create', 'read', 'update', 'delete'],
-        'Visit': ['create', 'read', 'update', 'delete'],
         'Session': ['create', 'read', 'update', 'delete'],
         'Trade': ['create', 'read', 'update', 'delete'],
-        'Task': ['read', 'update', 'create'],
+        'Reminder': ['create', 'read', 'update', 'delete'],
         'Report': ['create', 'read', 'update'],
         'ReportItem': ['create', 'read', 'update', 'delete'],
         'Mark': ['create', 'read', 'update', 'delete'],
@@ -107,5 +103,4 @@ class PermissionRequiredMixin:
 
 class ReadOnlyPermissionMixin(PermissionRequiredMixin):
     permission_action = 'read'
-
 

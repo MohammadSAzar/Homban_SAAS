@@ -3,7 +3,7 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.conf import settings
 
 from . import models
-from .forms import AdminCustomUserCreationForm, AdminCustomUserChangeForm, TaskAdminForm
+from .forms import AdminCustomUserCreationForm, AdminCustomUserChangeForm, ReminderAdminForm
 
 
 # --------------------------------- CUM -----------------------------------
@@ -107,15 +107,6 @@ class RenterAdmin(admin.ModelAdmin):
 
 
 # --------------------------------- SERV ---------------------------------
-@admin.register(models.Visit)
-class VisitAdmin(admin.ModelAdmin):
-    list_display = ('type', 'agent', 'code', 'sale_file', 'rent_file', 'buyer', 'renter', 'status', 'datetime_created')
-    ordering = ('-datetime_created',)
-    list_filter = ('type', 'status',)
-    readonly_fields = ('code', 'datetime_created',)
-    list_per_page = getattr(settings, 'DJANGO_ADMIN_PER_PAGE', 20)
-
-
 @admin.register(models.Session)
 class SessionAdmin(admin.ModelAdmin):
     list_display = ('type', 'agent', 'code', 'sale_file', 'rent_file', 'buyer', 'renter', 'status', 'datetime_created')
@@ -136,22 +127,22 @@ class TradeAdmin(admin.ModelAdmin):
 
 
 # --------------------------------- MNGs ----------------------------------
-@admin.register(models.Task)
-class TaskAdmin(admin.ModelAdmin):
-    form = TaskAdminForm
-    list_display = ('title', 'status', 'type', 'agent', 'code', 'deadline',)
-    ordering = ('-datetime_created',)
-    list_filter = ['type', 'status', 'deadline']
-    search_fields = ['title', 'agent__username', 'code']
-    readonly_fields = ('code', 'datetime_created',)
-    list_per_page = getattr(settings, 'DJANGO_ADMIN_PER_PAGE', 20)
-
-
 @admin.register(models.TaskBoss)
 class TaskBossAdmin(admin.ModelAdmin):
     list_display = ('type', 'agent', 'code', 'condition', 'datetime_created')
     ordering = ('-datetime_created',)
     list_filter = ['type', 'condition']
+    readonly_fields = ('code', 'datetime_created',)
+    list_per_page = getattr(settings, 'DJANGO_ADMIN_PER_PAGE', 20)
+
+
+@admin.register(models.Reminder)
+class ReminderAdmin(admin.ModelAdmin):
+    form = ReminderAdminForm
+    list_display = ('title', 'status', 'agent', 'code', 'date',)
+    ordering = ('-datetime_created',)
+    list_filter = ['status', 'date']
+    search_fields = ['title', 'agent__username', 'code']
     readonly_fields = ('code', 'datetime_created',)
     list_per_page = getattr(settings, 'DJANGO_ADMIN_PER_PAGE', 20)
 
@@ -256,6 +247,5 @@ class InteractionItemAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         return qs.select_related('interaction', 'content_type')
-
 
 
