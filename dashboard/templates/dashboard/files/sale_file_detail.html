@@ -145,10 +145,10 @@
                                                                                                 {{ sub_district.name }} |
                                                                                             {% endfor %}
                                                                                         </p>
-                                                                                        {% if renter.created_by.name_family %}
-                                                                                            <p class="card-text">مشاور: {{ renter.created_by.name_family }}</p>
+                                                                                        {% if buyer.created_by.name_family %}
+                                                                                            <p class="card-text">مشاور: {{ buyer.created_by.name_family }}</p>
                                                                                         {% else %}
-                                                                                            <p class="card-text">مشاور: {{ renter.created_by }}</p>
+                                                                                            <p class="card-text">مشاور: {{ buyer.created_by }}</p>
                                                                                         {% endif %}
                                                                                         <p class="card-text">نام: {{ buyer.name }}</p>
                                                                                         <p class="card-text">بودجه: {{ buyer.budget_announced|intcomma:False|farsi_number }}</p>

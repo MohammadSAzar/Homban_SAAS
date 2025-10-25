@@ -67,6 +67,9 @@ class DashboardView(ReadOnlyPermissionMixin, TemplateView):
             ).all()
             context['sub_districts'] = sub_districts
             context['count'] = sub_districts.count()
+
+            agents = models.CustomUserModel.objects.all()
+            context['agents'] = agents
         else:
             agent = self.request.user
             context['subdi'] = agent.sub_district
@@ -1933,9 +1936,9 @@ class BuyerDetailView(ReadOnlyPermissionMixin, DetailView):
             area__lt=area_max
         ).exclude(delete_request='Yes')
 
-        if self.request.user.title != 'bs':
-            similar_sub_districts = buyer.sub_districts.all()
-            suggested_files_queryset = suggested_files_queryset.filter(sub_district__in=similar_sub_districts)
+        # if self.request.user.title != 'bs':
+        #     similar_sub_districts = buyer.sub_districts.all()
+        #     suggested_files_queryset = suggested_files_queryset.filter(sub_district__in=similar_sub_districts)
 
         paginator = Paginator(suggested_files_queryset, 1000)
         page_number = self.request.GET.get('page', 1)
@@ -2303,8 +2306,8 @@ class RenterDetailView(ReadOnlyPermissionMixin, DetailView):
 
         suggested_files_queryset = (
                 non_convertable_suggested_files_queryset | convertable_suggested_files_queryset).distinct()
-        if self.request.user.title != 'bs':
-            suggested_files_queryset = suggested_files_queryset.filter(sub_district__in=renter.sub_districts.all())
+        # if self.request.user.title != 'bs':
+        #     suggested_files_queryset = suggested_files_queryset.filter(sub_district__in=renter.sub_districts.all())
 
         paginator = Paginator(suggested_files_queryset, 1000)
         page_number = self.request.GET.get('page', 1)
@@ -4580,5 +4583,6 @@ class InteractionDetailView(LoginRequiredMixin, DetailView):
         context = super().get_context_data(**kwargs)
         context['announcement_object'] = self.object.announcement.content_object
         return context
+
 
 
