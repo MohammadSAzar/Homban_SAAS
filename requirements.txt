@@ -9,6 +9,7 @@ jdatetime==5.2.0
 mysqlclient==2.2.7
 pillow==11.1.0
 python-bidi==0.6.6
+pytz==2025.2
 reportlab==4.4.4
 sqlparse==0.5.3
 typing_extensions==4.12.2

@@ -12,23 +12,24 @@ from django.views.generic import DetailView, CreateView, ListView, UpdateView, D
 from django.views.decorators.http import require_GET, require_POST
 
 from django.db import transaction
-from django.db.models import Prefetch, Count, Q, F, PositiveBigIntegerField
+from django.db.models import Prefetch, Count, Q, F, Avg, Case, When, IntegerField, PositiveBigIntegerField, FloatField
 from django.db.models.functions import Cast
 
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
 from django.core.cache import cache
 
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
 from django.contrib import messages
 
+import jdatetime
 from jalali_date import datetime2jalali
 from datetime import datetime, timedelta
 from django.utils import timezone
 
-from . import models, forms, functions
+from . import models, forms, functions, choices
 from .permissions import PermissionRequiredMixin, ReadOnlyPermissionMixin
 
 
@@ -483,7 +484,7 @@ class SaleFileListView(ReadOnlyPermissionMixin, ListView):
     permission_model = 'SaleFile'
 
     def get_queryset(self):
-        if self.request.user.title != 'bs':
+        if self.request.user.title != 'bs' and self.request.user.title != 'nd':  # NEW
             sub_district = self.request.user.sub_district
             queryset_default = (
                 models.SaleFile.objects.select_related('province', 'city', 'district', 'sub_district', 'person', 'created_by')
@@ -703,7 +704,7 @@ class SaleFileListView(ReadOnlyPermissionMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if self.request.user.title == 'fp':
+        if self.request.user.title == 'fp' or self.request.user.title == 'nd':  # NEW
             form = forms.SaleFileAgentFilterForm(self.request.GET)
         else:
             form = forms.SaleFileFilterForm(self.request.GET)
@@ -758,7 +759,7 @@ class SaleFileDetailView(ReadOnlyPermissionMixin, DetailView):
 
     def dispatch(self, request, *args, **kwargs):
         user = request.user
-        if user.title != 'bs':
+        if user.title != 'bs' and user.title != 'nd':  # NEW
             sale_file = self.get_object()
             if sale_file.delete_request == 'Yes':
                 raise PermissionDenied("شما اجازه مشاهده این محتوا را ندارید")
@@ -1027,7 +1028,7 @@ class RentFileListView(ReadOnlyPermissionMixin, ListView):
     permission_model = 'RentFile'
 
     def get_queryset(self):
-        if self.request.user.title != 'bs':
+        if self.request.user.title != 'bs' and self.request.user.title != 'nd':  # NEW
             sub_district = self.request.user.sub_district
             queryset_default = (
                 models.RentFile.objects.select_related('province', 'city', 'district', 'sub_district', 'person', 'created_by')
@@ -1141,6 +1142,7 @@ class RentFileListView(ReadOnlyPermissionMixin, ListView):
 
                 return queryset_filtered
             return queryset_default
+
         else:
             queryset_default = (
                 models.RentFile.objects.select_related('province', 'city', 'district', 'sub_district', 'person', 'created_by')
@@ -1264,7 +1266,7 @@ class RentFileListView(ReadOnlyPermissionMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if self.request.user.title == 'fp':
+        if self.request.user.title == 'fp' or self.request.user.title == 'nd':  # NEW
             form = forms.RentFileAgentFilterForm(self.request.GET)
         else:
             form = forms.RentFileFilterForm(self.request.GET)
@@ -1318,7 +1320,7 @@ class RentFileDetailView(ReadOnlyPermissionMixin, DetailView):
 
     def dispatch(self, request, *args, **kwargs):
         user = request.user
-        if user.title != 'bs':
+        if user.title != 'bs' and user.title != 'nd':
             rent_file = self.get_object()
             if rent_file.delete_request == 'Yes':
                 raise PermissionDenied("شما اجازه مشاهده این محتوا را ندارید")
@@ -1743,7 +1745,7 @@ class BuyerListView(ReadOnlyPermissionMixin, ListView):
     permission_model = 'Buyer'
 
     def get_queryset(self):
-        if self.request.user.title == 'bs':
+        if self.request.user.title == 'bs' or self.request.user.title == 'nd':
             queryset_default = models.Buyer.objects.select_related('province', 'city', 'district', 'created_by').prefetch_related(
                 'sub_districts').exclude(delete_request='Yes').filter(status='acc')
 
@@ -1898,7 +1900,7 @@ class BuyerDetailView(ReadOnlyPermissionMixin, DetailView):
 
     def dispatch(self, request, *args, **kwargs):
         user = request.user
-        if user.title != 'bs':
+        if user.title != 'bs' or user.title != 'nd':
             buyer = self.get_object()
             if buyer.delete_request == 'Yes':
                 raise PermissionDenied("شما اجازه مشاهده این محتوا را ندارید")
@@ -2070,7 +2072,7 @@ class RenterListView(ReadOnlyPermissionMixin, ListView):
     permission_model = 'Renter'
 
     def get_queryset(self):
-        if self.request.user.title == 'bs':
+        if self.request.user.title == 'bs' or self.request.user.title == 'nd':
             queryset_default = models.Renter.objects.select_related('province', 'city', 'district', 'created_by').prefetch_related(
                 'sub_districts').exclude(delete_request='Yes').filter(status='acc')
 
@@ -2124,6 +2126,7 @@ class RenterListView(ReadOnlyPermissionMixin, ListView):
 
                 return queryset_filtered
             return queryset_default
+
         else:
             queryset_default = (
                 (models.Renter.objects.select_related('province', 'city', 'district', 'created_by').prefetch_related('sub_districts'))
@@ -2242,7 +2245,7 @@ class RenterDetailView(ReadOnlyPermissionMixin, DetailView):
 
     def dispatch(self, request, *args, **kwargs):
         user = request.user
-        if user.title != 'bs':
+        if user.title != 'bs' or user.title == 'nd':
             renter = self.get_object()
             if renter.delete_request == 'Yes':
                 raise PermissionDenied("شما اجازه مشاهده این محتوا را ندارید")
@@ -3538,8 +3541,10 @@ class ReportCreateView(LoginRequiredMixin, CreateView):
         now = timezone.now()
         today = datetime2jalali(now)
         today = today.strftime('%Y/%m/%d')
-        user_today_report = models.Report.objects.filter(agent=request.user).filter(date=today)
-        if user_today_report:
+        # user_today_report = models.Report.objects.filter(agent=request.user).filter(date=today)
+        # if user_today_report:
+        #     raise PermissionDenied("گزارش امروز شما موجود است و اجازه دسترسی مجدد ندارید.")
+        if models.Report.objects.filter(agent=request.user).filter(date=today):
             raise PermissionDenied("گزارش امروز شما موجود است و اجازه دسترسی مجدد ندارید.")
         return super().dispatch(request, *args, **kwargs)
 
@@ -3564,11 +3569,12 @@ class ReportCreateView(LoginRequiredMixin, CreateView):
 
         with transaction.atomic():
             self.object = form.save(commit=False)
-            self.object.save(user=self.request.user)
+            self.object.agent = self.request.user
+            self.object.save()
             if formset.is_valid():
                 formset.instance = self.object
                 formset.save()
-                messages.success(self.request, 'گزارش  با موفقیت ثبت شد.')
+                messages.success(self.request, 'گزارش با موفقیت ثبت شد.')
                 return redirect(self.success_url)
             else:
                 return self.form_invalid(form)
@@ -4277,7 +4283,7 @@ class AnnouncementListView(LoginRequiredMixin, ListView):
     paginate_by = 20
 
     def get_queryset(self):
-        return models.Announcement.objects.filter(
+        base_qs = models.Announcement.objects.filter(
             visible_to=self.request.user,
             is_active=True
         ).select_related(
@@ -4287,8 +4293,21 @@ class AnnouncementListView(LoginRequiredMixin, ListView):
             'viewed_by'
         ).order_by('-datetime_created')
 
+        filter_type = self.request.GET.get('filter', 'all')
+        if filter_type == 'sf':
+            return base_qs.filter(announcement_type='sf').order_by('-datetime_created')
+        elif filter_type == 'rf':
+            return base_qs.filter(announcement_type='rf').order_by('-datetime_created')
+        elif filter_type == 'by':
+            return base_qs.filter(announcement_type='by').order_by('-datetime_created')
+        elif filter_type == 'rt':
+            return base_qs.filter(announcement_type='rt').order_by('-datetime_created')
+        else:
+            return base_qs
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['filter_type'] = self.request.GET.get('filter', 'all')
         context['unviewed_count'] = self.get_queryset().exclude(viewed_by=self.request.user).count()
         return context
 
@@ -4305,6 +4324,15 @@ class AnnouncementDetailView(LoginRequiredMixin, DetailView):
             cache.delete(f'notifications_{self.request.user.pk}')
         return announcement
 
+    def get_already_sent_ids(self, announcement, content_type):
+        already_sent_items = models.InteractionItem.objects.filter(
+            interaction__announcement=announcement,
+            interaction__sender=self.request.user,
+            content_type=content_type
+        ).values_list('object_id', flat=True)
+
+        return list(already_sent_items)
+
     def get_suggestions_for_sale_file(self, sale_file):
         suggested_buyers = models.Buyer.objects.select_related(
             'created_by', 'province', 'city', 'district'
@@ -4318,6 +4346,13 @@ class AnnouncementDetailView(LoginRequiredMixin, DetailView):
             area_min__lt=1.2 * sale_file.area,
             area_max__gt=0.8 * sale_file.area
         ).exclude(delete_request='Yes')
+
+        # Exclude already sent buyers
+        buyer_content_type = ContentType.objects.get_for_model(models.Buyer)
+        already_sent_ids = self.get_already_sent_ids(self.object, buyer_content_type)
+        if already_sent_ids:
+            suggested_buyers = suggested_buyers.exclude(id__in=already_sent_ids)
+
         return suggested_buyers
 
     def get_suggestions_for_rent_file(self, rent_file):
@@ -4356,7 +4391,15 @@ class AnnouncementDetailView(LoginRequiredMixin, DetailView):
             area_min__lt=1.2 * rent_file.area,
             area_max__gt=0.8 * rent_file.area
         ).exclude(delete_request='Yes')
+
         suggested_renters = (non_convertable_renters | convertable_renters).distinct()
+
+        # Exclude already sent renters
+        renter_content_type = ContentType.objects.get_for_model(models.Renter)
+        already_sent_ids = self.get_already_sent_ids(self.object, renter_content_type)
+        if already_sent_ids:
+            suggested_renters = suggested_renters.exclude(id__in=already_sent_ids)
+
         return suggested_renters
 
     def get_suggestions_for_buyer(self, buyer):
@@ -4376,6 +4419,13 @@ class AnnouncementDetailView(LoginRequiredMixin, DetailView):
             area__gt=area_min,
             area__lt=area_max
         ).exclude(delete_request='Yes')
+
+        # Exclude already sent sale files
+        sale_file_content_type = ContentType.objects.get_for_model(models.SaleFile)
+        already_sent_ids = self.get_already_sent_ids(self.object, sale_file_content_type)
+        if already_sent_ids:
+            suggested_files = suggested_files.exclude(id__in=already_sent_ids)
+
         return suggested_files
 
     def get_suggestions_for_renter(self, renter):
@@ -4421,6 +4471,13 @@ class AnnouncementDetailView(LoginRequiredMixin, DetailView):
         ).exclude(delete_request='Yes')
 
         suggested_files = (non_convertable_files | convertable_files).distinct()
+
+        # Exclude already sent rent files
+        rent_file_content_type = ContentType.objects.get_for_model(models.RentFile)
+        already_sent_ids = self.get_already_sent_ids(self.object, rent_file_content_type)
+        if already_sent_ids:
+            suggested_files = suggested_files.exclude(id__in=already_sent_ids)
+
         return suggested_files
 
     def get_context_data(self, **kwargs):
@@ -4428,6 +4485,7 @@ class AnnouncementDetailView(LoginRequiredMixin, DetailView):
         announcement = self.object
         suggestions = []
         interaction_type = None
+
         if announcement.announcement_type == 'sf':
             sale_file = announcement.content_object
             suggestions = self.get_suggestions_for_sale_file(sale_file)
@@ -4453,7 +4511,8 @@ class AnnouncementDetailView(LoginRequiredMixin, DetailView):
         context['page_obj'] = page_obj
         context['is_paginated'] = page_obj.has_other_pages()
         context['interaction_type'] = interaction_type
-        context['total_suggestions'] = suggestions.count
+        context['total_suggestions'] = suggestions.count() if hasattr(suggestions, 'count') else len(suggestions)
+
         return context
 
 
@@ -4550,7 +4609,7 @@ class InteractionListView(LoginRequiredMixin, ListView):
         context['filter_type'] = self.request.GET.get('filter', 'all')
         context['unviewed_received_count'] = models.Interaction.objects.filter(
             receiver=self.request.user,
-            status='sent'
+            status='unseen'
         ).count()
         return context
 
@@ -4584,5 +4643,392 @@ class InteractionDetailView(LoginRequiredMixin, DetailView):
         context['announcement_object'] = self.object.announcement.content_object
         return context
 
+
+# ------------------------------- DailyTasks ------------------------------
+class NotifiedTaskListView(LoginRequiredMixin, ListView):
+    model = models.NotifiedTask
+    template_name = 'dashboard/tasks/notified_task_list.html'
+    context_object_name = 'all_tasks'
+
+    def get_queryset(self):
+        return (models.NotifiedTask.objects.filter(agent=self.request.user)
+                .select_related(
+            'related_announcement',
+            'related_interaction_item',
+            'related_interaction_item__interaction__sender',
+            'content_type'
+        )
+                .prefetch_related(
+            'related_announcement__content_object',
+            'related_interaction_item__content_object'
+        )
+                .order_by('status', '-created_at'))
+
+    def _calculate_stats(self, agent, days):
+        base_qs = models.NotifiedTask.objects.filter(
+            agent=agent,
+            created_at__gte=timezone.now() - timedelta(days=days)
+        )
+
+        # Single query to get all counts
+        stats = base_qs.aggregate(
+            # All tasks
+            all_count=Count('id'),
+            all_waiting=Count('id', filter=Q(status='waiting')),
+            all_done=Count('id', filter=Q(status='done')),
+
+            # Suggestion tasks
+            suggestion_count=Count('id', filter=Q(task_type='announcement_suggestions')),
+            suggestion_waiting=Count('id', filter=Q(task_type='announcement_suggestions', status='waiting')),
+            suggestion_done=Count('id', filter=Q(task_type='announcement_suggestions', status='done')),
+
+            # Interaction tasks
+            interaction_count=Count('id', filter=Q(task_type='received_interaction')),
+            interaction_waiting=Count('id', filter=Q(task_type='received_interaction', status='waiting')),
+            interaction_done=Count('id', filter=Q(task_type='received_interaction', status='done')),
+        )
+
+        # Calculate percentages
+        def calculate_percentage(part, total):
+            return round(100 * (part / total), 1) if total != 0 else '-'
+
+        return {
+            'all_tasks_all_statuses': stats['all_count'],
+            'all_tasks_waiting': stats['all_waiting'],
+            'all_tasks_done': stats['all_done'],
+            'all_tasks_done_percentage': calculate_percentage(stats['all_done'], stats['all_count']),
+
+            'suggestion_tasks_all_statuses': stats['suggestion_count'],
+            'suggestion_tasks_waiting': stats['suggestion_waiting'],
+            'suggestion_tasks_done': stats['suggestion_done'],
+            'suggestion_tasks_done_percentage': calculate_percentage(stats['suggestion_done'],
+                                                                     stats['suggestion_count']),
+
+            'interaction_tasks_all_statuses': stats['interaction_count'],
+            'interaction_tasks_waiting': stats['interaction_waiting'],
+            'interaction_tasks_done': stats['interaction_done'],
+            'interaction_tasks_done_percentage': calculate_percentage(stats['interaction_done'],
+                                                                      stats['interaction_count']),
+        }
+
+    def _get_basic_counts(self, agent):
+        counts = models.NotifiedTask.objects.filter(agent=agent).aggregate(
+            announcement_tasks_count=Count('id', filter=Q(task_type='announcement_suggestions')),
+            waiting_received_tasks_count=Count('id', filter=Q(task_type='received_interaction', status='waiting')),
+            waiting_suggested_tasks_count=Count('id', filter=Q(task_type='announcement_suggestions', status='waiting')),
+            all_waiting_count=Count('id', filter=Q(status='waiting')),
+        )
+
+        return counts
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        agent = self.request.user
+
+        # Get all tasks with optimized queryset
+        all_tasks = self.get_queryset()
+
+        # Filter tasks in Python to avoid additional DB queries
+        all_tasks_list = list(all_tasks)
+        context['announcement_tasks'] = [task for task in all_tasks_list if
+                                         task.task_type == 'announcement_suggestions']
+        context['received_tasks'] = [task for task in all_tasks_list if task.task_type == 'received_interaction']
+
+        # Get basic counts in single query
+        basic_counts = self._get_basic_counts(agent)
+        context['announcement_tasks_count'] = basic_counts['announcement_tasks_count']
+        context['waiting_received_tasks_count'] = basic_counts['waiting_received_tasks_count']
+        context['waiting_suggested_tasks_count'] = basic_counts['waiting_suggested_tasks_count']
+
+        # Date information
+        today = jdatetime.date.today()
+        context['today'] = today.strftime('%Y/%m/%d')
+        context['today_display'] = today.strftime('%A، %d %B %Y')
+        context['is_friday'] = today.weekday() == 6
+        if not context['is_friday']:
+            context['daily_status'] = models.DailyTaskStatus.get_or_create_for_today(self.request.user)
+
+        # Calculate stats for 10 and 30 days in single queries
+        stats_10 = self._calculate_stats(agent, 10)
+        stats_30 = self._calculate_stats(agent, 30)
+
+        # Add 10-day stats to context
+        for key, value in stats_10.items():
+            context[f"{key}_10"] = value
+
+        # Add 30-day stats to context
+        for key, value in stats_30.items():
+            context[f"{key}_30"] = value
+
+        # Fix the typo in the original code
+        if context.get('suggestion_tasks_done_percentage_30') == '-':
+            context['all_tasks_done_percentage_30'] = '-'
+
+        # Additional counts for notifications (optimized)
+        from django.db.models import Count, Q, Exists, OuterRef
+
+        # Announcement count
+        announcement_count = models.Announcement.objects.filter(
+            is_active=True,
+            visible_to=agent
+        ).exclude(
+            viewed_by=agent
+        ).count()
+        context['unseen_announcements_count'] = announcement_count
+
+        # Interaction count
+        interaction_count = models.Interaction.objects.filter(
+            receiver=agent,
+            status='sent'
+        ).count()
+        context['unseen_interactions_count'] = interaction_count
+
+        # Waiting tasks count
+        context['waiting_tasks_count'] = basic_counts['all_waiting_count']
+
+        # Sub_district (if needed)
+        if hasattr(agent, 'sub_district') and agent.sub_district:
+            # This will use the cached relation if available
+            context['agent_subdistrict'] = agent.sub_district
+
+        return context
+
+
+class NotifiedTaskDetailView(LoginRequiredMixin, DetailView):
+    model = models.NotifiedTask
+    template_name = 'dashboard/tasks/notified_task_detail.html'
+    context_object_name = 'task'
+
+    def get_queryset(self):
+        return models.NotifiedTask.objects.filter(
+            agent=self.request.user
+        ).select_related(
+            'related_announcement',
+            'related_interaction_item',
+            'related_interaction_item__interaction',
+            'related_interaction_item__interaction__sender',
+            'content_type'
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.object.content_object:
+            context['related_object'] = self.object.content_object
+        if self.object.related_announcement:
+            context['announcement_object'] = self.object.related_announcement.content_object
+            context['all_suggestions'] = self.object.related_announcement.get_suggestions_for_agent(self.request.user)
+        if self.object.related_interaction_item:
+            context['interaction'] = self.object.related_interaction_item.interaction
+            context['sender'] = self.object.related_interaction_item.interaction.sender
+        return context
+
+
+class BossAccessMixin(UserPassesTestMixin):
+    def test_func(self):
+        return self.request.user.is_authenticated and self.request.user.title == 'bs'
+
+
+class BossAgentTaskListView(LoginRequiredMixin, BossAccessMixin, ListView):
+    model = models.CustomUserModel
+    template_name = 'dashboard/tasks/boss_agent_task_list.html'
+    context_object_name = 'agents_by_district'
+
+    def get_queryset(self):
+        thirty_days_ago = timezone.now() - timedelta(days=30)
+
+        agents = models.CustomUserModel.objects.filter(
+            title__in=['fp', 'cp', 'bt', 'nd']
+        ).select_related('sub_district').annotate(
+            total_tasks=Count('notified_tasks', filter=Q(notified_tasks__created_at__gte=thirty_days_ago)),
+            waiting_tasks=Count('notified_tasks', filter=Q(notified_tasks__status='waiting',
+                                                           notified_tasks__created_at__gte=thirty_days_ago)),
+            done_tasks=Count('notified_tasks',
+                             filter=Q(notified_tasks__status='done', notified_tasks__created_at__gte=thirty_days_ago)),
+            done_percentage=Case(
+                When(total_tasks=0, then=0.0),
+                default=Cast(F('done_tasks'), FloatField()) * 100.0 / Cast(F('total_tasks'), FloatField()),
+                output_field=FloatField()
+            )
+        ).order_by('sub_district__name', 'name_family')
+
+        return agents
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Organize agents by sub_district
+        agents = self.get_queryset()
+        agents_by_district = {}
+
+        for agent in agents:
+            district_name = agent.sub_district.name if agent.sub_district else 'بدون محله'
+            if district_name not in agents_by_district:
+                agents_by_district[district_name] = []
+            agents_by_district[district_name].append(agent)
+
+        context['agents_by_district'] = agents_by_district
+
+        # Overall statistics
+        context['total_agents'] = agents.count()
+        context['total_waiting_tasks'] = sum(agent.waiting_tasks for agent in agents)
+
+        return context
+
+
+class BossAgentTaskDetailView(LoginRequiredMixin, BossAccessMixin, TemplateView):
+    template_name = 'dashboard/tasks/boss_agent_task_detail.html'
+
+    def get_agent_queryset(self, agent):
+        return (models.NotifiedTask.objects.filter(agent=agent)
+                .select_related(
+            'related_announcement',
+            'related_interaction_item',
+            'related_interaction_item__interaction__sender',
+            'content_type'
+        )
+                .prefetch_related(
+            'related_announcement__content_object',
+            'related_interaction_item__content_object'
+        )
+                .order_by('status', '-created_at'))
+
+    def _calculate_stats(self, agent, days):
+        base_qs = models.NotifiedTask.objects.filter(
+            agent=agent,
+            created_at__gte=timezone.now() - timedelta(days=days)
+        )
+
+        stats = base_qs.aggregate(
+            all_count=Count('id'),
+            all_waiting=Count('id', filter=Q(status='waiting')),
+            all_done=Count('id', filter=Q(status='done')),
+            suggestion_count=Count('id', filter=Q(task_type='announcement_suggestions')),
+            suggestion_waiting=Count('id', filter=Q(task_type='announcement_suggestions', status='waiting')),
+            suggestion_done=Count('id', filter=Q(task_type='announcement_suggestions', status='done')),
+            interaction_count=Count('id', filter=Q(task_type='received_interaction')),
+            interaction_waiting=Count('id', filter=Q(task_type='received_interaction', status='waiting')),
+            interaction_done=Count('id', filter=Q(task_type='received_interaction', status='done')),
+        )
+
+        def calculate_percentage(part, total):
+            return round(100 * (part / total), 1) if total != 0 else '-'
+
+        return {
+            'all_tasks_all_statuses': stats['all_count'],
+            'all_tasks_waiting': stats['all_waiting'],
+            'all_tasks_done': stats['all_done'],
+            'all_tasks_done_percentage': calculate_percentage(stats['all_done'], stats['all_count']),
+            'suggestion_tasks_all_statuses': stats['suggestion_count'],
+            'suggestion_tasks_waiting': stats['suggestion_waiting'],
+            'suggestion_tasks_done': stats['suggestion_done'],
+            'suggestion_tasks_done_percentage': calculate_percentage(stats['suggestion_done'],
+                                                                     stats['suggestion_count']),
+            'interaction_tasks_all_statuses': stats['interaction_count'],
+            'interaction_tasks_waiting': stats['interaction_waiting'],
+            'interaction_tasks_done': stats['interaction_done'],
+            'interaction_tasks_done_percentage': calculate_percentage(stats['interaction_done'],
+                                                                      stats['interaction_count']),
+        }
+
+    def _get_basic_counts(self, agent):
+        counts = models.NotifiedTask.objects.filter(agent=agent).aggregate(
+            announcement_tasks_count=Count('id', filter=Q(task_type='announcement_suggestions')),
+            waiting_received_tasks_count=Count('id', filter=Q(task_type='received_interaction', status='waiting')),
+            waiting_suggested_tasks_count=Count('id', filter=Q(task_type='announcement_suggestions', status='waiting')),
+            all_waiting_count=Count('id', filter=Q(status='waiting')),
+        )
+        return counts
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Get the agent
+        agent = get_object_or_404(
+            models.CustomUserModel,
+            pk=self.kwargs['agent_pk'],
+            title__in=['fp', 'cp', 'bt']
+        )
+        context['agent'] = agent
+
+        # Get all tasks with optimized queryset
+        all_tasks = self.get_agent_queryset(agent)
+        all_tasks_list = list(all_tasks)
+
+        context['all_tasks'] = all_tasks_list
+        context['announcement_tasks'] = [task for task in all_tasks_list if
+                                         task.task_type == 'announcement_suggestions']
+        context['received_tasks'] = [task for task in all_tasks_list if task.task_type == 'received_interaction']
+
+        # Get basic counts in single query
+        basic_counts = self._get_basic_counts(agent)
+        context['announcement_tasks_count'] = basic_counts['announcement_tasks_count']
+        context['waiting_received_tasks_count'] = basic_counts['waiting_received_tasks_count']
+        context['waiting_suggested_tasks_count'] = basic_counts['waiting_suggested_tasks_count']
+        context['waiting_tasks_count'] = basic_counts['all_waiting_count']
+
+        # Date information
+        today = jdatetime.date.today()
+        context['today'] = today.strftime('%Y/%m/%d')
+        context['today_display'] = today.strftime('%A، %d %B %Y')
+        context['is_friday'] = today.weekday() == 6
+
+        # Don't include daily_status for boss view
+        context['is_boss_view'] = True
+
+        # Calculate stats for 10 and 30 days
+        stats_10 = self._calculate_stats(agent, 10)
+        stats_30 = self._calculate_stats(agent, 30)
+
+        # Add 10-day stats to context
+        for key, value in stats_10.items():
+            context[f"{key}_10"] = value
+
+        # Add 30-day stats to context
+        for key, value in stats_30.items():
+            context[f"{key}_30"] = value
+
+        # Fix the typo in the original code
+        if context.get('suggestion_tasks_done_percentage_30') == '-':
+            context['all_tasks_done_percentage_30'] = '-'
+
+        # Sub_district (if needed)
+        if hasattr(agent, 'sub_district') and agent.sub_district:
+            context['agent_subdistrict'] = agent.sub_district
+
+        return context
+
+
+# AJAX
+@require_POST
+def complete_received_task(request, task_id):
+    task = get_object_or_404(models.NotifiedTask, pk=task_id, agent=request.user, task_type='received_interaction')
+    if task.status != 'waiting':
+        messages.error(request, 'این وظیفه قبلاً تکمیل شده است.')
+        return redirect('notified_task_list')
+    form = forms.NotifiedTaskCompletionForm(request.POST, instance=task)
+    if form.is_valid():
+        result = form.cleaned_data.get('result', '')
+        task.mark_as_done(result)
+        cache.delete(f'notifications_{request.user.pk}')
+        messages.success(request, 'وظیفه با موفقیت تکمیل شد.')
+        return redirect('notified_task_list')
+    else:
+        messages.error(request, 'لطفاً فرم را به درستی پر کنید.')
+        return redirect('notified_task_list')
+
+
+def get_task_count(request):
+    if request.user.is_authenticated:
+        tasks = models.NotifiedTask.objects.filter(
+            agent=request.user
+        )
+        return JsonResponse({
+            'total': tasks.count(),
+            'waiting': tasks.filter(status='waiting').count(),
+            'done': tasks.filter(status='done').count(),
+            'announcement_suggestions': tasks.filter(task_type='announcement_suggestions', status='waiting').count(),
+            'received_interaction': tasks.filter(task_type='received_interaction', status='waiting').count(),
+        })
+    return JsonResponse({'error': 'Unauthorized'}, status=401)
 
 

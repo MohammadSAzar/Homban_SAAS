@@ -32,11 +32,11 @@
                                     {% if announcement.announcement_type == 'sf' %}
                                         <em class="icon ni ni-home-alt"></em> یک فایل فروش جدید ساخته شده!
                                     {% elif announcement.announcement_type == 'rf' %}
-                                        <em class="icon ni ni-key"></em> یک فایل اجاره جدید ساخته شده!
+                                        <em class="icon ni ni-home-alt"></em> یک فایل اجاره جدید ساخته شده!
                                     {% elif announcement.announcement_type == 'by' %}
                                         <em class="icon ni ni-user-check"></em>  یک خریدار جدید ساخته شده!
                                     {% elif announcement.announcement_type == 'rt' %}
-                                        <em class="icon ni ni-users"></em>  یک مستاجر جدید ساخته شده!
+                                        <em class="icon ni ni-user-check"></em>  یک مستاجر جدید ساخته شده!
                                     {% endif %}
                                 </h5>
                             </div>
@@ -69,49 +69,40 @@
                         </div>
                         <hr style="margin: 20px 0;">
 
-                        <!-- Objects -->
-                        <h6 class="title" style="margin-bottom: 15px;">جزئیات</h6>
+                        <!-- Info -->
+                        <h5 class="title" style="margin-bottom: 15px; margin-top: 2em;">
+                            <em class="icon ni ni-info" style="margin-left: 5px; font-weight: normal;"></em>جزئیات
+                        </h5>
                         {% with obj=announcement.content_object %}
                             <div class="row gy-3">
                                 <!-- SF -->
                                 {% if announcement.announcement_type == 'sf' %}
-                                    <!-- code + see -->
+                                    <!-- title + see -->
                                     {% if request.user.sub_district == obj.sub_district or request.user.title == 'bs' %}
-                                        <div class="col-lg-3 col-sm-6">
+                                        <div class="col-lg-4 col-sm-6">
                                             <div class="form-group">
-                                                <label class="form-label">کد</label>
+                                                <label class="form-label">عنوان</label>
                                                 <a href="{% url 'sale_file_detail' obj.pk obj.unique_url_id %}" target="_blank">
                                                     <div class="form-control-wrap">
                                                         <div type="text" class="form-control form-control-xl form-control-outlined" style="background-color: #E0F2F1">
-                                                            {{ obj.code|farsi_number }}
+                                                            {{ obj.title|farsi_number }}
                                                         </div>
                                                     </div>
                                                 </a>
                                             </div>
                                         </div>
                                     {% else %}
-                                        <div class="col-lg-3 col-sm-6">
+                                        <div class="col-lg-4 col-sm-6">
                                             <div class="form-group">
-                                                <label class="form-label">کد</label>
+                                                <label class="form-label">عنوان</label>
                                                 <div class="form-control-wrap">
                                                     <div type="text" class="form-control form-control-xl form-control-outlined">
-                                                        {{ obj.code|farsi_number }}
+                                                        {{ obj.title|farsi_number }}
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     {% endif %}
-                                    <!-- sub_district -->
-                                    <div class="col-lg-3 col-sm-6">
-                                        <div class="form-group">
-                                            <label class="form-label">زیرمحله</label>
-                                            <div class="form-control-wrap">
-                                                <div type="text" class="form-control form-control-xl form-control-outlined">
-                                                    {{ obj.sub_district }}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
                                     <!-- price -->
                                     <div class="col-lg-3 col-sm-6">
                                         <div class="form-group">
@@ -124,44 +115,16 @@
                                         </div>
                                     </div>
                                     <!-- area -->
-                                    <div class="col-lg-3 col-sm-6">
+                                    <div class="col-lg-2 col-sm-6">
                                         <div class="form-group">
                                             <label class="form-label">متراژ</label>
                                             <div class="form-control-wrap">
                                                 <div type="text" class="form-control form-control-xl form-control-outlined">
-                                                    {{ obj.area|farsi_number }} متر
+                                                    {{ obj.area|farsi_number }}
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                <!-- RF -->
-                                {% elif announcement.announcement_type == 'rf' %}
-                                    <!-- code + see -->
-                                    {% if request.user.sub_district == obj.sub_district or request.user.title == 'bs' %}
-                                        <div class="col-lg-3 col-sm-6">
-                                            <div class="form-group">
-                                                <label class="form-label">کد</label>
-                                                <a href="{% url 'rent_file_detail' obj.pk obj.unique_url_id %}" target="_blank">
-                                                    <div class="form-control-wrap">
-                                                        <div type="text" class="form-control form-control-xl form-control-outlined" style="background-color: #E0F2F1">
-                                                            {{ obj.code|farsi_number }}
-                                                        </div>
-                                                    </div>
-                                                </a>
-                                            </div>
-                                        </div>
-                                    {% else %}
-                                        <div class="col-lg-3 col-sm-6">
-                                            <div class="form-group">
-                                                <label class="form-label">کد</label>
-                                                <div class="form-control-wrap">
-                                                    <div type="text" class="form-control form-control-xl form-control-outlined">
-                                                        {{ obj.code|farsi_number }}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    {% endif %}
                                     <!-- sub_district -->
                                     <div class="col-lg-3 col-sm-6">
                                         <div class="form-group">
@@ -173,6 +136,34 @@
                                             </div>
                                         </div>
                                     </div>
+                                <!-- RF -->
+                                {% elif announcement.announcement_type == 'rf' %}
+                                    <!-- title + see -->
+                                    {% if request.user.sub_district == obj.sub_district or request.user.title == 'bs' %}
+                                        <div class="col-lg-4 col-sm-6">
+                                            <div class="form-group">
+                                                <label class="form-label">عنوان</label>
+                                                <a href="{% url 'rent_file_detail' obj.pk obj.unique_url_id %}" target="_blank">
+                                                    <div class="form-control-wrap">
+                                                        <div type="text" class="form-control form-control-xl form-control-outlined" style="background-color: #E0F2F1">
+                                                            {{ obj.title|farsi_number }}
+                                                        </div>
+                                                    </div>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <div class="col-lg-4 col-sm-6">
+                                            <div class="form-group">
+                                                <label class="form-label">عنوان</label>
+                                                <div class="form-control-wrap">
+                                                    <div type="text" class="form-control form-control-xl form-control-outlined">
+                                                        {{ obj.title|farsi_number }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endif %}
                                     <!-- deposit -->
                                     <div class="col-lg-2 col-sm-6">
                                         <div class="form-group">
@@ -201,24 +192,50 @@
                                             <label class="form-label">متراژ</label>
                                             <div class="form-control-wrap">
                                                 <div type="text" class="form-control form-control-xl form-control-outlined">
-                                                    {{ obj.area|farsi_number }} متر
+                                                    {{ obj.area|farsi_number }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- sub_district -->
+                                    <div class="col-lg-2 col-sm-6">
+                                        <div class="form-group">
+                                            <label class="form-label">زیرمحله</label>
+                                            <div class="form-control-wrap">
+                                                <div type="text" class="form-control form-control-xl form-control-outlined">
+                                                    {{ obj.sub_district }}
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 <!-- BY -->
                                 {% elif announcement.announcement_type == 'by' %}
-                                    <!-- code -->
-                                    <div class="col-lg-3 col-sm-6">
-                                        <div class="form-group">
-                                            <label class="form-label">کد</label>
-                                            <div class="form-control-wrap">
-                                                <div type="text" class="form-control form-control-xl form-control-outlined">
-                                                    {{ obj.code|farsi_number }}
+                                    <!-- name + see -->
+                                    {% if request.user.title == 'bs' %}
+                                        <div class="col-lg-2 col-sm-6">
+                                            <div class="form-group">
+                                                <label class="form-label">نام</label>
+                                                <a href="{% url 'buyer_detail' obj.pk obj.code %}" target="_blank">
+                                                    <div class="form-control-wrap">
+                                                        <div type="text" class="form-control form-control-xl form-control-outlined" style="background-color: #E0F2F1">
+                                                            {{ obj.name }}
+                                                        </div>
+                                                    </div>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <div class="col-lg-2 col-sm-6">
+                                            <div class="form-group">
+                                                <label class="form-label">نام</label>
+                                                <div class="form-control-wrap">
+                                                    <div type="text" class="form-control form-control-xl form-control-outlined">
+                                                        {{ obj.name}}
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    {% endif %}
                                     <!-- budget -->
                                     <div class="col-lg-3 col-sm-6">
                                         <div class="form-group">
@@ -231,43 +248,57 @@
                                         </div>
                                     </div>
                                     <!-- area -->
-                                    <div class="col-lg-3 col-sm-6">
+                                    <div class="col-lg-2 col-sm-6">
                                         <div class="form-group">
                                             <label class="form-label">محدوده متراژ</label>
                                             <div class="form-control-wrap">
                                                 <div type="text" class="form-control form-control-xl form-control-outlined">
-                                                    {{ obj.area_min|farsi_number }} - {{ obj.area_max|farsi_number }} متر
+                                                    {{ obj.area_min|farsi_number }} - {{ obj.area_max|farsi_number }}
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                     <!-- sub_districts -->
-                                    <div class="col-lg-3 col-sm-6">
+                                    <div class="col-lg-5 col-sm-6">
                                         <div class="form-group">
                                             <label class="form-label">زیرمحله‌ها</label>
                                             <div class="form-control-wrap">
                                                 <div type="text" class="form-control form-control-xl form-control-outlined">
-                                                    {% for sd in obj.sub_districts.all|slice:":3" %}
+                                                    {% for sd in obj.sub_districts.all %}
                                                         {{ sd.name }}{% if not forloop.last %}، {% endif %}
                                                     {% endfor %}
-                                                    {% if obj.sub_districts.count > 3 %}...{% endif %}
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 <!-- RT -->
                                 {% elif announcement.announcement_type == 'rt' %}
-                                    <!-- code -->
-                                    <div class="col-lg-2 col-sm-6">
-                                        <div class="form-group">
-                                            <label class="form-label">کد</label>
-                                            <div class="form-control-wrap">
-                                                <div type="text" class="form-control form-control-xl form-control-outlined">
-                                                    {{ obj.code|farsi_number }}
+                                    <!-- name + see -->
+                                    {% if request.user.title == 'bs' %}
+                                        <div class="col-lg-2 col-sm-6">
+                                            <div class="form-group">
+                                                <label class="form-label">نام</label>
+                                                <a href="{% url 'buyer_detail' obj.pk obj.code %}" target="_blank">
+                                                    <div class="form-control-wrap">
+                                                        <div type="text" class="form-control form-control-xl form-control-outlined" style="background-color: #E0F2F1">
+                                                            {{ obj.name }}
+                                                        </div>
+                                                    </div>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <div class="col-lg-2 col-sm-6">
+                                            <div class="form-group">
+                                                <label class="form-label">نام</label>
+                                                <div class="form-control-wrap">
+                                                    <div type="text" class="form-control form-control-xl form-control-outlined">
+                                                        {{ obj.name}}
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    {% endif %}
                                     <!-- deposit -->
                                     <div class="col-lg-2 col-sm-6">
                                         <div class="form-group">
@@ -291,26 +322,25 @@
                                         </div>
                                     </div>
                                     <!-- area -->
-                                    <div class="col-lg-3 col-sm-6">
+                                    <div class="col-lg-2 col-sm-6">
                                         <div class="form-group">
                                             <label class="form-label">محدوده متراژ</label>
                                             <div class="form-control-wrap">
                                                 <div type="text" class="form-control form-control-xl form-control-outlined">
-                                                    {{ obj.area_min|farsi_number }} - {{ obj.area_max|farsi_number }} متر
+                                                    {{ obj.area_min|farsi_number }} - {{ obj.area_max|farsi_number }}
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                     <!-- sub_districts -->
-                                    <div class="col-lg-3 col-sm-6">
+                                    <div class="col-lg-4 col-sm-6">
                                         <div class="form-group">
                                             <label class="form-label">زیرمحله‌ها</label>
                                             <div class="form-control-wrap">
                                                 <div type="text" class="form-control form-control-xl form-control-outlined">
-                                                    {% for sd in obj.sub_districts.all|slice:":3" %}
+                                                    {% for sd in obj.sub_districts.all %}
                                                         {{ sd.name }}{% if not forloop.last %}، {% endif %}
                                                     {% endfor %}
-                                                    {% if obj.sub_districts.count > 3 %}...{% endif %}
                                                 </div>
                                             </div>
                                         </div>
@@ -388,20 +418,21 @@
                                             <div style="flex: 1;">
                                                 <div class="row gy-3">
 
-                                                    <!-- code -->
-                                                    <div class="col-lg-2 col-sm-4">
-                                                        <div class="form-group">
-                                                            <label class="form-label">کد</label>
-                                                            <div class="form-control-wrap">
-                                                                <div type="text" class="form-control form-control-outlined">
-                                                                    {{ suggestion.code|farsi_number }}
-                                                                </div>
+                                                    <!-- BYs to SFs -->
+                                                    {% if interaction_type == 'buyers_to_sale_file' %}
+                                                        <!-- name (+ link)-->
+                                                        <div class="col-lg-2 col-sm-4">
+                                                            <div class="form-group">
+                                                                <label class="form-label">نام</label>
+                                                                <a href="{{ suggestion.get_absolute_url }}" target="_blank">
+                                                                    <div class="form-control-wrap">
+                                                                        <div type="text" class="form-control form-control-outlined" style="background-color: #E0F2F1">
+                                                                            {{ suggestion.name }}
+                                                                        </div>
+                                                                    </div>
+                                                                </a>
                                                             </div>
                                                         </div>
-                                                    </div>
-
-                                                    <!-- buyers_to_sale_file -->
-                                                    {% if interaction_type == 'buyers_to_sale_file' %}
                                                         <!-- budget -->
                                                         <div class="col-lg-3 col-sm-4">
                                                             <div class="form-group">
@@ -414,9 +445,9 @@
                                                             </div>
                                                         </div>
                                                         <!-- area -->
-                                                        <div class="col-lg-3 col-sm-4">
+                                                        <div class="col-lg-2 col-sm-4">
                                                             <div class="form-group">
-                                                                <label class="form-label">محدوده متراژ</label>
+                                                                <label class="form-label">متراژ</label>
                                                                 <div class="form-control-wrap">
                                                                     <div type="text" class="form-control form-control-outlined">
                                                                         {{ suggestion.area_min|farsi_number }} - {{ suggestion.area_max|farsi_number }}
@@ -425,23 +456,35 @@
                                                             </div>
                                                         </div>
                                                         <!-- sub_districts -->
-                                                        <div class="col-lg-3 col-sm-4">
+                                                        <div class="col-lg-5 col-sm-4">
                                                             <div class="form-group">
                                                                 <label class="form-label">زیرمحله‌ (ها)</label>
                                                                 <div class="form-control-wrap">
                                                                     <div type="text" class="form-control form-control-outlined">
-                                                                        {% for sd in suggestion.sub_districts.all|slice:":2" %}
+                                                                        {% for sd in suggestion.sub_districts.all %}
                                                                             {{ sd.name }}{% if not forloop.last %}، {% endif %}
                                                                         {% endfor %}
-                                                                        {% if suggestion.sub_districts.count > 2 %}...{% endif %}
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                    <!-- renters_to_rent_file -->
+                                                    <!-- RTs to RFs -->
                                                     {% elif interaction_type == 'renters_to_rent_file' %}
+                                                        <!-- name (+ link)-->
+                                                        <div class="col-lg-2 col-sm-4">
+                                                            <div class="form-group">
+                                                                <label class="form-label">نام</label>
+                                                                <a href="{{ suggestion.get_absolute_url }}" target="_blank">
+                                                                    <div class="form-control-wrap">
+                                                                        <div type="text" class="form-control form-control-outlined" style="background-color: #E0F2F1">
+                                                                            {{ suggestion.name }}
+                                                                        </div>
+                                                                    </div>
+                                                                </a>
+                                                            </div>
+                                                        </div>
                                                         <!-- deposit -->
-                                                        <div class="col-lg-3 col-sm-4">
+                                                        <div class="col-lg-2 col-sm-4">
                                                             <div class="form-group">
                                                                 <label class="form-label">ودیعه</label>
                                                                 <div class="form-control-wrap">
@@ -452,7 +495,7 @@
                                                             </div>
                                                         </div>
                                                         <!-- rent -->
-                                                        <div class="col-lg-3 col-sm-4">
+                                                        <div class="col-lg-2 col-sm-4">
                                                             <div class="form-group">
                                                                 <label class="form-label">اجاره</label>
                                                                 <div class="form-control-wrap">
@@ -468,27 +511,39 @@
                                                                 <label class="form-label">متراژ</label>
                                                                 <div class="form-control-wrap">
                                                                     <div type="text" class="form-control form-control-outlined">
-                                                                        {{ suggestion.area|farsi_number }}
+                                                                        {{ suggestion.area_min|farsi_number }} - {{ suggestion.area_max|farsi_number }}
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                         <!-- sub_districts -->
-                                                        <div class="col-lg-3 col-sm-4">
+                                                        <div class="col-lg-4 col-sm-4">
                                                             <div class="form-group">
                                                                 <label class="form-label">زیرمحله‌ (ها)</label>
                                                                 <div class="form-control-wrap">
                                                                     <div type="text" class="form-control form-control-outlined">
-                                                                        {% for sd in suggestion.sub_districts.all|slice:":2" %}
+                                                                        {% for sd in suggestion.sub_districts.all %}
                                                                             {{ sd.name }}{% if not forloop.last %}، {% endif %}
                                                                         {% endfor %}
-                                                                        {% if suggestion.sub_districts.count > 2 %}...{% endif %}
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                    <!-- sale_files_to_buyer -->
+                                                    <!-- SFs to BYs -->
                                                     {% elif interaction_type == 'sale_files_to_buyer' %}
+                                                        <!-- title (+ link)-->
+                                                        <div class="col-lg-5 col-sm-4">
+                                                            <div class="form-group">
+                                                                <label class="form-label">عنوان</label>
+                                                                <a href="{{ suggestion.get_absolute_url }}" target="_blank">
+                                                                    <div class="form-control-wrap">
+                                                                        <div type="text" class="form-control form-control-outlined" style="background-color: #E0F2F1">
+                                                                            {{ suggestion.title|farsi_number }}
+                                                                        </div>
+                                                                    </div>
+                                                                </a>
+                                                            </div>
+                                                        </div>
                                                         <!-- price -->
                                                         <div class="col-lg-3 col-sm-4">
                                                             <div class="form-group">
@@ -511,21 +566,34 @@
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <!-- sub_districts -->
-                                                        <div class="col-lg-3 col-sm-4">
+                                                        <!-- sub_district -->
+                                                        <div class="col-lg-2 col-sm-4">
                                                             <div class="form-group">
-                                                                <label class="form-label">زیرمحله‌ (ها)</label>
+                                                                <label class="form-label">زیرمحله</label>
                                                                 <div class="form-control-wrap">
                                                                     <div type="text" class="form-control form-control-outlined">
-                                                                        {{ suggestion.sub_district|farsi_number }}
+                                                                        {{ suggestion.sub_district }}
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                    <!-- rent_files_to_renter -->
+                                                    <!-- RFs to RTs -->
                                                     {% elif interaction_type == 'rent_files_to_renter' %}
+                                                        <!-- title (+ link)-->
+                                                        <div class="col-lg-4 col-sm-4">
+                                                            <div class="form-group">
+                                                                <label class="form-label">عنوان</label>
+                                                                <a href="{{ suggestion.get_absolute_url }}" target="_blank">
+                                                                    <div class="form-control-wrap">
+                                                                        <div type="text" class="form-control form-control-outlined" style="background-color: #E0F2F1">
+                                                                            {{ suggestion.title|farsi_number }}
+                                                                        </div>
+                                                                    </div>
+                                                                </a>
+                                                            </div>
+                                                        </div>
                                                         <!-- deposit -->
-                                                        <div class="col-lg-3 col-sm-4">
+                                                        <div class="col-lg-2 col-sm-4">
                                                             <div class="form-group">
                                                                 <label class="form-label">ودیعه</label>
                                                                 <div class="form-control-wrap">
@@ -536,7 +604,7 @@
                                                             </div>
                                                         </div>
                                                         <!-- rent -->
-                                                        <div class="col-lg-3 col-sm-4">
+                                                        <div class="col-lg-2 col-sm-4">
                                                             <div class="form-group">
                                                                 <label class="form-label">اجاره</label>
                                                                 <div class="form-control-wrap">
@@ -557,52 +625,21 @@
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <!-- sub_districts -->
-                                                        <div class="col-lg-3 col-sm-4">
+                                                        <!-- sub_district -->
+                                                        <div class="col-lg-2 col-sm-4">
                                                             <div class="form-group">
-                                                                <label class="form-label">زیرمحله‌ (ها)</label>
+                                                                <label class="form-label">زیرمحله</label>
                                                                 <div class="form-control-wrap">
                                                                     <div type="text" class="form-control form-control-outlined">
-                                                                        {{ suggestion.sub_district|farsi_number }}
+                                                                        {{ suggestion.sub_district }}
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     {% endif %}
 
-                                                    <!-- Links -->
-                                                    <div class="col-lg-1 col-sm-4">
-                                                        <div class="form-group">
-                                                            <label class="form-label">مشاهده</label>
-                                                            <div class="form-control-wrap">
-                                                                {% if interaction_type == 'buyers_to_sale_file' %}
-                                                                    <a href="{% url 'buyer_detail' suggestion.pk suggestion.code %}"
-                                                                       class="btn btn-outline-primary btn-sm" target="_blank">
-                                                                        <em class="icon ni ni-eye"></em>
-                                                                    </a>
-                                                                {% elif interaction_type == 'renters_to_rent_file' %}
-                                                                    <a href="{% url 'renter_detail' suggestion.pk suggestion.code %}"
-                                                                       class="btn btn-outline-primary btn-sm" target="_blank">
-                                                                        <em class="icon ni ni-eye"></em>
-                                                                    </a>
-                                                                {% elif interaction_type == 'sale_files_to_buyer' %}
-                                                                    <a href="{% url 'sale_file_detail' suggestion.pk suggestion.unique_url_id %}"
-                                                                       class="btn btn-outline-primary btn-sm" target="_blank">
-                                                                        <em class="icon ni ni-eye"></em>
-                                                                    </a>
-                                                                {% elif interaction_type == 'rent_files_to_renter' %}
-                                                                    <a href="{% url 'rent_file_detail' suggestion.pk suggestion.unique_url_id %}"
-                                                                       class="btn btn-outline-primary btn-sm" target="_blank">
-                                                                        <em class="icon ni ni-eye"></em>
-                                                                    </a>
-                                                                {% endif %}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
                                                 </div>
                                             </div>
-                                            <!-- end: Info -->
 
                                         </div>
                                     </div>
@@ -705,4 +742,5 @@
     <!-- end: JS -->
 
 {% endblock %}
+
 

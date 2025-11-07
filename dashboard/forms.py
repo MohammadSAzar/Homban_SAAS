@@ -68,7 +68,7 @@ class SaleFileCreateForm(forms.ModelForm):
             self.add_error('price_min', 'قیمت فایل باید بین 1 تا 1000 میلیارد تومان باشد')
         if area and not checkers.area_checker(area):
             self.add_error('area', 'متراژ فایل باید بین 20 تا 10000 متر باشد.')
-        if self.user.title != 'bs' and sub_district != self.user.sub_district:
+        if (self.user.title != 'bs' and self.user.title != 'nd') and sub_district != self.user.sub_district:
             self.add_error('sub_district', 'مشاور اجازه ایجاد فایل جدید در این زیرمحله را ندارد')
 
         return cleaned_data
@@ -202,7 +202,7 @@ class SaleFileRecoverForm(forms.ModelForm):
         return cleaned_data
 
 
-# --------------------------------- Files ---------------------------------
+# --------------------------------- Rent Files ---------------------------------
 create_rent_file_fields = ['province', 'city', 'district', 'sub_district', 'address', 'street', 'deposit_announced', 'deposit_min',
                            'rent_announced', 'rent_min', 'convertable', 'room', 'area', 'age', 'document', 'level',
                            'parking', 'elevator', 'warehouse', 'title', 'description', 'source', 'person',
@@ -252,7 +252,7 @@ class RentFileCreateForm(forms.ModelForm):
             self.add_error('rent_min', 'مبلغ اجاره باید بین صفر تا 10 میلیارد تومان باشد')
         if area and not checkers.area_checker(area):
             self.add_error('area', 'متراژ فایل باید بین 20 تا 10000 متر باشد.')
-        if self.user.title != 'bs' and sub_district != self.user.sub_district:
+        if (self.user.title != 'bs' and self.user.title != 'nd') and sub_district != self.user.sub_district:
             self.add_error('sub_district', 'مشاور اجازه ایجاد فایل جدید در این زیرمحله را ندارد')
 
         return cleaned_data
@@ -1408,6 +1408,64 @@ ReportItemFormSet = inlineformset_factory(
         'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 2, 'placeholder': 'توضیحات...'}),
     }
 )
+
+
+# -------------------------------- DailyTasks --------------------------------
+class NotifiedTaskCompletionForm(forms.ModelForm):
+    class Meta:
+        model = models.NotifiedTask
+        fields = ['result']
+        widgets = {
+            'result': forms.Textarea(attrs={
+                'class': 'form-control form-control-xl',
+                'rows': 4,
+                'placeholder': 'نتیجه انجام وظیفه را بنویسید...'
+            })
+        }
+        labels = {
+            'result': _('نتیجه')
+        }
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        instance.mark_as_done(self.cleaned_data.get('result'))
+        if commit:
+            instance.save()
+        return instance
+
+
+class NotifiedTaskFilterForm(forms.Form):
+    task_type = forms.ChoiceField(
+        choices=[('', 'همه')] + list(choices.daily_task_types),
+        required=False,
+        label=_('نوع وظیفه'),
+        widget=forms.Select(attrs={'class': 'form-select'})
+    )
+
+    status = forms.ChoiceField(
+        choices=[('', 'همه')] + list(choices.daily_task_statuses),
+        required=False,
+        label=_('وضعیت'),
+        widget=forms.Select(attrs={'class': 'form-select'})
+    )
+
+    date_from = forms.CharField(
+        required=False,
+        label=_('از تاریخ'),
+        widget=forms.TextInput(attrs={
+            'class': 'form-control date-picker',
+            'placeholder': '1404/07/01'
+        })
+    )
+
+    date_to = forms.CharField(
+        required=False,
+        label=_('تا تاریخ'),
+        widget=forms.TextInput(attrs={
+            'class': 'form-control date-picker',
+            'placeholder': '1404/07/30'
+        })
+    )
 
 
 # -------------------------------- BossTasks --------------------------------

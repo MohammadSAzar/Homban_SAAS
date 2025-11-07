@@ -65,6 +65,22 @@ ROLE_PERMISSIONS = {
         'ReportItem': ['create', 'read', 'update', 'delete'],
         'Mark': ['create', 'read', 'update', 'delete'],
     },
+
+    'nd': {
+        'Location': ['read'],
+        'RentFile': ['create', 'read', 'update', 'delete'],
+        'SaleFile': ['create', 'read', 'update', 'delete'],
+        'Person': ['create', 'read', 'update', 'delete'],
+        'Buyer': ['create', 'read', 'update', 'delete'],
+        'Renter': ['create', 'read', 'update', 'delete'],
+        'Session': ['create', 'read', 'update', 'delete'],
+        'Trade': ['create', 'read', 'update', 'delete'],
+        'Reminder': ['create', 'read', 'update', 'delete'],
+        'TaskBoss': ['create', 'read', 'update', 'delete'],
+        'Report': ['create', 'read', 'update', 'delete'],
+        'ReportItem': ['create', 'read', 'update', 'delete'],
+        'Mark': ['create', 'read', 'update', 'delete'],
+    },
 }
 
 
@@ -103,4 +119,5 @@ class PermissionRequiredMixin:
 
 class ReadOnlyPermissionMixin(PermissionRequiredMixin):
     permission_action = 'read'
+
 

@@ -128,5 +128,14 @@ urlpatterns = [
     path('interaction-list/', views.InteractionListView.as_view(), name='interaction_list'),
     path('interaction-detail/<int:pk>/', views.InteractionDetailView.as_view(), name='interaction_detail'),
     path('announcement-create/<int:announcement_id>/create-interaction/', views.InteractionCreateView.as_view(), name='interaction_create'),
+    # tasks
+    path('notified-tasks/list/', views.NotifiedTaskListView.as_view(), name='notified_task_list'),
+    path('notified-task/detail/<int:pk>/', views.NotifiedTaskDetailView.as_view(), name='notified_task_detail'),
+    path('boss/agents/', views.BossAgentTaskListView.as_view(), name='boss_agent_task_list'),
+    path('boss/agent/<int:agent_pk>/tasks/', views.BossAgentTaskDetailView.as_view(), name='boss_agent_task_detail'),
+    # tasks (AJAX)
+    path('notified-tasks/<int:task_id>/complete/', views.complete_received_task, name='complete_task'),
+    path('notified-tasks/count/', views.get_task_count, name='get_task_count'),
 ]
+
 

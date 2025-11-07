@@ -1,0 +1,606 @@
+{% extends '_base_dashboard.html' %}
+
+{% load static %}
+{% load i18n %}
+{% load jalali_tags %}
+{% load jalali_date_converter %}
+{% load number_converter %}
+{% load price_converter %}
+{% load humanize %}
+{% load widget_tweaks %}
+{% load pagination %}
+
+
+{% block title %}وظایف {{ agent.name_family|default:agent.username }}{% endblock %}
+
+
+{% block content %}
+
+    <!-- Header -->
+    <div class="nk-block">
+        <div class="row gy-4">
+            <div class="col-lg-12">
+                <div class="card card-bordered" style="background: linear-gradient(135deg, #81C784 0%, #00a65c 100%);">
+                    <div class="card-inner">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <h5 class="title" style="color: white;">
+                                    <em class="icon ni ni-user"></em> وظایف مشاور: {{ agent.name_family|default:agent.username }}
+                                </h5>
+                                <p style="color: rgba(255,255,255,0.9); margin-bottom: 0;">
+                                    <strong>محله:</strong> {{ agent.sub_district.name }} |
+                                    <strong>نوع:</strong> {{ agent.get_title_display }}
+                                </p>
+                            </div>
+                            <div>
+                                <a href="{% url 'boss_agent_task_list' %}" class="btn btn-light">
+                                    <em class="icon ni ni-arrow-left"></em>
+                                    <span>بازگشت به لیست مشاوران</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- end: Header -->
+    
+    <!-- Main -->
+    <div class="nk-block">
+        <div class="row gy-4">
+
+            <!-- Stats -->
+            <div class="col-lg-12">
+                <div class="card card-bordered">
+                    <div class="card-inner">
+
+                        <!-- Title -->
+                        <div class="card-title-group align-start mb-4">
+                            <div class="card-title">
+                                <h5 class="title">
+                                    <em class="icon ni ni-check-circle"></em> آمار عملکرد {{ agent.name_family|default:agent.username }}
+                                </h5>
+                            </div>
+                        </div>
+
+                        <!-- Period Selection -->
+                        <ul class="nav nav-tabs nav-tabs-mb-icon nav-tabs-card" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link active" data-bs-toggle="tab" href="#period-10" role="tab" aria-selected="true">
+                                    <span>10 روز اخیر</span>
+                                </a>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link" data-bs-toggle="tab" href="#period-30" role="tab" aria-selected="false">
+                                    <span>30 روز اخیر</span>
+                                </a>
+                            </li>
+                        </ul>
+
+                        <!-- Type & Stats -->
+                        <div class="tab-content">
+
+                            <!-- 10-Days -->
+                            <div class="tab-pane active" id="period-10" role="tabpanel">
+
+                                <!-- Type Selection -->
+                                <ul class="nav nav-tabs mt-3" role="tablist">
+                                    <li class="nav-item" role="presentation">
+                                        <a class="nav-link active" data-bs-toggle="tab" href="#all-10" role="tab">کلیه وظایف</a>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <a class="nav-link" data-bs-toggle="tab" href="#suggestion-10" role="tab">ارسال پیشنهاد</a>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <a class="nav-link" data-bs-toggle="tab" href="#interaction-10" role="tab">بررسی پیشنهاد</a>
+                                    </li>
+                                </ul>
+
+                                <!-- Stats -->
+                                <div class="tab-content mt-4">
+                                    <!-- All Tasks - 10 Days -->
+                                    <div class="tab-pane active" id="all-10" role="tabpanel">
+                                        <div class="row gy-3">
+                                            <div class="col-lg-3 col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="form-label">مجموع</label>
+                                                    <div class="form-control-wrap">
+                                                        <div class="form-control form-control-xl form-control-outlined" style="background-color: #E3F2FD; text-align: center; font-family: Estedad;">
+                                                            {{ all_tasks_all_statuses_10|farsi_number }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-3 col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="form-label">در انتظار</label>
+                                                    <div class="form-control-wrap">
+                                                        <div class="form-control form-control-xl form-control-outlined" style="background-color: #FFF3E0; text-align: center; font-family: Estedad;">
+                                                            {{ all_tasks_waiting_10|farsi_number }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-3 col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="form-label">انجام‌شده</label>
+                                                    <div class="form-control-wrap">
+                                                        <div class="form-control form-control-xl form-control-outlined" style="background-color: #E8F5E9; text-align: center; font-family: Estedad;">
+                                                            {{ all_tasks_done_10|farsi_number }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-3 col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="form-label">درصد انجام</label>
+                                                    <div class="form-control-wrap">
+                                                        <div class="form-control form-control-xl form-control-outlined" style="background-color: #E8F5E9; text-align: center; font-family: Estedad;">
+                                                            {{ all_tasks_done_percentage_10|farsi_number }} %
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Suggestion Tasks - 10 Days -->
+                                    <div class="tab-pane" id="suggestion-10" role="tabpanel">
+                                        <div class="row gy-3">
+                                            <div class="col-lg-3 col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="form-label">مجموع</label>
+                                                    <div class="form-control-wrap">
+                                                        <div class="form-control form-control-xl form-control-outlined" style="background-color: #E3F2FD; text-align: center; font-family: Estedad;">
+                                                            {{ suggestion_tasks_all_statuses_10|farsi_number }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-3 col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="form-label">در انتظار</label>
+                                                    <div class="form-control-wrap">
+                                                        <div class="form-control form-control-xl form-control-outlined" style="background-color: #FFF3E0; text-align: center; font-family: Estedad;">
+                                                            {{ suggestion_tasks_waiting_10|farsi_number }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-3 col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="form-label">انجام‌شده</label>
+                                                    <div class="form-control-wrap">
+                                                        <div class="form-control form-control-xl form-control-outlined" style="background-color: #E8F5E9; text-align: center; font-family: Estedad;">
+                                                            {{ suggestion_tasks_done_10|farsi_number }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-3 col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="form-label">درصد انجام</label>
+                                                    <div class="form-control-wrap">
+                                                        <div class="form-control form-control-xl form-control-outlined" style="background-color: #E8F5E9; text-align: center; font-family: Estedad;">
+                                                            {{ suggestion_tasks_done_percentage_10|farsi_number }} %
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Interaction Tasks - 10 Days -->
+                                    <div class="tab-pane" id="interaction-10" role="tabpanel">
+                                        <div class="row gy-3">
+                                            <div class="col-lg-3 col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="form-label">همه</label>
+                                                    <div class="form-control-wrap">
+                                                        <div class="form-control form-control-xl form-control-outlined" style="background-color: #E3F2FD; text-align: center; font-family: Estedad;">
+                                                            {{ interaction_tasks_all_statuses_10|farsi_number }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-3 col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="form-label">در انتظار</label>
+                                                    <div class="form-control-wrap">
+                                                        <div class="form-control form-control-xl form-control-outlined" style="background-color: #FFF3E0; text-align: center; font-family: Estedad;">
+                                                            {{ interaction_tasks_waiting_10|farsi_number }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-3 col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="form-label">انجام‌شده</label>
+                                                    <div class="form-control-wrap">
+                                                        <div class="form-control form-control-xl form-control-outlined" style="background-color: #E8F5E9; text-align: center; font-family: Estedad;">
+                                                            {{ interaction_tasks_done_10|farsi_number }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-3 col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="form-label">درصد انجام</label>
+                                                    <div class="form-control-wrap">
+                                                        <div class="form-control form-control-xl form-control-outlined" style="background-color: #E8F5E9; text-align: center; font-family: Estedad;">
+                                                            {{ interaction_tasks_done_percentage_10|farsi_number }} %
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <!-- 30-Days -->
+                            <div class="tab-pane" id="period-30" role="tabpanel">
+
+                                <!-- Type Selection -->
+                                <ul class="nav nav-tabs mt-3" role="tablist">
+                                    <li class="nav-item" role="presentation">
+                                        <a class="nav-link active" data-bs-toggle="tab" href="#all-30" role="tab">کلیه وظایف</a>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <a class="nav-link" data-bs-toggle="tab" href="#suggestion-30" role="tab">ارسال پیشنهاد</a>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <a class="nav-link" data-bs-toggle="tab" href="#interaction-30" role="tab">بررسی پیشنهاد</a>
+                                    </li>
+                                </ul>
+
+                                <!-- Stats -->
+                                <div class="tab-content mt-4">
+                                    <!-- All Tasks - 30 Days -->
+                                    <div class="tab-pane active" id="all-30" role="tabpanel">
+                                        <div class="row gy-3">
+                                            <div class="col-lg-3 col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="form-label">همه</label>
+                                                    <div class="form-control-wrap">
+                                                        <div class="form-control form-control-xl form-control-outlined" style="background-color: #E3F2FD; text-align: center; font-family: Estedad;">
+                                                            {{ all_tasks_all_statuses_30|farsi_number }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-3 col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="form-label">در انتظار</label>
+                                                    <div class="form-control-wrap">
+                                                        <div class="form-control form-control-xl form-control-outlined" style="background-color: #FFF3E0; text-align: center; font-family: Estedad;">
+                                                            {{ all_tasks_waiting_30|farsi_number }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-3 col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="form-label">انجام‌شده</label>
+                                                    <div class="form-control-wrap">
+                                                        <div class="form-control form-control-xl form-control-outlined" style="background-color: #E8F5E9; text-align: center; font-family: Estedad;">
+                                                            {{ all_tasks_done_30|farsi_number }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-3 col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="form-label">درصد انجام</label>
+                                                    <div class="form-control-wrap">
+                                                        <div class="form-control form-control-xl form-control-outlined" style="background-color: #E8F5E9; text-align: center; font-family: Estedad;">
+                                                            {{ all_tasks_done_percentage_30|farsi_number }} %
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Suggestion Tasks - 30 Days -->
+                                    <div class="tab-pane" id="suggestion-30" role="tabpanel">
+                                        <div class="row gy-3">
+                                            <div class="col-lg-3 col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="form-label">همه</label>
+                                                    <div class="form-control-wrap">
+                                                        <div class="form-control form-control-xl form-control-outlined" style="background-color: #E3F2FD; text-align: center; font-family: Estedad;">
+                                                            {{ suggestion_tasks_all_statuses_30|farsi_number }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-3 col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="form-label">در انتظار</label>
+                                                    <div class="form-control-wrap">
+                                                        <div class="form-control form-control-xl form-control-outlined" style="background-color: #FFF3E0; text-align: center; font-family: Estedad;">
+                                                            {{ suggestion_tasks_waiting_30|farsi_number }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-3 col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="form-label">انجام‌شده</label>
+                                                    <div class="form-control-wrap">
+                                                        <div class="form-control form-control-xl form-control-outlined" style="background-color: #E8F5E9; text-align: center; font-family: Estedad;">
+                                                            {{ suggestion_tasks_done_30|farsi_number }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-3 col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="form-label">درصد انجام</label>
+                                                    <div class="form-control-wrap">
+                                                        <div class="form-control form-control-xl form-control-outlined" style="background-color: #E8F5E9; text-align: center; font-family: Estedad;">
+                                                            {{ suggestion_tasks_done_percentage_30|farsi_number }} %
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Interaction Tasks - 30 Days -->
+                                    <div class="tab-pane" id="interaction-30" role="tabpanel">
+                                        <div class="row gy-3">
+                                            <div class="col-lg-3 col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="form-label">همه</label>
+                                                    <div class="form-control-wrap">
+                                                        <div class="form-control form-control-xl form-control-outlined" style="background-color: #E3F2FD; text-align: center; font-family: Estedad;">
+                                                            {{ interaction_tasks_all_statuses_30|farsi_number }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-3 col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="form-label">در انتظار</label>
+                                                    <div class="form-control-wrap">
+                                                        <div class="form-control form-control-xl form-control-outlined" style="background-color: #FFF3E0; text-align: center; font-family: Estedad;">
+                                                            {{ interaction_tasks_waiting_30|farsi_number }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-3 col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="form-label">انجام‌شده</label>
+                                                    <div class="form-control-wrap">
+                                                        <div class="form-control form-control-xl form-control-outlined" style="background-color: #E8F5E9; text-align: center; font-family: Estedad;">
+                                                            {{ interaction_tasks_done_30|farsi_number }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-3 col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="form-label">درصد انجام</label>
+                                                    <div class="form-control-wrap">
+                                                        <div class="form-control form-control-xl form-control-outlined" style="background-color: #E8F5E9; text-align: center; font-family: Estedad;">
+                                                            {{ interaction_tasks_done_percentage_30|farsi_number }} %
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- end: Stats -->
+
+            <!-- Announcement Suggestions -->
+            {% if waiting_suggested_tasks_count != 0 %}
+                {% if announcement_tasks %}
+                    <div class="col-lg-12">
+                        <div class="card card-bordered">
+                            <div class="card-inner">
+
+                                <!-- Title -->
+                                <div class="card-title-group align-start mb-3">
+                                    <div class="card-title">
+                                        <h6 class="title">
+                                            <em class="icon ni ni-bell"></em>پیشنهاداتی که باید ارسال کند
+                                            <span class="badge badge-dim bg-primary" style="margin-right: 10px; font-family: Estedad">{{ waiting_suggested_tasks_count|farsi_number }} مورد</span>
+                                        </h6>
+                                    </div>
+                                </div>
+
+                                <!-- Loop -->
+                                {% for task in announcement_tasks %}
+                                    {% if task.status == 'waiting' %}
+                                        <div style="border: 1px solid #dbdfea; border-radius: 4px; padding: 20px; margin-bottom: 20px; background-color: #E3F2FD;">
+
+                                            <!-- Upper -->
+                                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #dbdfea;">
+                                                <div style="flex: 1;">
+                                                    <span style="font-weight: bold; color: #364a63; font-size: 1.2em;">
+                                                        <em class="icon ni ni-send"></em>
+                                                        این مشاور <span style="font-family: Estedad; color: #1976D2;">{{ task.get_suggestion_count|farsi_number }}</span> پیشنهاد برای
+                                                        <span style="font-family: Estedad; color: #1976D2;">{{ task.get_target_agents_count|farsi_number }}</span> مشاور دارد
+                                                    </span>
+                                                </div>
+                                                <div style="text-align: left;">
+                                                    {% if task.status == 'waiting' %}
+                                                        <span class="badge badge-dim bg-warning">در انتظار ارسال</span>
+                                                    {% else %}
+                                                        <span class="badge badge-dim bg-success">ارسال شده</span>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+
+                                            <!-- Link -->
+                                            <div style="margin-bottom: 15px;">
+                                                <a href="{% url 'announcement_detail' task.related_announcement.pk %}" class="btn btn-primary btn-lg" target="_blank">
+                                                    <em class="icon ni ni-external"></em>
+                                                    <span>مشاهده اعلان</span>
+                                                </a>
+                                                <span class="text-soft" style="margin-right: 10px;">
+                                                    تاریخ ایجاد: {{ task.created_at|to_jalali:'%Y/%m/%d - %H:%M'|farsi_number }}
+                                                </span>
+                                            </div>
+
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endif %}
+            <!-- end: Announcement Suggestions -->
+
+            <!-- Received Interaction Tasks -->
+            {% if received_tasks %}
+                <div class="col-lg-12">
+                    <div class="card card-bordered">
+                        <div class="card-inner">
+
+                            <!-- Title -->
+                            <div class="card-title-group align-start mb-3">
+                                <div class="card-title">
+                                    <h6 class="title">
+                                        <em class="icon ni ni-inbox"></em> پیشنهاداتی که دریافت کرده است
+                                        <span class="badge badge-dim bg-success" style="margin-right: 10px; font-family: Estedad">{{ waiting_received_tasks_count|farsi_number }} مورد در انتظار</span>
+                                    </h6>
+                                </div>
+                            </div>
+
+                            <!-- Loop -->
+                            {% for task in received_tasks %}
+                                <div style="border: 1px solid #dbdfea; border-radius: 4px; padding: 20px; margin-bottom: 20px;
+                                            {% if task.status == 'waiting' %}background-color: #FFF3E0;{% else %}background-color: #E8F5E9;{% endif %}">
+
+                                    <!-- Upper -->
+                                    <div class="row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #dbdfea;">
+                                        <!-- Main Text -->
+                                        <div style="flex: 1;">
+                                            <span style="font-weight: bold; color: #364a63; font-size: 1em;">
+                                                {% with obj=task.related_interaction_item.content_object sender=task.related_interaction_item.interaction.sender %}
+                                                    {% if task.related_interaction_item.interaction.interaction_type == 'buyers_to_sale_file' %}
+                                                        <em class="icon ni ni-user-check"></em>
+                                                        خریدار <a href="{{ obj.get_absolute_url }}" style="color: #00a65c; padding: 0 2px;" target="_blank">{{ obj.name }}</a> برای فایل فروش
+                                                        <a href="{{ task.related_interaction_item.interaction.announcement.content_object.get_absolute_url }}" style="color: #00a65c; padding: 0 2px;" target="_blank">{{ task.related_interaction_item.interaction.announcement.content_object.title }}</a>
+                                                        توسط
+                                                        <strong style="color: #00a65c; border-bottom: 1px solid #00a65c; padding: 0 2px;">{{ sender.name_family|default:sender.username }}</strong> پیشنهاد شده است
+
+                                                    {% elif task.related_interaction_item.interaction.interaction_type == 'renters_to_rent_file' %}
+                                                        <em class="icon ni ni-user-check"></em>
+                                                        مستاجر <a href="{{ obj.get_absolute_url }}" style="color: #00a65c; padding: 0 2px;" target="_blank">{{ obj.name }}</a> برای فایل اجاره
+                                                        <a href="{{ task.related_interaction_item.interaction.announcement.content_object.get_absolute_url }}" style="color: #00a65c; padding: 0 2px;" target="_blank">{{ task.related_interaction_item.interaction.announcement.content_object.title }}</a>
+                                                        توسط
+                                                        <strong style="color: #00a65c; border-bottom: 1px solid #00a65c; padding: 0 2px;">{{ sender.name_family|default:sender.username }}</strong> پیشنهاد شده است
+
+                                                    {% elif task.related_interaction_item.interaction.interaction_type == 'sale_files_to_buyer' %}
+                                                        <em class="icon ni ni-home-alt"></em>
+                                                        فایل فروش <a href="{{ obj.get_absolute_url }}" style="color: #00a65c; padding: 0 2px;" target="_blank">{{ obj.title }}</a> برای خریدار
+                                                        <a href="{{ task.related_interaction_item.interaction.announcement.content_object.get_absolute_url }}" style="color: #00a65c; padding: 0 2px;" target="_blank">{{ task.related_interaction_item.interaction.announcement.content_object.name }}</a>
+                                                        توسط
+                                                        <strong style="color: #00a65c; border-bottom: 1px solid #00a65c; padding: 0 2px;">{{ sender.name_family|default:sender.username }}</strong> پیشنهاد شده است
+
+                                                    {% elif task.related_interaction_item.interaction.interaction_type == 'rent_files_to_renter' %}
+                                                        <em class="icon ni ni-home-alt"></em>
+                                                        فایل اجاره <a href="{{ obj.get_absolute_url }}" style="color: #00a65c; padding: 0 2px;" target="_blank">{{ obj.title }}</a> برای مستاجر
+                                                        <a href="{{ task.related_interaction_item.interaction.announcement.content_object.get_absolute_url }}" style="color: #00a65c; padding: 0 2px;" target="_blank">{{ task.related_interaction_item.interaction.announcement.content_object.name }}</a>
+                                                        توسط
+                                                        <strong style="color: #00a65c; border-bottom: 1px solid #00a65c; padding: 0 2px;">{{ sender.name_family|default:sender.username }}</strong> پیشنهاد شده است
+
+                                                    {% endif %}
+                                                {% endwith %}
+                                            </span>
+                                        </div>
+                                        <!-- Status -->
+                                        <div style="text-align: right; margin-top: 0.7em; margin-bottom: 0.5em;">
+                                            {% if task.status == 'waiting' %}
+                                                <span class="badge badge-dim bg-warning" style="font-weight: bolder;">در انتظار</span>
+                                            {% elif task.status == 'done' %}
+                                                <span class="badge badge-dim bg-success" style="font-weight: bolder;">انجام شده</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <!-- end: Upper -->
+
+                                    <!-- Lower -->
+                                    <div style="margin-top: 15px;">
+                                    
+                                        <!-- Date -->
+                                        <div style="margin-bottom: 10px;">
+                                            <span class="text-soft">
+                                                <em class="icon ni ni-clock"></em>
+                                                تاریخ ایجاد: {{ task.created_at|to_jalali:'%Y/%m/%d - %H:%M'|farsi_number }}
+                                                {% if task.completed_at %}
+                                                    | تاریخ تکمیل: {{ task.completed_at|to_jalali:'%Y/%m/%d - %H:%M'|farsi_number }}
+                                                {% endif %}
+                                            </span>
+                                        </div>
+                                        
+                                        <!-- Result -->
+                                        {% if task.status == 'done' %}
+                                            <!-- Result (Read-only for boss) -->
+                                            {% if task.result %}
+                                                <div class="form-control form-control-xl" style="margin-bottom: 0; background-color: #E0F2F1">
+                                                    <strong style="color: #526484;">نتیجه بررسی:</strong> {{ task.result }}
+                                                </div>
+                                            {% else %}
+                                                <div class="form-control form-control-xl" style="margin-bottom: 0; background-color: #FFEBEE">
+                                                    <strong style="color: #526484;">نتیجه‌ای وارد نشده است.</strong>
+                                                </div>
+                                            {% endif %}
+                                        {% elif task.status == 'waiting' %}
+                                            <!-- Waiting Status Message -->
+                                            <div class="alert alert-warning" style="margin-bottom: 0;">
+                                                <em class="icon ni ni-alert-circle"></em>
+                                                این وظیفه هنوز توسط مشاور تکمیل نشده است.
+                                            </div>
+                                        {% endif %}
+                                    
+                                    </div>
+                                    <!-- end: Lower -->
+
+                                </div>
+                            {% endfor %}
+
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            <!-- end: Received Interaction Tasks -->
+
+            <!-- No Task -->
+            {% if not announcement_tasks and not received_tasks %}
+                <div class="col-lg-12">
+                    <div class="card card-bordered">
+                        <div class="card-inner">
+                            <div class="alert alert-success" style="text-align: center;">
+                                <em class="icon ni ni-check-circle" style="font-size: 3em; color: #4CAF50;"></em>
+                                <p style="margin-top: 10px; font-size: 1.2em;">این مشاور وظیفه‌ای برای انجام ندارد.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            <!-- end: No Task -->
+
+        </div>
+    </div>
+    <!-- end: Main -->
+
+{% endblock %}
+

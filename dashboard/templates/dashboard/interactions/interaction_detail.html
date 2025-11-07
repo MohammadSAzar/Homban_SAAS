@@ -46,8 +46,9 @@
                 <div class="card card-bordered">
                     <div class="card-inner">
 
-                        <!-- Title -->
+                        <!-- Title & Status -->
                         <div class="card-title-group align-start mb-3">
+                            <!-- Title -->
                             <div class="card-title" style="margin-bottom: 1em;">
                                 <h5 class="title" style="font-size: 1.3em;">
                                     {% if interaction.sender == request.user %}
@@ -57,11 +58,12 @@
                                     {% endif %}
                                 </h5>
                             </div>
+                            <!-- Status -->
                             <div class="card-tools">
-                                {% if interaction.status == 'sent' %}
-                                    <span class="badge badge-dim bg-warning" style="font-size: 1em; padding: 8px 15px; font-family: Estedad">جدید</span>
-                                {% elif interaction.status == 'viewed' %}
-                                    <span class="badge badge-dim bg-info" style="font-size: 1em; padding: 8px 15px; font-family: Estedad">مشاهده شده</span>
+                                {% if interaction.status == 'unseen' %}
+                                    <span class="badge badge-dim bg-primary" style="font-size: 0.7em;">{{ interaction.get_status_display }}</span>
+                                {% elif interaction.status == 'seen' %}
+                                    <span class="badge badge-dim bg-success" style="font-size: 0.7em;">{{ interaction.get_status_display }}</span>
                                 {% endif %}
                             </div>
                         </div>
@@ -69,40 +71,37 @@
                         <!-- Basics -->
                         <div class="row gy-3">
                             <!-- From -->
-                            <div class="col-lg-3 col-sm-6">
+                            <div class="col-lg-4 col-sm-6">
                                 <div class="form-group">
                                     <label class="form-label">از</label>
                                     <div class="form-control-wrap">
                                         <div type="text" class="form-control form-control-xl form-control-outlined">
-                                            {{ interaction.sender.name_family|default:interaction.sender }}
+                                            {% if request.user == interaction.sender %}
+                                                شما
+                                            {% else %}
+                                                {{ interaction.sender.name_family|default:interaction.sender }}
+                                            {% endif %}
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <!-- To -->
-                            <div class="col-lg-3 col-sm-6">
+                            <div class="col-lg-4 col-sm-6">
                                 <div class="form-group">
                                     <label class="form-label">به</label>
                                     <div class="form-control-wrap">
                                         <div type="text" class="form-control form-control-xl form-control-outlined">
-                                            {{ interaction.receiver.name_family|default:interaction.receiver }}
+                                            {% if request.user == interaction.receiver %}
+                                                شما
+                                            {% else %}
+                                                {{ interaction.receiver.name_family|default:interaction.sender }}
+                                            {% endif %}
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <!-- Type -->
-                            <div class="col-lg-3 col-sm-6">
-                                <div class="form-group">
-                                    <label class="form-label">نوع تعامل</label>
-                                    <div class="form-control-wrap">
-                                        <div type="text" class="form-control form-control-xl form-control-outlined">
-                                            {{ interaction.get_interaction_type_display }}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- Date (creation) -->
-                            <div class="col-lg-3 col-sm-6">
+                            <!-- Date -->
+                            <div class="col-lg-4 col-sm-6">
                                 <div class="form-group">
                                     <label class="form-label">تاریخ ایجاد</label>
                                     <div class="form-control-wrap">
@@ -112,19 +111,6 @@
                                     </div>
                                 </div>
                             </div>
-                            <!-- Date (view) -->
-                            {% if interaction.datetime_viewed %}
-                                <div class="col-lg-3 col-sm-6">
-                                    <div class="form-group">
-                                        <label class="form-label">تاریخ مشاهده</label>
-                                        <div class="form-control-wrap">
-                                            <div type="text" class="form-control form-control-xl form-control-outlined">
-                                                {{ interaction.datetime_viewed|to_jalali:'%Y/%m/%d - %H:%M'|farsi_number }}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            {% endif %}
                         </div>
 
                         <!-- Note -->
@@ -156,8 +142,22 @@
 
                         <!-- Title -->
                         <div class="card-title-group align-start mb-3">
-                            <div class="card-title">
-                                <h6 class="title">اعلان اصلی</h6>
+                            <div class="card-title" style="margin-bottom: 1em;">
+                                <h5 class="title" style="font-size: 1.2em;">
+                                    {% if interaction.interaction_type == 'buyers_to_sale_file' or interaction.interaction_type == 'renters_to_rent_file' %}
+                                       {% if interaction.interaction_type == 'buyers_to_sale_file' %}
+                                            <em class="icon ni ni-file"></em> برای فایل فروش:
+                                       {% else %}
+                                            <em class="icon ni ni-file"></em> برای فایل اجاره:
+                                       {% endif %}
+                                    {% else %}
+                                        {% if interaction.interaction_type == 'sale_files_to_buyer' %}
+                                            <em class="icon ni ni-users"></em> برای خریدار:
+                                        {% else %}
+                                            <em class="icon ni ni-users"></em> برای مستاجر:
+                                        {% endif %}
+                                    {% endif %}
+                                </h5>
                             </div>
                         </div>
 
@@ -166,31 +166,22 @@
                             <div class="row gy-3">
 
                                 <!-- SF -->
-                                {% if interaction.announcement.type == 'sf' %}
-                                    <!-- type -->
-                                    <div class="col-lg-2 col-sm-4">
-                                        <div class="form-group">
-                                            <label class="form-label">نوع</label>
-                                            <div class="form-control-wrap">
-                                                <div type="text" class="form-control form-control-outlined">
-                                                    {{ interaction.announcement.get_announcement_type_status }}
+                                {% if interaction.announcement.announcement_type == 'sf' %}
+                                    <!-- title -->
+                                    <div class="col-lg-4 col-sm-4">
+                                        <a href="{% url 'sale_file_detail' obj.pk obj.unique_url_id %}" target="_blank">
+                                            <div class="form-group">
+                                                <label class="form-label">عنوان</label>
+                                                <div class="form-control-wrap">
+                                                    <div type="text" class="form-control form-control-outlined" style="background-color: #E0F2F1">
+                                                        {{ obj.title|farsi_number }}
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </div>
-                                    <!-- code -->
-                                    <div class="col-lg-2 col-sm-4">
-                                        <div class="form-group">
-                                            <label class="form-label">کد</label>
-                                            <div class="form-control-wrap">
-                                                <div type="text" class="form-control form-control-outlined">
-                                                    {{ obj.code|farsi_number }}
-                                                </div>
-                                            </div>
-                                        </div>
+                                        </a>
                                     </div>
                                     <!-- price -->
-                                    <div class="col-lg-2 col-sm-4">
+                                    <div class="col-lg-3 col-sm-4">
                                         <div class="form-group">
                                             <label class="form-label">قیمت</label>
                                             <div class="form-control-wrap">
@@ -212,7 +203,7 @@
                                         </div>
                                     </div>
                                     <!-- sub_district -->
-                                    <div class="col-lg-2 col-sm-4">
+                                    <div class="col-lg-3 col-sm-4">
                                         <div class="form-group">
                                             <label class="form-label">زیرمحله</label>
                                             <div class="form-control-wrap">
@@ -222,41 +213,20 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <!-- see -->
-                                    <div class="col-lg-2 col-sm-4">
-                                        <div class="form-group">
-                                            <label class="form-label">عملیات</label>
-                                            <div class="form-control-wrap">
-                                                <a href="{% url 'sale_file_detail' obj.pk obj.unique_url_id %}"
-                                                   class="btn btn-outline-primary btn-sm" target="_blank">
-                                                    <em class="icon ni ni-eye"></em> مشاهده
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                <!-- SF -->
-                                {% elif interaction.announcement.type == 'rf' %}
-                                    <!-- type -->
-                                    <div class="col-lg-2 col-sm-4">
-                                        <div class="form-group">
-                                            <label class="form-label">نوع</label>
-                                            <div class="form-control-wrap">
-                                                <div type="text" class="form-control form-control-outlined">
-                                                    {{ interaction.announcement.get_announcement_type_status }}
+                                <!-- RF -->
+                                {% elif interaction.announcement.announcement_type == 'rf' %}
+                                    <!-- title -->
+                                    <div class="col-lg-4 col-sm-4">
+                                        <a href="{% url 'rent_file_detail' obj.pk obj.unique_url_id %}" target="_blank">
+                                            <div class="form-group">
+                                                <label class="form-label">عنوان</label>
+                                                <div class="form-control-wrap">
+                                                    <div type="text" class="form-control form-control-outlined" style="background-color: #E0F2F1">
+                                                        {{ obj.title|farsi_number }}
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </div>
-                                    <!-- code -->
-                                    <div class="col-lg-2 col-sm-4">
-                                        <div class="form-group">
-                                            <label class="form-label">کد</label>
-                                            <div class="form-control-wrap">
-                                                <div type="text" class="form-control form-control-outlined">
-                                                    {{ obj.code|farsi_number }}
-                                                </div>
-                                            </div>
-                                        </div>
+                                        </a>
                                     </div>
                                     <!-- deposit -->
                                     <div class="col-lg-2 col-sm-4">
@@ -302,44 +272,23 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <!-- see -->
-                                    <div class="col-lg-2 col-sm-4">
-                                        <div class="form-group">
-                                            <label class="form-label">عملیات</label>
-                                            <div class="form-control-wrap">
-                                                <a href="{% url 'rent_file_detail' obj.pk obj.unique_url_id %}"
-                                                   class="btn btn-outline-primary btn-sm" target="_blank">
-                                                    <em class="icon ni ni-eye"></em> مشاهده
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
                                 <!-- BY -->
-                                {% elif interaction.announcement.type == 'by' %}
-                                    <!-- type -->
+                                {% elif interaction.announcement.announcement_type == 'by' %}
+                                    <!-- name -->
                                     <div class="col-lg-2 col-sm-4">
-                                        <div class="form-group">
-                                            <label class="form-label">نوع</label>
-                                            <div class="form-control-wrap">
-                                                <div type="text" class="form-control form-control-outlined">
-                                                    {{ interaction.announcement.get_announcement_type_status }}
+                                        <a href="{% url 'buyer_detail' obj.pk obj.code %}" target="_blank">
+                                            <div class="form-group">
+                                                <label class="form-label">نام</label>
+                                                <div class="form-control-wrap">
+                                                    <div type="text" class="form-control form-control-outlined" style="background-color: #E0F2F1">
+                                                        {{ obj.name }}
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </div>
-                                    <!-- code -->
-                                    <div class="col-lg-2 col-sm-4">
-                                        <div class="form-group">
-                                            <label class="form-label">کد</label>
-                                            <div class="form-control-wrap">
-                                                <div type="text" class="form-control form-control-outlined">
-                                                    {{ obj.code|farsi_number }}
-                                                </div>
-                                            </div>
-                                        </div>
+                                        </a>
                                     </div>
                                     <!-- budget -->
-                                    <div class="col-lg-2 col-sm-4">
+                                    <div class="col-lg-3 col-sm-4">
                                         <div class="form-group">
                                             <label class="form-label">بودجه</label>
                                             <div class="form-control-wrap">
@@ -361,56 +310,32 @@
                                         </div>
                                     </div>
                                     <!-- sub_districts -->
-                                    <div class="col-lg-2 col-sm-4">
+                                    <div class="col-lg-5 col-sm-4">
                                         <div class="form-group">
                                             <label class="form-label">زیرمحلات</label>
                                             <div class="form-control-wrap">
                                                 <div type="text" class="form-control form-control-outlined">
-                                                    {% for sd in obj.sub_districts.all|slice:":2" %}
+                                                    {% for sd in obj.sub_districts.all %}
                                                         {{ sd.name }}{% if not forloop.last %}، {% endif %}
                                                     {% endfor %}
-                                                    {% if obj.sub_districts.count > 2 %}
-                                                        <span class="badge badge-dim bg-secondary" style="font-family: Estedad">+{{ obj.sub_districts.count|add:"-2"|farsi_number }}</span>
-                                                    {% endif %}
                                                 </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- see -->
-                                    <div class="col-lg-2 col-sm-4">
-                                        <div class="form-group">
-                                            <label class="form-label">عملیات</label>
-                                            <div class="form-control-wrap">
-                                                <a href="{% url 'sale_file_detail' obj.pk obj.unique_url_id %}"
-                                                   class="btn btn-outline-primary btn-sm" target="_blank">
-                                                    <em class="icon ni ni-eye"></em> مشاهده
-                                                </a>
                                             </div>
                                         </div>
                                     </div>
                                 <!-- RT -->
-                                {% elif interaction.announcement.type == 'rt' %}
-                                    <!-- type -->
+                                {% elif interaction.announcement.announcement_type == 'rt' %}
+                                    <!-- name -->
                                     <div class="col-lg-2 col-sm-4">
-                                        <div class="form-group">
-                                            <label class="form-label">نوع</label>
-                                            <div class="form-control-wrap">
-                                                <div type="text" class="form-control form-control-outlined">
-                                                    {{ interaction.announcement.get_announcement_type_status }}
+                                        <a href="{% url 'renter_detail' obj.pk obj.code %}" target="_blank">
+                                            <div class="form-group">
+                                                <label class="form-label">نام</label>
+                                                <div class="form-control-wrap">
+                                                    <div type="text" class="form-control form-control-outlined" style="background-color: #E0F2F1">
+                                                        {{ obj.name }}
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </div>
-                                    <!-- code -->
-                                    <div class="col-lg-2 col-sm-4">
-                                        <div class="form-group">
-                                            <label class="form-label">کد</label>
-                                            <div class="form-control-wrap">
-                                                <div type="text" class="form-control form-control-outlined">
-                                                    {{ obj.code|farsi_number }}
-                                                </div>
-                                            </div>
-                                        </div>
+                                        </a>
                                     </div>
                                     <!-- deposit -->
                                     <div class="col-lg-2 col-sm-4">
@@ -446,30 +371,15 @@
                                         </div>
                                     </div>
                                     <!-- sub_districts -->
-                                    <div class="col-lg-2 col-sm-4">
+                                    <div class="col-lg-4 col-sm-4">
                                         <div class="form-group">
                                             <label class="form-label">زیرمحلات</label>
                                             <div class="form-control-wrap">
                                                 <div type="text" class="form-control form-control-outlined">
-                                                    {% for sd in obj.sub_districts.all|slice:":2" %}
+                                                    {% for sd in obj.sub_districts.all %}
                                                         {{ sd.name }}{% if not forloop.last %}، {% endif %}
                                                     {% endfor %}
-                                                    {% if obj.sub_districts.count > 2 %}
-                                                        <span class="badge badge-dim bg-secondary" style="font-family: Estedad">+{{ obj.sub_districts.count|add:"-2"|farsi_number }}</span>
-                                                    {% endif %}
                                                 </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- see -->
-                                    <div class="col-lg-2 col-sm-4">
-                                        <div class="form-group">
-                                            <label class="form-label">عملیات</label>
-                                            <div class="form-control-wrap">
-                                                <a href="{% url 'renter_detail' obj.pk obj.code %}"
-                                                   class="btn btn-outline-primary btn-sm" target="_blank">
-                                                    <em class="icon ni ni-eye"></em> مشاهده
-                                                </a>
                                             </div>
                                         </div>
                                     </div>
@@ -492,7 +402,15 @@
                         <div class="card-title-group align-start mb-3">
                             <div class="card-title">
                                 <h6 class="title">
-                                    آیتم‌های پیشنهادی
+                                    {% if interaction.interaction_type == 'buyers_to_sale_file' %}
+                                        <em class="icon ni ni-users"></em> خریداران پیشنهادی:
+                                    {% elif interaction.interaction_type == 'renters_to_rent_file' %}
+                                        <em class="icon ni ni-users"></em> مستاجران پیشنهادی:
+                                    {% elif interaction.interaction_type == 'sale_files_to_buyer' %}
+                                        <em class="icon ni ni-file"></em> فایل‌های فروش پیشنهادی:
+                                    {% elif interaction.interaction_type == 'rent_files_to_renter' %}
+                                        <em class="icon ni ni-file"></em> فایل‌های اجاره پیشنهادی:
+                                    {% endif %}
                                     <span class="badge badge-dim bg-info" style="margin-right: 10px; font-family: Estedad">{{ interaction.items.count|farsi_number }} مورد</span>
                                 </h6>
                             </div>
@@ -518,16 +436,18 @@
                                         <div class="row gy-3">
                                             <!-- BYs for SFs -->
                                             {% if interaction.interaction_type == 'buyers_to_sale_file' %}
-                                                <!-- code -->
-                                                <div class="col-lg-3 col-sm-4">
-                                                    <div class="form-group">
-                                                        <label class="form-label">کد</label>
-                                                        <div class="form-control-wrap">
-                                                            <div type="text" class="form-control form-control-outlined">
-                                                                {{ obj.code|floatformat:0|intcomma|farsi_number }}
+                                                <!-- name -->
+                                                <div class="col-lg-2 col-sm-4">
+                                                    <a href="{% url 'buyer_detail' obj.pk obj.code %}" target="_blank">
+                                                        <div class="form-group">
+                                                            <label class="form-label">نام</label>
+                                                            <div class="form-control-wrap">
+                                                                <div type="text" class="form-control form-control-outlined" style="background-color: #E0F2F1">
+                                                                    {{ obj.name }}
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                    </div>
+                                                    </a>
                                                 </div>
                                                 <!-- budget -->
                                                 <div class="col-lg-3 col-sm-4">
@@ -541,7 +461,7 @@
                                                     </div>
                                                 </div>
                                                 <!-- area -->
-                                                <div class="col-lg-3 col-sm-4">
+                                                <div class="col-lg-2 col-sm-4">
                                                     <div class="form-group">
                                                         <label class="form-label">محدوده متراژ</label>
                                                         <div class="form-control-wrap">
@@ -552,48 +472,35 @@
                                                     </div>
                                                 </div>
                                                 <!-- sub_districts -->
-                                                <div class="col-lg-3 col-sm-4">
+                                                <div class="col-lg-5 col-sm-4">
                                                     <div class="form-group">
                                                         <label class="form-label">زیرمحلات</label>
                                                         <div class="form-control-wrap">
                                                             <div type="text" class="form-control form-control-outlined">
-                                                                {% for sd in obj.sub_districts.all|slice:":2" %}
+                                                                {% for sd in obj.sub_districts.all %}
                                                                     {{ sd.name }}{% if not forloop.last %}، {% endif %}
                                                                 {% endfor %}
-                                                                {% if obj.sub_districts.count > 2 %}
-                                                                    <span class="badge badge-dim bg-secondary" style="font-family: Estedad">+{{ obj.sub_districts.count|add:"-2"|farsi_number }}</span>
-                                                                {% endif %}
                                                             </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <!-- see -->
-                                                <div class="col-lg-1 col-sm-4">
-                                                    <div class="form-group">
-                                                        <label class="form-label">مشاهده</label>
-                                                        <div class="form-control-wrap">
-                                                            <a href="{% url 'buyer_detail' obj.pk obj.code %}"
-                                                               class="btn btn-primary btn-sm" target="_blank">
-                                                                <em class="icon ni ni-eye"></em>
-                                                            </a>
                                                         </div>
                                                     </div>
                                                 </div>
                                             <!-- RTs for RFs -->
                                             {% elif interaction.interaction_type == 'renters_to_rent_file' %}
-                                                <!-- code -->
-                                                <div class="col-lg-3 col-sm-4">
-                                                    <div class="form-group">
-                                                        <label class="form-label">کد</label>
-                                                        <div class="form-control-wrap">
-                                                            <div type="text" class="form-control form-control-outlined">
-                                                                {{ obj.code|floatformat:0|intcomma|farsi_number }}
+                                                <!-- name -->
+                                                <div class="col-lg-2 col-sm-4">
+                                                    <a href="{% url 'renter_detail' obj.pk obj.code %}" target="_blank">
+                                                        <div class="form-group">
+                                                            <label class="form-label">نام</label>
+                                                            <div class="form-control-wrap">
+                                                                <div type="text" class="form-control form-control-outlined" style="background-color: #E0F2F1">
+                                                                    {{ obj.name }}
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                    </div>
+                                                    </a>
                                                 </div>
                                                 <!-- deposit -->
-                                                <div class="col-lg-3 col-sm-4">
+                                                <div class="col-lg-2 col-sm-4">
                                                     <div class="form-group">
                                                         <label class="form-label">ودیعه</label>
                                                         <div class="form-control-wrap">
@@ -604,7 +511,7 @@
                                                     </div>
                                                 </div>
                                                 <!-- rent -->
-                                                <div class="col-lg-3 col-sm-4">
+                                                <div class="col-lg-2 col-sm-4">
                                                     <div class="form-group">
                                                         <label class="form-label">رهن</label>
                                                         <div class="form-control-wrap">
@@ -615,7 +522,7 @@
                                                     </div>
                                                 </div>
                                                 <!-- area -->
-                                                <div class="col-lg-3 col-sm-4">
+                                                <div class="col-lg-2 col-sm-4">
                                                     <div class="form-group">
                                                         <label class="form-label">محدوده متراژ</label>
                                                         <div class="form-control-wrap">
@@ -626,44 +533,32 @@
                                                     </div>
                                                 </div>
                                                 <!-- sub_districts -->
-                                                <div class="col-lg-3 col-sm-4">
+                                                <div class="col-lg-4 col-sm-4">
                                                     <div class="form-group">
                                                         <label class="form-label">زیرمحلات</label>
                                                         <div class="form-control-wrap">
                                                             <div type="text" class="form-control form-control-outlined">
-                                                                {% for sd in obj.sub_districts.all|slice:":2" %}
+                                                                {% for sd in obj.sub_districts.all %}
                                                                     {{ sd.name }}{% if not forloop.last %}، {% endif %}
                                                                 {% endfor %}
-                                                                {% if obj.sub_districts.count > 2 %}
-                                                                    <span class="badge badge-dim bg-secondary" style="font-family: Estedad">+{{ obj.sub_districts.count|add:"-2"|farsi_number }}</span>
-                                                                {% endif %}
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <!-- see -->
-                                                <div class="col-lg-1 col-sm-4">
-                                                    <div class="form-group">
-                                                        <label class="form-label">مشاهده</label>
-                                                        <div class="form-control-wrap">
-                                                            <a href="{% url 'renter_detail' obj.pk obj.code %}"
-                                                               class="btn btn-primary btn-sm" target="_blank">
-                                                                <em class="icon ni ni-eye"></em>
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                            <!-- SFs for BYs -->
                                             {% elif interaction.interaction_type == 'sale_files_to_buyer' %}
-                                                <!-- code -->
-                                                <div class="col-lg-3 col-sm-4">
-                                                    <div class="form-group">
-                                                        <label class="form-label">کد</label>
-                                                        <div class="form-control-wrap">
-                                                            <div type="text" class="form-control form-control-outlined">
-                                                                {{ obj.code|floatformat:0|intcomma|farsi_number }}
+                                                <!-- title -->
+                                                <div class="col-lg-4 col-sm-4">
+                                                    <a href="{% url 'sale_file_detail' obj.pk obj.unique_url_id %}" target="_blank">
+                                                        <div class="form-group">
+                                                            <label class="form-label">عنوان</label>
+                                                            <div class="form-control-wrap">
+                                                                <div type="text" class="form-control form-control-outlined" style="background-color: #E0F2F1">
+                                                                    {{ obj.title|farsi_number }}
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                    </div>
+                                                    </a>
                                                 </div>
                                                 <!-- price -->
                                                 <div class="col-lg-3 col-sm-4">
@@ -677,7 +572,7 @@
                                                     </div>
                                                 </div>
                                                 <!-- area -->
-                                                <div class="col-lg-3 col-sm-4">
+                                                <div class="col-lg-2 col-sm-4">
                                                     <div class="form-group">
                                                         <label class="form-label">متراژ</label>
                                                         <div class="form-control-wrap">
@@ -698,32 +593,23 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <!-- see -->
-                                                <div class="col-lg-1 col-sm-4">
-                                                    <div class="form-group">
-                                                        <label class="form-label">مشاهده</label>
-                                                        <div class="form-control-wrap">
-                                                            <a href="{% url 'sale_file_detail' obj.pk obj.unique_url_id %}"
-                                                               class="btn btn-primary btn-sm" target="_blank">
-                                                                <em class="icon ni ni-eye"></em>
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                            <!-- RFs for RTs -->
                                             {% elif interaction.interaction_type == 'rent_files_to_renter' %}
-                                                <!-- code -->
-                                                <div class="col-lg-3 col-sm-4">
-                                                    <div class="form-group">
-                                                        <label class="form-label">کد</label>
-                                                        <div class="form-control-wrap">
-                                                            <div type="text" class="form-control form-control-outlined">
-                                                                {{ obj.code|floatformat:0|intcomma|farsi_number }}
+                                                <!-- title -->
+                                                <div class="col-lg-4 col-sm-4">
+                                                    <a href="{% url 'rent_file_detail' obj.pk obj.unique_url_id %}" target="_blank">
+                                                        <div class="form-group">
+                                                            <label class="form-label">عنوان</label>
+                                                            <div class="form-control-wrap">
+                                                                <div type="text" class="form-control form-control-outlined" style="background-color: #E0F2F1">
+                                                                    {{ obj.title|farsi_number }}
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                    </div>
+                                                    </a>
                                                 </div>
                                                 <!-- deposit -->
-                                                <div class="col-lg-3 col-sm-4">
+                                                <div class="col-lg-2 col-sm-4">
                                                     <div class="form-group">
                                                         <label class="form-label">ودیعه</label>
                                                         <div class="form-control-wrap">
@@ -734,7 +620,7 @@
                                                     </div>
                                                 </div>
                                                 <!-- rent -->
-                                                <div class="col-lg-3 col-sm-4">
+                                                <div class="col-lg-2 col-sm-4">
                                                     <div class="form-group">
                                                         <label class="form-label">رهن</label>
                                                         <div class="form-control-wrap">
@@ -745,7 +631,7 @@
                                                     </div>
                                                 </div>
                                                 <!-- area -->
-                                                <div class="col-lg-3 col-sm-4">
+                                                <div class="col-lg-2 col-sm-4">
                                                     <div class="form-group">
                                                         <label class="form-label">متراژ</label>
                                                         <div class="form-control-wrap">
@@ -756,25 +642,13 @@
                                                     </div>
                                                 </div>
                                                 <!-- sub_district -->
-                                                <div class="col-lg-3 col-sm-4">
+                                                <div class="col-lg-2 col-sm-4">
                                                     <div class="form-group">
                                                         <label class="form-label">زیرمحله</label>
                                                         <div class="form-control-wrap">
                                                             <div type="text" class="form-control form-control-outlined">
                                                                 {{ obj.sub_district }}
                                                             </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <!-- see -->
-                                                <div class="col-lg-1 col-sm-4">
-                                                    <div class="form-group">
-                                                        <label class="form-label">مشاهده</label>
-                                                        <div class="form-control-wrap">
-                                                            <a href="{% url 'rent_file_detail' obj.pk obj.unique_url_id %}"
-                                                               class="btn btn-primary btn-sm" target="_blank">
-                                                                <em class="icon ni ni-eye"></em>
-                                                            </a>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -816,12 +690,6 @@
                                 <em class="icon ni ni-arrow-left"></em>
                                 <span>بازگشت به تعامل‌ها</span>
                             </a>
-                            {% if interaction.receiver == request.user and interaction.status != 'closed' %}
-                                <button type="button" class="btn btn-danger" onclick="closeInteraction({{ interaction.pk }})">
-                                    <em class="icon ni ni-cross-circle"></em>
-                                    <span>بستن تعامل</span>
-                                </button>
-                            {% endif %}
                         </div>
                     </div>
                 </div>

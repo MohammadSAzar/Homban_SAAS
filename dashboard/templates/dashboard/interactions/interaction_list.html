@@ -47,12 +47,12 @@
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link {% if filter_type == 'sent' %}active{% endif %}"
-                                   href="{% url 'interaction_list' %}?filter=sent">ارسال شده</a>
+                                   href="{% url 'interaction_list' %}?filter=sent">ارسال‌شده</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link {% if filter_type == 'received' %}active{% endif %}"
                                    href="{% url 'interaction_list' %}?filter=received">
-                                    دریافت شده
+                                    دریافت‌شده
                                     {% if unviewed_received_count > 0 %}
                                         <span class="badge badge-dim bg-danger" style="font-family: Estedad">{{ unviewed_received_count|farsi_number }}</span>
                                     {% endif %}
@@ -74,45 +74,112 @@
                             <!-- Loop -->
                             {% for interaction in interactions %}
                                 <div style="border: 1px solid #dbdfea; border-radius: 4px; padding: 20px; margin-bottom: 20px;
-                                            {% if interaction.receiver == request.user and interaction.status == 'sent' %}background-color: #FFF3E0;{% else %}background-color: #f5f6fa;{% endif %}">
+                                            {% if interaction.receiver == request.user and interaction.status == 'unseen' %}background-color: #FFF3E0;{% else %}background-color: #f5f6fa;{% endif %}">
 
                                     <!-- Upper -->
                                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #dbdfea;">
+                                        <!-- Main Text -->
                                         <div style="flex: 1;">
-                                            <span style="font-weight: bold; color: #364a63; font-size: 1.1em;">
+                                            <span style="font-weight: bold; color: #364a63; font-size: 0.9em;">
+                                                <!-- you = sender -->
                                                 {% if interaction.sender == request.user %}
-                                                    <em class="icon ni ni-send" style="font-size: 1.2em; color: #1976D2;"></em> ارسال شده به:
-                                                    <span style="color: #1976D2;">{{ interaction.receiver.name_family|default:interaction.receiver }}</span>
-                                                {% else %}
-                                                    <em class="icon ni ni-inbox" style="font-size: 1.2em; color: #388E3C;"></em> دریافت شده از:
-                                                    <span style="color: #388E3C;">{{ interaction.sender.name_family|default:interaction.sender }}</span>
+                                                    <em class="icon ni ni-send" style="font-size: 1.2em; color: #00a65c;"></em>
+                                                    {% if interaction.interaction_type == 'buyers_to_sale_file' %}
+                                                        شما تعدادی خریدار برای فایل فروش
+                                                        <a href="{{ interaction.announcement.content_object.get_absolute_url }}" target="_blank">
+                                                            <span style="color: #00a65c; padding: 0 3px;">{{ interaction.announcement.content_object.title }}</span>
+                                                        </a>
+                                                        به
+                                                        <span style="color: #00a65c; padding: 0 3px;">{{ interaction.receiver.name_family|default:interaction.receiver }}</span>
+                                                        پیشنهاد داده‌اید
+                                                    {% elif interaction.interaction_type == 'renters_to_rent_file' %}
+                                                        شما تعدادی مستاجر برای فایل اجاره
+                                                        <a href="{{ interaction.announcement.content_object.get_absolute_url }}" target="_blank">
+                                                            <span style="color: #00a65c; padding: 0 3px;">{{ interaction.announcement.content_object.title }}</span>
+                                                        </a>
+                                                        به
+                                                        <span style="color: #00a65c; padding: 0 3px;">{{ interaction.receiver.name_family|default:interaction.receiver }}</span>
+                                                        پیشنهاد داده‌اید
+                                                    {% elif interaction.interaction_type == 'sale_files_to_buyer' %}
+                                                        شما تعدادی فایل فروش برای خریدار
+                                                        <a href="{{ interaction.announcement.content_object.get_absolute_url }}" target="_blank">
+                                                            <span style="color: #00a65c; padding: 0 3px;">{{ interaction.announcement.content_object.name }}</span>
+                                                        </a>
+                                                        به
+                                                        <span style="color: #00a65c; padding: 0 3px;">{{ interaction.receiver.name_family|default:interaction.receiver }}</span>
+                                                        پیشنهاد داده‌اید
+                                                    {% elif interaction.interaction_type == 'rent_files_to_renter' %}
+                                                        شما تعدادی فایل اجاره برای مستاجر
+                                                        <a href="{{ interaction.announcement.content_object.get_absolute_url }}" target="_blank">
+                                                            <span style="color: #00a65c; padding: 0 3px;">{{ interaction.announcement.content_object.title }}</span>
+                                                        </a>
+                                                        به
+                                                        <span style="color: #00a65c; padding: 0 3px;">{{ interaction.receiver.name_family|default:interaction.receiver }}</span>
+                                                        پیشنهاد داده‌اید
+                                                    {% endif %}
+                                                <!-- you = receiver -->
+                                                {% elif interaction.receiver == request.user %}
+                                                    <em class="icon ni ni-inbox" style="font-size: 1.2em; color: #00a65c;"></em>
+                                                    {% if interaction.interaction_type == 'buyers_to_sale_file' %}
+                                                        <span style="color: #00a65c; padding: 0 3px;">{{ interaction.sender.name_family|default:interaction.sender }}</span>
+                                                        تعدادی خریدار برای فایل فروش
+                                                        <a href="{{ interaction.announcement.content_object.get_absolute_url }}" target="_blank">
+                                                            <span style="color: #00a65c; padding: 0 3px;">{{ interaction.announcement.content_object.title }}</span>
+                                                        </a>
+                                                        به شما پیشنهاد داده ‌است
+                                                    {% elif interaction.interaction_type == 'renters_to_rent_file' %}
+                                                        <span style="color: #00a65c; padding: 0 3px;">{{ interaction.sender.name_family|default:interaction.sender }}</span>
+                                                        تعدادی مستاجر برای فایل اجاره
+                                                        <a href="{{ interaction.announcement.content_object.get_absolute_url }}" target="_blank">
+                                                            <span style="color: #00a65c; padding: 0 3px;">{{ interaction.announcement.content_object.title }}</span>
+                                                        </a>
+                                                        به شما پیشنهاد داده ‌است
+                                                    {% elif interaction.interaction_type == 'sale_files_to_buyer' %}
+                                                        <span style="color: #00a65c; padding: 0 3px;">{{ interaction.sender.name_family|default:interaction.sender }}</span>
+                                                        تعدادی فایل فروش برای خریدار
+                                                        <a href="{{ interaction.announcement.content_object.get_absolute_url }}" target="_blank">
+                                                            <span style="color: #00a65c; padding: 0 3px;">{{ interaction.announcement.content_object.name }}</span>
+                                                        </a>
+                                                        به شما پیشنهاد داده‌ است
+                                                    {% elif interaction.interaction_type == 'rent_files_to_renter' %}
+                                                        <span style="color: #00a65c; padding: 0 3px;">{{ interaction.sender.name_family|default:interaction.sender }}</span>
+                                                        تعدادی فایل اجاره برای مستاجر
+                                                        <a href="{{ interaction.announcement.content_object.get_absolute_url }}" target="_blank">
+                                                            <span style="color: #00a65c; padding: 0 3px;">{{ interaction.announcement.content_object.name }}</span>
+                                                        </a>
+                                                        به شما پیشنهاد داده‌ است
+                                                    {% endif %}
                                                 {% endif %}
                                             </span>
                                         </div>
+                                        <!-- Status -->
                                         <div style="text-align: left;">
-                                            {% if interaction.status == 'sent' %}
-                                                <span class="badge badge-dim bg-primary" style="font-family: Estedad">ارسال‌شده</span>
-                                            {% elif interaction.status == 'received' %}
-                                                <span class="badge badge-dim bg-success" style="font-family: Estedad">دیده‌شده</span>
+                                            {% if interaction.status == 'unseen' %}
+                                                <span class="badge badge-dim bg-primary" style="font-size: 0.7em;">{{ interaction.get_status_display }}</span>
+                                            {% elif interaction.status == 'seen' %}
+                                                <span class="badge badge-dim bg-success" style="font-size: 0.7em;">{{ interaction.get_status_display }}</span>
                                             {% endif %}
                                         </div>
                                     </div>
 
                                     <!-- Info -->
                                     <div class="row gy-3 mb-3">
-                                        <!-- Type -->
-                                        <div class="col-lg-4 col-sm-6">
-                                            <strong style="color: #526484;">نوع:</strong>
-                                            <span style="font-size: 0.85em;">{{ interaction.get_interaction_type_display }}</span>
-                                        </div>
                                         <!-- Count -->
                                         <div class="col-lg-4 col-sm-6">
-                                            <strong style="color: #526484;">تعداد آیتم‌ها:</strong>
-                                            <span class="badge badge-dim bg-secondary" style="font-family: Estedad">{{ interaction.items.count|farsi_number }} مورد</span>
+                                            {% if interaction.interaction_type == 'buyers_to_sale_file' %}
+                                                <strong style="color: #526484; font-size: 0.95em;">تعداد خریداران پیشنهادی:</strong>
+                                            {% elif interaction.interaction_type == 'renters_to_rent_file' %}
+                                                <strong style="color: #526484; font-size: 0.95em;">تعداد مستاجران پیشنهادی:</strong>
+                                            {% elif interaction.interaction_type == 'sale_files_to_buyer' %}
+                                                <strong style="color: #526484; font-size: 0.95em;">تعداد فایل‌های فروش پیشنهادی:</strong>
+                                            {% elif interaction.interaction_type == 'rent_files_to_renter' %}
+                                                <strong style="color: #526484; font-size: 0.95em;">تعداد فایل‌های اجاره پیشنهادی:</strong>
+                                            {% endif %}
+                                            <span style="color: #364a63;">{{ interaction.items.count|farsi_number }}</span>
                                         </div>
                                         <!-- Date -->
                                         <div class="col-lg-4 col-sm-6">
-                                            <strong style="color: #526484;">تاریخ:</strong>
+                                            <strong style="color: #526484; font-size: 0.95em;">تاریخ:</strong>
                                             <span style="color: #364a63;">{{ interaction.datetime_created|to_jalali:'%Y/%m/%d - %H:%M'|farsi_number }}</span>
                                         </div>
                                     </div>

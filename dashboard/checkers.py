@@ -22,8 +22,12 @@ def rent_file_rent_price_checker(price):
 
 
 def file_price_checker(price):
-    if min_file_price <= price <= max_file_price:
-        return True
+    if price / 1000000 >= 1:
+        if min_file_price <= price <= max_file_price:
+            return True
+    else:
+        if min_file_price <= 1000000 * price <= max_file_price:
+            return True
 
 
 def area_checker(area):

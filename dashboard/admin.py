@@ -249,3 +249,20 @@ class InteractionItemAdmin(admin.ModelAdmin):
         return qs.select_related('interaction', 'content_type')
 
 
+@admin.register(models.NotifiedTask)
+class NotifiedTaskAdmin(admin.ModelAdmin):
+    list_display = ['id', 'agent', 'date', 'task_type', 'status', 'created_at', 'completed_at']
+    list_filter = ['agent', 'date', 'task_type', 'status']
+    search_fields = ['agent']
+    readonly_fields = ['created_at', 'completed_at']
+    date_hierarchy = 'created_at'
+
+
+@admin.register(models.DailyTaskStatus)
+class DailyTaskStatusAdmin(admin.ModelAdmin):
+    list_display = ['id', 'agent', 'date', 'created_at', 'updated_at']
+    list_filter = ['agent', 'date',]
+    search_fields = ['agent']
+    readonly_fields = ['created_at', 'updated_at']
+    date_hierarchy = 'created_at'
+

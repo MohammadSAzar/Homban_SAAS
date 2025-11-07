@@ -1,0 +1,394 @@
+{% extends '_base_dashboard.html' %}
+
+{% load static %}
+{% load i18n %}
+{% load jalali_tags %}
+{% load jalali_date_converter %}
+{% load number_converter %}
+{% load price_converter %}
+{% load humanize %}
+{% load widget_tweaks %}
+{% load pagination %}
+
+
+{% block title %}جزئیات وظیفه{% endblock %}
+
+
+{% block content %}
+    
+    <!-- Main -->
+    <div class="nk-block">
+        <div class="row gy-4">
+    
+            <!-- Upper -->
+            <div class="col-lg-12">
+                <div class="card card-bordered">
+                    <div class="card-inner">
+                    
+                        <!-- Basics -->
+                        <div class="card-title-group align-start mb-3">
+                            <!-- Title & Dates -->
+                            <div class="card-title" style="margin-bottom: 1em;">
+                                <!-- Title -->
+                                <h5 class="title" style="font-size: 1.3em;">
+                                    {% if task.task_type == 'announcement_suggestions' %}
+                                        <em class="icon ni ni-send"></em> جزئیات پیشنهادی که باید ارسال کنید
+                                    {% else %}
+                                        <em class="icon ni ni-inbox"></em> جزئیات پیشنهادی که دریافت کرده‌اید
+                                    {% endif %}
+                                </h5>
+                                <!-- Dates -->
+                                <div style="margin-top: 1.9em; margin-bottom: 0.5em; font-size: 0.9em">تاریخ ایجاد: {{ task.created_at|to_jalali:'%Y/%m/%d - %H:%M'|farsi_number }}</div>
+                                <div style="font-size: 0.9em">تاریخ تکمیل: {{ task.completed_at|to_jalali:'%Y/%m/%d - %H:%M'|farsi_number }}</div>
+                            </div>
+                            <!-- Status -->
+                            <div class="card-tools">
+                                {% if task.status == 'waiting' %}
+                                    <span class="badge badge-dim bg-warning" style="font-size: 1em; padding: 8px 15px;">{{ task.get_status_display }}</span>
+                                {% else %}
+                                    <span class="badge badge-dim bg-success" style="font-size: 1em; padding: 8px 15px;">{{ task.get_status_display }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+    
+                        <!-- Result -->
+                        {% if task.result %}
+                            <hr style="margin: 20px 0;">
+                            <div class="row gy-3">
+                                <div class="col-lg-12">
+                                    <div class="form-group">
+                                        <label class="form-label">نتیجه</label>
+                                        <div class="form-control-wrap">
+                                            <textarea class="form-control form-control-xl form-control-outlined"
+                                                      rows="3"
+                                                      readonly>{{ task.result }}</textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+    
+                    </div>
+                </div>
+            </div>
+            <!-- end: Upper -->
+    
+            <!-- Announcement Suggestion -->
+            {% if task.task_type == 'announcement_suggestions' and task.related_announcement %}
+                <!-- Nothing is needed here! -->
+            {% endif %}
+            <!-- end: Announcement Suggestion -->
+    
+            <!-- Received Interaction -->
+            {% if task.task_type == 'received_interaction' and task.related_interaction_item %}
+                <div class="col-lg-12">
+                    <div class="card card-bordered">
+                        <div class="card-inner">
+        
+                            <!-- Info -->
+                            {% with obj=related_object %}
+                                <!-- Sender + Object (Link) -->
+                                <div class="row gy-3 mb-3">
+                                    <div class="col-lg-12">
+                                        <div class="alert alert-info">
+                                            <strong>ارسال شده توسط:</strong>
+                                            <span style="border-bottom: 1px solid #00a65c; color: #00a65c">{{ sender.name_family|default:sender.username }}</span>
+                                            <strong>برای</strong>
+                                                {% if obj.title %}
+                                                    فایل <a href="{{ obj.get_absolute_url }}" target="_blank" style="border-bottom: 1px solid #00a65c; color: #00a65c">{{ obj.title}}</a>
+                                                {% elif obj.name %}
+                                                    مشتری <a href="{{ obj.get_absolute_url }}" target="_blank" style="border-bottom: 1px solid #00a65c; color: #00a65c">{{ obj.name }}</a>
+                                                {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Detail -->
+                                <div class="row gy-3">
+                                    <!-- SF -->
+                                    {% if task.content_type.model == 'salefile' %}
+                                        <!-- Title + Link -->
+                                        <div class="col-lg-5 col-sm-4">
+                                            <div class="form-group">
+                                                <label class="form-label">عنوان</label>
+                                                <a href="{% url 'sale_file_detail' obj.pk obj.unique_url_id %}" target="_blank">
+                                                <div class="form-control-wrap">
+                                                    <div type="text" class="form-control form-control-outlined" style="background-color: #E0F2F1">
+                                                        {{ obj.title|farsi_number }}
+                                                    </div>
+                                                </div>
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <!-- Price -->
+                                        <div class="col-lg-3 col-sm-4">
+                                            <div class="form-group">
+                                                <label class="form-label">قیمت</label>
+                                                <div class="form-control-wrap">
+                                                    <div type="text" class="form-control form-control-outlined">
+                                                        {{ obj.price_announced|price_converter|intcomma:False|farsi_number }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Area -->
+                                        <div class="col-lg-2 col-sm-4">
+                                            <div class="form-group">
+                                                <label class="form-label">متراژ</label>
+                                                <div class="form-control-wrap">
+                                                    <div type="text" class="form-control form-control-outlined">
+                                                        {{ obj.area|farsi_number }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Sub_district -->
+                                        <div class="col-lg-2 col-sm-4">
+                                            <div class="form-group">
+                                                <label class="form-label">زیرمحله</label>
+                                                <div class="form-control-wrap">
+                                                    <div type="text" class="form-control form-control-outlined">
+                                                        {{ obj.sub_district }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <!-- RF -->
+                                    {% elif task.content_type.model == 'rentfile' %}
+                                        <!-- Title + Link -->
+                                        <div class="col-lg-4 col-sm-4">
+                                            <div class="form-group">
+                                                <label class="form-label">عنوان</label>
+                                                <a href="{% url 'rent_file_detail' obj.pk obj.unique_url_id %}" target="_blank">
+                                                <div class="form-control-wrap">
+                                                    <div type="text" class="form-control form-control-outlined" style="background-color: #E0F2F1">
+                                                        {{ obj.title|farsi_number }}
+                                                    </div>
+                                                </div>
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <!-- Deposit -->
+                                        <div class="col-lg-2 col-sm-4">
+                                            <div class="form-group">
+                                                <label class="form-label">ودیعه</label>
+                                                <div class="form-control-wrap">
+                                                    <div type="text" class="form-control form-control-outlined">
+                                                        {{ obj.deposit_announced|price_converter|intcomma:False|farsi_number }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Rent -->
+                                        <div class="col-lg-2 col-sm-4">
+                                            <div class="form-group">
+                                                <label class="form-label">اجاره</label>
+                                                <div class="form-control-wrap">
+                                                    <div type="text" class="form-control form-control-outlined">
+                                                        {{ obj.rent_announced|price_converter|intcomma:False|farsi_number }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Area -->
+                                        <div class="col-lg-2 col-sm-4">
+                                            <div class="form-group">
+                                                <label class="form-label">متراژ</label>
+                                                <div class="form-control-wrap">
+                                                    <div type="text" class="form-control form-control-outlined">
+                                                        {{ obj.area|farsi_number }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Sub_district -->
+                                        <div class="col-lg-2 col-sm-4">
+                                            <div class="form-group">
+                                                <label class="form-label">زیرمحله</label>
+                                                <div class="form-control-wrap">
+                                                    <div type="text" class="form-control form-control-outlined">
+                                                        {{ obj.sub_district }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <!-- BY -->
+                                    {% elif task.content_type.model == 'buyer' %}
+                                        <!-- Name + Link -->
+                                        <div class="col-lg-2 col-sm-4">
+                                            <div class="form-group">
+                                                <label class="form-label">نام</label>
+                                                <a href="{% url 'buyer_detail' obj.pk obj.code %}" target="_blank">
+                                                <div class="form-control-wrap">
+                                                    <div type="text" class="form-control form-control-outlined" style="background-color: #E0F2F1">
+                                                        {{ obj.name }}
+                                                    </div>
+                                                </div>
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <!-- Budget -->
+                                        <div class="col-lg-3 col-sm-4">
+                                            <div class="form-group">
+                                                <label class="form-label">بودجه</label>
+                                                <div class="form-control-wrap">
+                                                    <div type="text" class="form-control form-control-outlined">
+                                                        {{ obj.budget_announced|price_converter|intcomma:False|farsi_number }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Area -->
+                                        <div class="col-lg-3 col-sm-4">
+                                            <div class="form-group">
+                                                <label class="form-label">متراژ</label>
+                                                <div class="form-control-wrap">
+                                                    <div type="text" class="form-control form-control-outlined">
+                                                        {{ obj.area_min|farsi_number }} - {{ obj.area_max|farsi_number }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Sub_districts -->
+                                        <div class="col-lg-5 col-sm-6">
+                                            <div class="form-group">
+                                                <label class="form-label">زیرمحله‌ها</label>
+                                                <div class="form-control-wrap">
+                                                    <div type="text" class="form-control form-control-xl form-control-outlined">
+                                                        {% for sd in obj.sub_districts.all %}
+                                                            {{ sd.name }}{% if not forloop.last %}، {% endif %}
+                                                        {% endfor %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <!-- RT -->
+                                    {% elif task.content_type.model == 'renter' %}
+                                        <!-- Name + Link -->
+                                        <div class="col-lg-2 col-sm-4">
+                                            <div class="form-group">
+                                                <label class="form-label">نام</label>
+                                                <a href="{% url 'renter_detail' obj.pk obj.code %}" target="_blank">
+                                                <div class="form-control-wrap">
+                                                    <div type="text" class="form-control form-control-outlined" style="background-color: #E0F2F1">
+                                                        {{ obj.name }}
+                                                    </div>
+                                                </div>
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <!-- Deposit -->
+                                        <div class="col-lg-2 col-sm-4">
+                                            <div class="form-group">
+                                                <label class="form-label">ودیعه</label>
+                                                <div class="form-control-wrap">
+                                                    <div type="text" class="form-control form-control-outlined">
+                                                        {{ obj.deposit_announced|price_converter|intcomma:False|farsi_number }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Rent -->
+                                        <div class="col-lg-2 col-sm-4">
+                                            <div class="form-group">
+                                                <label class="form-label">اجاره</label>
+                                                <div class="form-control-wrap">
+                                                    <div type="text" class="form-control form-control-outlined">
+                                                        {{ obj.rent_announced|price_converter|intcomma:False|farsi_number }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Area -->
+                                        <div class="col-lg-2 col-sm-4">
+                                            <div class="form-group">
+                                                <label class="form-label">متراژ</label>
+                                                <div class="form-control-wrap">
+                                                    <div type="text" class="form-control form-control-outlined">
+                                                        {{ obj.area_min|farsi_number }} - {{ obj.area_max|farsi_number }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Sub_districts -->
+                                        <div class="col-lg-4 col-sm-6">
+                                            <div class="form-group">
+                                                <label class="form-label">زیرمحله‌ها</label>
+                                                <div class="form-control-wrap">
+                                                    <div type="text" class="form-control form-control-xl form-control-outlined">
+                                                        {% for sd in obj.sub_districts.all %}
+                                                            {{ sd.name }}{% if not forloop.last %}، {% endif %}
+                                                        {% endfor %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% endwith %}
+        
+                            <!-- Form -->
+                            {% if task.status == 'waiting' %}
+                                <hr style="margin: 20px 0;">
+                                <form method="post" action="{% url 'complete_task' task.pk %}">
+                                    {% csrf_token %}
+                                    <div class="row gy-3">
+                                        <div class="col-lg-10">
+                                            <div class="form-group">
+                                                <label class="form-label">نتیجه بررسی</label>
+                                                <div class="form-control-wrap">
+                                                    <textarea class="form-control form-control-xl" 
+                                                              name="result" 
+                                                              rows="3"
+                                                              placeholder="نتیجه بررسی این پیشنهاد را وارد کنید..." required></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <div class="form-group">
+                                                <label class="form-label">عملیات</label>
+                                                <div class="form-control-wrap">
+                                                    <button type="submit" class="btn btn-primary btn-block" style="width: 100%;">
+                                                        <em class="icon ni ni-check-circle"></em>
+                                                        <span>تکمیل وظیفه</span>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            {% endif %}
+        
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            <!-- end: Received Interaction -->
+    
+            <!-- Buttons -->
+            <div class="col-lg-12">
+                <div class="card card-bordered">
+                    <div class="card-inner">
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <a href="{% url 'notified_task_list' %}" class="btn btn-secondary">
+                                <em class="icon ni ni-arrow-left"></em>
+                                <span>بازگشت به وظایف</span>
+                            </a>
+                            {% if task.task_type == 'announcement_suggestions' and task.status == 'waiting' %}
+                                <a href="{% url 'announcement_detail' task.related_announcement.pk %}" class="btn btn-primary">
+                                    <em class="icon ni ni-send"></em>
+                                    <span>ارسال پیشنهادات</span>
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- end: Buttons -->
+    
+        </div>
+    </div>
+    <!-- end: Main -->
+    
+{% endblock %}
+
+

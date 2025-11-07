@@ -182,6 +182,10 @@
                                                     <li class="nk-menu-item">
                                                         <a href="{% url 'delete_request_list' %}" class="nk-menu-link"><span class="nk-menu-text">موارد حذفی</span></a>
                                                     </li>
+                                                    <li class="nk-menu-item">
+                                                        <a href="{% url 'boss_agent_task_list' %}" class="nk-menu-link"><span class="nk-menu-text">آمار وظایف مشاوران</span></a>
+                                                    </li>
+
                                                 </ul>
                                             </li>
                                         {% endif %}
@@ -283,6 +287,29 @@
                                             </ul>
                                         </li>
 
+                                        <!-- Tasks -->
+                                        {% if request.user.title != 'bs' %}
+                                            <li class="nk-menu-item has-sub">
+                                                <a href="#" class="nk-menu-link nk-menu-toggle" style="position: relative;">
+                                                    <span class="nk-menu-icon"><em class="icon ni ni-check-circle"></em></span>
+                                                    <span class="nk-menu-text">وظایف</span>
+                                                    {% if has_pending_tasks %}
+                                                        <span class="notification-badge">{{ pending_tasks_count|farsi_number }}</span>
+                                                    {% endif %}
+                                                </a>
+                                                <ul class="nk-menu-sub">
+                                                    <li class="nk-menu-item">
+                                                        <a href="{% url 'notified_task_list' %}" class="nk-menu-link">
+                                                            <span class="nk-menu-text">وظایف شما</span>
+                                                            {% if pending_tasks_count > 0 %}
+                                                                <span class="notification-badge">{{ pending_tasks_count|farsi_number }}</span>
+                                                            {% endif %}
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                        {% endif %}
+
                                     </ul>
                                     <!-- end:Sidebar >>> menu >>> items -->
 
@@ -324,8 +351,10 @@
                                             <!-- Name -->
                                             <a href="#" class="dropdown-toggle" data-bs-toggle="dropdown">
                                                 <div class="user-toggle">
-                                                    {% if user.name_family %}
+                                                    {% if user.name_family and user.sub_district %}
                                                         <div class="user-name dropdown-indicator" style="font-size: 1em; padding-top: 0.5em;">{{ user.name_family }} / {{ user.sub_district }}</div>
+                                                    {% elif user.name_family and not user.sub_district %}
+                                                        <div class="user-name dropdown-indicator" style="font-size: 1em; padding-top: 0.5em;">{{ user.name_family }} / {{ user.get_title_display }}</div>
                                                     {% else %}
                                                         <div class="user-name dropdown-indicator" style="font-size: 1em; padding-top: 0.5em;">{{ user.get_title_display }} / {{ user.sub_district }}</div>
                                                     {% endif %}

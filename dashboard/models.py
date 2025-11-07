@@ -3,17 +3,22 @@ import zipfile
 
 import random
 import string
+
 import jdatetime
 from jdatetime import timedelta, datetime
+from datetime import datetime
+from django.utils import timezone
+
+from django.db import models
+from django.db.models import Count, Q, F, PositiveBigIntegerField
+from django.db.models.functions import Cast
 
 from django.conf import settings
-from django.db import models
 from django.shortcuts import reverse
 from django.contrib.auth.models import AbstractUser
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.utils.text import slugify
-from django.utils import timezone
 from django.utils.translation import gettext as _
 
 from . import choices
@@ -200,6 +205,7 @@ class CustomUserModel(AbstractUser):
         ('fp', _('File Person')),
         ('cp', _('Customer Person')),
         ('bt', _('Dual Person')),
+        ('nd', 'همه محلات'),  # NEW
     ]
     title = models.CharField(max_length=10, choices=TITLE_CHOICES, blank=True, null=True, verbose_name=_('Title'))
     name_family = models.CharField(max_length=300, blank=True, null=True, verbose_name='نام و نام خانوادگی')
@@ -879,6 +885,7 @@ class Mark(models.Model):
         return reverse('mark_detail', args=[self.pk])
 
 
+# --------------------------------- TEAMs ---------------------------------
 class Report(models.Model):
     agent = models.ForeignKey(CustomUserModel, on_delete=models.SET_NULL, null=True, blank=True, related_name='new_reports',
                               verbose_name='مشاور')
@@ -895,6 +902,12 @@ class Report(models.Model):
             jalali_now = jdatetime.datetime.now()
             self.date = jalali_now.strftime('%Y/%m/%d')
         super().save(*args, **kwargs)
+        if self.agent and self.date:
+            daily_status, created = DailyTaskStatus.objects.get_or_create(
+                agent=self.agent,
+                date=self.date
+            )
+            daily_status.update_from_report(self)
 
     class Meta:
         verbose_name = 'گزارش'
@@ -912,12 +925,21 @@ class Report(models.Model):
 
 
 class ReportItem(models.Model):
-    report = models.ForeignKey(Report, on_delete=models.CASCADE, null=True, blank=True, related_name='ads', verbose_name='کزارش')
+    report = models.ForeignKey(Report, on_delete=models.CASCADE, null=True, blank=True, related_name='items', verbose_name='کزارش')
     file_code = models.CharField(max_length=10, null=True, blank=True, verbose_name='کد فایل')
     customer_code = models.CharField(max_length=10, null=True, blank=True, verbose_name='کد مشتری')
     description = models.TextField(max_length=1000, blank=True, null=True, verbose_name='توضیحات')
     type = models.CharField(max_length=10, choices=choices.report_item_choices, verbose_name='نوع')
     datetime_created = models.DateTimeField(auto_now_add=True, verbose_name=_('Date and Time of Creation'))
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.report and self.report.pk and self.report.agent and self.report.date:
+            daily_status, created = DailyTaskStatus.objects.get_or_create(
+                agent=self.report.agent,
+                date=self.report.date
+            )
+            daily_status.update_from_report(self.report)
 
     @property
     def file(self):
@@ -974,7 +996,7 @@ class Announcement(models.Model):
     created_by = models.ForeignKey(CustomUserModel, on_delete=models.CASCADE, related_name='created_announcements', verbose_name='منشا')
     visible_to = models.ManyToManyField(CustomUserModel, blank=True, related_name='visible_announcements', verbose_name='مخاطب')
     viewed_by = models.ManyToManyField(CustomUserModel, blank=True, related_name='viewed_announcements', verbose_name='بیننده')
-    announcement_type = models.CharField(max_length=20, choices=choices.mark_types, verbose_name='نوع')
+    announcement_type = models.CharField(max_length=20, choices=choices.announcement_types, verbose_name='نوع')
     is_active = models.BooleanField(default=True, verbose_name='فعال بودن')
     datetime_created = models.DateTimeField(auto_now_add=True, verbose_name='زمان ساخت')
 
@@ -990,6 +1012,301 @@ class Announcement(models.Model):
     def __str__(self):
         return f"اعلان: {self.announcement_type} - {self.object_id}"
 
+    def get_agents_with_suggestions(self):
+        agents_with_suggestions = []
+        creator = self.created_by
+
+        if self.announcement_type == 'sf':
+            sale_file = self.content_object
+            matching_buyers = Buyer.objects.filter(
+                status='acc',
+                budget_announced__gt=0.9 * sale_file.price_announced,
+                budget_announced__lt=1.1 * sale_file.price_announced,
+                area_min__lt=1.2 * sale_file.area,
+                area_max__gt=0.8 * sale_file.area
+            ).exclude(
+                delete_request='Yes'
+            ).exclude(
+                created_by=creator
+            ).values_list('created_by', flat=True).distinct()
+            agents_with_suggestions = list(matching_buyers)
+
+        elif self.announcement_type == 'rf':
+            rent_file = self.content_object
+            base_queryset = Renter.objects.annotate(
+                deposit_total_calc=Cast(
+                    F('deposit_announced') + (100 * F('rent_announced') / 3),
+                    PositiveBigIntegerField()
+                )
+            ).exclude(
+                delete_request='Yes'
+            ).exclude(
+                created_by=creator
+            )
+
+            non_convertable = base_queryset.filter(
+                status='acc',
+                convertable='isnt',
+                deposit_announced__gt=0.8 * rent_file.deposit_announced,
+                deposit_announced__lt=1.2 * rent_file.deposit_announced,
+                rent_announced__gt=0.8 * rent_file.rent_announced,
+                rent_announced__lt=1.2 * rent_file.rent_announced,
+                area_min__lt=1.2 * rent_file.area,
+                area_max__gt=0.8 * rent_file.area
+            )
+
+            rent_total_min = 0.8 * (rent_file.deposit_announced + 100 * (rent_file.rent_announced / 3))
+            rent_total_max = 1.2 * (rent_file.deposit_announced + 100 * (rent_file.rent_announced / 3))
+
+            convertable = base_queryset.filter(
+                status='acc',
+                convertable='is',
+                deposit_total_calc__gt=rent_total_min,
+                deposit_total_calc__lt=rent_total_max,
+                area_min__lt=1.2 * rent_file.area,
+                area_max__gt=0.8 * rent_file.area
+            )
+
+            matching_renters = (non_convertable | convertable).values_list('created_by', flat=True).distinct()
+            agents_with_suggestions = list(matching_renters)
+
+        elif self.announcement_type == 'by':
+            buyer = self.content_object
+            price_min = 0.9 * buyer.budget_announced
+            price_max = 1.1 * buyer.budget_announced
+            area_min = 0.8 * buyer.area_min
+            area_max = 1.2 * buyer.area_max
+
+            query = SaleFile.objects.filter(
+                status='acc',
+                price_announced__gt=price_min,
+                price_announced__lt=price_max,
+                area__gt=area_min,
+                area__lt=area_max
+            ).exclude(
+                delete_request='Yes'
+            ).exclude(
+                created_by=creator
+            )
+            matching_files = query.values_list('created_by', flat=True).distinct()
+            agents_with_suggestions = list(matching_files)
+
+        elif self.announcement_type == 'rt':
+            renter = self.content_object
+            deposit_min = 0.8 * renter.deposit_announced
+            deposit_max = 1.2 * renter.deposit_announced
+            rent_min = 0.8 * renter.rent_announced
+            rent_max = 1.2 * renter.rent_announced
+            area_min = 0.8 * renter.area_min
+            area_max = 1.2 * renter.area_max
+            renter_total_min = 0.8 * (renter.deposit_announced + 100 * (renter.rent_announced / 3))
+            renter_total_max = 1.2 * (renter.deposit_announced + 100 * (renter.rent_announced / 3))
+
+            base_queryset = RentFile.objects.annotate(
+                deposit_total_calc=Cast(
+                    F('deposit_announced') + (100 * F('rent_announced') / 3),
+                    PositiveBigIntegerField()
+                )
+            ).exclude(
+                delete_request='Yes'
+            ).exclude(
+                created_by=creator
+            )
+
+            non_convertable = base_queryset.filter(
+                status='acc',
+                convertable='isnt',
+                deposit_announced__gt=deposit_min,
+                deposit_announced__lt=deposit_max,
+                rent_announced__gt=rent_min,
+                rent_announced__lt=rent_max,
+                area__gt=area_min,
+                area__lt=area_max
+            )
+
+            convertable = base_queryset.filter(
+                status='acc',
+                convertable='is',
+                deposit_total_calc__gt=renter_total_min,
+                deposit_total_calc__lt=renter_total_max,
+                area__gt=area_min,
+                area__lt=area_max
+            )
+
+            query = (non_convertable | convertable).distinct()
+            matching_files = query.values_list('created_by', flat=True).distinct()
+            agents_with_suggestions = list(matching_files)
+
+        return CustomUserModel.objects.filter(id__in=agents_with_suggestions)
+
+    def get_suggestions_for_agent(self, agent):
+        creator = self.created_by
+
+        if self.announcement_type == 'sf':
+            sale_file = self.content_object
+            suggestions = Buyer.objects.filter(
+                created_by=agent,
+                status='acc',
+                budget_announced__gt=0.9 * sale_file.price_announced,
+                budget_announced__lt=1.1 * sale_file.price_announced,
+                area_min__lt=1.2 * sale_file.area,
+                area_max__gt=0.8 * sale_file.area
+            ).exclude(delete_request='Yes')
+
+            # Exclude already sent buyers by this agent for this announcement
+            buyer_ct = ContentType.objects.get_for_model(Buyer)
+            already_sent_ids = InteractionItem.objects.filter(
+                interaction__announcement=self,
+                interaction__sender=agent,
+                content_type=buyer_ct
+            ).values_list('object_id', flat=True)
+
+            if already_sent_ids:
+                suggestions = suggestions.exclude(id__in=already_sent_ids)
+
+            return suggestions
+
+        elif self.announcement_type == 'rf':
+            rent_file = self.content_object
+            base_queryset = Renter.objects.filter(
+                created_by=agent
+            ).annotate(
+                deposit_total_calc=Cast(
+                    F('deposit_announced') + (100 * F('rent_announced') / 3),
+                    PositiveBigIntegerField()
+                )
+            ).exclude(delete_request='Yes')
+
+            non_convertable = base_queryset.filter(
+                status='acc',
+                convertable='isnt',
+                deposit_announced__gt=0.8 * rent_file.deposit_announced,
+                deposit_announced__lt=1.2 * rent_file.deposit_announced,
+                rent_announced__gt=0.8 * rent_file.rent_announced,
+                rent_announced__lt=1.2 * rent_file.rent_announced,
+                area_min__lt=1.2 * rent_file.area,
+                area_max__gt=0.8 * rent_file.area
+            )
+
+            rent_total_min = 0.8 * (rent_file.deposit_announced + 100 * (rent_file.rent_announced / 3))
+            rent_total_max = 1.2 * (rent_file.deposit_announced + 100 * (rent_file.rent_announced / 3))
+
+            convertable = base_queryset.filter(
+                status='acc',
+                convertable='is',
+                deposit_total_calc__gt=rent_total_min,
+                deposit_total_calc__lt=rent_total_max,
+                area_min__lt=1.2 * rent_file.area,
+                area_max__gt=0.8 * rent_file.area
+            )
+
+            suggestions = (non_convertable | convertable).distinct()
+
+            # Exclude already sent renters by this agent for this announcement
+            renter_ct = ContentType.objects.get_for_model(Renter)
+            already_sent_ids = InteractionItem.objects.filter(
+                interaction__announcement=self,
+                interaction__sender=agent,
+                content_type=renter_ct
+            ).values_list('object_id', flat=True)
+
+            if already_sent_ids:
+                suggestions = suggestions.exclude(id__in=already_sent_ids)
+
+            return suggestions
+
+        elif self.announcement_type == 'by':
+            buyer = self.content_object
+            price_min = 0.9 * buyer.budget_announced
+            price_max = 1.1 * buyer.budget_announced
+            area_min = 0.8 * buyer.area_min
+            area_max = 1.2 * buyer.area_max
+
+            suggestions = SaleFile.objects.filter(
+                created_by=agent,
+                status='acc',
+                price_announced__gt=price_min,
+                price_announced__lt=price_max,
+                area__gt=area_min,
+                area__lt=area_max
+            ).exclude(delete_request='Yes')
+
+            # Exclude already sent sale files by this agent for this announcement
+            sale_file_ct = ContentType.objects.get_for_model(SaleFile)
+            already_sent_ids = InteractionItem.objects.filter(
+                interaction__announcement=self,
+                interaction__sender=agent,
+                content_type=sale_file_ct
+            ).values_list('object_id', flat=True)
+
+            if already_sent_ids:
+                suggestions = suggestions.exclude(id__in=already_sent_ids)
+
+            return suggestions
+
+        elif self.announcement_type == 'rt':
+            renter = self.content_object
+            deposit_min = 0.8 * renter.deposit_announced
+            deposit_max = 1.2 * renter.deposit_announced
+            rent_min = 0.8 * renter.rent_announced
+            rent_max = 1.2 * renter.rent_announced
+            area_min = 0.8 * renter.area_min
+            area_max = 1.2 * renter.area_max
+            renter_total_min = 0.8 * (renter.deposit_announced + 100 * (renter.rent_announced / 3))
+            renter_total_max = 1.2 * (renter.deposit_announced + 100 * (renter.rent_announced / 3))
+
+            base_queryset = RentFile.objects.filter(
+                created_by=agent
+            ).annotate(
+                deposit_total_calc=Cast(
+                    F('deposit_announced') + (100 * F('rent_announced') / 3),
+                    PositiveBigIntegerField()
+                )
+            ).exclude(delete_request='Yes')
+
+            non_convertable = base_queryset.filter(
+                status='acc',
+                convertable='isnt',
+                deposit_announced__gt=deposit_min,
+                deposit_announced__lt=deposit_max,
+                rent_announced__gt=rent_min,
+                rent_announced__lt=rent_max,
+                area__gt=area_min,
+                area__lt=area_max
+            )
+
+            convertable = base_queryset.filter(
+                status='acc',
+                convertable='is',
+                deposit_total_calc__gt=renter_total_min,
+                deposit_total_calc__lt=renter_total_max,
+                area__gt=area_min,
+                area__lt=area_max
+            )
+
+            suggestions = (non_convertable | convertable).distinct()
+
+            # Exclude already sent rent files by this agent for this announcement
+            rent_file_ct = ContentType.objects.get_for_model(RentFile)
+            already_sent_ids = InteractionItem.objects.filter(
+                interaction__announcement=self,
+                interaction__sender=agent,
+                content_type=rent_file_ct
+            ).values_list('object_id', flat=True)
+
+            if already_sent_ids:
+                suggestions = suggestions.exclude(id__in=already_sent_ids)
+
+            return suggestions
+
+        return None
+
+    def get_remaining_suggestion_count_for_agent(self, agent):
+        suggestions = self.get_suggestions_for_agent(agent)
+        if suggestions:
+            return suggestions.count()
+        return 0
+
     def get_object_display(self):
         return str(self.content_object)
 
@@ -1003,7 +1320,7 @@ class Interaction(models.Model):
     receiver = models.ForeignKey(CustomUserModel, on_delete=models.CASCADE, related_name='received_interactions', verbose_name='گیرنده')
     interaction_type = models.CharField(max_length=20, choices=choices.interaction_types, verbose_name='نوع')
     message = models.TextField(max_length=1000, blank=True, null=True, verbose_name='پبغام')
-    status = models.CharField(max_length=20, choices=choices.interactions_statuses, default='sent', verbose_name='وضعیت')
+    status = models.CharField(max_length=20, choices=choices.interactions_statuses, default='unseen', verbose_name='وضعیت')
     datetime_viewed = models.DateTimeField(null=True, blank=True, verbose_name='زمان مشاهده')
     datetime_created = models.DateTimeField(auto_now_add=True, verbose_name='زمان ساخت')
 
@@ -1038,9 +1355,128 @@ class InteractionItem(models.Model):
         verbose_name_plural = 'آیتم‌های تعامل'
         indexes = [
             models.Index(fields=['content_type', 'object_id']),
+            models.Index(fields=['interaction', 'content_type']),
         ]
 
     def __str__(self):
         return f"آیتم در  {self.interaction.id} - {self.content_object}"
+
+
+class NotifiedTask(models.Model):
+    agent = models.ForeignKey(CustomUserModel, on_delete=models.CASCADE, related_name='notified_tasks', verbose_name='مشاور')
+    date = models.CharField(max_length=50, blank=True, null=True, verbose_name='تاریخ')
+    task_type = models.CharField(max_length=30, choices=choices.daily_task_types, verbose_name='نوع وظیفه')
+    status = models.CharField(max_length=20, choices=choices.daily_task_statuses, default='waiting', verbose_name='وضعیت')
+    result = models.TextField(blank=True, null=True, verbose_name='نتیجه')
+    related_announcement = models.ForeignKey(Announcement, on_delete=models.CASCADE, null=True, blank=True,
+                                             related_name='suggestion_tasks', verbose_name='اعلان مربوطه')
+    related_interaction_item = models.ForeignKey(InteractionItem, on_delete=models.CASCADE, null=True, blank=True,
+                                                 related_name='notified_tasks', verbose_name='آیتم تعاملی مربوطه')
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True, blank=True)
+    object_id = models.PositiveIntegerField(null=True, blank=True)
+    content_object = GenericForeignKey('content_type', 'object_id')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='زمان و تاریخ ایجاد')
+    completed_at = models.DateTimeField(null=True, blank=True, verbose_name='زمان و تاریخ تکمیل')
+
+    def save(self, *args, **kwargs):
+        if not self.date:
+            jalali_now = jdatetime.datetime.now()
+            self.date = jalali_now.strftime('%Y/%m/%d')
+        super().save(*args, **kwargs)
+
+    class Meta:
+        verbose_name = 'وظیفه'
+        verbose_name_plural = 'وظایف'
+        ordering = ['-created_at', 'status']
+        indexes = [
+            models.Index(fields=['agent', 'status']),
+            models.Index(fields=['task_type', 'status']),
+        ]
+
+    def __str__(self):
+        return f"{self.agent} - {self.get_task_type_display()} - {self.get_status_display()}"
+
+    def mark_as_done(self, result=None):
+        self.completed_at = timezone.now()
+        if result:
+            self.result = result
+        self.status = 'done'
+        self.save()
+
+    def get_suggestion_count(self):
+        if self.task_type == 'announcement_suggestions' and self.related_announcement:
+            return self.related_announcement.get_suggestions_for_agent(self.agent).count()
+        return 0
+
+    def get_target_agents_count(self):
+        if self.task_type == 'announcement_suggestions' and self.related_announcement:
+            suggestions = self.related_announcement.get_suggestions_for_agent(self.agent)
+            return suggestions.values('created_by').distinct().count()
+        return 0
+
+
+class DailyTaskStatus(models.Model):
+    agent = models.ForeignKey(CustomUserModel, on_delete=models.CASCADE, related_name='daily_task_statuses', verbose_name='مشاور')
+    date = models.CharField(max_length=10, verbose_name='تاریخ')
+    report_done = models.BooleanField(default=False, verbose_name='گزارش ثبت شده')
+    ads_done = models.BooleanField(default=False, verbose_name='انجام وظیفه آگهی')
+    eva_done = models.BooleanField(default=False, verbose_name='انجام وظیفه کارشناسی')
+    dis_done = models.BooleanField(default=False, verbose_name='انجام وظیفه تخفیف')
+    ser_done = models.BooleanField(default=False, verbose_name='انجام وظیفه سرویس')
+    report = models.OneToOneField(Report, on_delete=models.CASCADE, null=True, blank=True, related_name='daily_task_status',
+                                  verbose_name='گزارش')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'وظایف (وضعیت)'
+        verbose_name_plural = 'وظایف (وضعیت)'
+        ordering = ['-date']
+        indexes = [
+            models.Index(fields=['agent', 'date']),
+        ]
+        unique_together = [
+            ('agent', 'date'),
+        ]
+
+    def __str__(self):
+        return f"{self.agent} - {self.date}"
+
+    def update_from_report(self, report):
+        self.report = report
+        self.report_done = True
+        report_items = report.items.all()
+        for item in report_items:
+            if item.type == 'ads':
+                self.ads_done = True
+            elif item.type == 'eva':
+                self.eva_done = True
+            elif item.type == 'dis':
+                self.dis_done = True
+            elif item.type == 'ser':
+                self.ser_done = True
+        self.save()
+
+    def is_friday(self):
+        year, month, day = map(int, self.date.split('/'))
+        jalali_date = jdatetime.date(year, month, day)
+        return jalali_date.weekday() == 4
+
+    @classmethod
+    def get_or_create_for_today(cls, agent):
+        """Get or create daily task status for today"""
+        today = jdatetime.date.today().strftime('%Y/%m/%d')
+
+        # Check if Friday
+        year, month, day = map(int, today.split('/'))
+        jalali_date = jdatetime.date(year, month, day)
+        if jalali_date.weekday() == 4:  # Friday
+            return None
+
+        obj, created = cls.objects.get_or_create(
+            agent=agent,
+            date=today
+        )
+        return obj
 
 
