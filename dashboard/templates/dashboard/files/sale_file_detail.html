@@ -152,6 +152,15 @@
                                                                                         {% endif %}
                                                                                         <p class="card-text">نام: {{ buyer.name }}</p>
                                                                                         <p class="card-text">بودجه: {{ buyer.budget_announced|intcomma:False|farsi_number }}</p>
+                                                                                        <!-- Link -->
+                                                                                            {% if request.user.title == 'bs' or request.user.sub_district in buyer.sub_districts.all %}
+                                                                                            <a href="{% url 'buyer_detail' buyer.pk buyer.code %}"
+                                                                                               class="btn btn-primary"
+                                                                                               style="font-size: 0.75em; width:100%; text-align: center; justify-content: center;"
+                                                                                               target="_blank">
+                                                                                               مشاهده
+                                                                                            </a>
+                                                                                        {% endif %}
                                                                                     </div>
                                                                                 </div>
                                                                             </div>
