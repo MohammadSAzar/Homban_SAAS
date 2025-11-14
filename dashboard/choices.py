@@ -302,3 +302,17 @@ code_finder_types = [
 ]
 
 
+room_types = [
+    ('private', 'چت خصوصی'),
+    ('group', 'گروه'),
+    ('channel', 'کانال'),
+]
+
+
+message_types = [
+        ('text', 'متن'),
+        ('image', 'تصویر'),
+        ('video', 'ویدیو'),
+        ('voice', 'وویس'),
+    ]
+

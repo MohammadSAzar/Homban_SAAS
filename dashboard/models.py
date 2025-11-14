@@ -1480,3 +1480,99 @@ class DailyTaskStatus(models.Model):
         return obj
 
 
+# --------------------------------- Chat ---------------------------------
+class ChatRoom(models.Model):
+    room_type = models.CharField(max_length=10, choices=choices.room_types, verbose_name='نوع اتاق')
+    name = models.CharField(max_length=200, blank=True, null=True, verbose_name='نام')
+    description = models.TextField(blank=True, null=True, verbose_name='توضیحات')
+    participants = models.ManyToManyField(CustomUserModel, related_name='chat_rooms', verbose_name='اعضا')
+    created_by = models.ForeignKey(CustomUserModel, on_delete=models.SET_NULL, null=True, blank=True,
+                                   related_name='created_rooms', verbose_name='ایجاد شده توسط')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='زمان ایجاد')
+    updated_at = models.DateTimeField(auto_now=True, verbose_name='زمان بروزرسانی')
+
+    class Meta:
+        verbose_name = 'اتاق چت'
+        verbose_name_plural = 'اتاق‌های چت'
+        ordering = ['-updated_at']
+        indexes = [
+            models.Index(fields=['room_type', '-updated_at']),
+        ]
+
+    def __str__(self):
+        if self.room_type == 'private':
+            participants = self.participants.all()[:2]
+            names = [p.name_family or p.username for p in participants]
+            return f"چت: {' - '.join(names)}"
+        return self.name or f"{self.get_room_type_display()}"
+
+    def get_last_message(self):
+        return self.messages.order_by('-created_at').first()
+
+    def get_unread_count(self, user):
+        return self.messages.exclude(
+            read_by=user
+        ).exclude(
+            sender=user
+        ).count()
+
+
+class Message(models.Model):
+    room = models.ForeignKey(ChatRoom, on_delete=models.CASCADE, related_name='messages', verbose_name='اتاق')
+    sender = models.ForeignKey(CustomUserModel, on_delete=models.CASCADE, related_name='sent_messages', verbose_name='فرستنده')
+    message_type = models.CharField(max_length=10, choices=choices.message_types, default='text', verbose_name='نوع پیام')
+    content = models.TextField(blank=True, null=True, verbose_name='محتوا')
+    file = models.FileField(upload_to='chat_files/%Y/%m/%d/', blank=True, null=True, verbose_name='فایل')
+    reply_to = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='replies',
+                                 verbose_name='پاسخ به')
+    forwarded_from = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='forwards',
+                                       verbose_name='فوروارد از')
+    read_by = models.ManyToManyField(CustomUserModel, blank=True, related_name='read_messages', verbose_name='خوانده شده توسط')
+    is_edited = models.BooleanField(default=False, verbose_name='ویرایش شده')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='زمان ارسال')
+    edited_at = models.DateTimeField(null=True, blank=True, verbose_name='زمان ویرایش')
+
+    class Meta:
+        verbose_name = 'پیام'
+        verbose_name_plural = 'پیام‌ها'
+        ordering = ['created_at']
+        indexes = [
+            models.Index(fields=['room', '-created_at']),
+            models.Index(fields=['sender', '-created_at']),
+        ]
+
+    def __str__(self):
+        return f"{self.sender.name_family or self.sender.username}: {self.content[:50] if self.content else self.message_type}"
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self.room.save()
+
+    def get_jalali_time(self):
+        jalali_dt = jdatetime.datetime.fromgregorian(datetime=self.created_at)
+        return jalali_dt.strftime('%H:%M')
+
+    def get_jalali_date(self):
+        jalali_dt = jdatetime.datetime.fromgregorian(datetime=self.created_at)
+        return jalali_dt.strftime('%Y/%m/%d')
+
+
+class MessageReaction(models.Model):
+    message = models.ForeignKey(Message, on_delete=models.CASCADE, related_name='reactions', verbose_name='پیام')
+    user = models.ForeignKey(CustomUserModel, on_delete=models.CASCADE, related_name='message_reactions', verbose_name='مشاور')
+    emoji = models.CharField(max_length=10, verbose_name='اموجی')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='زمان')
+
+    class Meta:
+        verbose_name = 'واکنش پیام'
+        verbose_name_plural = 'واکنش‌های پیام'
+        unique_together = ['message', 'user', 'emoji']
+        indexes = [
+            models.Index(fields=['message', 'emoji']),
+        ]
+
+    def __str__(self):
+        return f"{self.user.name_family or self.user.username} - {self.emoji}"
+
+
+

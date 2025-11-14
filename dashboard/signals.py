@@ -351,3 +351,28 @@ def get_agents_with_suggestions(announcement_instance):
     return models.CustomUserModel.objects.filter(id__in=agents_with_suggestions)
 
 
+# --------------------------------- Chat ---------------------------------
+@receiver(post_save, sender=models.Message)
+def clear_chat_notification_cache(sender, instance, created, **kwargs):
+    if created:
+        room = instance.room
+        participants = room.participants.all()
+        for participant in participants:
+            if participant != instance.sender:
+                cache.delete(f'chat_notifications_{participant.pk}')
+                cache.delete(f'notifications_{participant.pk}')
+
+
+@receiver(post_save, sender=models.Message)
+def ensure_all_users_in_channel(sender, instance, created, **kwargs):
+    if created and instance.room.room_type == 'channel':
+        from django.contrib.auth import get_user_model
+        CustomUserModel = get_user_model()
+
+        channel = instance.room
+        all_users = CustomUserModel.objects.filter(is_active=True)
+
+        for user in all_users:
+            if user not in channel.participants.all():
+                channel.participants.add(user)
+

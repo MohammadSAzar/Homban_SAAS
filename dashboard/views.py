@@ -12,7 +12,7 @@ from django.views.generic import DetailView, CreateView, ListView, UpdateView, D
 from django.views.decorators.http import require_GET, require_POST
 
 from django.db import transaction
-from django.db.models import Prefetch, Count, Q, F, Avg, Case, When, IntegerField, PositiveBigIntegerField, FloatField
+from django.db.models import Prefetch, Count, Q, F, Avg, Max, Case, When, IntegerField, PositiveBigIntegerField, FloatField
 from django.db.models.functions import Cast
 
 from django.core.exceptions import PermissionDenied
@@ -5030,5 +5030,312 @@ def get_task_count(request):
             'received_interaction': tasks.filter(task_type='received_interaction', status='waiting').count(),
         })
     return JsonResponse({'error': 'Unauthorized'}, status=401)
+
+
+# --------------------------------- Chat ---------------------------------
+class ChatRoomListView(LoginRequiredMixin, ListView):
+    """
+    List all chat rooms for the current user
+    """
+    model = models.ChatRoom
+    template_name = 'dashboard/chat/chat_list.html'
+    context_object_name = 'rooms'
+
+    def get_queryset(self):
+        user = self.request.user
+
+        # Get all rooms where user is a participant
+        rooms = models.ChatRoom.objects.filter(
+            participants=user
+        ).prefetch_related(
+            'participants',
+            'messages'
+        ).annotate(
+            last_message_time=Max('messages__created_at'),
+            unread_count=Count('messages', filter=~Q(messages__read_by=user) & ~Q(messages__sender=user))
+        ).order_by('-last_message_time')
+
+        return rooms
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+
+        # Get or create global group - add ALL users
+        group, created = models.ChatRoom.objects.get_or_create(
+            room_type='group',
+            name='گروه عمومی',
+            defaults={'description': 'گروه گفتگوی همه کاربران'}
+        )
+        if user not in group.participants.all():
+            group.participants.add(user)
+
+        # Get or create boss channel - add ALL users (bosses can write, all can read)
+        channel, created = models.ChatRoom.objects.get_or_create(
+            room_type='channel',
+            name='کانال مدیران',
+            defaults={'description': 'اطلاعیه‌های مدیریت - فقط مدیران می‌توانند پیام ارسال کنند'}
+        )
+        if user not in channel.participants.all():
+            channel.participants.add(user)
+
+        # Categorize rooms
+        context['private_rooms'] = context['rooms'].filter(room_type='private')
+        context['group_room'] = context['rooms'].filter(room_type='group').first()
+        context['channel_room'] = context['rooms'].filter(room_type='channel').first()
+
+        # Get all users for starting new chats
+        context['all_users'] = models.CustomUserModel.objects.filter(
+            is_active=True
+        ).exclude(pk=user.pk).order_by('name_family', 'username')
+
+        return context
+
+
+class ChatRoomDetailView(LoginRequiredMixin, DetailView):
+    """
+    Display messages in a specific chat room
+    """
+    model = models.ChatRoom
+    template_name = 'dashboard/chat/chat_room.html'
+    context_object_name = 'room'
+
+    def get_queryset(self):
+        return models.ChatRoom.objects.filter(
+            participants=self.request.user
+        ).prefetch_related(
+            'participants',
+            'messages__sender',
+            'messages__reply_to',
+            'messages__reactions'
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        room = self.object
+        user = self.request.user
+
+        # Get all messages
+        messages = room.messages.all().select_related(
+            'sender', 'reply_to', 'reply_to__sender'
+        ).prefetch_related('reactions__user', 'read_by')
+
+        context['messages'] = messages
+
+        # Mark messages as read
+        unread_messages = messages.exclude(sender=user).exclude(read_by=user)
+        for msg in unread_messages:
+            msg.read_by.add(user)
+
+        # Check if user can send messages in channel
+        context['can_send'] = True
+        if room.room_type == 'channel' and user.title != 'bs':
+            context['can_send'] = False
+
+        # Get other participant for private chats
+        if room.room_type == 'private':
+            other_participant = room.participants.exclude(pk=user.pk).first()
+            context['other_user'] = other_participant
+
+        return context
+
+
+@login_required
+def start_private_chat(request, user_id):
+    """
+    Start or get existing private chat with another user
+    """
+    other_user = get_object_or_404(models.CustomUserModel, pk=user_id, is_active=True)
+    current_user = request.user
+
+    if other_user == current_user:
+        messages.error(request, 'نمی‌توانید با خودتان چت کنید.')
+        return redirect('chat_list')
+
+    # Check if chat already exists
+    existing_room = models.ChatRoom.objects.filter(
+        room_type='private',
+        participants=current_user
+    ).filter(
+        participants=other_user
+    ).first()
+
+    if existing_room:
+        return redirect('chat_room', pk=existing_room.pk)
+
+    # Create new private chat
+    room = models.ChatRoom.objects.create(
+        room_type='private',
+        created_by=current_user
+    )
+    room.participants.add(current_user, other_user)
+
+    return redirect('chat_room', pk=room.pk)
+
+
+@login_required
+def send_message(request, room_id):
+    """
+    Send a message in a chat room (AJAX)
+    """
+    if request.method == 'POST':
+        room = get_object_or_404(models.ChatRoom, pk=room_id, participants=request.user)
+
+        # Check permissions for channel
+        if room.room_type == 'channel' and request.user.title != 'bs':
+            return JsonResponse({'error': 'شما اجازه ارسال پیام در این کانال را ندارید.'}, status=403)
+
+        content = request.POST.get('content', '').strip()
+        message_type = request.POST.get('message_type', 'text')
+        reply_to_id = request.POST.get('reply_to')
+
+        if not content and message_type == 'text':
+            return JsonResponse({'error': 'محتوای پیام نمی‌تواند خالی باشد.'}, status=400)
+
+        # Create message
+        message = models.Message.objects.create(
+            room=room,
+            sender=request.user,
+            message_type=message_type,
+            content=content
+        )
+
+        # Handle reply
+        if reply_to_id:
+            try:
+                reply_to = models.Message.objects.get(pk=reply_to_id, room=room)
+                message.reply_to = reply_to
+                message.save()
+            except models.Message.DoesNotExist:
+                pass
+
+        # Handle file upload
+        if 'file' in request.FILES:
+            message.file = request.FILES['file']
+            message.save()
+
+        # Mark as read by sender
+        message.read_by.add(request.user)
+
+        return JsonResponse({
+            'success': True,
+            'message_id': message.id,
+            'content': message.content,
+            'sender': message.sender.name_family or message.sender.username,
+            'time': message.get_jalali_time()
+        })
+
+    return JsonResponse({'error': 'متد نامعتبر'}, status=405)
+
+
+@login_required
+def edit_message(request, message_id):
+    """
+    Edit a message (AJAX)
+    """
+    if request.method == 'POST':
+        message = get_object_or_404(
+            models.Message,
+            pk=message_id,
+            sender=request.user,
+            message_type='text'
+        )
+
+        new_content = request.POST.get('content', '').strip()
+        if not new_content:
+            return JsonResponse({'error': 'محتوای پیام نمی‌تواند خالی باشد.'}, status=400)
+
+        message.content = new_content
+        message.is_edited = True
+        message.edited_at = timezone.now()
+        message.save()
+
+        return JsonResponse({
+            'success': True,
+            'content': message.content,
+            'edited': True
+        })
+
+    return JsonResponse({'error': 'متد نامعتبر'}, status=405)
+
+
+@login_required
+def delete_message(request, message_id):
+    """
+    Delete a message (AJAX)
+    """
+    if request.method == 'POST':
+        message = get_object_or_404(models.Message, pk=message_id, sender=request.user)
+        message.delete()
+
+        return JsonResponse({'success': True})
+
+    return JsonResponse({'error': 'متد نامعتبر'}, status=405)
+
+
+@login_required
+def forward_message(request, message_id):
+    """
+    Forward a message to another room (AJAX)
+    """
+    if request.method == 'POST':
+        original_message = get_object_or_404(models.Message, pk=message_id)
+        target_room_id = request.POST.get('target_room_id')
+
+        target_room = get_object_or_404(
+            models.ChatRoom,
+            pk=target_room_id,
+            participants=request.user
+        )
+
+        # Check channel permissions
+        if target_room.room_type == 'channel' and request.user.title != 'bs':
+            return JsonResponse({'error': 'شما اجازه ارسال پیام در این کانال را ندارید.'}, status=403)
+
+        # Create forwarded message
+        forwarded = models.Message.objects.create(
+            room=target_room,
+            sender=request.user,
+            message_type=original_message.message_type,
+            content=original_message.content,
+            file=original_message.file,
+            forwarded_from=original_message
+        )
+        forwarded.read_by.add(request.user)
+
+        return JsonResponse({
+            'success': True,
+            'message': 'پیام با موفقیت فوروارد شد.'
+        })
+
+    return JsonResponse({'error': 'متد نامعتبر'}, status=405)
+
+
+@login_required
+def add_reaction(request, message_id):
+    """
+    Add emoji reaction to a message (AJAX)
+    """
+    if request.method == 'POST':
+        message = get_object_or_404(models.Message, pk=message_id)
+        emoji = request.POST.get('emoji')
+
+        if not emoji:
+            return JsonResponse({'error': 'ایموجی انتخاب نشده است.'}, status=400)
+
+        # Toggle reaction
+        reaction, created = models.MessageReaction.objects.get_or_create(
+            message=message,
+            user=request.user,
+            emoji=emoji
+        )
+
+        if not created:
+            reaction.delete()
+            return JsonResponse({'success': True, 'action': 'removed'})
+
+        return JsonResponse({'success': True, 'action': 'added'})
+
+    return JsonResponse({'error': 'متد نامعتبر'}, status=405)
 
 

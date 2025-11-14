@@ -136,6 +136,16 @@ urlpatterns = [
     # tasks (AJAX)
     path('notified-tasks/<int:task_id>/complete/', views.complete_received_task, name='complete_task'),
     path('notified-tasks/count/', views.get_task_count, name='get_task_count'),
+    # Chat
+    path('chat/', views.ChatRoomListView.as_view(), name='chat_list'),
+    path('chat/room/<int:pk>/', views.ChatRoomDetailView.as_view(), name='chat_room'),
+    path('chat/start/<int:user_id>/', views.start_private_chat, name='start_private_chat'),
+    # Chat (AJAX)
+    path('chat/send/<int:room_id>/', views.send_message, name='send_message'),
+    path('chat/edit/<int:message_id>/', views.edit_message, name='edit_message'),
+    path('chat/delete/<int:message_id>/', views.delete_message, name='delete_message'),
+    path('chat/forward/<int:message_id>/', views.forward_message, name='forward_message'),
+    path('chat/react/<int:message_id>/', views.add_reaction, name='add_reaction'),
 ]
 
 

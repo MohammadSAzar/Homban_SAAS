@@ -310,6 +310,19 @@
                                             </li>
                                         {% endif %}
 
+                                        <!-- Chat -->
+                                        <li class="nk-menu-item has-sub">
+                                            <a href="{% url 'chat_list' %}" class="nk-menu-link">
+                                                <span class="nk-menu-icon"><em class="icon ni ni-chat"></em></span>
+                                                <span class="nk-menu-text">چت آنلاین</span>
+                                                {% if total_unread_chats > 0 %}
+                                                    <span style="position: absolute; top: -5px; right: -5px; background-color: #00a65c; color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 0.75em; font-family: Estedad;">
+                                                        {{ total_unread_chats|farsi_number }}
+                                                    </span>
+                                                {% endif %}
+                                            </a>
+                                        </li>
+
                                     </ul>
                                     <!-- end:Sidebar >>> menu >>> items -->
 

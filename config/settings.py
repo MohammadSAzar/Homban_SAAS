@@ -64,8 +64,9 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                # Announcement / Interaction notifications
+                # Announcement / Interaction / Chat >>> Notifications
                 'dashboard.context_processors.notification_counts',
+                'dashboard.context_processors.chat_notifications',
             ],
         },
     },

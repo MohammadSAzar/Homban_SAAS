@@ -1,4 +1,7 @@
-from .models import Announcement, Interaction, NotifiedTask
+from django.db.models import Q, Count
+from django.core.cache import cache
+
+from .models import Announcement, Interaction, NotifiedTask, ChatRoom
 
 
 def notification_counts(request):
@@ -59,6 +62,83 @@ def notification_counts(request):
         'total_unread_count': 0,
         'has_unread_notifications': False,
         'has_pending_tasks': False,
+    }
+
+
+def chat_notifications(request):
+    if request.user.is_authenticated:
+        cache_key = f'chat_notifications_{request.user.pk}'
+        cached_data = cache.get(cache_key)
+
+        if cached_data is not None:
+            return cached_data
+
+        total_unread_chats = ChatRoom.objects.filter(
+            participants=request.user
+        ).annotate(
+            unread=Count(
+                'messages',
+                filter=~Q(messages__read_by=request.user) & ~Q(messages__sender=request.user)
+            )
+        ).aggregate(total=Count('id', filter=Q(unread__gt=0)))['total'] or 0
+
+        unread_private = ChatRoom.objects.filter(
+            room_type='private',
+            participants=request.user
+        ).annotate(
+            unread=Count(
+                'messages',
+                filter=~Q(messages__read_by=request.user) & ~Q(messages__sender=request.user)
+            )
+        ).filter(unread__gt=0).count()
+
+        # Group unread count
+        group_room = ChatRoom.objects.filter(
+            room_type='group',
+            participants=request.user
+        ).first()
+
+        unread_group = 0
+        if group_room:
+            unread_group = group_room.messages.exclude(
+                read_by=request.user
+            ).exclude(
+                sender=request.user
+            ).count()
+
+        # Channel unread count
+        channel_room = ChatRoom.objects.filter(
+            room_type='channel',
+            participants=request.user
+        ).first()
+
+        unread_channel = 0
+        if channel_room:
+            unread_channel = channel_room.messages.exclude(
+                read_by=request.user
+            ).exclude(
+                sender=request.user
+            ).count()
+
+        data = {
+            'unread_private_chats': unread_private,
+            'unread_group_messages': unread_group,
+            'unread_channel_messages': unread_channel,
+            'total_unread_chats': total_unread_chats,
+            'has_unread_chats': total_unread_chats > 0,
+        }
+
+        # Cache for 5 minutes
+        cache.set(cache_key, data, 300)
+
+        return data
+
+    return {
+        'unread_private_chats': 0,
+        'unread_group_messages': 0,
+        'unread_channel_messages': 0,
+        'total_unread_chats': 0,
+        'has_unread_chats': False,
     }
 
 

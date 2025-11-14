@@ -1,0 +1,391 @@
+{% extends '_base_dashboard.html' %}
+
+{% load static %}
+{% load i18n %}
+{% load jalali_tags %}
+{% load jalali_date_converter %}
+{% load number_converter %}
+{% load price_converter %}
+{% load humanize %}
+{% load widget_tweaks %}
+{% load pagination %}
+
+
+{% block title %}چت‌ها{% endblock %}
+
+
+{% block content %}
+    
+    <!-- Main -->
+    <div class="nk-block">
+        <div class="row gy-4">
+            
+            <!-- Chat Rooms Column -->
+            <div class="col-lg-8">
+                <div class="card card-bordered">
+                    <div class="card-inner p-0">
+                        
+                        <!-- Header -->
+                        <div style="padding: 20px; border-bottom: 1px solid #dbdfea;">
+                            <h5 style="margin: 0; color: var(--text-color);">
+                                <em class="icon ni ni-chat-circle"></em> چت‌ها
+                            </h5>
+                        </div>
+                        
+                        <!-- Group Room -->
+                        {% if group_room %}
+                            <div class="section-title">
+                                <em class="icon ni ni-users"></em> گروه عمومی
+                            </div>
+                            <a href="{% url 'chat_room' group_room.id %}" style="text-decoration: none; color: inherit;">
+                                <div class="chat-list-item">
+                                    <div class="chat-avatar">
+                                        <em class="icon ni ni-users"></em>
+                                    </div>
+                                    <div class="chat-info">
+                                        <div class="chat-name">{{ group_room.name }}</div>
+                                        <div class="chat-last-message">
+                                            {% if group_room.get_last_message %}
+                                                {{ group_room.get_last_message.sender.name_family|default:group_room.get_last_message.sender.username }}: 
+                                                {{ group_room.get_last_message.content|truncatewords:8 }}
+                                            {% else %}
+                                                هنوز پیامی ارسال نشده
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div style="text-align: left;">
+                                        {% if group_room.get_last_message %}
+                                            <div class="chat-time">
+                                                {{ group_room.get_last_message.created_at|to_jalali|farsi_number }}
+                                            </div>
+                                        {% endif %}
+                                        {% with unread=group_room.get_unread_count %}
+                                            {% if unread > 0 %}
+                                                <div class="unread-badge" style="margin-top: 5px;">
+                                                    {{ unread|farsi_number }}
+                                                </div>
+                                            {% endif %}
+                                        {% endwith %}
+                                    </div>
+                                </div>
+                            </a>
+                        {% endif %}
+                        
+                        <!-- Boss Channel (All users can see, only bosses can send) -->
+                        {% if channel_room %}
+                            <div class="section-title">
+                                <em class="icon ni ni-star"></em> کانال مدیران
+                                <small style="font-weight: normal; color: #8094ae; margin-right: 10px;">
+                                    (فقط مدیران می‌توانند پیام ارسال کنند)
+                                </small>
+                            </div>
+                            <a href="{% url 'chat_room' channel_room.id %}" style="text-decoration: none; color: inherit;">
+                                <div class="chat-list-item">
+                                    <div class="chat-avatar" style="background-color: #FFD700; color: #1a1a1a;">
+                                        <em class="icon ni ni-star"></em>
+                                    </div>
+                                    <div class="chat-info">
+                                        <div class="chat-name">{{ channel_room.name }}</div>
+                                        <div class="chat-last-message">
+                                            {% if channel_room.get_last_message %}
+                                                {{ channel_room.get_last_message.sender.name_family|default:channel_room.get_last_message.sender.username }}: 
+                                                {{ channel_room.get_last_message.content|truncatewords:8 }}
+                                            {% else %}
+                                                هنوز اطلاعیه‌ای ارسال نشده
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div style="text-align: left;">
+                                        {% if channel_room.get_last_message %}
+                                            <div class="chat-time">
+                                                {{ channel_room.get_last_message.created_at|to_jalali|farsi_number }}
+                                            </div>
+                                        {% endif %}
+                                        {% with unread=channel_room.get_unread_count %}
+                                            {% if unread > 0 %}
+                                                <div class="unread-badge" style="margin-top: 5px;">
+                                                    {{ unread|farsi_number }}
+                                                </div>
+                                            {% endif %}
+                                        {% endwith %}
+                                    </div>
+                                </div>
+                            </a>
+                        {% endif %}
+                        
+                        <!-- Private Chats -->
+                        {% if private_rooms %}
+                            <div class="section-title">
+                                <em class="icon ni ni-user"></em> چت‌های خصوصی
+                            </div>
+                            {% for room in private_rooms %}
+                                {% with other_user=room.participants.all|first %}
+                                    {% if other_user.id != request.user.id %}
+                                        {% with other_user=other_user %}
+                                            <a href="{% url 'chat_room' room.id %}" style="text-decoration: none; color: inherit;">
+                                                <div class="chat-list-item">
+                                                    <div class="chat-avatar">
+                                                        {{ other_user.name_family|default:other_user.username|slice:":2"|upper }}
+                                                    </div>
+                                                    <div class="chat-info">
+                                                        <div class="chat-name">
+                                                            {{ other_user.name_family|default:other_user.username }}
+                                                        </div>
+                                                        <div class="chat-last-message">
+                                                            {% if room.get_last_message %}
+                                                                {% if room.get_last_message.sender == request.user %}
+                                                                    شما: 
+                                                                {% endif %}
+                                                                {{ room.get_last_message.content|truncatewords:8 }}
+                                                            {% else %}
+                                                                چت جدید
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+                                                    <div style="text-align: left;">
+                                                        {% if room.get_last_message %}
+                                                            <div class="chat-time">
+                                                                {{ room.get_last_message.created_at|to_jalali|farsi_number }}
+                                                            </div>
+                                                        {% endif %}
+                                                        {% with unread=room.get_unread_count %}
+                                                            {% if unread > 0 %}
+                                                                <div class="unread-badge" style="margin-top: 5px;">
+                                                                    {{ unread|farsi_number }}
+                                                                </div>
+                                                            {% endif %}
+                                                        {% endwith %}
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        {% endwith %}
+                                    {% else %}
+                                        {% with other_user=room.participants.all.1 %}
+                                            <a href="{% url 'chat_room' room.id %}" style="text-decoration: none; color: inherit;">
+                                                <div class="chat-list-item">
+                                                    <div class="chat-avatar">
+                                                        {{ other_user.name_family|default:other_user.username|slice:":2"|upper }}
+                                                    </div>
+                                                    <div class="chat-info">
+                                                        <div class="chat-name">
+                                                            {{ other_user.name_family|default:other_user.username }}
+                                                        </div>
+                                                        <div class="chat-last-message">
+                                                            {% if room.get_last_message %}
+                                                                {% if room.get_last_message.sender == request.user %}
+                                                                    شما: 
+                                                                {% endif %}
+                                                                {{ room.get_last_message.content|truncatewords:8 }}
+                                                            {% else %}
+                                                                چت جدید
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+                                                    <div style="text-align: left;">
+                                                        {% if room.get_last_message %}
+                                                            <div class="chat-time">
+                                                                {{ room.get_last_message.created_at|to_jalali|farsi_number }}
+                                                            </div>
+                                                        {% endif %}
+                                                        {% with unread=room.get_unread_count %}
+                                                            {% if unread > 0 %}
+                                                                <div class="unread-badge" style="margin-top: 5px;">
+                                                                    {{ unread|farsi_number }}
+                                                                </div>
+                                                            {% endif %}
+                                                        {% endwith %}
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        {% endwith %}
+                                    {% endif %}
+                                {% endwith %}
+                            {% endfor %}
+                        {% endif %}
+                        
+                        {% if not private_rooms and not group_room and not channel_room %}
+                            <div style="padding: 40px; text-align: center; color: #8094ae;">
+                                <em class="icon ni ni-chat" style="font-size: 3em;"></em>
+                                <p>هنوز چتی وجود ندارد</p>
+                                <p>از لیست کاربران یک چت جدید شروع کنید</p>
+                            </div>
+                        {% endif %}
+                        
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Users List Column -->
+            <div class="col-lg-4">
+                <div class="card card-bordered">
+                    <div class="card-inner p-0">
+                        
+                        <!-- Header -->
+                        <div style="padding: 20px; border-bottom: 1px solid #dbdfea;">
+                            <h5 style="margin: 0; color: var(--text-color);">
+                                <em class="icon ni ni-users"></em> شروع چت جدید
+                            </h5>
+                        </div>
+                        
+                        <!-- Search Box -->
+                        <div style="padding: 15px; border-bottom: 1px solid #dbdfea;">
+                            <div class="form-group" style="margin: 0;">
+                                <div class="form-control-wrap">
+                                    <div class="form-icon form-icon-left">
+                                        <em class="icon ni ni-search"></em>
+                                    </div>
+                                    <input type="text" id="userSearch" class="form-control" 
+                                           placeholder="جستجو کاربر..." 
+                                           onkeyup="searchUsers()">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Users List -->
+                        <div id="usersList" style="max-height: 500px; overflow-y: auto;">
+                            {% for user in all_users %}
+                                <a href="{% url 'start_private_chat' user.id %}" style="text-decoration: none; color: inherit;">
+                                    <div class="user-list-item" data-username="{{ user.name_family|default:user.username|lower }}">
+                                        <div class="chat-avatar" style="width: 40px; height: 40px; font-size: 1em;">
+                                            {{ user.name_family|default:user.username|slice:":2"|upper }}
+                                        </div>
+                                        <div>
+                                            <div style="font-weight: 500; color: var(--text-color);">
+                                                {{ user.name_family|default:user.username }}
+                                            </div>
+                                            <small style="color: #8094ae;">
+                                                {{ user.get_title_display }}
+                                            </small>
+                                        </div>
+                                    </div>
+                                </a>
+                            {% empty %}
+                                <div style="padding: 20px; text-align: center; color: #8094ae;">
+                                    کاربری یافت نشد
+                                </div>
+                            {% endfor %}
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+    <!-- end: Main -->
+
+    <!-- JS -->
+    <script>
+        function searchUsers() {
+            const searchValue = document.getElementById('userSearch').value.toLowerCase();
+            const userItems = document.querySelectorAll('.user-list-item');
+            
+            userItems.forEach(item => {
+                const username = item.getAttribute('data-username');
+                if (username.includes(searchValue)) {
+                    item.parentElement.style.display = 'block';
+                } else {
+                    item.parentElement.style.display = 'none';
+                }
+            });
+        }
+    </script>
+    <!-- end: JS -->
+    
+    <!-- Style -->
+    <style>
+    :root {
+        --primary-color: #00a65c;
+        --text-color: #1a1a1a;
+    }
+    
+    .chat-list-item {
+        padding: 15px;
+        border-bottom: 1px solid #dbdfea;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    
+    .chat-list-item:hover {
+        background-color: #f5f6fa;
+    }
+    
+    .chat-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background-color: var(--primary-color);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 1.2em;
+    }
+    
+    .chat-info {
+        flex: 1;
+    }
+    
+    .chat-name {
+        font-weight: bold;
+        color: var(--text-color);
+        margin-bottom: 5px;
+    }
+    
+    .chat-last-message {
+        color: #8094ae;
+        font-size: 0.9em;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    
+    .chat-time {
+        color: #8094ae;
+        font-size: 0.85em;
+    }
+    
+    .unread-badge {
+        background-color: var(--primary-color);
+        color: white;
+        border-radius: 50%;
+        width: 25px;
+        height: 25px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.85em;
+        font-weight: bold;
+    }
+    
+    .user-list-item {
+        padding: 10px 15px;
+        border-bottom: 1px solid #dbdfea;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .user-list-item:hover {
+        background-color: #f5f6fa;
+    }
+    
+    .section-title {
+        padding: 15px;
+        background-color: #f5f6fa;
+        font-weight: bold;
+        color: var(--text-color);
+        border-bottom: 1px solid #dbdfea;
+    }
+</style>
+    <!-- end: Style -->
+        
+{% endblock %}
+
+
